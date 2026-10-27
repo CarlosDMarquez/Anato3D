@@ -1,0 +1,62 @@
+import { GRUPOS } from './grupos.js';
+import { LATIN } from './latin.js';
+import { MUSCULOS } from './musculos-fichas.js';
+
+// Ficha de un músculo o tendón a partir de los datos que trae el modelo (nombre en español y latín de
+// la traducción de Z-Anatomy, acción, inervación, región y capa) más la ficha escrita a mano si existe.
+
+const LAYER = { 1: 'Capa superficial', 2: 'Capa intermedia', 3: 'Capa profunda' };
+const cap = (s) => (s ? s[0].toUpperCase() + s.slice(1) : s);
+const parse = (s) => {
+  try { return JSON.parse(s || '[]'); } catch { return []; }
+};
+
+// Etimología generada palabra por palabra a partir del término latino.
+export function latinEtymology(latin) {
+  if (!latin) return null;
+  const words = latin.replace(/[()[\],]/g, ' ').split(/\s+/).filter(Boolean);
+  const parts = [];
+  const seen = new Set();
+  for (const w of words) {
+    const key = w.toLowerCase();
+    const meaning = LATIN[key];
+    if (!meaning || seen.has(key)) continue;
+    seen.add(key);
+    parts.push(`${w.toLowerCase()}, «${meaning}»`);
+  }
+  if (!parts.length) return null;
+  return `Del latín ${parts.join('; ')}.`;
+}
+
+export function resolveMuscle(name, x) {
+  const side = /_L$/.test(name) ? 'L' : /_R$/.test(name) ? 'R' : null;
+  const region = parse(x.region);
+  const nerves = parse(x.innervation_es);
+  // Ficha escrita: primero la del propio músculo, después la del músculo o grupo que lo contiene.
+  const key = String(x.name_en ?? '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '');
+  const entry = MUSCULOS[key] ?? [...region].reverse().map((g) => MUSCULOS[g]).find(Boolean) ?? null;
+  const group = [...region].reverse().map((g) => GRUPOS[g]).find(Boolean);
+  const fields = [
+    group && { label: 'Región', value: group.nombre },
+    x.function_es && { label: 'Acción', value: entry?.accion ?? x.function_es },
+    nerves.length && { label: 'Inervación', value: nerves.join(', ') },
+    entry?.origen && { label: 'Origen', value: entry.origen },
+    entry?.insercion && { label: 'Inserción', value: entry.insercion },
+  ].filter(Boolean);
+  const chips = [x.tissue === 'tendon' ? 'Tendón' : 'Músculo esquelético', LAYER[x.layer], side && (side === 'L' ? 'Lado izquierdo' : 'Lado derecho')].filter(Boolean);
+  return {
+    key: x.name_en,
+    side,
+    title: cap(x.name_es || x.name_en),
+    latin: x.name_la || null,
+    tissue: null,
+    chips,
+    fields,
+    entry: {
+      descripcion: entry?.descripcion ?? null,
+      etimologia: entry?.etimologia ?? latinEtymology(x.name_la),
+    },
+    datos: entry?.datos ?? [],
+    source: x.source ?? null,
+  };
+}

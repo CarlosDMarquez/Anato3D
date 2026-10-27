@@ -1,0 +1,44 @@
+{
+ "groups": {
+  "Lymph_nodes": {
+   "nombre": "Nodos linfáticos",
+   "latin": "Nodi lymphoidei"
+  },
+  "Lymph_nodes_of_neck": {
+   "nombre": "Nodos del cuello",
+   "latin": "Nodi lymphoidei colli"
+  },
+  "Lymph_nodes_of_upper_limb": {
+   "nombre": "Nodos del miembro superior",
+   "latin": "Nodi lymphoidei membri superioris"
+  },
+  "Abdominal_lymph_nodes": {
+   "nombre": "Nodos del abdomen",
+   "latin": "Nodi lymphoidei abdominis"
+  },
+  "Lymph_nodes_of_head": {
+   "nombre": "Nodos de la cabeza",
+   "latin": "Nodi lymphoidei capitis"
+  },
+  "Pharyngeal_lymphoid_ring": {
+   "nombre": "Anillo linfático de la faringe",
+   "latin": "Anulus lymphoideus pharyngis"
+  },
+  "Thymus": {
+   "nombre": "Timo",
+   "latin": "Thymus"
+  },
+  "Pelvic_lymph_nodes": {
+   "nombre": "Nodos de la pelvis",
+   "latin": "Nodi lymphoidei pelvis"
+  },
+  "Lymph_nodes_of_lower_limb": {
+   "nombre": "Nodos del miembro inferior",
+   "latin": "Nodi lymphoidei membri inferioris"
+  },
+  "Thoracic_lymph_nodes": {
+   "nombre": "Nodos del tórax",
+   "latin": "Nodi lymphoidei thoracis"
+  }
+ }
+}

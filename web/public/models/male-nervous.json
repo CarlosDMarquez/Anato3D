@@ -1,0 +1,644 @@
+{
+ "groups": {
+  "Central_nervous_system": {
+   "nombre": "Sistema nervioso central",
+   "latin": "Systema nervosum centrale"
+  },
+  "Meninges": {
+   "nombre": "Meninges",
+   "latin": "Meninges"
+  },
+  "Dura": {
+   "nombre": "Duramadre",
+   "latin": "Dura"
+  },
+  "Cranial_dura": {
+   "nombre": "Dura craneal",
+   "latin": "Dura cranialis"
+  },
+  "Tentorium_cerebelli": {
+   "nombre": "Tienda del cerebello",
+   "latin": "Tentorium cerebelli"
+  },
+  "Spinal_dura": {
+   "nombre": "Dura espinal",
+   "latin": "Dura spinalis"
+  },
+  "Leptomeninges": {
+   "nombre": "Leptomeninges",
+   "latin": "Leptomeninges"
+  },
+  "Pia": {
+   "nombre": "Piamadre",
+   "latin": "Pia"
+  },
+  "Cranial_pia": {
+   "nombre": "Pia craneal",
+   "latin": "Pia cranialis"
+  },
+  "Brain": {
+   "nombre": "Encéfalo",
+   "latin": "Encephalon"
+  },
+  "Cerebrum": {
+   "nombre": "Cerebro",
+   "latin": "Cerebrum"
+  },
+  "Telencephalon": {
+   "nombre": "Telencéfalo",
+   "latin": "Telencephalon"
+  },
+  "Temporal_lobe": {
+   "nombre": "Lóbulo temporal",
+   "latin": "Lobus temporalis"
+  },
+  "Occipital_lobe": {
+   "nombre": "Lóbulo occipital",
+   "latin": "Lobus occipitalis"
+  },
+  "Interlobular_sulci": {
+   "nombre": "Surcos interlobulares",
+   "latin": ""
+  },
+  "Frontal_lobe": {
+   "nombre": "Lóbulo frontal",
+   "latin": "Lobus frontalis"
+  },
+  "Inferior_frontal_gyrus": {
+   "nombre": "Giro frontal inferior",
+   "latin": "Gyrus frontalis inferior"
+  },
+  "Parietal_lobe": {
+   "nombre": "Lóbulo parietal",
+   "latin": "Lobus parietalis"
+  },
+  "Inferior_parietal_lobe": {
+   "nombre": "Lobulillo parietal inferior",
+   "latin": ""
+  },
+  "Superior_temporal_gyrus": {
+   "nombre": "Giro temporal superior",
+   "latin": "Gyrus temporalis superior"
+  },
+  "Occipitotemporal_gyri": {
+   "nombre": "Circunvoluciones occipitotemporales",
+   "latin": "Gyri occipitotemporales"
+  },
+  "Insula": {
+   "nombre": "Ínsula",
+   "latin": "Insula"
+  },
+  "Limbic_lobe": {
+   "nombre": "Lóbulo límbico",
+   "latin": "Lobus limbicus"
+  },
+  "Limbic_gyrus": {
+   "nombre": "Giro límbico",
+   "latin": "Gyrus limbicus"
+  },
+  "Fornicate_gyrus": {
+   "nombre": "Giro fornicato",
+   "latin": "Gyrus fornicatus"
+  },
+  "Hippocampus": {
+   "nombre": "Hipocampo",
+   "latin": "Hippocampus"
+  },
+  "Basal_forebrain": {
+   "nombre": "Prosencéfalo basal",
+   "latin": "Pars basalis telencephali"
+  },
+  "Amygdaloid_body": {
+   "nombre": "Cuerpo amigdaloide",
+   "latin": "Corpus amygdaloideum"
+  },
+  "Corpus_striatum": {
+   "nombre": "Cuerpo estriado",
+   "latin": "Corpus striatum"
+  },
+  "Dorsal_striatum": {
+   "nombre": "Estriado dorsal",
+   "latin": "Striatum dorsale"
+  },
+  "Caudate_nucleus": {
+   "nombre": "Núcleo caudado",
+   "latin": "Nucleus caudatus"
+  },
+  "Globus_pallidus": {
+   "nombre": "Globo pálido",
+   "latin": "Globus pallidus"
+  },
+  "White_matter_of_telencephalon": {
+   "nombre": "Sustancia blanca del telencéfalo",
+   "latin": "Substantia alba telencephali"
+  },
+  "Internal_capsule": {
+   "nombre": "Capsula interna",
+   "latin": "Capsula interna"
+  },
+  "Commissural_fibres_of_telencephalon": {
+   "nombre": "Fibras comisurales del telencéfalo",
+   "latin": "Fibrae commissurales telencephali"
+  },
+  "Corpus_callosum": {
+   "nombre": "Cuerpo calloso",
+   "latin": "Corpus callosum"
+  },
+  "Anterior_commissure": {
+   "nombre": "Comisura anterior",
+   "latin": "Commissura anterior"
+  },
+  "Projection_fibers_of_telencephalon": {
+   "nombre": "Fibras de proyección del telencéfalo",
+   "latin": ""
+  },
+  "Fornix": {
+   "nombre": "Fórnix",
+   "latin": "Fornix"
+  },
+  "Lateral_ventricle": {
+   "nombre": "Ventrículo lateral",
+   "latin": "Ventriculus lateralis"
+  },
+  "Walls_of_lateral_ventricle": {
+   "nombre": "Paredes del ventrículo lateral",
+   "latin": "Parietes ventriculi lateralis"
+  },
+  "Septum_pellucidum": {
+   "nombre": "Septo pelúcido",
+   "latin": "Septum pellucidum"
+  },
+  "Diencephalon": {
+   "nombre": "Diencéfalo",
+   "latin": "Diencephalon"
+  },
+  "Habenula": {
+   "nombre": "Habénula",
+   "latin": "Habenula"
+  },
+  "Optic_tract": {
+   "nombre": "Tracto óptico",
+   "latin": "Tractus opticus"
+  },
+  "Thalamus": {
+   "nombre": "Tálamo",
+   "latin": "Thalamus"
+  },
+  "Hypothalamus": {
+   "nombre": "Hipotálamo",
+   "latin": "Hypothalamus"
+  },
+  "White_matter_of_diencephalon": {
+   "nombre": "Sustancia blanca del diencéfalo",
+   "latin": "Substantia alba diencephali"
+  },
+  "Third_ventricle": {
+   "nombre": "Tercer ventrículo",
+   "latin": "Ventriculus tertius"
+  },
+  "Cerebellum": {
+   "nombre": "Cerebelo",
+   "latin": "Cerebellum"
+  },
+  "Cerebellar_peduncles": {
+   "nombre": "Pedúnculos cerebelosos",
+   "latin": "Pedunculi cerebellares"
+  },
+  "Superior_cerebellar_peduncle": {
+   "nombre": "Pedúnculo cerebeloso superior",
+   "latin": "Pedunculus cerebellaris superior"
+  },
+  "Brainstem": {
+   "nombre": "Tronco encefálico",
+   "latin": "Trucus encephali"
+  },
+  "Midbrain": {
+   "nombre": "Mesencéfalo",
+   "latin": "Mesencephalon"
+  },
+  "Cerebral_peduncle": {
+   "nombre": "Pedúnculo cerebral",
+   "latin": "Pedunculus cerebri"
+  },
+  "Tegmentum_of_midbrain": {
+   "nombre": "Tegmento del mesencéfalo",
+   "latin": "Tegmentum mesencephali"
+  },
+  "Grey_matter_of_tegmentum_of_midbrain": {
+   "nombre": "Sustancia gris del tegmento del mesencéfalo",
+   "latin": "Substantia grisea tegmenti mesencephali"
+  },
+  "Oculomotor_complex": {
+   "nombre": "Complejo oculomotor",
+   "latin": "Complexus oculomotorius"
+  },
+  "Central_mesencephalic_structures": {
+   "nombre": "Estructuras mesencefálicas centrales",
+   "latin": "Structurae centrales mesencephali"
+  },
+  "Tectum_of_midbrain": {
+   "nombre": "Techo del mesencéfalo",
+   "latin": "Tectum mesencephali"
+  },
+  "Superior_colliculus": {
+   "nombre": "Colículo superior",
+   "latin": "Colliculus superior"
+  },
+  "Inferior_colliculus": {
+   "nombre": "Colículo inferior",
+   "latin": "Colliculus inferior"
+  },
+  "Pons": {
+   "nombre": "Puente troncoencefálico",
+   "latin": "Pons"
+  },
+  "Tegmentum_of_pons": {
+   "nombre": "Tegmento del pons",
+   "latin": "Tegmentum pontis"
+  },
+  "Grey_matter_of_pontine_tegmentum": {
+   "nombre": "Sustancia gris del tegmento pontino",
+   "latin": "Substantia grisea tegmenti pontis"
+  },
+  "Vestibular_nuclei": {
+   "nombre": "Núcleos vestibulares",
+   "latin": "Nuclei vestibulares"
+  },
+  "Fourth_ventricle": {
+   "nombre": "Cuarto ventrículo",
+   "latin": "Ventriculus quartus"
+  },
+  "Medulla_oblongata": {
+   "nombre": "Bulbo raquídeo",
+   "latin": "Medulla oblongata"
+  },
+  "Grey_matter_of_medulla_oblongata": {
+   "nombre": "Materia gris del bulbo raquídeo",
+   "latin": "Substantia grisea medullae oblongatae"
+  },
+  "Spinal_cord": {
+   "nombre": "Médula espinal",
+   "latin": "Medulla spinalis"
+  },
+  "Grey_matter_of_spinal_cord": {
+   "nombre": "Sustancia gris de la médula espinal",
+   "latin": "Substantia grisea medullae spinalis"
+  },
+  "Anterior_horn_of_spinal_cord": {
+   "nombre": "Cuerno anterior de la médula espinal",
+   "latin": "Cornu anterius medullae spinalis"
+  },
+  "Central_structures_of_spinal_cord": {
+   "nombre": "Estructuras centrales de la médula espinal",
+   "latin": "Structurae centrales medullae spinalis"
+  },
+  "Peripheral_nervous_system": {
+   "nombre": "Sistema nervioso periférico",
+   "latin": "Systema nervosum periphericum"
+  },
+  "Cranial_nerves": {
+   "nombre": "Nervios craneales",
+   "latin": "Nervi craniales"
+  },
+  "Olfactory_nerve_I": {
+   "nombre": "Nervio olfatorio (I)",
+   "latin": "Nervus olfactorius (I)"
+  },
+  "Optic_nerve_II": {
+   "nombre": "Nervio óptico (II)",
+   "latin": "Nervus opticus (II)"
+  },
+  "Oculomotor_nerve_III": {
+   "nombre": "Nervio oculomotor (III)",
+   "latin": "Nervus oculomotorius (III)"
+  },
+  "Trigeminal_nerve_V": {
+   "nombre": "Nervio trigémino (V)",
+   "latin": "Nervus trigeminus (V)"
+  },
+  "Sensory_root_of_trigeminal_nerve": {
+   "nombre": "Raíz sensorial del nervio trigémino",
+   "latin": "Radix sensoria nervi trigemini"
+  },
+  "Facial_nerve_VII": {
+   "nombre": "Nervio facial (VII)",
+   "latin": "Nervus facialis (VII)"
+  },
+  "Chorda_tympani": {
+   "nombre": "Cuerda del tímpano",
+   "latin": "Chorda tympani"
+  },
+  "Vestibulocochlear_nerve_VIII": {
+   "nombre": "Nervio vestibulococlear (VIII)",
+   "latin": "Nervus vestibulocochlearis (VIII)"
+  },
+  "Vestibular_nerve": {
+   "nombre": "Nervio vestibular",
+   "latin": "Nervus vestibularis"
+  },
+  "Cochlear_nerve": {
+   "nombre": "Nervio coclear",
+   "latin": "Nervus cochlearis"
+  },
+  "Glossopharyngeal_nerve_IX": {
+   "nombre": "Nervio glosofaringeo (IX)",
+   "latin": "Nervus glossopharyngeus (IX)"
+  },
+  "Vagus_nerve_X": {
+   "nombre": "Nervio vago (X)",
+   "latin": "Nervus vagus (X)"
+  },
+  "Accessory_nerve_XI": {
+   "nombre": "Nervio accesorio (XI)",
+   "latin": "Nervus accessorius (XI)"
+  },
+  "Hypoglossal_nerve_XII": {
+   "nombre": "Nervio hipogloso (XII)",
+   "latin": "Nervus hypoglossus (XII)"
+  },
+  "Nerves": {
+   "nombre": "Nervios",
+   "latin": "Nervorum"
+  },
+  "Spinal_nerves": {
+   "nombre": "Nervios espinales",
+   "latin": "Nervi spinales"
+  },
+  "Brachial_plexus": {
+   "nombre": "Plexo braquial",
+   "latin": "Plexus brachialis"
+  },
+  "Supraclavicular_part_of_brachial_plexus": {
+   "nombre": "Parte supraclavicular del plexo braquial",
+   "latin": "Pars supraclavicularis plexus brachialis"
+  },
+  "Superior_trunk_of_brachial_plexus": {
+   "nombre": "Tronco superior del plexo braquial",
+   "latin": "Truncus superior plexus brachialis"
+  },
+  "Middle_trunk_of_brachial_plexus": {
+   "nombre": "Tronco medio del plexo braquial",
+   "latin": "Truncus medius plexus brachialis"
+  },
+  "Inferior_trunk_of_brachial_plexus": {
+   "nombre": "Tronco inferior del plexo braquial",
+   "latin": "Truncus inferior plexus brachialis"
+  },
+  "Supraclavicular_branches_of_brachial_plexus": {
+   "nombre": "Ramas supraclaviculares del plexo braquial",
+   "latin": "Rami supraclaviculares plexus brachialis"
+  },
+  "Dorsal_scapular_nerve": {
+   "nombre": "Nervio escapular dorsal",
+   "latin": "Nervus dorsalis scapulae"
+  },
+  "Long_thoracic_nerve": {
+   "nombre": "Nervio torácico largo",
+   "latin": "Nervus thoracicus longus"
+  },
+  "Suprascapular_nerve": {
+   "nombre": "Nervio supraescapular",
+   "latin": "Nervus suprascapularis"
+  },
+  "Subclavian_nerve": {
+   "nombre": "Nervio subclavio",
+   "latin": "Nervus subclavius"
+  },
+  "Branches_of_posterior_cord_of_brachial_plexus": {
+   "nombre": "Ramas del fascículo posterior del plexo braquial",
+   "latin": "Rami fasciculi posterioris plexus brachialis"
+  },
+  "Axillary_nerve": {
+   "nombre": "Nervio axilar",
+   "latin": "Nervus axillaris"
+  },
+  "Infraclavicular_part_of_brachial_plexus": {
+   "nombre": "Parte infraclavicular del plexo braquial",
+   "latin": "Pars infraclavicularis plexus brachialis"
+  },
+  "Branches_of_lateral_cord_of_brachial_plexus": {
+   "nombre": "Ramas del fascículo lateral del plexo braquial",
+   "latin": "Rami fasciculi lateralis plexus brachialis"
+  },
+  "Lateral_pectoral_nerve": {
+   "nombre": "Nervio pectoral lateral",
+   "latin": "Nervus pectoralis lateralis"
+  },
+  "Musculocutaneous_nerve": {
+   "nombre": "Nervio musculocutáneo",
+   "latin": "Nervus musculocutaneus"
+  },
+  "Radial_nerve": {
+   "nombre": "Nervio radial",
+   "latin": "Nervus radialis"
+  },
+  "Deep_branch_of_radial_nerve": {
+   "nombre": "Rama profunda del nervio radial",
+   "latin": "Ramus profundus nervi radialis"
+  },
+  "Superficial_branch_of_radial_nerve": {
+   "nombre": "Rama superficial del nervio radial",
+   "latin": "Ramus superficialis nervi radialis"
+  },
+  "Branches_of_medial_cord_of_brachial_plexus": {
+   "nombre": "Ramas del fascilculo medial del plexo braquial",
+   "latin": "Rami fasciculi medialis plexus brachialis"
+  },
+  "Medial_antebrachial_cutaneous_nerve": {
+   "nombre": "Nervio cutáneo antebraquial medial",
+   "latin": "Nervus cutaneus medialis antebrachii"
+  },
+  "Ulnar_nerve": {
+   "nombre": "Nervio ulnar",
+   "latin": "Nervus ulnaris"
+  },
+  "Dorsal_branch_of_ulnar_nerve": {
+   "nombre": "Rama dorsal del nervio ulnar",
+   "latin": "Ramus dorsalis nervi ulnaris"
+  },
+  "Superficial_branch_of_ulnar_nerve": {
+   "nombre": "Rama superficial del nervio ulnar",
+   "latin": "Ramus superficialis nervi ulnaris"
+  },
+  "Common_palmar_digital_branches_of_ulnar_nerve": {
+   "nombre": "Ramas digitales palmares comunes del nervio ulnar",
+   "latin": "Rami digitales palmares communes nervi ulnaris"
+  },
+  "Median_nerve": {
+   "nombre": "Nervio mediano",
+   "latin": "Nervus medianus"
+  },
+  "Common_palmar_digital_branches_of_median_nerve": {
+   "nombre": "Ramas digitales palmares comunes del nervio mediano",
+   "latin": "Rami digitales palmares communes nervi mediani"
+  },
+  "Thoracic_nerves": {
+   "nombre": "Nervios torácicos",
+   "latin": "Nervi thoracici"
+  },
+  "Anterior_rami_of_thoracic_nerves": {
+   "nombre": "Ramos anteriores de los nervios torácicos",
+   "latin": ""
+  },
+  "Intercostal_nerves": {
+   "nombre": "Nervios intercostales",
+   "latin": "Nervi intercostales"
+  },
+  "Lumbar_nerves": {
+   "nombre": "Nervios lumbares",
+   "latin": "Nervi lumbales"
+  },
+  "Anterior_rami_of_lumbar_nerves": {
+   "nombre": "Ramas anteriores de los nervios lumbares",
+   "latin": "Rami anteriores nervorum lumbalium"
+  },
+  "Iliohypogastric_nerve": {
+   "nombre": "Nervio iliohipogástrico",
+   "latin": "Nervus iliohypogastricus"
+  },
+  "Ilio_inguinal_nerve": {
+   "nombre": "Nervio ilioinguinal",
+   "latin": "Nervus ilioinguinalis"
+  },
+  "Lumbosacral_plexus": {
+   "nombre": "Plexo lumbosacro",
+   "latin": "Plexus lumbosacralis"
+  },
+  "Lumbar_plexus": {
+   "nombre": "Plexo lumbar",
+   "latin": "Plexus lumbalis"
+  },
+  "Branches_of_posterior_part_of_lumbar_plexus": {
+   "nombre": "Ramas de la parte posterior del plexo lumbar",
+   "latin": "Rami partis posterioris plexus lumbalis"
+  },
+  "Femoral_nerve": {
+   "nombre": "Nervio femoral",
+   "latin": "Nervus femoralis"
+  },
+  "Saphenous_nerve": {
+   "nombre": "Nervio safeno",
+   "latin": "Nervus saphenus"
+  },
+  "Branches_of_anterior_part_of_lumbar_plexus": {
+   "nombre": "Ramas de la parte anterior del plexo lumbar",
+   "latin": "Rami partis anterioris plexus lumbalis"
+  },
+  "Obturator_nerve": {
+   "nombre": "Nervio obturador",
+   "latin": "Nervus obturatorius"
+  },
+  "Posterior_branch_of_obturator_nerve": {
+   "nombre": "Rama posterior del nervio obturador",
+   "latin": "Ramus posterior nervi obturatorii"
+  },
+  "Anterior_branch_of_obturator_nerve": {
+   "nombre": "Rama anterior del nervio obturador",
+   "latin": "Ramus anterior nervi obturatorii"
+  },
+  "Sacral_plexus": {
+   "nombre": "Plexo sacro",
+   "latin": "Plexus sacralis"
+  },
+  "Sciatic_nerve": {
+   "nombre": "Nervio ciático",
+   "latin": "Nervus ischiadicus"
+  },
+  "Common_fibular_nerve": {
+   "nombre": "Nervio fibular común",
+   "latin": "Nervus fibularis communis"
+  },
+  "Superficial_fibular_nerve": {
+   "nombre": "Nervio fibular superficial",
+   "latin": "Nervus fibularis superficialis"
+  },
+  "Deep_fibular_nerve": {
+   "nombre": "Nervio fibular profundo",
+   "latin": "Nervus fibularis profundus"
+  },
+  "Tibial_nerve": {
+   "nombre": "Nervio tibial",
+   "latin": "Nervus tibialis"
+  },
+  "Medial_plantar_nerve": {
+   "nombre": "Nervio plantar medial",
+   "latin": "Nervus plantaris medialis"
+  },
+  "Lateral_plantar_nerve": {
+   "nombre": "Nervio plantar lateral",
+   "latin": "Nervus plantaris lateralis"
+  },
+  "Automatic_division_of_peripheral_nervous_system": {
+   "nombre": "Sistema nervioso autónomo",
+   "latin": ""
+  },
+  "Thoracolumbar_part_of_autonomic_division": {
+   "nombre": "Parte toracolumbar de la división autónoma",
+   "latin": "Pars thoracolumbalis divisionis autonomicae"
+  },
+  "Sympathetic_trunk": {
+   "nombre": "Tronco simpático",
+   "latin": "Truncus sympathicus"
+  },
+  "Sense_organs": {
+   "nombre": "Órganos de los sentidos",
+   "latin": "Organa sensuum"
+  },
+  "Eye": {
+   "nombre": "Ojo",
+   "latin": "Oculus"
+  },
+  "Accessory_visual_structures": {
+   "nombre": "Estructuras visuales accesorias",
+   "latin": "Structurae accessoriae oculi"
+  },
+  "Lacrimal_apparatus": {
+   "nombre": "Órgano lagrimal",
+   "latin": "Apparatus lacrimalis"
+  },
+  "Lacrimal_gland": {
+   "nombre": "Glándula lagrimal",
+   "latin": "Glandula lacrimalis"
+  },
+  "Lacrimal_canliculus": {
+   "nombre": "Canalículo lagrimal",
+   "latin": ""
+  },
+  "Lacrimal_sac": {
+   "nombre": "Saco lagrimal",
+   "latin": "Saccus lacrimalis"
+  },
+  "Nasolacrimal_duct": {
+   "nombre": "Canal nasolagrimal",
+   "latin": "Ductus nasolacrimalis"
+  },
+  "Ear": {
+   "nombre": "Oído",
+   "latin": "Auris"
+  },
+  "External_ear": {
+   "nombre": "Oído externo",
+   "latin": "Auris externa"
+  },
+  "Tympanic_membrane": {
+   "nombre": "Membrana timpánica",
+   "latin": "Membrana tympanica"
+  },
+  "Internal_ear": {
+   "nombre": "Oído interno",
+   "latin": "Auris interna"
+  },
+  "Bony_labyrinth": {
+   "nombre": "Laberinto óseo",
+   "latin": "Labyrinthus osseus"
+  },
+  "Vestibule": {
+   "nombre": "Vestíbulo",
+   "latin": "Vestibulum"
+  },
+  "Cochlea": {
+   "nombre": "Cóclea",
+   "latin": "Cochlea"
+  }
+ }
+}

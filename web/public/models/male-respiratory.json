@@ -1,0 +1,28 @@
+{
+ "groups": {
+  "Tracheobronchial_tree": {
+   "nombre": "Árbol traqueobronquial",
+   "latin": "Arbor tracheobronchialis"
+  },
+  "Bronchi": {
+   "nombre": "Bronquios",
+   "latin": "Bronchi"
+  },
+  "Lungs": {
+   "nombre": "Pulmones",
+   "latin": "Pulmones"
+  },
+  "Upper_respiratory_tract": {
+   "nombre": "Vías respiratorias altas",
+   "latin": ""
+  },
+  "Nose": {
+   "nombre": "Nariz",
+   "latin": "Nasus"
+  },
+  "Larynx": {
+   "nombre": "Laringe",
+   "latin": "Larynx"
+  }
+ }
+}

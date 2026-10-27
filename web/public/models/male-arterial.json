@@ -1,0 +1,72 @@
+{
+ "groups": {
+  "Heart": {
+   "nombre": "Corazón",
+   "latin": "Cor"
+  },
+  "Trunk": {
+   "nombre": "Tronco",
+   "latin": "Truncus"
+  },
+  "Pulmonary_vessels": {
+   "nombre": "Vasos pulmonares",
+   "latin": "Vasa pulmonalia"
+  },
+  "Pulmonary_arteries": {
+   "nombre": "Arterias pulmonares",
+   "latin": "Arteriae pulmonales"
+  },
+  "Right_pulmonary_artery": {
+   "nombre": "Arteria pulmonar derecha",
+   "latin": "Arteria pulmonalis dextra"
+  },
+  "Left_pulmonary_artery": {
+   "nombre": "Arteria pulmonar izquierda",
+   "latin": "Arteria pulmonalis sinistra"
+  },
+  "Cardiac_vessels": {
+   "nombre": "Vasos del corazón",
+   "latin": "Vasa cardiaca"
+  },
+  "Arteries_of_heart": {
+   "nombre": "Arterias del corazón",
+   "latin": "Arteriae cardiacae"
+  },
+  "Systemic_arteries": {
+   "nombre": "Arterias sistémicas",
+   "latin": "Arteriae systematicae"
+  },
+  "Aorta": {
+   "nombre": "Aorta",
+   "latin": "Aorta"
+  },
+  "Trunk.001": {
+   "nombre": "Tronco",
+   "latin": "Truncus"
+  },
+  "Head": {
+   "nombre": "Cabeza",
+   "latin": "Caput"
+  },
+  "Subclavian_artery": {
+   "nombre": "Arteria subclavia",
+   "latin": "Arteria subclavia"
+  },
+  "Vertebral_artery": {
+   "nombre": "Arteria vertebral",
+   "latin": "Arteria vertebralis"
+  },
+  "Neck": {
+   "nombre": "Cuello",
+   "latin": "Collum"
+  },
+  "Upper_limb": {
+   "nombre": "Miembro superior",
+   "latin": "Membrum superius"
+  },
+  "Lower_limb": {
+   "nombre": "Miembro inferior",
+   "latin": "Membrum inferius"
+  }
+ }
+}

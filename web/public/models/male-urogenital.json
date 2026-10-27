@@ -1,0 +1,28 @@
+{
+ "groups": {
+  "Urinary_system": {
+   "nombre": "Sistema urinario",
+   "latin": "Systema urinarium"
+  },
+  "Kidney": {
+   "nombre": "Riñón",
+   "latin": "Ren"
+  },
+  "Male_genital_system": {
+   "nombre": "Órganos genitales masculinos",
+   "latin": "Systema genitale masculinum"
+  },
+  "Male_internal_genitalia": {
+   "nombre": "Órganos genitales internos",
+   "latin": "Organa genitalia masculina interna"
+  },
+  "Male_external_genitalia": {
+   "nombre": "Órganos genitales externos",
+   "latin": "Organa genitalia masculina externa"
+  },
+  "Penis": {
+   "nombre": "Pene",
+   "latin": "Penis"
+  }
+ }
+}

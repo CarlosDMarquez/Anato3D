@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0d11" />
+    <title>Anato3D</title>
+  </head>
+  <body>
+    <div id="app">
+      <div id="stage"></div>
+
+      <header class="brandbar">
+        <p class="brand">Anato<b>3D</b></p>
+        <div id="model-switch" class="segmented" role="group" aria-label="Modelo">
+          <button data-model="male" data-sysicon="male"><span>Masculino</span></button>
+          <button data-model="female" data-sysicon="female"><span>Femenino</span></button>
+        </div>
+        <p id="model-detail" class="model-detail"></p>
+      </header>
+
+      <nav class="toolbar" aria-label="Herramientas">
+        <button id="btn-home" data-icon="home" data-tip="Inicio" aria-label="Inicio"></button>
+        <button id="btn-undo" data-icon="undo" data-tip="Deshacer" aria-label="Deshacer"></button>
+        <hr />
+        <button data-panel="search" data-icon="search" data-tip="Buscar" aria-label="Buscar"></button>
+        <button data-panel="tools" data-icon="tools" data-tip="Herramientas" aria-label="Herramientas"></button>
+        <button data-panel="settings" data-icon="settings" data-tip="Ajustes" aria-label="Ajustes"></button>
+        <button data-panel="help" data-icon="help" data-tip="Ayuda" aria-label="Ayuda"></button>
+      </nav>
+
+      <section class="panel" id="panel-search" aria-label="Buscar">
+        <div class="panel-head"><h2>Buscar</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+        <input id="search-input" type="search" placeholder="Estructura, región o término latino" autocomplete="off" />
+        <ul id="search-results" class="results"></ul>
+      </section>
+
+      <section class="panel" id="panel-tools" aria-label="Herramientas">
+        <div class="panel-head"><h2>Herramientas</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+        <h3>Vistas</h3>
+        <div class="grid-btns">
+          <button data-tool="anterior">Anterior</button>
+          <button data-tool="posterior">Posterior</button>
+          <button data-tool="derecha">Lateral derecha</button>
+          <button data-tool="izquierda">Lateral izquierda</button>
+          <button data-tool="superior">Superior</button>
+          <button data-tool="rotate">Rotación automática</button>
+        </div>
+        <h3>Estructuras</h3>
+        <div class="grid-btns">
+          <button data-tool="show-all" class="wide">Restaurar ocultas y atenuadas</button>
+        </div>
+        <h3>Atajos de teclado</h3>
+        <dl class="keys">
+          <dt><kbd>H</kbd></dt><dd>Ocultar</dd>
+          <dt><kbd>I</kbd></dt><dd>Aislar</dd>
+          <dt><kbd>V</kbd></dt><dd>Transparentar</dd>
+          <dt><kbd>F</kbd></dt><dd>Centrar</dd>
+          <dt><kbd>/</kbd></dt><dd>Buscar</dd>
+          <dt><kbd>⌘Z</kbd></dt><dd>Deshacer</dd>
+        </dl>
+      </section>
+
+      <section class="panel" id="panel-settings" aria-label="Ajustes">
+        <div class="panel-head"><h2>Ajustes</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+        <label class="switch"><span>Alta calidad (resolución y sombras de contacto)</span><input id="set-quality" type="checkbox" checked /></label>
+        <label class="switch"><span>Resaltar al pasar el cursor</span><input id="set-hover" type="checkbox" checked /></label>
+        <label class="switch"><span>Mostrar genitales externos</span><input id="set-genitals" type="checkbox" checked /></label>
+        <p class="setting-note">Desactívalo para usar la app con público general: se ocultan la piel genital, el pene y el escroto con su contenido. Los órganos internos (próstata, vejiga…) siguen visibles.</p>
+      </section>
+
+      <section class="panel" id="panel-help" aria-label="Ayuda">
+        <div class="panel-head"><h2>Ayuda</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+        <h3>Cómo usar</h3>
+        <dl class="howto">
+          <dt>Girar</dt><dd>Arrastra con un dedo o con el ratón.</dd>
+          <dt>Zoom</dt><dd>Pellizca o usa la rueda.</dd>
+          <dt>Desplazar</dt><dd>Arrastra con dos dedos o con el botón derecho.</dd>
+          <dt>Seleccionar</dt><dd>Toca una estructura; con doble clic te acercas.</dd>
+          <dt>Regiones</dt><dd>Toca la ruta de la ficha para seleccionar el grupo completo.</dd>
+          <dt>Sistemas</dt><dd>Toca un sistema para pasar por sus capas; mantenlo presionado para elegir una.</dd>
+        </dl>
+        <h3>Créditos</h3>
+        <p class="small">Huesos, cartílagos, músculos, ligamentos, fascias, vasos, corazón, sistema nervioso, órganos de los sentidos y vísceras derivados de <b>Z-Anatomy</b> (CC BY-SA 4.0), basado en <b>BodyParts3D</b> © The Database Center for Life Science (DBCLS); nombres en español y latín de su traducción oficial. Piel derivada de <b>MakeHuman</b>. Iconos de sistemas: <b>Health Icons</b>; iconos de interfaz: <b>Lucide</b>; tipografía <b>IBM Plex</b>.</p>
+        <p class="small muted">Anato3D es una herramienta educativa y no sustituye la consulta con profesionales de la salud.</p>
+      </section>
+
+      <aside id="info" class="info" aria-live="polite"></aside>
+
+      <div id="pin" class="pin" hidden>
+        <svg class="pin-lines"><polyline /></svg>
+        <span class="pin-dot"></span>
+        <div class="pin-label"><b></b><i></i></div>
+      </div>
+
+      <div id="status-pill" class="status-pill" hidden><span></span><button>Restaurar</button></div>
+
+      <footer class="dock-wrap">
+        <div id="dock" class="dock" role="toolbar" aria-label="Sistemas"></div>
+      </footer>
+
+      <div id="popover" class="popover" hidden></div>
+      <div id="tooltip" class="tooltip" hidden></div>
+      <div id="toast" class="toast" hidden></div>
+      <div id="loader" class="loader">
+        <p class="brand big">Anato<b>3D</b></p>
+        <div class="loader-track"><div id="loader-bar"></div></div>
+        <p id="loader-label">Cargando…</p>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
