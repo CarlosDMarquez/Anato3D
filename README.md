@@ -17,7 +17,8 @@ Abre http://localhost:5173 (o el puerto que indique Vite). Para producción: `np
 | Ruta | Qué es |
 |---|---|
 | `*.blend`, `*.glb` (raíz) | Modelos fuente. Fase 1 = piel + ojos; Fase 2 (masculino) = esqueleto completo. |
-| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `export_glb.py`, `build_all.sh` (regenera todos los sistemas) y `audit_models.py` (busca errores medibles en los modelos). |
+| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app) y `audit_models.py` (busca errores medibles en los modelos). |
+| `Anato3D_Male_30_Fase2_musculature.npz` | Campo de desplazamiento de la complexión musculosa (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas). |
 | `sources/originals/` | Copia de los modelos tal como estaban antes de corregir el cuello. |
 | `sources/z-anatomy/` | Z-Anatomy descargado, con su traducción oficial (`translations.csv`) y TA2. No se publica. |
 | `build/` | Resultados intermedios (`male_muscular.blend`, estadísticas). |
@@ -344,6 +345,59 @@ Comparada con una imagen de referencia de un atlas 3D (vista anterior, capa supe
 - **Auditoría:** músculos dentro del hueso, 0 % (sin cambios); choques, 63 (sin cambios).
 
 **Diferencias que quedan:** la referencia es un modelo más ancho y musculoso (hombros, brazos, tórax): los músculos siguen la piel de MakeHuman. Los testículos se ven blancos (la túnica albugínea); en la referencia, cubiertos por la fascia espermática, son rosados.
+
+## Fase 9: complexión musculosa y mejoras de la web (2026-10-29)
+
+Encargo: «un cuerpo más ancho y musculoso como el de la referencia (hombros, brazos y tórax)».
+
+**Medido contra la referencia** (ancho del contorno en la vista anterior de la capa muscular, en fracción de la estatura):
+- **Brazo:** a la altura del deltoides, 0,038 frente a 0,047.
+- **Antebrazo bajo el codo:** 0,045 frente a 0,051–0,052.
+- **Pantorrilla:** 0,049 frente a 0,057.
+- **Línea de los hombros:** al 17,5 % de la estatura medía 0,186 frente a 0,243. Los hombros de MakeHuman caen: el acromion quedaba ~2,5 cm más bajo respecto al mentón y el trapecio apenas subía por el cuello.
+- **Lo que no apretaba la piel:** solo el trapecio (hasta 9 mm). Los demás músculos del brazo y del tórax eran así de delgados.
+
+**Arreglos:**
+- **Hombros (`proportions.py`, `raise_shoulders`; `fix_neck.py`, paso 3a2):**
+  - la clavícula gira 8° sobre su extremo esternal y el acromion sube 2 cm;
+  - la escápula la sigue (lo que se mueve la articulación acromioclavicular);
+  - el brazo entero sube con ella y se separa 3° del tronco.
+  - Todo son movimientos rígidos: los huesos siguen siendo transformaciones afines de Z-Anatomy, y los tramos de los huesos largos (`segments`) se mueven con ellos.
+  - La piel sigue a cada hueso con pesos suaves.
+- **Complexión (`musculature.py`; `fix_neck.py`, paso 3c3):**
+  - La piel sale un abultamiento por músculo, medido contra la referencia: deltoides (13 mm hacia fuera), bíceps y tríceps (8), antebrazo bajo el codo (6–8), pectoral (9), trapecio superior (22), dorsal ancho y serrato (8), flancos (10) y pantorrilla (7–8). Después se suaviza y va según la normal suavizada.
+  - Donde la piel tiene otra piel enfrente (el brazo frente al tórax), sale como mucho un tercio del hueco.
+  - Un campo de desplazamiento en el volumen (rejilla de 6 mm) lleva con ella lo que hay dentro: cero en los huesos, el de la piel en la piel y armónico (Laplace, sobrerrelajación rojo-negro) entre medias.
+    - Se guarda en `Anato3D_Male_30_Fase2_musculature.npz` (0,8 MB).
+    - `Fitter.deform` lo aplica después del ajuste por huesos a todo lo que ajusta: músculos, vasos, nervios y vísceras se engrosan a la vez, sin cruzarse.
+    - El músculo junto a la piel sale tanto como ella y el que está sobre el hueso casi no se mueve.
+  - El paso es determinista: dos ejecuciones dan el mismo campo.
+- **Resultado (mismas medidas):**
+
+| | Antes | Ahora | Referencia |
+|---|---|---|---|
+| Línea de los hombros | 0,186 | 0,236 | 0,243 |
+| Contorno a la altura del deltoides | 0,266 | 0,274 | 0,269–0,275 |
+| Antebrazo | 0,045 | 0,049–0,051 | 0,051–0,052 |
+| Pantorrilla | 0,049 | 0,053 | 0,057–0,058 |
+
+  - La cintura sigue más estrecha que la de la referencia: el tronco queda en V.
+- **Auditoría:** los mismos 63 choques, ninguno nuevo. 7 piezas empeoran, todas por menos de 3 mm: el nervio supraescapular roza la escápula 1,7 mm, y el conducto deferente derecho sale 2,7 mm de la piel, bajo la piel genital.
+
+**Web:**
+- **Búsqueda en todos los sistemas:** `tools/search_index.py` escribe `male-index.json` con el nombre y los datos de ficha de las 2.602 piezas de los sistemas que se descargan aparte (511 KB, 54 KB comprimido).
+  - Buscar «bíceps» antes de abrir el sistema muscular solo daba dos bolsas sinoviales del bíceps femoral.
+  - Al elegir un resultado, se descarga su sistema, se activa la capa que lo muestra y se selecciona.
+  - Los resultados dicen el lado (izq./der.); antes los dos lados salían como uno.
+- **Texturas de los huesos en WebP** (`EXT_texture_webp`): `male.glb` baja de 14,8 a 11,2 MB.
+- **Barra de sistemas:** en pantallas estrechas, los bordes se difuminan mientras haya más sistemas a ese lado; al tocar uno, se centra.
+- **Programas de sombreado:** se compilan antes de añadir un sistema a la escena, para que no aparezca un instante blanco.
+- **Página:**
+  - título y descripción;
+  - icono (`favicon.svg`, iconos de 180, 192 y 512 px);
+  - manifiesto para instalarla como app en el móvil.
+- **Cabecera:** «Hombre adulto · 12 sistemas» en lugar de «Fase 4 · 12 sistemas».
+- **Errata:** «Cabeza corta músculo del bíceps braquial» → «Cabeza corta del músculo bíceps braquial».
 
 ## Auditoría (`tools/audit_models.py`)
 

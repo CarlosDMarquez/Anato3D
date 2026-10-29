@@ -160,3 +160,91 @@ def skin_displacement(W, edges, bone_objs, world, fields, crotch_z):
         wl = smooth(side * below * (~hand_or_arm), 4)
         D += wl[:, None] * fields[f'leg_{s}'].displace(W, smooth=True)
     return D
+
+
+# ── Cintura escapular ───────────────────────────────────────────────────────
+# Los hombros de MakeHuman caen: frente a la imagen de referencia, con la misma estatura, el acromion quedaba ~2,5 cm más
+# bajo respecto al mentón, las clavículas horizontales y el brazo más pegado al tronco (la mano, ~3 cm más adentro).
+# La clavícula gira sobre su extremo esternal hasta subir el acromion SHOULDER_RISE; la escápula la sigue (se traslada
+# lo que se mueve la articulación acromioclavicular), y el brazo entero, con una abducción de ABDUCTION grados sobre el
+# hombro. Todo son movimientos rígidos (los huesos siguen siendo transformaciones afines de Z-Anatomy). La piel sigue a
+# cada hueso con pesos suaves, como en las extremidades: sube el hombro, el trapecio queda más inclinado y el cuello y
+# el tórax no se mueven.
+SHOULDER_RISE = 0.02
+ABDUCTION = 3.0
+
+
+def _rot_xz(angle, center):
+    """Giro en el plano frontal (alrededor del eje y) por `center`, como función de puntos (n, 3)."""
+    c, s = np.cos(angle), np.sin(angle)
+    R = np.array([[c, 0, -s], [0, 1, 0], [s, 0, c]])
+    return R, (lambda P: (np.asarray(P) - center) @ R.T + center)
+
+
+def girdle_moves(world, objs, s):
+    """Transformaciones (función de puntos y rotación) de clavícula, escápula y brazo de un lado."""
+    C = world(objs[f'Clavicle_{s}'])
+    order = np.argsort(np.abs(C[:, 0])); k = max(3, len(C) // 20)
+    sc, ac = C[order[:k]].mean(0), C[order[-k:]].mean(0)            # extremos esternal y acromial
+    v = ac - sc; L = np.hypot(v[0], v[2]); z1 = v[2] + SHOULDER_RISE
+    theta = np.arctan2(z1, np.sign(v[0]) * np.sqrt(L * L - z1 * z1)) - np.arctan2(v[2], v[0])
+    Rc, clav = _rot_xz(theta, sc)
+    lift = clav(ac[None])[0] - ac
+    sh = joints(world, objs, s)['shoulder']
+    Ra, abd = _rot_xz(np.radians(ABDUCTION) * np.sign(sh[0]), sh)
+    return {'clav': (clav, Rc), 'scap': (lambda P: np.asarray(P) + lift, np.eye(3)),
+            'arm': (lambda P: abd(P) + lift, Ra), 'lift': lift, 'theta': theta}
+
+
+def _girdle_part(name, s):
+    if not name.endswith('_' + s): return None
+    if name.startswith('Clavicle'): return 'clav'
+    if name.startswith('Scapula'): return 'scap'
+    if name.startswith(ARM_BONES) or any(h in name for h in HAND): return 'arm'
+    return None
+
+
+def raise_shoulders(world, set_world, objs, W, edges):
+    """Mueve la cintura escapular y el brazo de los dos lados; devuelve el desplazamiento de la piel y un resumen."""
+    moves = {s: girdle_moves(world, objs, s) for s in 'LR'}
+    # Pertenencia de la piel (antes de mover los huesos): hueso más cercano, con transición suave.
+    verts, faces, owner = [], [], []
+    for name, o in objs.items():
+        if o.type != 'MESH' or o.get('system') != 'skeletal': continue
+        P = world(o); base = len(verts); verts += P.tolist()
+        faces += [[base + i for i in p.vertices] for p in o.data.polygons]
+        part = _girdle_part(name, 'L') or _girdle_part(name, 'R')
+        owner += [f'{part}_{name[-1]}' if part else 'other'] * len(o.data.polygons)
+    T = bvhtree.BVHTree.FromPolygons(verts, faces)
+    near = np.array([owner[T.find_nearest(Vector(p))[2]] for p in W])
+    n = len(W); deg = np.maximum(np.bincount(edges.ravel(), minlength=n), 1).astype(float)
+    def smooth(w, it=12):
+        for _ in range(it):
+            acc = np.zeros(n); np.add.at(acc, edges[:, 0], w[edges[:, 1]]); np.add.at(acc, edges[:, 1], w[edges[:, 0]])
+            w = 0.5 * w + 0.5 * acc / deg
+        return w
+    D = np.zeros_like(W)
+    for s, m in moves.items():
+        for part in ('clav', 'scap', 'arm'):
+            D += smooth((near == f'{part}_{s}').astype(float))[:, None] * (m[part][0](W) - W)
+    # Huesos (y sus tramos, que anato3d_fit.py lee en coordenadas de mundo).
+    moved = []
+    for name, o in objs.items():
+        if o.type != 'MESH' or o.get('system') != 'skeletal': continue
+        s = name[-1]; part = _girdle_part(name, s) if s in 'LR' else None
+        if not part: continue
+        f, R = moves[s][part]
+        set_world(o, f(world(o)))
+        if 'segments' in o:
+            seg = json.loads(o['segments'])
+            seg['origin'] = [round(float(x), 6) for x in f(np.array([seg['origin']]))[0]]
+            seg['axis'] = [round(float(x), 6) for x in R @ np.array(seg['axis'])]
+            o['segments'] = json.dumps(seg)
+        moved.append(name)
+    for s, side in (('L', 'Left'), ('R', 'Right')):
+        for joint in ('Shoulder', 'Elbow', 'Wrist'):
+            lm = objs.get(f'Landmark_{side}_{joint}_Joint')
+            if lm: lm.location = type(lm.location)(moves[s]['arm'][0](np.array([lm.matrix_world.translation]))[0])
+    report = {s: {'clavícula_grados': round(float(np.degrees(m['theta'])), 1),
+                  'acromion_sube_cm': round(float(m['lift'][2]) * 100, 2)} for s, m in moves.items()}
+    return D, moved, report

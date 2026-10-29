@@ -3,8 +3,9 @@
 Cómo funciona el ajuste:
   Los huesos de la Fase 2 son una transformación afín exacta de los huesos de Z-Anatomy, cada uno con
   la suya. Cada vértice se mueve con la mezcla de las transformaciones de los huesos más cercanos,
-  ponderadas por la inversa de la distancia, como la piel con su esqueleto. Después, opcionalmente, se
-  meten bajo la piel los vértices que quedaran fuera de ella.
+  ponderadas por la inversa de la distancia, como la piel con su esqueleto. Luego se aplica la complexión
+  musculosa (tools/musculature.py: el campo que engrosa hombros, brazos y tórax, el mismo que infló la piel).
+  Después, opcionalmente, se meten bajo la piel los vértices que quedaran fuera de ella.
 """
 import bpy, bmesh, sys, os, re, csv, json, time, collections
 import numpy as np
@@ -12,6 +13,7 @@ from mathutils import Vector, kdtree, bvhtree
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 FASE2 = os.path.join(ROOT, 'Anato3D_Male_30_Fase2.blend')
+MUSCULATURE = os.path.join(ROOT, 'Anato3D_Male_30_Fase2_musculature.npz')   # lo escribe fix_neck.py
 TRANSLATIONS = os.path.join(ROOT, 'sources/z-anatomy/translations.csv')
 OUT_DIR = os.path.join(ROOT, 'build')
 WEB_MODELS = os.path.join(ROOT, 'web/public/models')
@@ -48,6 +50,7 @@ ES_FIXES = [(r'^Musculo\b', 'Músculo'), (r'\bulmonar', 'pulmonar'), (r'\bcorazo
 ES_OVERRIDES = {
     'Posterior septal branches of sphenopalatine artery': 'Ramas septales posteriores de la arteria esfenopalatina',
     'Anterior septal branches of anterior ethmoidal artery': 'Ramas septales anteriores de la arteria etmoidal anterior',
+    'Short head of biceps brachii': 'Cabeza corta del músculo bíceps braquial',
 }
 _UNACCENT = str.maketrans('áéíóú', 'aeiou')
 
@@ -94,8 +97,12 @@ def deepest(paths, name, root):
 class Fitter:
     def __init__(self, objects=None):
         """`objects`: los objetos de la Fase 2 ya cargados (fix_neck.py ajusta así músculos al esqueleto que está
-        corrigiendo); sin ellos se cargan de Anato3D_Male_30_Fase2.blend."""
+        corrigiendo); sin ellos se cargan de Anato3D_Male_30_Fase2.blend, con su complexión musculosa."""
+        self.bulk = None
         if objects is None:
+            if os.path.exists(MUSCULATURE):
+                from musculature import Field
+                self.bulk = Field.load(MUSCULATURE)
             with bpy.data.libraries.load(FASE2) as (src, dst):
                 dst.objects = list(src.objects)
             ref = bpy.data.collections.new('Fase2_ref')
@@ -217,6 +224,7 @@ class Fitter:
             ids = np.fromiter(best.keys(), int); d = np.fromiter(best.values(), float)
             w = 1.0 / np.maximum(d, 1e-3) ** IDW_POWER; w /= w.sum()
             out[i] = np.einsum('b,bk->k', w, np.append(v, 1.0) @ self.BM[ids])
+        if self.bulk is not None: out += self.bulk.sample(out)
         return out
 
     # La piel de MakeHuman tiene cavidades (boca, ojos): estar «fuera» según la superficie más cercana no

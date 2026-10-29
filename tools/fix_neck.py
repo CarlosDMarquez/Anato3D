@@ -11,8 +11,12 @@ Qué hace:
      mandíbula–occipucio, sin mover hombros ni clavículas.
   3a. Extremidades con las proporciones de Z-Anatomy (tools/proportions.py): la rodilla baja ~4,7 cm y el codo ~3,3 cm;
      huesos largos por tramos (cada tramo, afín) y piel con el mismo campo, suavizado.
+  3a2. Hombros (tools/proportions.py): la clavícula gira sobre el esternón hasta subir el acromion 2 cm, la escápula la
+     sigue y el brazo se separa 3° del tronco; la piel, con ellos.
   3b–c. La piel se subdivide y se infla donde un hueso queda a menos de 3–5 mm (mandíbula, C5–C7, tibia…), con
      abultamientos anchos y unidos (sin bultos sueltos ni surcos entre ellos); la nuca se alisa.
+  3c2–3. La piel se infla sobre el deltoides de Z-Anatomy, y la complexión musculosa (tools/musculature.py) engrosa
+     hombros, brazos y tórax; el campo en el volumen queda en Anato3D_Male_30_Fase2_musculature.npz.
   4. Lo mismo para la piel femenina (misma malla base de MakeHuman), escalado a su estatura.
 
 Guarda una copia de los originales en sources/originals/ la primera vez.
@@ -80,7 +84,9 @@ def export(glb_paths, collection):
             filepath=path, export_format='GLB', use_active_collection=True, use_active_collection_with_nested=True,
             export_extras=True, export_yup=True, export_apply=False, export_hierarchy_full_collections=True,
             export_vertex_color='ACTIVE',
-            export_image_format='JPEG', export_jpeg_quality=90,
+            # WebP (EXT_texture_webp, que three.js carga): las texturas de los huesos pasaban de 10,7 MB en JPEG; el
+            # modelo baja de 14,8 a 11,2 MB con la misma calidad aparente.
+            export_image_format='WEBP', export_image_quality=80,
             export_draco_mesh_compression_enable=True, export_draco_mesh_compression_level=7,
             export_draco_position_quantization=14, export_draco_normal_quantization=10)
         print('exportado', path)
@@ -196,6 +202,13 @@ for s, side in (('L', 'Left'), ('R', 'Right')):
             lm.location = lm.location + type(lm.location)(fields[f'{key}_{s}'].displace(p[None])[0])
 print(f'extremidades: {len(moved)} huesos reproporcionados; piel movida hasta {np.linalg.norm(limb_disp, axis=1).max() * 100:.1f} cm '
       f'(entrepierna a {crotch_z:.3f} m)')
+
+# 3a2. Hombros (tools/proportions.py): los de MakeHuman caen. La clavícula gira sobre el esternón hasta subir el acromion
+#      2 cm, la escápula la sigue y el brazo se separa 3° del tronco, como en la imagen de referencia; la piel, con ellos.
+from proportions import raise_shoulders
+girdle_disp, girdle_moved, report = raise_shoulders(world, set_world, objs, world(skin), skin_edges)
+set_world(skin, world(skin) + girdle_disp)
+print(f'hombros: {len(girdle_moved)} huesos movidos; {report}; piel movida hasta {np.linalg.norm(girdle_disp, axis=1).max() * 100:.1f} cm')
 
 # 3b. La mandíbula asomaba bajo el mentón ya en la Fase 2 original (hasta 12 mm); el hioides (hasta 6 mm) y la
 #     apófisis espinosa de C6 (3,8 mm), tras acortar el cuello. Se infla la piel solo ahí, con caída suave, para dejar al menos SOFT de partes blandas.
@@ -396,6 +409,24 @@ def make_room(za_muscles, margin=0.003):
     Ns /= np.linalg.norm(Ns, axis=1)[:, None]
     set_world(skin, W + Ns * soften(need)[:, None])
 make_room(SHOULDER)
+
+# 3c3. Complexión musculosa (tools/musculature.py): hombros, brazos y tórax más llenos, como en los atlas. La piel de
+#      MakeHuman es la de un hombre delgado; frente a una imagen de referencia, el brazo medía un ~20 % menos de ancho
+#      y el trapecio apenas subía por el cuello. La piel sale según el grosor de partes blandas que tiene debajo, y el
+#      campo en el volumen (Anato3D_Male_30_Fase2_musculature.npz) lleva con ella todo lo que ajusta anato3d_fit.py.
+from musculature import bones_bvh, skin_target, Field
+W = world(skin)
+E = np.empty(len(skin.data.edges) * 2, dtype=np.int64); skin.data.edges.foreach_get('vertices', E); E = E.reshape(-1, 2)
+N = np.array([v.normal[:] for v in skin.data.vertices]) @ np.linalg.inv(np.array(skin.matrix_world)[:3, :3])
+N /= np.linalg.norm(N, axis=1)[:, None]
+polys = [p.vertices[:] for p in skin.data.polygons]
+BT, owner = bones_bvh({o.name: o for o in bpy.data.objects if o.type == 'MESH' and o.get('system') == 'skeletal'}, world)
+bulk, report = skin_target(W, N, E, polys, BT, owner, world, objs)
+print('complexión, piel:', report)
+field = Field.solve(W, polys, bulk, BT)
+print('complexión, campo:', field.report)
+field.save(os.path.join(ROOT, f'{MALE}_musculature.npz'))
+set_world(skin, W + bulk)
 
 # 3d. Tono de la piel por vértice (tools/skin_tone.py): sin él, un solo color la hacía parecer un maniquí.
 MALE_TONE = male_layers(skin, objs, world)

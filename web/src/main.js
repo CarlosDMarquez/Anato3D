@@ -4,14 +4,17 @@ import '@fontsource/ibm-plex-sans/600.css';
 import '@fontsource/ibm-plex-serif/400-italic.css';
 import './styles.css';
 import { Viewer } from './viewer.js';
-import { SYSTEMS, SYSTEM_BY_ID, DEFAULT_STAGES } from './systems.js';
+import { SYSTEMS, SYSTEM_BY_ID, DEFAULT_STAGES, classify } from './systems.js';
 import { systemIcon, uiIcon } from './ui/icons.js';
 import { renderInfo } from './ui/info.js';
 import { GRUPOS } from './data/grupos.js';
+import { resolvePart, sideOf } from './data/resolve.js';
 
 const MODELS = {
   male: {
-    url: '/models/male.glb', label: 'Masculino', detail: 'Fase 4 · 12 sistemas', icon: 'male',
+    url: '/models/male.glb', label: 'Masculino', detail: 'Hombre adulto · 12 sistemas', icon: 'male',
+    // Nombres de las piezas de los sistemas que se descargan aparte, para buscarlas antes (tools/search_index.py).
+    index: '/models/male-index.json',
     // Región externa de los genitales, para la opción «Mostrar genitales externos» (build_genital_skin.py).
     genitalRegion: '/models/male-genital-region.json',
     // Sistemas en archivos aparte: se descargan la primera vez que se activan.
@@ -30,7 +33,7 @@ const MODELS = {
       integumentary: { url: '/models/male-integumentary.glb', meta: '/models/male-integumentary.json' },
     },
   },
-  female: { url: '/models/female.glb', label: 'Femenino', detail: 'Fase 1 · piel y ojos', icon: 'female' },
+  female: { url: '/models/female.glb', label: 'Femenino', detail: 'Piel y ojos · en desarrollo', icon: 'female' },
 };
 
 const $ = (sel) => document.querySelector(sel);
@@ -149,13 +152,24 @@ function buildDock() {
     btn.addEventListener('contextmenu', (e) => { e.preventDefault(); cancel(); openStageMenu(id, btn); });
     btn.addEventListener('click', () => {
       if (longPressed) return;
+      btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
       if (!available[id].size) return openStageMenu(id, btn);
       cycleStage(id);
     });
   });
 }
 
+// En pantallas estrechas el dock se desplaza de lado y los últimos sistemas quedaban cortados sin aviso: los bordes se
+// difuminan mientras haya más sistemas a ese lado.
+function updateDockFade() {
+  dock.classList.toggle('fade-l', dock.scrollLeft > 4);
+  dock.classList.toggle('fade-r', dock.scrollLeft + dock.clientWidth < dock.scrollWidth - 4);
+}
+dock.addEventListener('scroll', updateDockFade, { passive: true });
+window.addEventListener('resize', updateDockFade);
+
 function renderDock() {
+  updateDockFade();
   for (const btn of dock.querySelectorAll('.dock-item')) {
     const sys = SYSTEM_BY_ID[btn.dataset.sys];
     const stageId = state.stages[sys.id];
@@ -420,6 +434,7 @@ function togglePanel(name) {
   panel.classList.add('open');
   $(`.toolbar [data-panel="${name}"]`).classList.add('on');
   if (name === 'search') {
+    loadPendingIndex();
     const input = $('#search-input');
     input.focus();
     input.select();
@@ -428,6 +443,28 @@ function togglePanel(name) {
 }
 
 const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+// Piezas de los sistemas aún sin descargar: buscar «bíceps» antes de abrir el sistema muscular solo encontraba dos bolsas
+// del bíceps femoral. Al elegir una, se descarga su sistema y se muestra.
+const pendingIndex = new Map();                        // url del índice → promesa de [{ id, key, system, side, info }]
+const GENITAL_NAME = /penis|Glans|Testis|Epididym|Scrot|Spermatic|Cremaster|Dartos/i;
+function loadPendingIndex() {
+  const url = MODELS[state.model].index;
+  if (!url) return Promise.resolve([]);
+  if (!pendingIndex.has(url)) {
+    pendingIndex.set(url, fetch(url).then((r) => r.json()).then((data) => Object.entries(data).flatMap(([key, list]) =>
+      list.flatMap(([name, extras]) => {
+        const cls = classify(extras);
+        return cls ? [{ id: name, key, system: cls.system, side: sideOf(name), info: resolvePart(name, extras) }] : [];
+      }))).catch(() => []));
+  }
+  return pendingIndex.get(url).then((list) => {
+    pendingParts = list;
+    if ($('#panel-search').classList.contains('open')) renderSearch($('#search-input').value);
+  });
+}
+let pendingParts = [];
+
 function renderSearch(q) {
   const list = $('#search-results');
   const term = norm(q.trim());
@@ -444,18 +481,31 @@ function renderSearch(q) {
       return !seen.has(k) && seen.add(k);
     })
     .slice(0, 80);
+  // Lo que todavía no está descargado (nunca con «Mostrar genitales externos» desactivado: no se sabe qué quedaría oculto).
+  const systems = MODELS[state.model].systems ?? {};
+  const pending = !term ? [] : pendingParts
+    .filter((p) => systems[p.key] && !systems[p.key].loaded && !(viewer.modesty && GENITAL_NAME.test(p.id)))
+    .filter((p) => norm(`${p.info.title} ${p.info.latin ?? ''} ${p.info.entry?.nombre ?? ''}`).includes(term))
+    .sort((a, b) => a.info.title.localeCompare(b.info.title, 'es'))
+    .filter((p) => {
+      const k = `${p.info.title}|${p.side}`;
+      return !seen.has(k) && seen.add(k);
+    })
+    .slice(0, Math.max(0, 80 - parts.length));
   list.innerHTML = groups.map((g) => `
       <li><button data-group="${g.group}"><span class="res-kind">Región</span><span class="res-name">${g.label}</span></button></li>`).join('') +
-    (parts.length || groups.length
-      ? parts.map((p) => `
-      <li><button data-id="${p.id}" style="--sys:${SYSTEM_BY_ID[p.system].color}">
+    (parts.length || groups.length || pending.length
+      ? [...parts, ...pending].map((p) => `
+      <li><button ${p.key ? `data-pending="${p.key}" ` : ''}data-id="${p.id}" style="--sys:${SYSTEM_BY_ID[p.system].color}">
         <i></i><span class="res-name">${p.info.title}${p.side ? ` <em>${p.side === 'L' ? 'izq.' : 'der.'}</em>` : ''}</span>
         <small>${SYSTEM_BY_ID[p.system].label}</small>
       </button></li>`).join('')
       : '<li class="muted empty">Sin resultados en este modelo.</li>');
-  list.querySelectorAll('[data-id]').forEach((b) => b.addEventListener('click', () => {
-    reveal(viewer.parts.find((p) => p.id === b.dataset.id));
+  list.querySelectorAll('[data-id]').forEach((b) => b.addEventListener('click', async () => {
     if (isMobile()) closePanels();
+    if (b.dataset.pending && !(await ensureSystem(b.dataset.pending))) return;
+    const part = viewer.parts.find((p) => p.id === b.dataset.id);
+    if (part) reveal(part);
   }));
   list.querySelectorAll('[data-group]').forEach((b) => b.addEventListener('click', () => {
     selectGroup(b.dataset.group);

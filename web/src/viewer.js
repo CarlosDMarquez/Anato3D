@@ -5,7 +5,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { classify } from './systems.js';
-import { resolvePart } from './data/resolve.js';
+import { resolvePart, sideOf } from './data/resolve.js';
 import { SSAO, profileFor, toPhysical, applyProfile, NEEDS_FIBERS } from './realism.js';
 
 // ?plain en la URL desactiva los materiales realistas (para comparar rendimiento y aspecto).
@@ -384,8 +384,12 @@ export class Viewer extends EventTarget {
     }
     if (this.roots.includes(gltf.scene)) return [];
     this.roots.push(gltf.scene);
-    this.scene.add(gltf.scene);
     const parts = this.#collectParts(gltf.scene);
+    // Los programas nuevos (perfiles de tejido, fibras) se compilan antes de añadir el sistema a la escena: mientras se
+    // compilaban, el sistema recién descargado se veía un instante blanco y translúcido.
+    for (const p of parts) for (const m of p.meshes) m.material = m.userData.baseMaterial;
+    await this.renderer.compileAsync(gltf.scene, this.camera, this.scene).catch(() => {});
+    this.scene.add(gltf.scene);
     this.parts.push(...parts);
     if (this.modesty) this.#applyModesty(parts);
     this.#epicardialFat();
@@ -530,6 +534,7 @@ export class Viewer extends EventTarget {
         layer: extras.layer ?? 1,
         major: !!extras.major,
         sheet: !!extras.sheet,
+        side: sideOf(node.name),
         info: resolvePart(node.name, extras),
         visible: true,
         ghost: false,

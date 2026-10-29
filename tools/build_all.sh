@@ -36,4 +36,6 @@ if want visceral || want genital; then
   $B -b --disable-autoexec Anato3D_Male_30_Fase2.blend --python tools/build_genital_skin.py 2>&1 | grep -E "^\[genital\]|Error|Traceback" > build/build_genital_skin.log
   export_glb integumentary Genital_Skin
 fi
+# Índice de búsqueda de los sistemas que la app descarga aparte.
+python3 tools/search_index.py
 echo "listo: $ALL"

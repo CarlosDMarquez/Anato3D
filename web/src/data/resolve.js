@@ -29,6 +29,8 @@ function ribClass(n) {
   return { chip: 'Costilla flotante', dato: 'Costilla flotante: su extremo anterior termina libre entre los músculos de la pared abdominal.' };
 }
 
+export const sideOf = (name) => splitSide(name).side;
+
 export function resolvePart(name, extras = {}) {
   if (extras.system === 'muscular') return resolveMuscle(name, extras);
   if (extras.system === 'connective') return resolveConnective(name, extras);
