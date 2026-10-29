@@ -92,18 +92,22 @@ def deepest(paths, name, root):
 
 # ── Ajuste a los huesos y a la piel de la Fase 2 ────────────────────────────
 class Fitter:
-    def __init__(self):
-        with bpy.data.libraries.load(FASE2) as (src, dst):
-            dst.objects = list(src.objects)
-        ref = bpy.data.collections.new('Fase2_ref')
-        bpy.context.scene.collection.children.link(ref)
-        for o in dst.objects:
-            if o is not None: ref.objects.link(o)
-        bpy.context.view_layer.update()
+    def __init__(self, objects=None):
+        """`objects`: los objetos de la Fase 2 ya cargados (fix_neck.py ajusta así músculos al esqueleto que está
+        corrigiendo); sin ellos se cargan de Anato3D_Male_30_Fase2.blend."""
+        if objects is None:
+            with bpy.data.libraries.load(FASE2) as (src, dst):
+                dst.objects = list(src.objects)
+            ref = bpy.data.collections.new('Fase2_ref')
+            bpy.context.scene.collection.children.link(ref)
+            for o in dst.objects:
+                if o is not None: ref.objects.link(o)
+            bpy.context.view_layer.update()
+            objects = [o for o in dst.objects if o is not None]
 
         bones, samples, sample_bone = [], [], []
         allV, allF = [], []                                    # todos los huesos juntos, para la distancia real
-        for o in dst.objects:
+        for o in objects:
             if o is None or o.type != 'MESH' or o.get('system') != 'skeletal': continue
             m = re.search(r'Z-Anatomy object "(.+?)"', o.get('source', ''))
             z = bpy.data.objects.get(m.group(1)) if m else None
@@ -135,7 +139,7 @@ class Fitter:
         log(f'{len(bones)} huesos con transformación, {len(S)} muestras; mayor error de ajuste afín:',
             ', '.join(f'{b["name"]} {b["res"] * 1000:.1f} mm' for b in sorted(bones, key=lambda b: -b['res'])[:4]))
 
-        skin = bpy.data.objects['Skin_Body']
+        skin = next(o for o in objects if o.name == 'Skin_Body')
         bm = bmesh.new(); bm.from_mesh(skin.data); bm.transform(skin.matrix_world)
         self.skin = bvhtree.BVHTree.FromBMesh(bm)
         self.genital = GenitalPose(self) if 'Corpus cavernosum of penis' in bpy.data.objects else None
@@ -143,7 +147,7 @@ class Fitter:
         # Huesos de la Fase 2 juntos, con la orientación de cada uno (las piezas _L tienen las normales hacia dentro y
         # algunos huesos son mallas abiertas: se usa la cara más cercana, no la paridad).
         bm = bmesh.new(); self.bone_sign = []; self.bone_closed = []
-        for o in dst.objects:
+        for o in objects:
             if o is None or o.type != 'MESH' or o.get('system') != 'skeletal': continue
             b = bmesh.new(); b.from_mesh(o.data); b.transform(o.matrix_world)
             self.bone_sign += [1.0 if b.calc_volume(signed=True) >= 0 else -1.0] * len(b.faces)

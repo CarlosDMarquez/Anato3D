@@ -330,6 +330,73 @@ CAVITY = ('Maxilla', 'Palatine', 'Sphenoid', 'Vomer', 'Ethmoid', 'Inferior_Nasal
 cover_close([o.name for o in bpy.data.objects if o.type == 'MESH' and o.get('system') == 'skeletal'
              and not o.name.startswith(CAVITY)])
 
+# 3c2. Hombro: el deltoides de Z-Anatomy (un cuerpo real) no cabe en el hombro de MakeHuman, más delgado por detrás. Su
+#      porción espinal (posterior) asomaba hasta 21 mm y el ajuste la aplastaba contra la piel: salía plana, como un
+#      escudo con el borde inferior en arista. Se ajusta el deltoides de Z-Anatomy a este esqueleto (el mismo ajuste
+#      que en build_muscular.py) y la piel se infla sobre él con 3 mm de tejido subcutáneo, con caída suave.
+SHOULDER = [f'{p} part of deltoid muscle.{s}' for p in ('Scapular spinal', 'Acromial', 'Clavicular') for s in 'lr']
+def make_room(za_muscles, margin=0.003):
+    sys.path.insert(0, os.path.dirname(__file__))
+    from anato3d_fit import Fitter
+    names = {re.search(r'Z-Anatomy object "(.+?)"', o['source']).group(1) for o in objs.values()
+             if o.type == 'MESH' and o.get('system') == 'skeletal' and re.search(r'Z-Anatomy object "', o.get('source', ''))}
+    with bpy.data.libraries.load(ZA) as (src, dst):
+        dst.objects = sorted(names | set(za_muscles))
+    tmp = bpy.data.collections.new('za_tmp'); bpy.context.scene.collection.children.link(tmp)
+    for o in dst.objects:
+        if o is not None: tmp.objects.link(o)
+    bpy.context.view_layer.update()
+    fitter = Fitter([o for o in objs.values() if o.type == 'MESH'])
+    P = np.vstack([fitter.deform(world(bpy.data.objects[n])) for n in za_muscles])
+    for o in list(tmp.objects): bpy.data.objects.remove(o)
+    bpy.data.collections.remove(tmp)
+    # Solo la piel del hombro y del brazo (su hueso más cercano es el húmero, la escápula o la clavícula): junto a la
+    # axila, el deltoides tenía por piel más cercana la pared del tórax, y la inflaba hacia el brazo.
+    verts, faces, owner = [], [], []
+    for n, o in objs.items():
+        if o.type != 'MESH' or o.get('system') != 'skeletal': continue
+        B = world(o); base = len(verts); verts += B.tolist()
+        faces += [[base + i for i in p.vertices] for p in o.data.polygons]
+        owner += [n.startswith(('Humerus', 'Scapula', 'Clavicle'))] * len(o.data.polygons)
+    BT = bvhtree.BVHTree.FromPolygons(verts, faces)
+    W = world(skin)
+    shoulder = np.array([owner[BT.find_nearest(Vector(w))[2]] for w in W])
+    T = bvhtree.BVHTree.FromPolygons(W.tolist(), [p.vertices[:] for p in skin.data.polygons])
+    N = np.array([v.normal[:] for v in skin.data.vertices]) @ np.linalg.inv(np.array(skin.matrix_world)[:3, :3])
+    N /= np.linalg.norm(N, axis=1)[:, None]
+    kd = kdtree.KDTree(len(W))
+    for i, w in enumerate(W): kd.insert(w, i)
+    kd.balance()
+    need = np.zeros(len(W)); hits = 0; worst = 0.0
+    for p in P:
+        loc, nrm, _, _ = T.find_nearest(Vector(p))
+        d = (Vector(p) - loc).dot(nrm) + margin
+        if d <= 0 or not shoulder[kd.find(loc)[1]]: continue
+        # Solo la cara posterior y lateral del hombro: en la bóveda de la axila (piel que mira arriba o abajo) el
+        # deltoides no tiene que asomar y ahí no se infla.
+        if not (nrm.y > 0.25 or abs(nrm.x) > 0.6) or abs(nrm.z) > 0.6: continue
+        hits += 1; worst = max(worst, d)
+        R = min(max(0.02, 4 * d), 0.05)
+        n0 = np.array(nrm)
+        for _, i, dd in kd.find_range(loc, R):
+            if N[i] @ n0 < 0.5 or not shoulder[i]: continue      # ni la piel de enfrente (el tórax frente al brazo)
+            need[i] = max(need[i], d * (1 - smooth(dd / R)))
+    print(f'hombro: {hits} vértices del deltoides a menos de {margin * 1000:.0f} mm de la piel (hasta {worst * 1000:.1f} mm); '
+          f'piel inflada hasta {need.max() * 1000:.1f} mm en {(need > 1e-4).sum()} vértices')
+    if not hits: return
+    # Dirección: las normales suavizadas sobre la malla. En el pliegue axilar posterior, que es cóncavo, las normales de
+    # cada vértice convergen y la piel inflada hacía un saliente. Una sola pasada: una segunda perseguía puntos en los
+    # pliegues de la piel recién inflada, junto a la axila.
+    E = np.empty(len(skin.data.edges) * 2, dtype=np.int64); skin.data.edges.foreach_get('vertices', E); E = E.reshape(-1, 2)
+    deg = np.maximum(np.bincount(E.ravel(), minlength=len(W)), 1)[:, None]
+    Ns = N.copy()
+    for _ in range(30):
+        acc = np.zeros_like(Ns); np.add.at(acc, E[:, 0], Ns[E[:, 1]]); np.add.at(acc, E[:, 1], Ns[E[:, 0]])
+        Ns = 0.5 * Ns + 0.5 * acc / deg
+    Ns /= np.linalg.norm(Ns, axis=1)[:, None]
+    set_world(skin, W + Ns * soften(need)[:, None])
+make_room(SHOULDER)
+
 # 3d. Tono de la piel por vértice (tools/skin_tone.py): sin él, un solo color la hacía parecer un maniquí.
 MALE_TONE = male_layers(skin, objs, world)
 apply_layers(skin, MALE_TONE)

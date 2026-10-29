@@ -307,6 +307,10 @@ Los tres salen de `build_visceral.py` (`classify_new`) con el mismo ajuste:
   - El desplazamiento se extiende con suavidad a los vecinos y nada vuelve a entrar en el hueso.
   - Dos rondas.
 - **Platisma:** muscular hasta su inserción (`ALL_FLESH`).
+- **Hombro (`fix_neck.py`, paso 3c2):** el deltoides de Z-Anatomy no cabía en el hombro de MakeHuman, más delgado por detrás. Su porción posterior asomaba hasta 21 mm y el ajuste la aplastaba contra la piel, con forma de escudo.
+  - Se ajusta el deltoides a este esqueleto (con `Fitter(objects)`, sobre el esqueleto en memoria).
+  - La piel se infla sobre él con 3 mm de tejido subcutáneo (hasta 23 mm), con caída suave y en la dirección de las normales suavizadas. Con la normal de cada vértice, el pliegue axilar posterior se doblaba.
+  - Solo cuenta la piel cuyo hueso más cercano es el húmero, la escápula o la clavícula, que mira hacia atrás o hacia fuera. Así no se toca la pared del tórax frente al brazo ni la bóveda de la axila.
 - **Región genital:** también marca las celdas con algún vértice de una pieza genital fuera de la piel. Con la rejilla de 2 mm, los conductos deferentes podían quedar a la vista con la opción desactivada.
 
 ## Auditoría (`tools/audit_models.py`)
