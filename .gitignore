@@ -2,3 +2,6 @@ sources/
 build/
 web/node_modules/
 web/dist/
+# Copias automáticas de Blender al guardar y archivos de macOS
+*.blend1
+.DS_Store
