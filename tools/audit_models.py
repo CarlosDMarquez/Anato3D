@@ -61,11 +61,13 @@ def in_genital_skin(p):
 bones = [o for o in bpy.data.objects if o.type == 'MESH' and o.get('system') == 'skeletal']
 # Algunos huesos son mallas abiertas (el sacro, p. ej.): la paridad de rayos no sirve. Se usa la cara más cercana
 # y su normal, orientada según el volumen con signo de cada hueso (las piezas _L tienen las normales hacia dentro).
-bm = bmesh.new(); FACE_SIGN = []; FACE_CLOSED = []
+bm = bmesh.new(); FACE_SIGN = []; FACE_CLOSED = []; FACE_BONE = []; BONE_TREE = []
 for o in bones:
     b = world_mesh(o); sign = 1.0 if b.calc_volume(signed=True) >= 0 else -1.0
     closed = all(e.is_manifold for e in b.edges)
-    me = bpy.data.meshes.new('tmp'); b.to_mesh(me); FACE_SIGN += [sign] * len(b.faces); FACE_CLOSED += [closed] * len(b.faces); b.free()
+    BONE_TREE.append(bvhtree.BVHTree.FromBMesh(b))
+    me = bpy.data.meshes.new('tmp'); b.to_mesh(me); FACE_SIGN += [sign] * len(b.faces); FACE_CLOSED += [closed] * len(b.faces)
+    FACE_BONE += [len(BONE_TREE) - 1] * len(b.faces); b.free()
     bm.from_mesh(me); bpy.data.meshes.remove(me)
 BONES = bvhtree.BVHTree.FromBMesh(bm); bm.free()
 def bone_depth(p):
@@ -74,7 +76,11 @@ def bone_depth(p):
     if loc is None: return 0.0
     d = -(p - loc).dot(nrm) * FACE_SIGN[idx]
     # Hueso abierto (el occipital): lejos de su superficie la normal no dice si se está dentro.
-    return d if FACE_CLOSED[idx] or dist < 0.004 else min(d, 0.0)
+    if not FACE_CLOSED[idx] and dist >= 0.004: return min(d, 0.0)
+    # Lejos de la superficie, la normal de la cara más cercana de un hueso fino (una costilla, el ala ilíaca) puede
+    # apuntar al revés: más de 6 mm «dentro» se confirma por paridad en ese hueso (salían venas «a 32 mm» de uno).
+    if d > 0.006 and FACE_CLOSED[idx] and not parity_inside(BONE_TREE[FACE_BONE[idx]], p): return -dist
+    return d
 
 DIRS = [Vector(d) for d in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))]
 def parity_inside(tree, p, dirs=DIRS, need=None):

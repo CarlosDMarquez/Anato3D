@@ -88,7 +88,39 @@ def export(glb_paths, collection):
 # ── Modelo masculino (Fase 2) ───────────────────────────────────────────────
 bpy.ops.wm.open_mainfile(filepath=os.path.join(ORIG, f'{MALE}.blend'), load_ui=False)
 objs = {o.name: o for o in bpy.data.objects}
-za_names = {k: re.search(r'Z-Anatomy object "(.+?)"', objs[k]['source']).group(1) for k in CERVICAL}
+
+# 0. Esqueleto simétrico. La piel de MakeHuman lo es (0,1 mm de media), pero en la Fase 2 el tórax (vértebras C7–L1,
+#    esternón, costillas, clavículas, escápulas) quedó 3–3,5 mm a la izquierda y el húmero izquierdo un 7–9 % más
+#    grueso que el derecho: los músculos del brazo izquierdo salían de la piel y se aplastaban contra ella (cabeza
+#    lateral del tríceps: 28 % de sus vértices corregidos, frente al 4 % del derecho). Cada pareja izquierda/derecha
+#    se sustituye por la media de una y el espejo de la otra (Z-Anatomy las tiene en espejo vértice a vértice, así
+#    que la media sigue siendo una transformación afín de Z-Anatomy); los huesos de la línea media se centran.
+MIRROR = np.array([-1.0, 1.0, 1.0])
+def symmetrize():
+    pairs, moved = 0, 0
+    for name, o in objs.items():
+        if o.type != 'MESH' or o.get('system') != 'skeletal': continue
+        if name.endswith('_L') and name[:-2] + '_R' in objs:
+            r = objs[name[:-2] + '_R']; L = world(o); R = world(r) * MIRROR
+            if len(L) == len(R) and np.linalg.norm(L - R, axis=1).max() < 0.02:
+                A = (L + R) / 2                                 # correspondencia vértice a vértice
+            else:
+                A = L + ((L.mean(0) + R.mean(0)) / 2 - L.mean(0))   # solo se igualan los centros
+                set_world(r, (world(r) * MIRROR + (A.mean(0) - R.mean(0))) * MIRROR); set_world(o, A); pairs += 1
+                continue
+            set_world(o, A); set_world(r, A * MIRROR); pairs += 1
+        elif not name.endswith(('_L', '_R')):
+            W = world(o); dx = (W[:, 0].min() + W[:, 0].max()) / 2
+            if abs(dx) > 1e-4: set_world(o, W - np.array([dx, 0, 0])); moved += 1
+    for name, o in objs.items():                               # marcas de las articulaciones, también en espejo
+        if o.type == 'EMPTY' and name.startswith('Landmark_Left_') and name.replace('Left', 'Right') in objs:
+            r = objs[name.replace('Left', 'Right')]
+            a = (np.array(o.matrix_world.translation) + np.array(r.matrix_world.translation) * MIRROR) / 2
+            o.location = o.location + Vector(a - np.array(o.matrix_world.translation))
+            r.location = r.location + Vector(a * MIRROR - np.array(r.matrix_world.translation))
+    print(f'simetría: {pairs} parejas de huesos promediadas con su espejo, {moved} huesos de la línea media centrados')
+symmetrize()
+za_names ={k: re.search(r'Z-Anatomy object "(.+?)"', objs[k]['source']).group(1) for k in CERVICAL}
 with bpy.data.libraries.load(ZA) as (src, dst):
     dst.objects = list(za_names.values())
 za = dict(zip(za_names.keys(), dst.objects))

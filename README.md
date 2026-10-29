@@ -278,6 +278,37 @@ Los tres salen de `build_visceral.py` (`classify_new`) con el mismo ajuste:
 - **Unión con el cuerpo:** unión suave con la piel de MakeHuman donde nacen el pene y el escroto. La franja que la toca se hunde 1,2 mm, así que no queda borde, rendija ni parpadeo.
 - **Tono:** más pigmentado que el tronco y más oscuro en el escroto, en los surcos y en el rafe. Junto a la unión, el mismo tono de la piel del cuerpo.
 
+## Fase 7: sistema muscular
+
+**Qué fallaba (medido):**
+- **Esqueleto asimétrico en la Fase 2:** la piel de MakeHuman es simétrica (0,1 mm de media), pero:
+  - el tórax (vértebras C7–L1, esternón, costillas, clavículas, escápulas) estaba 3–3,5 mm a la izquierda;
+  - el húmero izquierdo era un 7–9 % más grueso que el derecho.
+  - Los músculos del brazo izquierdo salían de la piel y se aplastaban contra ella (cabeza lateral del tríceps: 28 % de sus vértices corregidos, frente al 4 % del derecho).
+- **Capa «Profundo» incompleta:** era «bajo dos capas de músculo», y la pierna o el hombro, con dos planos, nunca llegaban. Faltaban el tibial posterior, el poplíteo, los flexores largos, el manguito de los rotadores, el braquial y el vasto intermedio.
+- **Dentro del hueso:** 58 músculos entraban más de un 3 % (cabeza cubital del extensor cubital del carpo, 31 %; aductor mayor, 6 mm; plantar, 9,6 mm).
+- **Unos dentro de otros:** 73 parejas con más del 5 % de vértices dentro de otro músculo, hasta 8 mm (aductor largo en el vasto medial, subclavio en el pectoral mayor).
+- **Platisma:** Z-Anatomy lo marca como tendón junto a la mandíbula, y salía una banda blanca a lo largo de ella.
+
+**Arreglos:**
+- **Esqueleto simétrico (`fix_neck.py`, paso 0):**
+  - Cada pareja izquierda/derecha se sustituye por la media de una y el espejo de la otra. Z-Anatomy las tiene en espejo vértice a vértice, así que siguen siendo transformaciones afines de Z-Anatomy, con el mismo error de ajuste.
+  - La línea media se centra. Lo heredan los 12 sistemas.
+- **Capas anatómicas (`build_muscular.py`):**
+  - Superficial: lo que se ve al quitar la piel.
+  - Profunda: lo que está cubierto y descansa sobre el hueso o las vísceras, sin otro músculo debajo.
+  - Intermedia: lo que tiene músculos encima y debajo.
+  - «Debajo» exige que el otro músculo esté al menos 4 mm más lejos de la piel, para que el vecino de al lado no cuente.
+  - El umbral (18 % de la cara interna) está calibrado con los de libro. Sobre el hueso, de 0 a 0,17: poplíteo, supraespinoso, braquial, vasto intermedio, supinador. Con un plano debajo, de 0,18 a 0,44: sóleo, intercostales internos, romboides, glúteo medio, oblicuo interno.
+  - Resultado: 190 superficiales, 70 intermedios y 210 profundos.
+- **Fuera del hueso:** `fit(..., out_of_bone=True)` lleva a la superficie del hueso (+0,5 mm) lo que el ajuste metía en él.
+- **Separación entre músculos:**
+  - Cede el más profundo (por capa y, a igual capa, el más alejado de la piel): sus vértices dentro del otro pasan a su superficie.
+  - El desplazamiento se extiende con suavidad a los vecinos y nada vuelve a entrar en el hueso.
+  - Dos rondas.
+- **Platisma:** muscular hasta su inserción (`ALL_FLESH`).
+- **Región genital:** también marca las celdas con algún vértice de una pieza genital fuera de la piel. Con la rejilla de 2 mm, los conductos deferentes podían quedar a la vista con la opción desactivada.
+
 ## Auditoría (`tools/audit_models.py`)
 
 ```bash
@@ -300,6 +331,7 @@ Escribe `build/audit.json`.
 - **Piel genital:** es una malla abierta.
   - Cuenta como «dentro» solo a menos de 2 cm de ella. Lejos, la normal de su cara más cercana contesta al azar, y hasta el 2026-10-27 eso daba por cubiertos los dientes y los ojos.
   - Para «visible desde fuera», el rayo tiene que escapar también de ella.
+- **Más de 6 mm dentro de un hueso cerrado:** se confirma por paridad en ese hueso. La normal de la cara más cercana de un hueso fino (una costilla, el ala ilíaca) puede apuntar al revés lejos de él. Salían venas y fascias «a 32–44 mm» dentro del hueso sin estarlo.
 - **Fase 6 frente a antes:** la proporción dentro de hueso por sistema no cambió al bajar la rodilla y el codo (músculo 1,35 → 1,34 %; ligamentos y fascias 4,96 → 5,17 %, con menos piezas por encima del 3 %).
 
 ## Problemas conocidos del modelo masculino Fase 2

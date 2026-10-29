@@ -490,6 +490,15 @@ for k in range(rdims[2]):
             # deferentes), o si esta piel la tapa y queda por fuera de la superficie del cuerpo.
             loc, nrm, _, _ = SKIN_BVH.find_nearest(p)
             bits[i + rdims[0] * (j + rdims[1] * k)] = depth(p) > 0.0006 or (inside_genital_skin(p) and (p - loc).dot(nrm) > 0)
+# Además, toda celda con un vértice de una pieza genital (cordón, vasos y nervios del pene y del escroto) que asome de
+# la piel del cuerpo: con la rejilla de 2 mm, los conductos deferentes podían quedar a la vista (1–1,3 mm) en la ingle.
+for o in bpy.data.objects:
+    if o.type != 'MESH' or o is obj or not (o.name in PENIS + SCROTAL or CORD.search(o.name)): continue
+    for p in world(o):
+        q = (np.array([p[0], p[2], -p[1]]) - rlo) / RVOX
+        if (q < 0).any() or (q >= rdims).any(): continue
+        if depth(Vector(p)) > 0.0002:
+            i, j, k = q.astype(int); bits[i + rdims[0] * (j + rdims[1] * k)] = True
 json.dump({'voxel': RVOX, 'origin': [round(float(v), 5) for v in rlo], 'dims': rdims.tolist(),
            'bits': base64.b64encode(np.packbits(bits, bitorder='little').tobytes()).decode()},
           open(os.path.join(ROOT, 'web/public/models/male-genital-region.json'), 'w'))
