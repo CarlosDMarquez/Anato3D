@@ -313,6 +313,38 @@ Los tres salen de `build_visceral.py` (`classify_new`) con el mismo ajuste:
   - Solo cuenta la piel cuyo hueso más cercano es el húmero, la escápula o la clavícula, que mira hacia atrás o hacia fuera. Así no se toca la pared del tórax frente al brazo ni la bóveda de la axila.
 - **Región genital:** también marca las celdas con algún vértice de una pieza genital fuera de la piel. Con la rejilla de 2 mm, los conductos deferentes podían quedar a la vista con la opción desactivada.
 
+## Fase 8: vista muscular como en los atlas (2026-10-29)
+
+Comparada con una imagen de referencia de un atlas 3D (vista anterior, capa superficial).
+
+**Diferencias (medidas en el visor):**
+- Los músculos flotaban en el vacío: la referencia los muestra sobre el esqueleto, con ligamentos y retináculos, los ojos, los cartílagos de la nariz y los genitales.
+- **Rojo de los músculos:** más oscuro y pardo que el de la referencia (mediana sRGB 140, 58, 45 frente a 165, 63, 52).
+- **Abdomen:** Z-Anatomy modela el oblicuo externo, el interno y el transverso enteros con el material del vientre, también sus aponeurosis.
+  - Delante del recto y en la ingle salían rojos, en lugar de la aponeurosis blanca y la vaina del recto.
+  - El oblicuo interno asomaba a parches por delante del recto (1.840 caras de un lado, a menos de 1 mm).
+- **Pico en el borde del recto:** `push_out_of_bone` llevaba 5 vértices hasta una costilla, a 53 mm. La normal de la cara más cercana de un hueso fino apunta al revés lejos de él.
+- **Bordes de tendón en dientes de sierra:** Z-Anatomy marca el tendón cara a cara.
+
+**Arreglos:**
+- **Contexto por sistema (`systems.js`, `main.js`):** un sistema puede mostrar piezas de otros que estén apagados (`context`). Se cargan sin avisos y respetan la opción de los genitales externos.
+  - El muscular muestra los huesos (sin dientes), los ligamentos, los ojos, los cartílagos respiratorios y los genitales externos.
+- **Rojo de músculo:** multiplicado por (0,88, 0,6, 0,6) en el visor.
+- **Vaina del recto (`build_muscular.py`):**
+  - Se mide sobre la huella del recto vista de frente (rejilla de 2 mm): distancia con signo a su borde, y profundidad de sus caras anterior y posterior.
+  - **Oblicuo externo:** aponeurosis hasta 16 mm por fuera del recto y en la ingle, por debajo de la espina ilíaca anterosuperior.
+    - Delante del recto es un velo (28 % de opacidad) que se vuelve blanco hacia su borde.
+    - Hacia el vientre se funde en 6 mm.
+  - **Oblicuo interno y transverso:** aponeurosis desde 5 y 12 mm por fuera del recto. La lámina anterior es invisible delante del recto; la posterior se ve al quitarlo.
+  - Las mallas se cortan por la isolínea (borde limpio). La opacidad va por vértice, en el alfa del color (`COLOR_0`), y el visor la usa con `vertexColors`.
+  - Lo que el oblicuo externo cubre pasa por debajo de él (`tuck_under`), y el oblicuo externo y el recto, por debajo del pectoral mayor.
+  - La pared del abdomen (recto, oblicuos, transverso) se ajusta con el desplazamiento suavizado donde se pliega (`smooth=4`).
+- **`push_out_of_bone` (`anato3d_fit.py`):** a más de 6 mm de profundidad, confirma por paridad en ese hueso. El sistema nervioso, que también lo usa, sale idéntico.
+- **Bordes de tendón:** cada músculo se corta por la isolínea de la fracción de tendón de sus vértices, con 3 pasadas de suavizado, 1 o ninguna, la que deje el área de tendón con menos de un 25 % de cambio. Así quedaron 209, 6 y 2 músculos.
+- **Auditoría:** músculos dentro del hueso, 0 % (sin cambios); choques, 63 (sin cambios).
+
+**Diferencias que quedan:** la referencia es un modelo más ancho y musculoso (hombros, brazos, tórax): los músculos siguen la piel de MakeHuman. Los testículos se ven blancos (la túnica albugínea); en la referencia, cubiertos por la fascia espermática, son rosados.
+
 ## Auditoría (`tools/audit_models.py`)
 
 ```bash

@@ -146,12 +146,14 @@ class Fitter:
 
         # Huesos de la Fase 2 juntos, con la orientación de cada uno (las piezas _L tienen las normales hacia dentro y
         # algunos huesos son mallas abiertas: se usa la cara más cercana, no la paridad).
-        bm = bmesh.new(); self.bone_sign = []; self.bone_closed = []
+        bm = bmesh.new(); self.bone_sign = []; self.bone_closed = []; self.bone_of_face = []; self.bone_trees = []
         for o in objects:
             if o is None or o.type != 'MESH' or o.get('system') != 'skeletal': continue
             b = bmesh.new(); b.from_mesh(o.data); b.transform(o.matrix_world)
             self.bone_sign += [1.0 if b.calc_volume(signed=True) >= 0 else -1.0] * len(b.faces)
             self.bone_closed += [all(e.is_manifold for e in b.edges)] * len(b.faces)
+            self.bone_of_face += [len(self.bone_trees)] * len(b.faces)
+            self.bone_trees.append(bvhtree.BVHTree.FromBMesh(b))
             me = bpy.data.meshes.new('tmp'); b.to_mesh(me); b.free(); bm.from_mesh(me); bpy.data.meshes.remove(me)
         self.fase2_bones = bvhtree.BVHTree.FromBMesh(bm); bm.free()
 
@@ -169,6 +171,10 @@ class Fitter:
                 if not self.bone_closed[idx] and dist > 0.004: continue
                 n = np.array(nrm) * self.bone_sign[idx]
                 depth = -np.dot(v - np.array(loc), n)
+                # Lejos de un hueso fino (una costilla, un cartílago costal), la normal de su cara más cercana puede
+                # apuntar al revés: un punto del recto a 5 cm de una costilla salía «dentro» y se llevaba a ella, en un
+                # pico. Más de 6 mm se confirma por paridad en ese hueso.
+                if depth > 0.006 and not self._parity_inside(self.bone_trees[self.bone_of_face[idx]], v): continue
                 if depth > 0.0003:
                     V[i] = np.array(loc) + n * margin; moved += 1
         return moved
@@ -217,11 +223,14 @@ class Fitter:
     # basta. Se confirma por paridad: un punto dentro del cuerpo cruza la piel un número impar de veces.
     _DIRS = [Vector(d) for d in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))]
     def inside_body(self, p):
-        odd = 0
+        return self._parity_inside(self.skin, Vector(p))
+
+    def _parity_inside(self, tree, p):
+        p = Vector(p); odd = 0
         for d in self._DIRS:
             o, n = p, 0
             while n < 24:
-                hit, _, _, _ = self.skin.ray_cast(o + d * 1e-5, d)
+                hit, _, _, _ = tree.ray_cast(o + d * 1e-5, d)
                 if hit is None: break
                 n += 1; o = hit
             odd += n % 2

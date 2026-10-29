@@ -529,6 +529,7 @@ export class Viewer extends EventTarget {
         tissue: extras.tissue ?? null,
         layer: extras.layer ?? 1,
         major: !!extras.major,
+        sheet: !!extras.sheet,
         info: resolvePart(node.name, extras),
         visible: true,
         ghost: false,
@@ -550,12 +551,14 @@ export class Viewer extends EventTarget {
           mat.sheenColor = new THREE.Color('#d8907a');
         });
         const frame = () => (part.fiberFrame ??= fiberFrame(meshes.map((x) => x.geometry)));
-        const tendinous = /Tendon/.test(base.name ?? '');
+        const tendinous = /Tendon|Aponeurosis/.test(base.name ?? '');
         if (((part.system === 'muscular' && part.tissue === 'muscle') || part.tissue === 'heart') && !tendinous) {
           addFiberAttribute(m.geometry, frame());
           base = this.#variant(base, 'fiber', (mat) => {
             addFibers(mat);
-            mat.color.multiply(new THREE.Color(0.62, 0.5, 0.5)); // rojo más profundo, como el músculo fresco
+            // Rojo de músculo fresco, como en los atlas: medido contra una referencia, el anterior quedaba un 15 % más
+            // oscuro y algo pardo (sRGB 140, 58, 45 frente a 165, 63, 52).
+            mat.color.multiply(new THREE.Color(0.88, 0.6, 0.6));
           });
         }
         if (!PLAIN) {
@@ -565,6 +568,11 @@ export class Viewer extends EventTarget {
         }
         // Su AO horneado salió oscuro por las caras invertidas; hasta re-hornearlo, se omite.
         if (m.geometry.userData.windingFixed) base = this.#variant(base, 'noAO', (mat) => (mat.aoMap = null));
+        // Aponeurosis de los músculos anchos del abdomen: blanca; su opacidad viene por vértice (alfa del color): velo
+        // delante del recto (vaina anterior), que deja verlo, y blanca a sus lados.
+        // Láminas musculares de la piel (platisma): translúcidas, dejan ver lo que cubren.
+        if (/Aponeurosis/.test(base.name ?? '')) base = this.#variant(base, 'apo', (mat) => Object.assign(mat, { transparent: true, depthWrite: false }));
+        else if (part.sheet) base = this.#variant(base, 'skinsheet', (mat) => Object.assign(mat, { transparent: true, opacity: 0.3, depthWrite: false }));
         m.userData.baseMaterial ??= base;
         this.partByMesh.set(m, part);
       }

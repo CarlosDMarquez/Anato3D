@@ -70,10 +70,17 @@ function stageOf(part) {
   return SYSTEM_BY_ID[part.system].stages.find((s) => s.id === state.stages[part.system]) ?? null;
 }
 
+// Piezas de un sistema apagado que otro sistema activo muestra como contexto (los huesos bajo los músculos…).
+function contextShown(part) {
+  if (state.stages[part.system]) return false;
+  return SYSTEMS.some((s) => state.stages[s.id] && s.context?.[part.system]?.(part));
+}
+
 function apply() {
   for (const part of viewer.parts) {
     const stage = stageOf(part);
-    part.visible = !!stage && stage.filter(part) && !state.hidden.has(part.id) && (!state.isolated || state.isolated.has(part.id))
+    const shown = (!!stage && stage.filter(part)) || contextShown(part);
+    part.visible = shown && !state.hidden.has(part.id) && (!state.isolated || state.isolated.has(part.id))
       && !(viewer.modesty && part.modestEmpty);
     part.ghost = !!stage?.ghost || state.faded.has(part.id);
   }
@@ -96,18 +103,19 @@ function computeAvailability() {
 }
 
 // Descarga el GLB de un sistema la primera vez que se activa.
-async function ensureSystem(id) {
+async function ensureSystem(id, quiet = false) {
   const def = MODELS[state.model].systems?.[id];
   if (!def || def.loaded) return true;
   const label = SYSTEM_BY_ID[id].noun ?? `sistema ${SYSTEM_BY_ID[id].label.toLowerCase()}`;
+  const say = quiet ? () => {} : toast;               // el contexto de otro sistema se carga sin avisos
   def.loading ??= (async () => {
-    toast(`Cargando ${label}…`, 0);
+    say(`Cargando ${label}…`, 0);
     const meta = await fetch(def.meta).then((r) => r.json());
     for (const [gid, g] of Object.entries(meta.groups ?? {})) GRUPOS[gid] ??= g;
-    await viewer.addSystem(def.url, (k) => toast(`Cargando ${label}… ${Math.round(k * 100)} %`, 0));
+    await viewer.addSystem(def.url, (k) => say(`Cargando ${label}… ${Math.round(k * 100)} %`, 0));
     def.loaded = true;
     computeAvailability();
-    toast(`${label[0].toUpperCase()}${label.slice(1)} listo`);
+    say(`${label[0].toUpperCase()}${label.slice(1)} listo`);
   })().catch((err) => {
     console.error(err);
     toast(`No se pudo cargar: ${label}`);
@@ -161,6 +169,11 @@ function renderDock() {
   document.querySelectorAll('#model-switch [data-model]').forEach((b) => b.classList.toggle('on', b.dataset.model === state.model));
 }
 
+// Descarga (sin avisos) los sistemas de los que un sistema activo muestra piezas como contexto.
+function loadContext(id) {
+  for (const src of Object.keys(SYSTEM_BY_ID[id].context ?? {})) ensureSystem(src, true).then((ok) => ok && apply());
+}
+
 function cycleStage(id) {
   const sys = SYSTEM_BY_ID[id];
   const order = [null, ...sys.stages.filter((s) => available[id].has(s.id)).map((s) => s.id)];
@@ -173,6 +186,7 @@ async function setStage(id, stageId) {
     state.stages[id] = stageId;
     state.isolated = null;
   });
+  if (stageId) loadContext(id);
   const sys = SYSTEM_BY_ID[id];
   toast(stageId ? `${sys.label} · ${sys.stages.find((s) => s.id === stageId).label}` : `${sys.label} · apagado`);
 }
@@ -564,6 +578,7 @@ async function loadModel(id) {
   for (const sys of Object.keys(MODELS[id].systems ?? {})) {
     if (state.stages[sys]) ensureSystem(sys).then((ok) => ok && apply());
   }
+  for (const sys of SYSTEMS) if (state.stages[sys.id]) loadContext(sys.id);
 }
 
 buildChrome();

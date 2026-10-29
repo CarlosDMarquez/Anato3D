@@ -222,7 +222,7 @@ const BY_NAME = [
   [/Bone_/, 'bone'],
   [/Cartilage/, 'cartilage'],
   [/Ligament|Capsule|Sheath|Bursa|Fascia|Valve|Labyrinth/, 'ligament'],
-  [/Tendon|Taenia/, 'tendon'],
+  [/Tendon|Taenia|Aponeurosis/, 'tendon'],
   [/Muscle/, 'muscle'],
   [/Myocardium/, 'heart'],
   [/Pulmonary_Vein|Artery/, 'artery'],

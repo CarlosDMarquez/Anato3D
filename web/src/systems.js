@@ -45,6 +45,16 @@ export const SYSTEMS = [
       { id: 'intermediate', label: 'Intermedio', filter: (p) => p.layer >= 2 },
       { id: 'deep', label: 'Profundo', filter: (p) => p.layer >= 3 },
     ],
+    // Como en los atlas, los músculos se ven sobre el esqueleto, con ligamentos, retináculos y aponeurosis, los ojos,
+    // los cartílagos de la nariz y la laringe y los genitales externos. Si su sistema está apagado, se muestran como
+    // contexto (y respetan la opción «Mostrar genitales externos»).
+    context: {
+      skeletal: (p) => p.tissue !== 'tooth',
+      connective: (p) => p.tissue === 'ligament',
+      integumentary: (p) => p.subsystem === 'eyes',
+      respiratory: (p) => p.tissue === 'cartilage',
+      urogenital: (p) => /penis|Glans|Testis|Epididymis/.test(p.id),
+    },
   },
   {
     id: 'arterial', label: 'Arterial', color: '#d23a3a',
