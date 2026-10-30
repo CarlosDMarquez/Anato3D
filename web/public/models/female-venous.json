@@ -1,0 +1,60 @@
+{
+ "groups": {
+  "Pulmonary_vessels": {
+   "nombre": "Vasos pulmonares",
+   "latin": "Vasa pulmonalia"
+  },
+  "Pulmonary_veins": {
+   "nombre": "Venas pulmonares",
+   "latin": "Venae pulmonales"
+  },
+  "Right_superior_pulmonary_vein": {
+   "nombre": "Vena pulmonar superior derecha",
+   "latin": "Vena pulmonalis dextra superior"
+  },
+  "Right_inferior_pulmonary_vein": {
+   "nombre": "Vena pulmonar inferior derecha",
+   "latin": "Vena pulmonalis dextra inferior"
+  },
+  "Left_superior_pulmonary_vein": {
+   "nombre": "Vena pulmonar superior izquierda",
+   "latin": "Vena pulmonalis sinistra superior"
+  },
+  "Left_inferior_pulmonary_vein": {
+   "nombre": "Vena pulmonar inferior izquierda",
+   "latin": "Vena pulmonalis sinistra inferior"
+  },
+  "Cardiac_vessels": {
+   "nombre": "Vasos del corazón",
+   "latin": "Vasa cardiaca"
+  },
+  "Cardiac_veins": {
+   "nombre": "Venas cardiacas",
+   "latin": "Venae cardiacae"
+  },
+  "Systemic_veins": {
+   "nombre": "Venas sistémicas",
+   "latin": "Venae systemicae"
+  },
+  "Trunk": {
+   "nombre": "Tronco",
+   "latin": "Truncus"
+  },
+  "Neck": {
+   "nombre": "Cuello",
+   "latin": "Collum"
+  },
+  "Head": {
+   "nombre": "Cabeza",
+   "latin": "Caput"
+  },
+  "Upper_limb": {
+   "nombre": "Miembro superior",
+   "latin": "Membrum superius"
+  },
+  "Lower_limb": {
+   "nombre": "Miembro inferior",
+   "latin": "Membrum inferius"
+  }
+ }
+}

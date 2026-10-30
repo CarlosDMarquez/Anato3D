@@ -33,7 +33,14 @@ const MODELS = {
       integumentary: { url: '/models/male-integumentary.glb', meta: '/models/male-integumentary.json' },
     },
   },
-  female: { url: '/models/female.glb', label: 'Femenino', detail: 'Piel y ojos · en desarrollo', icon: 'female' },
+  female: {
+    url: '/models/female.glb', label: 'Femenino', detail: 'Mujer adulta · 12 sistemas', icon: 'female',
+    index: '/models/female-index.json',
+    // Los mismos sistemas que el masculino (A3D_MODEL=female zsh tools/build_all.sh); los órganos femeninos que
+    // Z-Anatomy no tiene son formas paramétricas (tools/female_organs.py).
+    systems: Object.fromEntries(['muscular', 'connective', 'arterial', 'venous', 'nervous', 'respiratory', 'digestive',
+      'urogenital', 'endocrine', 'lymphatic', 'integumentary'].map((s) => [s, { url: `/models/female-${s}.glb`, meta: `/models/female-${s}.json` }])),
+  },
 };
 
 const $ = (sel) => document.querySelector(sel);
@@ -448,7 +455,7 @@ const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 // Piezas de los sistemas aún sin descargar: buscar «bíceps» antes de abrir el sistema muscular solo encontraba dos bolsas
 // del bíceps femoral. Al elegir una, se descarga su sistema y se muestra.
 const pendingIndex = new Map();                        // url del índice → promesa de [{ id, key, system, side, info }]
-const GENITAL_NAME = /penis|Glans|Testis|Epididym|Scrot|Spermatic|Cremaster|Dartos/i;
+const GENITAL_NAME = /penis|Glans|Testis|Epididym|Scrot|Spermatic|Cremaster|Dartos|clitoris|vestibul|Labi|Vulva/i;
 function loadPendingIndex() {
   const url = MODELS[state.model].index;
   if (!url) return Promise.resolve([]);

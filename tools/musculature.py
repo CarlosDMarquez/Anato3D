@@ -162,7 +162,10 @@ class Field:
         self.o = np.asarray(origin, float); self.h = float(h); self.D = np.asarray(D, np.float32)
 
     @classmethod
-    def solve(cls, W, polys, disp, bones_bvh, h=0.006, iterations=600, omega=1.85):
+    def solve(cls, W, polys, disp, bones_bvh, h=0.006, iterations=600, omega=1.85, extend=False):
+        """`extend`: fuera del cuerpo, el desplazamiento del vértice de piel más cercano en lugar de cero. Para el campo
+        hombre→mujer: la boca de MakeHuman es una cavidad cerrada (fuera del cuerpo) y los dientes, el maxilar y la
+        mandíbula, que la rodean, quedaban con desplazamiento cero (la mandíbula salía con 114 mm de error afín)."""
         active = np.linalg.norm(disp, axis=1) > 2e-4
         lo = np.maximum(W[active].min(0) - 0.04, W.min(0) - h)
         hi = np.minimum(W[active].max(0) + 0.04, W.max(0) + h)
@@ -197,7 +200,8 @@ class Field:
         # Hueso: cero dentro y a menos de una celda de su superficie.
         zero = np.zeros(n, bool)
         ii = np.nonzero(inside & ~surf)
-        zero[ii] = [bones_bvh.find_nearest(Vector(p), 0.9 * h)[0] is not None for p in C(ii)]
+        if bones_bvh is not None:                               # sin huesos (el campo hombre→mujer los mueve también)
+            zero[ii] = [bones_bvh.find_nearest(Vector(p), 0.9 * h)[0] is not None for p in C(ii)]
         free = inside & ~surf & ~zero
         free[[0, -1], :, :] = free[:, [0, -1], :] = free[:, :, [0, -1]] = False
         # Laplace por sobrerrelajación rojo-negro sobre las celdas libres (índices planos).
@@ -216,6 +220,9 @@ class Field:
                 flat[g] += delta
                 change = max(change, float(np.abs(delta).max()) if len(g) else 0.0)
             if change < 2e-6: break
+        if extend:
+            oi = np.nonzero(~inside & ~surf)
+            D[oi] = disp[[kd.find(p)[1] for p in C(oi)]]
         f = cls(lo, h, D)
         f.report = {'grid': n, 'free': int(free.sum()), 'skin_cells': int(surf.sum()), 'bone_cells': int(zero.sum()),
                     'iterations': it + 1, 'last_change_um': round(change * 1e6, 2)}

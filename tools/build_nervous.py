@@ -16,7 +16,7 @@ Salida: build/male_nervous.blend, build/male_nervous.json y web/public/models/ma
 import bpy, os, re, sys, json, collections
 sys.path.insert(0, os.path.dirname(__file__))
 from anato3d_fit import (Fitter, Extractor, Groups, bonus_paths, es, la, sanitize, source_name, principled, save,
-                         log, parse_args)
+                         log, parse_args, male_only, MODEL)
 
 opt = parse_args({'budget': 220000, 'only': None})
 
@@ -70,6 +70,7 @@ FALLBACK = {'cns': ('Central nervous system', 'Spinal cord'), 'pns': ('Periphera
 items = []
 for o in col.objects:
     if o.type not in ('MESH', 'CURVE') or o.name.startswith(('(', '?')) or '//' in o.name or o.name.endswith(('.j', '.g', '.t')): continue
+    if male_only(o.name): continue
     base, side = source_name(o.name)
     base = clean(base)
     if opt['only'] and not any(k in base.lower() for k in opt['only']): continue
@@ -154,6 +155,9 @@ for n, it in enumerate(items):
     name = sanitize(it['base']) + (f'_{it["side"]}' if it['side'] else '')
     # Solo los nervios periféricos superficiales (cutáneos, de los miembros) se corrigen por la piel.
     near_skin = it['sub'] == 'pns' and not any(k in low for k in DEEP_PNS) and it['path'][1] != 'Cranial nerves'
+    # En la mujer, la rama genital del genitofemoral (al labio mayor) y la anterior del obturador quedan bajo la piel: en el
+    # hombre la primera va al escroto (la cubre su piel).
+    near_skin = near_skin or (MODEL == 'female' and ('genital branch of genitofemoral' in low or 'anterior branch of obturator' in low))
     # La sustancia blanca casi siempre queda oculta bajo la corteza: se reduce más.
     obj, moved, worst = ex.fit(o, name, skin_offset=0.002 if near_skin else None,
                                detail=DETAIL.get(it['tissue'], 1.0),

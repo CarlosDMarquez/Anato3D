@@ -1,8 +1,9 @@
-"""Auditoría de los modelos del cuerpo masculino: busca errores medibles en todos los sistemas generados.
+"""Auditoría de los modelos del cuerpo (masculino o femenino): busca errores medibles en todos los sistemas generados.
 
 Uso (desde la raíz del proyecto):
   /Applications/Blender.app/Contents/MacOS/Blender -b --disable-autoexec Anato3D_Male_30_Fase2.blend \
     --python tools/audit_models.py [-- --systems urogenital,endocrine]
+  Modelo femenino: A3D_MODEL=female y Anato3D_Female_30_Fase2.blend.
 
 Qué mide, por objeto:
   - piel: vértices que salen de la piel (confirmado por paridad, como en anato3d_fit) y cuánto salen;
@@ -12,13 +13,14 @@ Qué mide, por objeto:
   - choques entre órganos: vértices de un órgano dentro de otro (solo mallas cerradas de vísceras).
 Además compara la posición de algunos órganos con las vértebras (niveles de referencia de los atlas).
 
-Salida: build/audit.json y un resumen en la consola.
+Salida: build/audit.json (build/female_audit.json) y un resumen en la consola.
 """
 import bpy, bmesh, os, re, sys, json, collections
 import numpy as np
 from mathutils import Vector, bvhtree
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+MODEL = os.environ.get('A3D_MODEL', 'male')
 SYSTEMS = {'muscular': 'Muscular_System', 'connective': 'Connective_System', 'arterial': 'Arterial_System',
            'venous': 'Venous_System', 'nervous': 'Nervous_System', 'respiratory': 'Respiratory_System',
            'digestive': 'Digestive_System', 'urogenital': 'Urogenital_System', 'endocrine': 'Endocrine_System',
@@ -31,7 +33,7 @@ def log(*a): print('[audit]', *a, flush=True)
 
 # ── Cargar los sistemas generados junto a la Fase 2 ─────────────────────────
 for s in wanted:
-    path = os.path.join(ROOT, 'build', f'male_{s}.blend')
+    path = os.path.join(ROOT, 'build', f'{MODEL}_{s}.blend')
     if not os.path.exists(path): log('falta', path); continue
     with bpy.data.libraries.load(path) as (src, dst):
         dst.collections = [SYSTEMS[s]]
@@ -46,7 +48,7 @@ skin = bpy.data.objects['Skin_Body']
 bm = world_mesh(skin); SKIN = bvhtree.BVHTree.FromBMesh(bm); bm.free()
 # Piel de los genitales (build_genital_skin.py): malla abierta, se usa la cara más cercana y su normal.
 GENITAL = None
-gpath = os.path.join(ROOT, 'build', 'male_integumentary.blend')
+gpath = os.path.join(ROOT, 'build', f'{MODEL}_integumentary.blend')
 if os.path.exists(gpath):
     with bpy.data.libraries.load(gpath) as (src, dst):
         dst.collections = ['Genital_Skin']
@@ -218,7 +220,7 @@ for o in objs:
     if o.get('system') != 'skeletal': seen[re.sub(r'\.\d+$', '', o.name)].append(o.get('system'))
 report['duplicates'] = {k: v for k, v in seen.items() if len(v) > 1}
 
-json.dump(report, open(os.path.join(ROOT, 'build', 'audit.json'), 'w'), ensure_ascii=False, indent=1)
+json.dump(report, open(os.path.join(ROOT, 'build', 'audit.json' if MODEL == 'male' else f'{MODEL}_audit.json'), 'w'), ensure_ascii=False, indent=1)
 
 # ── Resumen ─────────────────────────────────────────────────────────────────
 O = report['objects']

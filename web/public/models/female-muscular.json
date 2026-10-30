@@ -1,0 +1,168 @@
+{
+ "groups": {
+  "Cranial_part_of_muscular_system": {
+   "nombre": "Porción craneal del sistema muscular",
+   "latin": "Pars cranialis systematis muscularis"
+  },
+  "Muscles_of_head": {
+   "nombre": "Músculos de la cabeza",
+   "latin": "Muculi capitis"
+  },
+  "Superficial_muscles_of_head": {
+   "nombre": "Músculos superficiales de la cabeza",
+   "latin": "Musculi superficiales capitis"
+  },
+  "Facial_muscles": {
+   "nombre": "Músculos faciales",
+   "latin": "Musculi faciales"
+  },
+  "Cervical_part_of_muscular_system": {
+   "nombre": "Porción cervical del sistema muscular",
+   "latin": "Pars cervicalis systematis muscularis"
+  },
+  "Muscles_of_neck": {
+   "nombre": "Músculos del cuello",
+   "latin": "Musculi colli"
+  },
+  "Pharyngeal_muscles": {
+   "nombre": "Músculos faringeos",
+   "latin": "Musculi pharyngis"
+  },
+  "Laryngeal_muscles": {
+   "nombre": "Músculos laríngeos",
+   "latin": "Musculi laryngis"
+  },
+  "Dorsal_part_of_muscular_system": {
+   "nombre": "Porción dorsal del sistema muscular",
+   "latin": "Pars dorsalis systematis muscularis"
+  },
+  "Epaxial_muscles": {
+   "nombre": "Músculos epaxiales",
+   "latin": "Musculi epaxiales"
+  },
+  "Suboccipital_muscles": {
+   "nombre": "Músculos suboccipitales",
+   "latin": "Musculi suboccipitales"
+  },
+  "Erector_spinae": {
+   "nombre": "Erectores de la columna",
+   "latin": "Erector spinae"
+  },
+  "Transversospinal_muscles": {
+   "nombre": "Músculos transversoespinosos",
+   "latin": "Musculi transversospinales"
+  },
+  "Rotatores": {
+   "nombre": "Rotadores",
+   "latin": "Rotatores"
+  },
+  "Hypaxial_muscles_of_back": {
+   "nombre": "Músculos hipaxiales del dorso",
+   "latin": "Musculi hypaxiales dorsi"
+  },
+  "Trapezius_muscle": {
+   "nombre": "Músculo trapecio",
+   "latin": "Musculus trapezius"
+  },
+  "Thoracic_part_of_muscular_system": {
+   "nombre": "Porción torácica del sistema muscular",
+   "latin": "Pars thoracica systematis muscularis"
+  },
+  "Pectoralis_major_muscle": {
+   "nombre": "Músculo pectoral mayor",
+   "latin": "Musculus pectoralis major"
+  },
+  "Abdominal_part_of_muscular_system": {
+   "nombre": "Porción abdominal del sistema muscular",
+   "latin": "Pars abdominalis systematis muscularis"
+  },
+  "Muscles_of_abdomen": {
+   "nombre": "Músculos del abdomen",
+   "latin": "Musculi abdominis"
+  },
+  "Muscular_system_of_upper_limb": {
+   "nombre": "Sistema muscular del miembro superior",
+   "latin": "Systema musculare membri superioris"
+  },
+  "Muscles_of_upper_limb": {
+   "nombre": "Músculos del miembro superior",
+   "latin": "Musculi membri superiori"
+  },
+  "Scapulohumeral_muscles": {
+   "nombre": "Músculos escapulohumerales",
+   "latin": "Musculi scapulohumerales"
+  },
+  "Deltoid_muscle": {
+   "nombre": "Músculo deltoides",
+   "latin": "Musculus deltoideus"
+  },
+  "Rotator_cuff_muscles": {
+   "nombre": "Músculos del manguito rotador",
+   "latin": "Musculi cuffiae musculotendineae"
+  },
+  "Anterior_compartment_of_arm": {
+   "nombre": "Compartimento anterior del brazo",
+   "latin": "Compartimentum anterius brachii"
+  },
+  "Posterior_compartment_of_arm": {
+   "nombre": "Compartimento posterior del brazo",
+   "latin": "Compartimentum posterius brachii"
+  },
+  "Anterior_compartment_of_forearm": {
+   "nombre": "Compartimento anterior del antebrazo",
+   "latin": "Compartimentum anterius antebrachii"
+  },
+  "Posterior_compartment_of_forearm": {
+   "nombre": "Compartimento posterior del antebrazo",
+   "latin": "Compartimentum posterius antebrachii"
+  },
+  "Muscles_of_hand": {
+   "nombre": "Músculos de la mano",
+   "latin": "Musculi manus"
+  },
+  "Muscular_system_of_lower_limb": {
+   "nombre": "Sistema muscular del miembro inferior",
+   "latin": "Systema musculare membri inferioris"
+  },
+  "Muscles_of_lower_limb": {
+   "nombre": "Músculos del miembro inferior",
+   "latin": "Musculi membri inferioris"
+  },
+  "Superficial_gluteal_muscles": {
+   "nombre": "Músculos glúteos superficiales",
+   "latin": "Musculi glutei superficiales"
+  },
+  "Deep_gluteal_muscles": {
+   "nombre": "Músculos glúteos profundos",
+   "latin": "Musculi glutei profundi"
+  },
+  "Anterior_compartment_of_thigh": {
+   "nombre": "Compartimento anterior del muslo",
+   "latin": "Compartimentum anterius femoris"
+  },
+  "Medial_compartment_of_thigh": {
+   "nombre": "Compartimento medial del muslo",
+   "latin": "Compartimentum mediale muscle"
+  },
+  "Posterior_compartment_of_thigh": {
+   "nombre": "Compartimento posterior del muslo",
+   "latin": "Compartimentum posterius femoris"
+  },
+  "Anterior_compartment_of_leg": {
+   "nombre": "Compartimento anterior de la pierna",
+   "latin": "Compartimentum anterius cruris"
+  },
+  "Lateral_compartment_of_leg": {
+   "nombre": "Compartimento lateral de la pierna",
+   "latin": "Compartimentum laterale cruris"
+  },
+  "Posterior_compartment_of_leg": {
+   "nombre": "Compartimento posterior de la pierna",
+   "latin": "Compartimentum posterius cruris"
+  },
+  "Muscles_of_foot": {
+   "nombre": "Músculos del pie",
+   "latin": "Musculi pedis"
+  }
+ }
+}

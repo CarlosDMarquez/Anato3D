@@ -16,7 +16,7 @@ Salida: build/male_<sistema>.blend y .json, y web/public/models/male-<sistema>.j
 import bpy, bmesh, os, re, sys, json, collections
 sys.path.insert(0, os.path.dirname(__file__))
 from anato3d_fit import (Fitter, Extractor, Groups, bonus_paths, es, la, sanitize, source_name, principled, save,
-                         log, parse_args)
+                         log, parse_args, male_only, MODEL)
 from mathutils import Matrix, Vector, bvhtree
 import numpy as np
 
@@ -184,6 +184,7 @@ items = []
 sources = [o for c in ('8: Visceral systems', '1: Skeletal system', '6: Lymphoid organs') for o in bpy.data.collections[c].objects]
 for o in sources:
     if o.type not in ('MESH', 'CURVE') or o.name.startswith(('(', '?')) or '//' in o.name or o.name.endswith(('.j', '.g', '.t', '.i')): continue
+    if male_only(o.name): continue
     base, side = source_name(o.name)
     base = re.sub(r'\*+', '', base).strip()
     mat = o.active_material.name if o.active_material else None
@@ -232,6 +233,16 @@ MATS = {
     'seminal': principled('MAT_Seminal_Gland', srgb(0.86, 0.72, 0.58), 0.5, coat=0.3),
     'prostate': principled('MAT_Prostate', srgb(0.78, 0.54, 0.46), 0.5, coat=0.3),
     'erectile': principled('MAT_Erectile', srgb(0.80, 0.50, 0.48), 0.45, coat=0.3),
+    # Femeninos (tools/female_organs.py)
+    'uterus': principled('MAT_Uterus', srgb(0.80, 0.48, 0.48), 0.45, coat=0.35),
+    'vagina': principled('MAT_Vagina', srgb(0.86, 0.58, 0.58), 0.45, coat=0.35),
+    'ovary': principled('MAT_Ovary', srgb(0.92, 0.84, 0.80), 0.4, coat=0.4),
+    'tube': principled('MAT_Uterine_Tube', srgb(0.88, 0.62, 0.60), 0.45, coat=0.35),
+    'ligament': principled('MAT_Pelvic_Ligament', srgb(0.92, 0.88, 0.82), 0.45, coat=0.3),
+    'urethra': principled('MAT_Urethra', srgb(0.88, 0.64, 0.58), 0.45, coat=0.35),
+    'gland_f': principled('MAT_Vestibular_Gland', srgb(0.90, 0.74, 0.62), 0.5, coat=0.3),
+    'mammary': principled('MAT_Mammary_Gland', srgb(0.96, 0.82, 0.60), 0.5, coat=0.25),
+    'duct_f': principled('MAT_Lactiferous_Duct', srgb(0.95, 0.88, 0.74), 0.45, coat=0.3),
     # Endocrino
     'thyroid': principled('MAT_Thyroid', srgb(0.66, 0.26, 0.27), 0.4, coat=0.4),
     'parathyroid': principled('MAT_Parathyroid', srgb(0.82, 0.62, 0.34), 0.4, coat=0.3),
@@ -254,7 +265,9 @@ NAMES_ES = {'Respiratory system': 'Sistema respiratorio', 'Digestive system': 'S
             'Lymph nodes': 'Nodos linfáticos', 'Lymph nodes of head': 'Nodos de la cabeza', 'Lymph nodes of neck': 'Nodos del cuello',
             'Lymph nodes of upper limb': 'Nodos del miembro superior', 'Thoracic lymph nodes': 'Nodos del tórax',
             'Abdominal lymph nodes': 'Nodos del abdomen', 'Pelvic lymph nodes': 'Nodos de la pelvis',
-            'Lymph nodes of lower limb': 'Nodos del miembro inferior'}
+            'Lymph nodes of lower limb': 'Nodos del miembro inferior', 'Female genital system': 'Órganos genitales femeninos',
+            'Female internal genitalia': 'Órganos genitales internos', 'Female external genitalia': 'Órganos genitales externos',
+            'Breast': 'Mama'}
 # Nombres que faltan en la traducción oficial o que tienen erratas (clave: nombre inglés con «_»). Tienen prioridad.
 PARTS_ES = {
     'Node_of_arch_of_azygos_vein': 'Nodo del arco de la vena ácigos', 'Node_of_ligamentum_arteriosum': 'Nodo del ligamento arterioso',
@@ -302,6 +315,83 @@ for n, it in enumerate(items):
                                 'verts': len(obj.data.vertices), 'name_es': obj['name_es']})
     if n % 25 == 0: log(f'  {n}/{len(items)} {name}: {len(obj.data.polygons)} caras')
 
+# ── Órganos femeninos ───────────────────────────────────────────────────────
+# Z-Anatomy es un cuerpo masculino: los genitales femeninos, la uretra femenina y las glándulas mamarias se generan con
+# formas paramétricas sobre la pelvis y la piel femeninas (tools/female_organs.py).
+FEMALE_PARTS = {   # nombre: (español, latín, ruta)
+    'Vagina': ('Vagina', 'Vagina', 'internal'), 'Uterus': ('Útero', 'Uterus', 'internal'),
+    'Ovary': ('Ovario', 'Ovarium', 'internal'), 'Uterine_tube': ('Trompa uterina', 'Tuba uterina', 'internal'),
+    'Fimbriae_of_uterine_tube': ('Fimbrias de la trompa uterina', 'Fimbriae tubae uterinae', 'internal'),
+    'Ligament_of_ovary': ('Ligamento propio del ovario', 'Ligamentum ovarii proprium', 'internal'),
+    'Round_ligament_of_uterus': ('Ligamento redondo del útero', 'Ligamentum teres uteri', 'internal'),
+    'Urethra': ('Uretra femenina', 'Urethra feminina', 'urinary'),
+    'Glans_of_clitoris': ('Glande del clítoris', 'Glans clitoridis', 'external'),
+    'Body_of_clitoris': ('Cuerpo del clítoris', 'Corpus clitoridis', 'external'),
+    'Crus_of_clitoris': ('Raíz del clítoris', 'Crus clitoridis', 'external'),
+    'Bulb_of_vestibule': ('Bulbo del vestíbulo', 'Bulbus vestibuli', 'external'),
+    'Greater_vestibular_gland': ('Glándula vestibular mayor', 'Glandula vestibularis major', 'external'),
+    'Mammary_gland': ('Glándula mamaria', 'Glandula mammaria', 'breast'),
+    'Lactiferous_ducts': ('Conductos galactóforos', 'Ductus lactiferi', 'breast'),
+}
+FEMALE_PATHS = {'internal': (UROGENITAL, 'Female genital system', 'Female internal genitalia'),
+                'external': (UROGENITAL, 'Female genital system', 'Female external genitalia'),
+                'urinary': (UROGENITAL, 'Urinary system'), 'breast': (UROGENITAL, 'Breast')}
+if MODEL == 'female' and 'urogenital' in wanted:
+    from female_organs import pelvic_organs, mammary_glands
+    # Sin el sufijo .001 que reciben al cargarse los que se llaman como en Z-Anatomy (Sacrum, Coccyx).
+    ref = {re.sub(r'\.\d{3}$', '', o.name): o for o in bpy.data.collections['Fase2_ref'].objects}
+    bladder = next((it['out'] for it in items if 'out' in it and it['out'].name == 'Urinary_bladder'), None)
+    # matrix_basis: los objetos nuevos aún no están en la escena y su matrix_world no se ha calculado (con ella, la
+    # uretra salía del origen y medía 80 cm).
+    BW = np.array([(bladder.matrix_basis @ v.co)[:] for v in bladder.data.vertices]) if bladder else None
+    skin_o = ref['Skin_Body']
+    SW = np.array([(skin_o.matrix_world @ v.co)[:] for v in skin_o.data.vertices])
+    pieces, LM = pelvic_organs(ref, BW, SW)
+    SN = np.array([(skin_o.matrix_world.to_3x3() @ v.normal).normalized()[:] for v in skin_o.data.vertices])
+    _rb = bmesh.new()
+    for o in ref.values():
+        if o.type == 'MESH' and o.name.startswith(('Rib_', 'Costal_', 'Sternum')):
+            _b = bmesh.new(); _b.from_mesh(o.data); _b.transform(o.matrix_world)
+            _m = bpy.data.meshes.new('tmp'); _b.to_mesh(_m); _b.free(); _rb.from_mesh(_m); bpy.data.meshes.remove(_m)
+    RIBS = bvhtree.BVHTree.FromBMesh(_rb); _rb.free()
+    pieces += mammary_glands(SW, SN, RIBS, fitter.skin)
+    merged = collections.OrderedDict()
+    for name, tissue, V, F, external in pieces:
+        m = merged.setdefault(name, [tissue, [], [], external])
+        off = sum(len(v) for v in m[1]); m[1].append(V); m[2] += [tuple(i + off for i in f) for f in F]
+    for name, (tissue, Vs, F, external) in merged.items():
+        V = np.vstack(Vs)
+        if not external:                                         # los internos, 1,5 mm por dentro de la piel
+            moved = 0
+            for k, p in enumerate(V):
+                loc, nrm, _, dist = fitter.skin.find_nearest(Vector(p), 0.01)
+                if loc is None: continue
+                depth = (Vector(p) - loc).dot(nrm)
+                if depth > -0.0015: V[k] = np.array(Vector(p) - nrm * (depth + 0.0015)); moved += 1
+            if moved: log(f'  {name}: {moved} vértices metidos bajo la piel')
+        center = (V.min(0) + V.max(0)) / 2
+        me = bpy.data.meshes.new(name); me.from_pydata((V - center).tolist(), [], F); me.update()
+        for f in me.polygons: f.use_smooth = True
+        clash = bpy.data.objects.get(name)                      # la uretra masculina de Z-Anatomy se llama igual
+        if clash: clash.name = name + '_Z-Anatomy'
+        obj = bpy.data.objects.new(name, me); obj.location = center
+        obj.data.materials.append(MATS[tissue])
+        base, side = (name[:-2], name[-1]) if name.endswith(('_L', '_R')) else (name, None)
+        es_name, la_name, where = FEMALE_PARTS[base]
+        sub = 'urinary' if where == 'urinary' else 'reproductive'
+        obj['anato3d_id'] = f'urogenital_{name.lower()}'
+        obj['system'] = 'urogenital'; obj['subsystem'] = sub; obj['tissue'] = tissue; obj['major'] = True
+        obj['name_en'] = 'Female urethra' if base == 'Urethra' else base.replace('_', ' ').capitalize()
+        obj['name_la'] = la_name; obj['name_es'] = es_name
+        rp = list(FEMALE_PATHS[where][1:])
+        obj['region'] = json.dumps([sanitize(g) for g in rp])
+        obj['source'] = 'Anato3D (forma paramétrica con medidas anatómicas de adulta; tools/female_organs.py)'
+        roots['urogenital'].collection(rp).objects.link(obj)
+        items.append({'out': obj, 'tissue': tissue, 'system': 'urogenital', 'base': base})
+        stats['urogenital'].append({'name': name, 'sub': sub, 'tissue': tissue, 'faces': len(me.polygons),
+                                    'verts': len(me.vertices), 'name_es': es_name})
+    log(f'órganos femeninos: {len(merged)} piezas; vestíbulo a {LM["ps_bottom"][2]:.3f} m (borde inferior de la sínfisis)')
+
 # ── Solapes entre órganos ───────────────────────────────────────────────────
 # El ajuste mezcla las transformaciones de huesos vecinos y algunos órganos acababan unos dentro de otros. La auditoría
 # encontraba:
@@ -348,7 +438,8 @@ GROUP = {'kidney': 'kidney', 'renal_pelvis': 'kidney', 'adrenal': 'adrenal', 'sp
          'gallbladder': 'liver', 'colon': 'colon', 'taenia': 'colon', 'stomach': 'gi', 'intestine': 'gi',
          'bladder': 'pelvis', 'prostate': 'pelvis', 'seminal': 'pelvis', 'testis': 'testis', 'epididymis': 'testis',
          'lung': 'lungs', 'pleura': 'lungs', 'bronchus': 'lungs', 'thymus': 'thymus', 'thyroid': 'thyroid',
-         'parathyroid': 'thyroid', 'cartilage': 'larynx'}
+         'parathyroid': 'thyroid', 'cartilage': 'larynx', 'uterus': 'female', 'vagina': 'female', 'ovary': 'female',
+         'tube': 'female'}
 def group(o):
     return 'pancreas' if o['name'] == 'Pancreas' else GROUP.get(o['it']['tissue'])
 

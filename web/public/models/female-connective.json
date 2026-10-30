@@ -1,0 +1,380 @@
+{
+ "groups": {
+  "Arthrology": {
+   "nombre": "Artrología",
+   "latin": ""
+  },
+  "Joints_of_skull": {
+   "nombre": "Articulaciones del cráneo",
+   "latin": "Juncturae cranii"
+  },
+  "Cranial_fibrous_joints": {
+   "nombre": "Articulaciones fibrosas craneales",
+   "latin": "Juncturae fibrosae cranii"
+  },
+  "Cranial_syndesmosis": {
+   "nombre": "Sindesmosis craneales",
+   "latin": ""
+  },
+  "Cranial_synovial_joints": {
+   "nombre": "Articulaciones craneales",
+   "latin": "Articulationes cranii"
+  },
+  "Temporomandibular_joint": {
+   "nombre": "Articulación temporomandibular",
+   "latin": "Articulatio temporomandibularis"
+  },
+  "Laryngeal_joints": {
+   "nombre": "Articulaciones laríngeas",
+   "latin": "Juncturae laryngis"
+  },
+  "Fibrous_joints_of_larynx": {
+   "nombre": "Articulaciones fibrosas de laringe",
+   "latin": "Juncturae fibrosae laryngis"
+  },
+  "Thyrohyoid_membrane": {
+   "nombre": "Membrana tirohioidea",
+   "latin": "Membrana thyreohyoidea"
+  },
+  "Fibro_elastic_membrane_of_larynx": {
+   "nombre": "Membrana fibroelástica de la laringe",
+   "latin": "Membrana fibroelastica laryngis"
+  },
+  "Quadrangular_membrane": {
+   "nombre": "Membrana cuadrangular",
+   "latin": "Membrana quadrangularis"
+  },
+  "Synovial_joints_of_larynx": {
+   "nombre": "Articulaciones sinoviales de la laringe",
+   "latin": "Articultiones laryngis"
+  },
+  "Crico_arythenoid_joint": {
+   "nombre": "Articulación cricoaritenoidea",
+   "latin": ""
+  },
+  "Joints_of_vertebral_column": {
+   "nombre": "Articulaciones de la columna vertebral",
+   "latin": "Juncturae columnar vertebralis"
+  },
+  "Fibrous_joints_of_vertebral_column": {
+   "nombre": "Articulaciones fibrosas de la columna vertebral",
+   "latin": "Juncturae fibrosae columnae vertebralis"
+  },
+  "Cartilaginous_joints_of_vertebral_column": {
+   "nombre": "Articulaciones cartilaginosas de la columna vertebral",
+   "latin": "Juncturae cartilagineae columnae vertebralis"
+  },
+  "Intervertebral_symphysis": {
+   "nombre": "Sínfisis intervertebral",
+   "latin": "Symphysis intervertebralis"
+  },
+  "Intervertebral_disc": {
+   "nombre": "Disco intervertebral",
+   "latin": "Discus intervertebralis"
+  },
+  "Thoracic_joints": {
+   "nombre": "Articulaciones torácicas",
+   "latin": "Juncturae thoracis"
+  },
+  "Fibrous_joints_of_thorax": {
+   "nombre": "Articulaciones fibrosas del tórax",
+   "latin": "Juncturae fibrosae thoracis"
+  },
+  "Synovial_joints_of_thorax": {
+   "nombre": "Articulaciones sinoviales del tórax",
+   "latin": "Articulationes thoracis"
+  },
+  "Costovertebral_joints": {
+   "nombre": "Articulaciones costovertebrales",
+   "latin": "Articulationes costovertebrales"
+  },
+  "Joint_of_head_of_rib": {
+   "nombre": "Articulación de cabeza de la costilla",
+   "latin": "Articulatio capitis costae"
+  },
+  "Costotransverse_joint": {
+   "nombre": "Articulación costotransversa",
+   "latin": "Articulatio costotransversaria"
+  },
+  "Joints_of_upper_limb": {
+   "nombre": "Articulaciones del miembro superior",
+   "latin": "Juncturae membri superiori"
+  },
+  "Joints_of_pectoral_girdle": {
+   "nombre": "Articulaciones del cíngulo escapular",
+   "latin": "Juncturae cinguli pectoralis"
+  },
+  "Fibrous_joints_of_pectoral_girdle": {
+   "nombre": "Articulaciones fibrosas de la cíngulo escapular",
+   "latin": "Juncturae fibrosae cinguli pectoralis"
+  },
+  "Synovial_joints_of_pectoral_girdle": {
+   "nombre": "Articulaciones sinoviales del cíngulo escapular",
+   "latin": "Articulationes cinguli pecoralis"
+  },
+  "Acromioclavicular_joint": {
+   "nombre": "Articulación acromioclavicular",
+   "latin": "Articulatio acromioclavicularis"
+  },
+  "Coracoclavicular_ligament": {
+   "nombre": "Ligamento coracoclavicular",
+   "latin": "Ligamentum coracoclaviculare"
+  },
+  "Sternoclavicular_joint": {
+   "nombre": "Articulación esternoclavicular",
+   "latin": "Articulatio sternoclavicularis"
+  },
+  "Joints_of_free_upper_limb": {
+   "nombre": "Articulaciones de la parte libre del miembro superior",
+   "latin": "Juncturae partis liberae membri superioris"
+  },
+  "Fibrous_joints_of_free_upper_limb": {
+   "nombre": "Art. fibrosas de la parte libre del miembro superior",
+   "latin": "Juncturae fibrosae partis liberae membri superioris"
+  },
+  "Radio_ulnar_syndesmoses": {
+   "nombre": "Sindesmosis radioulnar",
+   "latin": "Syndesmoses radioulnares"
+  },
+  "Synovial_joints_of_free_upper_limb": {
+   "nombre": "Art. sinoviales de la parte libre del miembro superior",
+   "latin": "Articulationes partis liberae membri superioris"
+  },
+  "Glenohumeral_joint": {
+   "nombre": "Articulación glenohumeral",
+   "latin": "Articulatio glenohumeralis"
+  },
+  "Glenohumeral_ligaments": {
+   "nombre": "Ligamentos glenohumerales",
+   "latin": "Ligamenta glenohumeralia"
+  },
+  "Elbow_joint": {
+   "nombre": "Articulación del codo",
+   "latin": "Articulatio cubiti"
+  },
+  "Distal_radio_ulnar_joint": {
+   "nombre": "Articulación radioulnar distal",
+   "latin": "Articulatio radioulnaris distalis"
+  },
+  "Joints_of_hand": {
+   "nombre": "Articulaciones de la mano",
+   "latin": "Articulationes manus"
+  },
+  "Intercarpal_joints": {
+   "nombre": "Articulaciones intercarpianas",
+   "latin": "Articulationes intercarpeae"
+  },
+  "Dorsal_intercarpal_ligaments": {
+   "nombre": "Ligamentos intercarpianos dorsales",
+   "latin": "Ligamenta intercarpea dorsalia"
+  },
+  "Palmar_intercarpal_ligaments": {
+   "nombre": "Ligamentos intercarpianos palmares",
+   "latin": "Ligamenta intercarpea palmaria"
+  },
+  "Interosseus_intercarpal_ligaments": {
+   "nombre": "Ligamentos intercarpianos interóseos",
+   "latin": "Ligamenta intercarpea interossea"
+  },
+  "Pisiform_joint": {
+   "nombre": "Articulación del hueso pisiforme",
+   "latin": "Articulatio ossis pisiformis"
+  },
+  "Carpometacarpal_joints": {
+   "nombre": "Articulaciones carpometacarpianas",
+   "latin": "Articulationes carpometacarpeae"
+  },
+  "Intermetacarpal_joints": {
+   "nombre": "Articulaciones intermetacarpianas",
+   "latin": "Articulationes intermetacarpeae"
+  },
+  "Metacarpophalangeal_joints": {
+   "nombre": "Articulaciones metacarpofalángicas",
+   "latin": "Articulationes metacarpophalangeae"
+  },
+  "Interphalangeal_joints_of_hand": {
+   "nombre": "Articulaciones interfalángicas de la mano",
+   "latin": "Articulationes interphalangeae manus"
+  },
+  "Radiocarpal_joint": {
+   "nombre": "Articulación radiocarpiana",
+   "latin": "Articulatio radiocarpea"
+  },
+  "Palmar_radiocarpal_ligament": {
+   "nombre": "Ligamento radiocarpiano palmar",
+   "latin": "Ligamentum radiocarpeum palmare"
+  },
+  "Palmar_ulnocarpal_ligament": {
+   "nombre": "Ligamento ulnocarpiano palmar",
+   "latin": "Ligamentum ulnocarpeum palmare"
+  },
+  "Joints_of_lower_limb": {
+   "nombre": "Articulaciones del miembro inferior",
+   "latin": "Juncturae membri inferioris"
+  },
+  "Joints_of_pelvic_girdle": {
+   "nombre": "Articulaciones del cíngulo pélvico",
+   "latin": "Juncturae cinguli pelvici"
+  },
+  "Fibrous_joints_of_pelvic_girdle": {
+   "nombre": "Articulaciones fibrosas del cíngulo pélvico",
+   "latin": "Juncturae fibrosae cinguli pelvici"
+  },
+  "Obturator_membrane": {
+   "nombre": "Membrana obturadora",
+   "latin": "Membrana obturatoria"
+  },
+  "Sacrotuberous_ligament": {
+   "nombre": "Ligamento sacrotuberoso",
+   "latin": "Ligamentum sacrotuberale"
+  },
+  "Cartilaginous_joints_of_pelvic_girdle": {
+   "nombre": "Articulaciones cartilaginosas del cíngulo pélvico",
+   "latin": "Juncturae cartilagineae cinguli pelvici"
+  },
+  "Pubic_symphysis": {
+   "nombre": "Sínfisis púbica",
+   "latin": "Symphysis pubica"
+  },
+  "Synovial_joints_of_pelvic_girdle": {
+   "nombre": "Articulaciones sinoviales del cíngulo pélvico",
+   "latin": "Articulationes cinguli pelvici"
+  },
+  "Sacro_iliac_joint": {
+   "nombre": "Articulación sacroilíaca",
+   "latin": "Articulatio sacroiliaca"
+  },
+  "Joints_of_free_lower_limb": {
+   "nombre": "Articulaciones de la parte libre del miembro inferior",
+   "latin": "Juncturae partis liberae membri inferioris"
+  },
+  "Fibrous_joints_of_free_lower_limb": {
+   "nombre": "Art. fibrosas de la parte libre del miembro inferior",
+   "latin": "Juncturae fibrosae partis liberae membri inferioris"
+  },
+  "Tibiofibular_syndesmosis": {
+   "nombre": "Sindesmosis tibiofibular",
+   "latin": "Syndesmosis tibiofibularis"
+  },
+  "Synovial_joints_of_free_lower_limb": {
+   "nombre": "Art. sinoviales de la parte libre del miembro inferior",
+   "latin": "Articulationes partis liberae membri inferioris"
+  },
+  "Hip_joint": {
+   "nombre": "Articulación de la cadera",
+   "latin": "Articulatio coxae"
+  },
+  "Iliofemoral_ligament": {
+   "nombre": "Ligamento iliofemoral",
+   "latin": "Ligamentum iliofemorale"
+  },
+  "Knee_joint": {
+   "nombre": "Articulación de la rodilla",
+   "latin": "Articulatio genus"
+  },
+  "Medial_meniscus": {
+   "nombre": "Menisco medial",
+   "latin": "Meniscus medialis"
+  },
+  "Lateral_meniscus": {
+   "nombre": "Menisco lateral",
+   "latin": "Meniscus lateralis"
+  },
+  "Tibial_collateral_ligament": {
+   "nombre": "Ligamento colateral tibial",
+   "latin": "Ligamentum collaterale tibiale"
+  },
+  "Superior_tibiofibular_joint": {
+   "nombre": "Articulación tibiofibular",
+   "latin": "Articulatio tibiofibularis"
+  },
+  "Ankle_joint": {
+   "nombre": "Articulación talocrural",
+   "latin": "Articulatio talocruralis"
+  },
+  "Medial_collateral_ligament": {
+   "nombre": "Ligamento colateral medial",
+   "latin": ""
+  },
+  "Lateral_collateral_ligament": {
+   "nombre": "Ligamento colateral lateral",
+   "latin": ""
+  },
+  "Joints_of_foot": {
+   "nombre": "Articulaciones del pie",
+   "latin": "Articulationes pedis"
+  },
+  "Intertarsal_joints": {
+   "nombre": "Articulaciones intertarsianas",
+   "latin": "Articulationes intertarseae"
+  },
+  "Subtalar_joint": {
+   "nombre": "Articulación subtalar",
+   "latin": "Articulatio subtalaris"
+  },
+  "Transverse_tarsal_joint": {
+   "nombre": "Articulación transversa del tarso",
+   "latin": "Articulatio transversa tarsi"
+  },
+  "Bifurcate_ligament": {
+   "nombre": "Ligamento bifurcado",
+   "latin": "Ligamentum bifurcatum"
+  },
+  "Talocalcaneonavicular_joint": {
+   "nombre": "Articulación talocalcaneonavicular",
+   "latin": "Articulatio talocalcaneonavicularis"
+  },
+  "Calcaneocuboid_joint": {
+   "nombre": "Articulación calcáneocuboidea",
+   "latin": "Articulatio calcaneocuboidea"
+  },
+  "Cuneonavicular_joint": {
+   "nombre": "Articulación cuneonavicular",
+   "latin": "Articulatio cuneonavicularis"
+  },
+  "Cuneocuboid_joint": {
+   "nombre": "Articulación cuneocuboidea",
+   "latin": "Articulatio cuneocuboidea"
+  },
+  "Cuboidonavicular_joint": {
+   "nombre": "Articulación cuboideonavicular",
+   "latin": ""
+  },
+  "Intercuneiform_joints": {
+   "nombre": "Articulaciones intercuneiformes",
+   "latin": "Articulationes intercuneiformes"
+  },
+  "Tarsometatarsal_joints": {
+   "nombre": "Articulaciones tarsometatarsianas",
+   "latin": "Articulationes tarsometatarseae"
+  },
+  "Intermetatarsal_joints": {
+   "nombre": "Articulaciones intermetatarsianas",
+   "latin": "Articulationes intermetatarseae"
+  },
+  "Metatarsophalangeal_joints": {
+   "nombre": "Articulaciones metatarsofalángicas",
+   "latin": "Articulationes metatarsophalangeae"
+  },
+  "Interphalangeal_joints_of_foot": {
+   "nombre": "Articulaciones interfalángicas del pie",
+   "latin": "Articulationes interphalangeae pedis"
+  },
+  "Ligaments_of_muscles": {
+   "nombre": "Ligamentos y retináculos musculares",
+   "latin": ""
+  },
+  "Fasciae": {
+   "nombre": "Fascias",
+   "latin": "Fasciae"
+  },
+  "Synovial_bursae": {
+   "nombre": "Bolsas sinoviales (bursas)",
+   "latin": "Bursae synoviales"
+  },
+  "Tendon_sheaths": {
+   "nombre": "Vainas tendinosas",
+   "latin": "Vaginae tendinum"
+  }
+ }
+}

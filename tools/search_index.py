@@ -6,9 +6,9 @@ la app compone su ficha (sistema, nombres en español, inglés y latín, tejido)
 ese sistema y lo muestra.
 
 Uso (desde la raíz del proyecto; lo llama tools/build_all.sh al final):
-  python3 tools/search_index.py
+  python3 tools/search_index.py [male|female]
 """
-import glob, json, os, struct
+import glob, json, os, struct, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 MODELS = os.path.join(ROOT, 'web/public/models')
@@ -34,11 +34,12 @@ def parts(path):
 
 
 if __name__ == '__main__':
+    model = sys.argv[1] if len(sys.argv) > 1 else 'male'
     index = {}
-    for path in sorted(glob.glob(os.path.join(MODELS, 'male-*.glb'))):
-        key = os.path.basename(path)[len('male-'):-len('.glb')]
+    for path in sorted(glob.glob(os.path.join(MODELS, f'{model}-*.glb'))):
+        key = os.path.basename(path)[len(model) + 1:-len('.glb')]
         index[key] = parts(path)
-    out = os.path.join(MODELS, 'male-index.json')
+    out = os.path.join(MODELS, f'{model}-index.json')
     with open(out, 'w') as f:
         json.dump(index, f, ensure_ascii=False, separators=(',', ':'))
     print(f'índice de búsqueda: {sum(len(v) for v in index.values())} piezas en {len(index)} archivos → {out} '

@@ -176,7 +176,10 @@ function decodeRegion(r) {
 // Piezas que se ocultan enteras con «Mostrar genitales externos» desactivado (su borde entra un poco en el cuerpo), y
 // sistemas que pueden tener tramos externos (los músculos y fascias de la ingle no se recortan nunca).
 // Enteros, no recortados por la región: el recorte dejaba a la vista, en el pubis, la sección hueca de la raíz del pene.
-const MODEST_HIDE = new Set(['Skin_Genitals', 'Corpus_cavernosum_of_penis', 'Corpus_spongiosum_of_penis', 'Glans_penis']);
+const MODEST_HIDE = new Set(['Skin_Genitals', 'Corpus_cavernosum_of_penis', 'Corpus_spongiosum_of_penis', 'Glans_penis',
+  // Mujer: la piel de la vulva (también Skin_Genitals) y los genitales externos profundos.
+  'Glans_of_clitoris', 'Body_of_clitoris', 'Crus_of_clitoris_L', 'Crus_of_clitoris_R', 'Bulb_of_vestibule_L',
+  'Bulb_of_vestibule_R', 'Greater_vestibular_gland_L', 'Greater_vestibular_gland_R']);
 const MODEST_SYSTEMS = new Set(['urogenital', 'arterial', 'venous', 'nervous', 'lymphatic']);
 
 // Las piezas izquierdas de la Fase 2 se generaron en espejo y quedaron con las caras hacia dentro.
@@ -454,6 +457,7 @@ export class Viewer extends EventTarget {
   // ── Genitales externos (opción de los ajustes) ──
   setGenitalRegion(region) {
     this.genitalRegion = region ? decodeRegion(region) : null;
+    for (const part of this.parts) delete part.modestEmpty;
     this.#applyModesty(this.parts);
   }
 
@@ -467,7 +471,7 @@ export class Viewer extends EventTarget {
   #applyModesty(parts) {
     const R = this.genitalRegion;
     for (const part of parts) {
-      if (this.modesty && R && part.modestEmpty === undefined) part.modestEmpty = this.#modestCut(part, R);
+      if (this.modesty && part.modestEmpty === undefined) part.modestEmpty = this.#modestCut(part, R);
       for (const m of part.meshes) {
         if (!m.userData.modestIndex) continue;
         m.geometry.setIndex(this.modesty && R ? m.userData.modestIndex : m.userData.fullIndex);
@@ -479,7 +483,8 @@ export class Viewer extends EventTarget {
   // Calcula el índice recortado de cada malla de la pieza (una sola vez por malla); devuelve si queda vacía.
   #modestCut(part, R) {
     if (MODEST_HIDE.has(part.id)) return true;
-    if (!MODEST_SYSTEMS.has(part.system)) return false;
+    // Sin región (el modelo femenino: sus genitales externos son piezas enteras de MODEST_HIDE), no se recorta nada.
+    if (!R || !MODEST_SYSTEMS.has(part.system)) return false;
     let empty = true;
     const v = new THREE.Vector3();
     for (const m of part.meshes) {

@@ -15,7 +15,7 @@ Salida: build/male_arterial.* y build/male_venous.*, y sus .json en web/public/m
 import bpy, os, re, sys, json, collections
 sys.path.insert(0, os.path.dirname(__file__))
 from anato3d_fit import (Fitter, Extractor, Groups, bonus_paths, es, la, sanitize, source_name, principled, save,
-                         log, parse_args)
+                         log, parse_args, male_only, MODEL)
 
 opt = parse_args({'budget': 120000, 'only': None})   # presupuesto de caras para las mallas (corazón)
 
@@ -56,6 +56,8 @@ DEEP = ('cerebr', 'cerebell', 'basilar', 'communicating', 'callosomarginal', 'pe
 # externos no: sus ramas van al escroto, fuera de la piel de MakeHuman (los cubre build_genital_skin.py), y al
 # meterlos bajo la piel el tubo se estiraba de un lado a otro del pliegue de la ingle y asomaba.
 SUBCUTANEOUS = ('superficial epigastric', 'superficial circumflex iliac', 'thoraco-epigastric')
+# En la mujer no hay escroto: los pudendos externos van al monte del pubis y a los labios mayores, bajo la piel.
+if MODEL == 'female': SUBCUTANEOUS += ('external pudendal',)
 
 fitter = Fitter()
 paths = bonus_paths()
@@ -74,6 +76,7 @@ items = []
 for o in col.objects:
     # Fuera: etiquetas (.j/.g/.t), variantes entre paréntesis y duplicados con nombre corrupto («?», «//»).
     if o.type not in ('MESH', 'CURVE') or o.name.startswith(('(', '?')) or '//' in o.name or o.name.endswith(('.j', '.g', '.t')): continue
+    if male_only(o.name): continue
     mat = o.active_material.name if o.active_material else None
     base, side = source_name(o.name)
     in_heart = any(p[:2] == ('Cardiovascular system', 'Heart') for p in paths[o.name])

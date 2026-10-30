@@ -12,8 +12,12 @@ import numpy as np
 from mathutils import Vector, kdtree, bvhtree
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-FASE2 = os.path.join(ROOT, 'Anato3D_Male_30_Fase2.blend')
-MUSCULATURE = os.path.join(ROOT, 'Anato3D_Male_30_Fase2_musculature.npz')   # lo escribe fix_neck.py
+# Modelo: masculino (por defecto) o femenino (A3D_MODEL=female). El femenino tiene su propia Fase 2 (su piel y el
+# esqueleto masculino transformado hasta ella, ver fix_neck.py), no tiene la complexión musculosa del masculino y no lleva
+# los órganos que solo tiene el hombre (male_only).
+MODEL = os.environ.get('A3D_MODEL', 'male')
+FASE2 = os.path.join(ROOT, 'Anato3D_Male_30_Fase2.blend' if MODEL == 'male' else 'Anato3D_Female_30_Fase2.blend')
+MUSCULATURE = os.path.join(ROOT, 'Anato3D_Male_30_Fase2_musculature.npz') if MODEL == 'male' else ''  # fix_neck.py
 TRANSLATIONS = os.path.join(ROOT, 'sources/z-anatomy/translations.csv')
 OUT_DIR = os.path.join(ROOT, 'build')
 WEB_MODELS = os.path.join(ROOT, 'web/public/models')
@@ -75,9 +79,16 @@ def source_name(name):
     m = re.match(r'^(.*)\.(l|r)$', name)
     return (m.group(1), m.group(2).upper()) if m else (name, None)
 
+# Estructuras que solo tiene el hombre (Z-Anatomy es un cuerpo masculino): fuera del modelo femenino. La uretra de
+# Z-Anatomy es la masculina (prostática, membranosa y esponjosa); la femenina se genera aparte.
+MALE_ONLY = re.compile(r'penis|glans|testi(s|cular)|epididym|scrot|spermatic|cremaster|prostat|seminal|ductus deferens|'
+                       r'deferent|ejaculatory|dartos|bulbourethral|pampiniform|^urethra(\.[lr])?$', re.I)
+def male_only(name):
+    return MODEL == 'female' and bool(MALE_ONLY.search(name))
+
 def is_structure(o):
     """Objetos de malla reales: sin etiquetas (.j/.g) ni variantes entre paréntesis."""
-    return o.type == 'MESH' and not o.name.startswith('(') and not o.name.endswith(('.j', '.g'))
+    return o.type == 'MESH' and not o.name.startswith('(') and not o.name.endswith(('.j', '.g')) and not male_only(o.name)
 
 # ── Colecciones «Bonus» de Z-Anatomy: región, articulación e inervación ─────
 def bonus_paths():
@@ -100,7 +111,7 @@ class Fitter:
         corrigiendo); sin ellos se cargan de Anato3D_Male_30_Fase2.blend, con su complexión musculosa."""
         self.bulk = None
         if objects is None:
-            if os.path.exists(MUSCULATURE):
+            if MUSCULATURE and os.path.exists(MUSCULATURE):
                 from musculature import Field
                 self.bulk = Field.load(MUSCULATURE)
             with bpy.data.libraries.load(FASE2) as (src, dst):
@@ -149,7 +160,7 @@ class Fitter:
         skin = next(o for o in objects if o.name == 'Skin_Body')
         bm = bmesh.new(); bm.from_mesh(skin.data); bm.transform(skin.matrix_world)
         self.skin = bvhtree.BVHTree.FromBMesh(bm)
-        self.genital = GenitalPose(self) if 'Corpus cavernosum of penis' in bpy.data.objects else None
+        self.genital = GenitalPose(self) if MODEL == 'male' and 'Corpus cavernosum of penis' in bpy.data.objects else None
 
         # Huesos de la Fase 2 juntos, con la orientación de cada uno (las piezas _L tienen las normales hacia dentro y
         # algunos huesos son mallas abiertas: se usa la cara más cercana, no la paridad).
@@ -201,7 +212,7 @@ class Fitter:
             if merged and (sel.sum() < 60 or np.ptp(z[sel]) < 0.01): merged[-1] |= sel
             else: merged.append(sel.copy())
         if len(merged) > 1 and (merged[0].sum() < 60 or np.ptp(z[merged[0]]) < 0.01):
-            merged[1] |= merged.pop(0)
+            first = merged.pop(0); merged[0] |= first            # (merged[1] |= merged.pop(0) fallaba con dos tramos)
         return [(f'{o.name}#{i}', sel) for i, sel in enumerate(merged)]
 
     @staticmethod
@@ -521,7 +532,9 @@ class Groups:
         return parent
 
 def save(system_file, groups, stats, extra=None):
-    """Escribe build/<system_file>.blend y .json, y la tabla de grupos que lee la app."""
+    """Escribe build/<system_file>.blend y .json, y la tabla de grupos que lee la app. «male_» pasa a ser el prefijo del
+    modelo (female_muscular…)."""
+    if system_file.startswith('male_'): system_file = MODEL + system_file[4:]
     os.makedirs(OUT_DIR, exist_ok=True)
     blend_out = os.path.join(OUT_DIR, f'{system_file}.blend')
     bpy.data.libraries.write(blend_out, {groups.root}, fake_user=True)

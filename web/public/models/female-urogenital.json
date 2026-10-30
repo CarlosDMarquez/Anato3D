@@ -1,0 +1,28 @@
+{
+ "groups": {
+  "Urinary_system": {
+   "nombre": "Sistema urinario",
+   "latin": "Systema urinarium"
+  },
+  "Kidney": {
+   "nombre": "Riñón",
+   "latin": "Ren"
+  },
+  "Female_genital_system": {
+   "nombre": "Órganos genitales femeninos",
+   "latin": "Systema genitale femininum"
+  },
+  "Female_internal_genitalia": {
+   "nombre": "Órganos genitales internos",
+   "latin": "Organa genitalia feminina interna"
+  },
+  "Female_external_genitalia": {
+   "nombre": "Órganos genitales externos",
+   "latin": "Organa genitalia feminina externa"
+  },
+  "Breast": {
+   "nombre": "Mama",
+   "latin": "Mamma"
+  }
+ }
+}

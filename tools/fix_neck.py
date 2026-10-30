@@ -203,6 +203,13 @@ for s, side in (('L', 'Left'), ('R', 'Right')):
 print(f'extremidades: {len(moved)} huesos reproporcionados; piel movida hasta {np.linalg.norm(limb_disp, axis=1).max() * 100:.1f} cm '
       f'(entrepierna a {crotch_z:.3f} m)')
 
+# Para el modelo femenino (tools/female.py): piel y esqueleto masculinos en este punto, corregidos igual que la piel
+# femenina y antes de lo que solo es del hombre (hombros, complexión musculosa), con su colección y la jerarquía.
+MALE_SKIN_3A = world(skin)
+MALE_BONES_3A = {n: (world(o), o.get('segments'), o.users_collection[0].name) for n, o in objs.items()
+                 if o.type == 'MESH' and o.get('system') == 'skeletal'}
+MALE_PARENT = {ch.name: c.name for c in bpy.data.collections for ch in c.children}
+
 # 3a2. Hombros (tools/proportions.py): la clavícula gira sobre el esternón hasta subir el acromion 8 mm, la escápula la
 #      sigue y el brazo se separa 3° del tronco, como en la imagen de referencia; la piel, con ellos.
 from proportions import raise_shoulders
@@ -435,7 +442,8 @@ apply_layers(skin, MALE_TONE)
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT, f'{MALE}.blend'))
 export([os.path.join(ROOT, f'{MALE}_draco.glb'), os.path.join(ROOT, 'web/public/models/male.glb')], 'Anato3D_Male_30')
 
-# ── Modelo femenino (Fase 1): misma malla base, misma corrección a escala ──
+# ── Modelo femenino (Fase 2): misma malla base, misma corrección a escala, y el esqueleto masculino transformado ──
+FEMALE_OUT = 'Anato3D_Female_30_Fase2'
 bpy.ops.wm.open_mainfile(filepath=os.path.join(ORIG, f'{FEMALE}.blend'), load_ui=False)
 fskin = bpy.data.objects['Skin_Body']
 F = world(fskin)
@@ -451,8 +459,42 @@ for o in bpy.data.objects:
         idx = int(np.argmin(np.linalg.norm(F - np.array(o.matrix_world.translation), axis=1)))
         o.location = o.location + type(o.location)(f_shift * weights[idx] + limb_disp[idx] * k)
 print(f'piel femenina: desplazamiento de la cabeza {np.round(f_shift * 100, 2)} cm')
+
+# Esqueleto femenino (tools/female.py): cada hueso masculino, con la transformación afín que mejor sigue al campo que
+# convierte la piel masculina en la femenina.
+from female import breastless, female_bone
+fpolys = [p.vertices[:] for p in fskin.data.polygons]
+D_bones, n_breast = breastless(world(fskin), MALE_SKIN_3A, fpolys)
+mf_field = Field.solve(MALE_SKIN_3A, fpolys, D_bones, None, h=0.008, extend=True)
+print(f'esqueleto femenino, campo (sin las mamas: {n_breast} vértices):', mf_field.report)
+fem = {n: female_bone(mf_field, P, seg) for n, (P, seg, _) in MALE_BONES_3A.items()}
+print('esqueleto femenino, mayor separación del campo (mm):',
+      [(n, round(f[1] * 1000, 1)) for n, f in sorted(fem.items(), key=lambda x: -x[1][1])[:8]])
+with bpy.data.libraries.load(os.path.join(ROOT, f'{MALE}.blend')) as (src, dst):
+    dst.objects = [n for n in src.objects if n in MALE_BONES_3A]
+def female_collection(name):
+    """La colección con ese nombre en el archivo femenino, creada bajo su madre masculina si no existe."""
+    if name == 'Anato3D_Male_30': return bpy.data.collections['Anato3D_Female_30']
+    col = bpy.data.collections.get(name)
+    if col is None:
+        col = bpy.data.collections.new(name)
+        female_collection(MALE_PARENT.get(name, 'Anato3D_Male_30')).children.link(col)
+    return col
+for o in dst.objects:
+    female_collection(MALE_BONES_3A[o.name][2]).objects.link(o)
+bpy.context.view_layer.update()                   # matrix_world de los objetos recién añadidos (el cráneo tiene ubicación)
+for o in dst.objects:
+    V, _, seg2 = fem[o.name]
+    set_world(o, V)
+    if seg2: o['segments'] = seg2
+fbones = [o.name for o in dst.objects]
+print(f'esqueleto femenino: {len(fbones)} huesos; estatura de la piel {world(fskin)[:, 2].max():.3f} m')
 subdivide(fskin)
 assert len(fskin.data.vertices) == len(MALE_TONE['pliegues'][0]), 'la piel femenina no comparte la topología subdividida'
+# Ningún hueso a menos de 3 mm de la piel femenina, como en la masculina (las mismas funciones, sobre su piel).
+skin, objs = fskin, {o.name: o for o in bpy.data.objects}
+cover(['Mandible', 'Hyoid_Bone'] + NAPE)
+cover_close([n for n in fbones if not n.startswith(CAVITY)])
 apply_layers(fskin, female_layers(fskin, MALE_TONE, world))
-bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT, f'{FEMALE}.blend'))
-export([os.path.join(ROOT, f'{FEMALE}.glb'), os.path.join(ROOT, 'web/public/models/female.glb')], 'Anato3D_Female_30')
+bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT, f'{FEMALE_OUT}.blend'))
+export([os.path.join(ROOT, f'{FEMALE_OUT}_draco.glb'), os.path.join(ROOT, 'web/public/models/female.glb')], 'Anato3D_Female_30')

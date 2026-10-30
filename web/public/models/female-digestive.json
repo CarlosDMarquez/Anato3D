@@ -1,0 +1,28 @@
+{
+ "groups": {
+  "Mouth": {
+   "nombre": "Boca",
+   "latin": "Stoma"
+  },
+  "Digestive_canal": {
+   "nombre": "Tubo digestivo",
+   "latin": "Canalis digestorius"
+  },
+  "Liver": {
+   "nombre": "Hígado",
+   "latin": "Hepar"
+  },
+  "Peritoneal_structures": {
+   "nombre": "Estructuras peritoneales",
+   "latin": "Structurae peritoneales"
+  },
+  "Peritoneum": {
+   "nombre": "Peritoneo",
+   "latin": "Peritoneum"
+  },
+  "Pharynx": {
+   "nombre": "Faringe",
+   "latin": "Pharynx"
+  }
+ }
+}

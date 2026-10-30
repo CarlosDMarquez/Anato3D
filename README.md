@@ -16,13 +16,13 @@ Abre http://localhost:5173 (o el puerto que indique Vite). Para producción: `np
 
 | Ruta | Qué es |
 |---|---|
-| `*.blend`, `*.glb` (raíz) | Modelos fuente. Fase 1 = piel + ojos; Fase 2 (masculino) = esqueleto completo. |
-| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app) y `audit_models.py` (busca errores medibles en los modelos). |
+| `*.blend`, `*.glb` (raíz) | Modelos fuente. Fase 1 = piel + ojos; Fase 2 = piel + esqueleto completo (`Anato3D_Male_30_Fase2`, `Anato3D_Female_30_Fase2`). |
+| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (piel de la vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app) y `audit_models.py` (busca errores medibles en los modelos). |
 | `Anato3D_Male_30_Fase2_musculature.npz` | Campo de desplazamiento de la complexión musculosa (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas). |
 | `sources/originals/` | Copia de los modelos tal como estaban antes de corregir el cuello. |
 | `sources/z-anatomy/` | Z-Anatomy descargado, con su traducción oficial (`translations.csv`) y TA2. No se publica. |
 | `build/` | Resultados intermedios (`male_muscular.blend`, estadísticas). |
-| `web/public/models/` | GLB que sirve la app: `male.glb`, `female.glb`, y uno por sistema (`male-muscular`, `male-connective`, `male-arterial`, `male-venous`, `male-nervous`, `male-respiratory`, `male-digestive`, `male-urogenital`, `male-endocrine`, `male-lymphatic` y `male-integumentary`, la piel de los genitales), que se descargan al activarlos. |
+| `web/public/models/` | GLB que sirve la app: `male.glb`, `female.glb`, y uno por sistema (`male-muscular`, `male-connective`, `male-arterial`, `male-venous`, `male-nervous`, `male-respiratory`, `male-digestive`, `male-urogenital`, `male-endocrine`, `male-lymphatic` y `male-integumentary`, la piel de los genitales; los mismos con `female-`), que se descargan al activarlos. |
 | `web/src/systems.js` | Los 12 sistemas de la barra, sus capas y cómo se clasifica cada pieza. |
 | `web/src/data/anatomia.js` | Fichas en español: nombre, latín (TA), etimología, descripción y puntos clave. |
 | `web/src/data/resolve.js` | Convierte el nombre de un objeto (`Rib_7_L`) en su ficha (`Séptima costilla`, lado, FDI…). |
@@ -415,6 +415,62 @@ El usuario lo veía «todo deforme», frente a una imagen de referencia con los 
 - **Hombros (`proportions.py`):** el acromion sube 8 mm. El trapecio vuelve a bajar en diagonal.
 - **Esternocleidomastoideo:** abultamiento de 4 mm a lo largo de la línea mastoides–articulación esternoclavicular, solo en la piel que mira hacia delante o afuera. Así se marca la «V».
 - **Platisma:** 12 % de opacidad en el visor.
+
+## Modelo femenino (2026-10-30)
+
+Primera versión del modelo femenino con los 12 sistemas, para perfeccionar después. Se construye igual que el masculino:
+
+```bash
+# Fase 2 femenina (piel + esqueleto): la escribe fix_neck.py junto con la masculina.
+/Applications/Blender.app/Contents/MacOS/Blender -b --disable-autoexec Anato3D_Male_30_Fase2.blend --python tools/fix_neck.py
+# Sistemas, piel de la vulva e índice de búsqueda (build/female_*.blend → web/public/models/female-*.glb):
+A3D_MODEL=female zsh tools/build_all.sh
+```
+
+**Esqueleto** (`tools/female.py`, llamado desde `fix_neck.py`). Z-Anatomy es un cuerpo masculino y no hay en datos abiertos un esqueleto femenino con su estructura. Pero las pieles masculina y femenina de MakeHuman tienen la misma malla, vértice a vértice.
+- Un campo armónico en el volumen (`musculature.Field`, rejilla de 8 mm) lleva la piel masculina a la femenina. Se usa la piel masculina tras corregir cuello y extremidades, antes de la complexión musculosa (solo del hombre).
+- El desplazamiento que mueve los huesos no lleva las mamas (se rellena con Laplace) y está suavizado (40 pasadas, ~9 cm). Sin ello, las mamas doblaban las costillas 5–8 y la tibia se cizallaba hasta 2 cm.
+- Cada hueso es la transformación afín que mejor sigue al campo; los huesos largos, una por trozo de ~6 cm, unidas en ±5 mm. Mayor separación del campo: 7,2 mm (tibias).
+- Así cada hueso sigue siendo una transformación afín de Z-Anatomy y `anato3d_fit.py` ajusta músculos, vasos, nervios y vísceras al esqueleto femenino igual que al masculino.
+- Resultado: 258 huesos dentro de la piel femenina (1,574 m), con las mismas comprobaciones de distancia a la piel que el hombre. La pelvis toma las proporciones de la piel (más ancha); su forma propia es un trabajo pendiente.
+
+**Sistemas** (`A3D_MODEL=female`, `anato3d_fit.MODEL`): mismos scripts, sin la complexión musculosa ni las piezas que solo tiene el hombre (`male_only`: pene, testículos, epidídimo, escroto, cordón espermático, próstata, vesículas seminales, conducto deferente, glándulas bulbouretrales y la uretra masculina).
+
+**Órganos femeninos** (`tools/female_organs.py`, desde `build_visceral.py`). Z-Anatomy no los tiene: son formas paramétricas con medidas de adulta nulípara, colocadas sobre referencias de la pelvis (sínfisis, promontorio, espinas ilíacas, tuberosidades, línea arcuata), de la vejiga y de la piel.
+- Útero en anteversión y anteflexión sobre la vejiga; vagina de 8 cm, hacia arriba y atrás; ovarios en la fosa ovárica; trompas con sus fimbrias; ligamentos redondos y propios del ovario; uretra femenina.
+- Clítoris (glande, cuerpo y raíces), bulbos del vestíbulo y glándulas vestibulares mayores. El vestíbulo queda a la altura de la piel del periné.
+- Glándulas mamarias: una lente bajo el relieve de la mama de la piel (8 mm bajo ella, 3 mm tras el pezón), sobre el pectoral, del borde del esternón a la línea axilar media y de la 2.ª a la 6.ª costilla, con prolongación axilar y 15 lóbulos. Además, 14 conductos galactóforos por lado.
+
+**Piel de la vulva** (`tools/build_female_skin.py`). La piel de MakeHuman tiene el pubis liso. Se genera como la piel genital masculina: función de distancia con «surface nets», unida con suavidad a la piel del cuerpo y recortada.
+- Labios mayores y menores a lo largo de la línea de la vulva, sobre la piel, y capuchón del clítoris.
+- Color propio («Tono»).
+- Con «Mostrar genitales externos» desactivado se ocultan enteros, como en el hombre, la piel de la vulva y los genitales externos profundos.
+
+**Web:** el selector Masculino/Femenino carga `female-*.glb` y el índice de búsqueda `female-index.json`; fichas en español de los órganos femeninos (`visceras.js`).
+
+**Verificado:**
+- **Web:** carga los 12 sistemas sin errores de consola. El buscador incluye útero, ovarios, mamas y vulva, sin piezas masculinas. Con «Mostrar genitales externos» desactivado, la piel queda lisa.
+- **Auditoría (`A3D_MODEL=female`):**
+  - 38 choques entre órganos (36 en el hombre). Los que no tiene el hombre son solapes pequeños (2–10 %) entre órganos de Z-Anatomy; ninguno con los órganos femeninos.
+  - Las venas pudendas externas y la rama genital del genitofemoral iban al escroto, fuera de la piel. En la mujer se corrigen por la piel (`build_vascular.py`, `build_nervous.py`).
+  - Los órganos internos femeninos que asomaban (el extremo de la vagina) se meten 1,5 mm bajo la piel.
+
+**Pendiente (para perfeccionar):**
+- **Pelvis:** tiene las proporciones de la piel femenina, no la forma de una pelvis femenina. Es algo corta de delante atrás, así que el útero queda más vertical de lo habitual.
+- **Vulva:**
+  - Primera versión, con relieves bajos, porque los muslos de la piel de MakeHuman dejan una ranura de ~14 mm.
+  - El borde anterior del parche aún se nota en algunas vistas.
+  - Los genitales externos profundos (clítoris, bulbos) son formas simples.
+- **Mamas:** las forma la piel de MakeHuman. La glándula es una lente bajo ella, sin la grasa ni los ligamentos de Cooper.
+- **Cabeza:**
+  - Los labios de la piel femenina quedan entreabiertos: se ven los dientes.
+  - La auditoría marca algunos músculos del ojo y nodos retrofaríngeos junto a las cavidades.
+- **Músculos:** los del periné son los de Z-Anatomy (masculinos), ajustados a la pelvis femenina.
+
+**Arreglos que afectan también al hombre:**
+- **Tramos de la tibia** (`anato3d_fit._segments`): al unir un primer tramo pequeño con el siguiente, se duplicaba el segundo y se perdía el último (el distal, junto al tobillo). Le pasaba a las dos tibias masculinas. Con dos tramos fallaba (así apareció en la mujer).
+  - Se reconstruyeron los sistemas masculinos. Cambian solo estructuras de la pierna y el pie: tendones y músculos hasta 6,8 mm, arterias tibial posterior y tarsiana lateral hasta 8,6 mm. La auditoría masculina sigue con los mismos 36 choques.
+- **Auditoría:** `A3D_MODEL=female` audita el modelo femenino (`build/female_audit.json`).
 
 ## Revisión en cinco pasadas (2026-10-29)
 
