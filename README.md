@@ -399,6 +399,41 @@ Encargo: «un cuerpo más ancho y musculoso como el de la referencia (hombros, b
 - **Cabecera:** «Hombre adulto · 12 sistemas» en lugar de «Fase 4 · 12 sistemas».
 - **Errata:** «Cabeza corta músculo del bíceps braquial» → «Cabeza corta del músculo bíceps braquial».
 
+## Revisión en cinco pasadas (2026-10-29)
+
+Cinco recorridos del modelo, cada uno con vistas anterior, posterior y lateral y detalles:
+1. **Sistema muscular**, en sus tres capas.
+2. **Esqueleto y tejido conjuntivo**, con medidas de las articulaciones del hombro tras subirlo:
+   - clavícula–esternón 0,1 mm;
+   - clavícula–acromion 0,3 mm;
+   - húmero–glena 1,6 mm;
+   - escápula–costillas 14 mm (antes 15).
+3. **Vasos y nervios.**
+4. **Vísceras, piel y genitales.**
+5. **Uso de la web** en escritorio y móvil.
+
+**Errores encontrados y corregidos:**
+- **Vista muscular sin ligamentos:** en el estado inicial (tejido conjuntivo en «Cartílagos»), al encender el sistema muscular se perdían la línea alba y los retináculos, y entre los rectos se veía la columna.
+  - El contexto solo se aplicaba con su sistema apagado. Ahora se suma a la capa que tenga.
+- **Opción «Mostrar genitales externos» desactivada:** el recorte por la región dejaba a la vista, en el pubis, la sección hueca de la raíz del pene. Los cuerpos cavernoso y esponjoso y el glande se ocultan enteros.
+- **Solapes entre órganos** (`build_visceral.py`): 75 grupos de nodos linfáticos salen, enteros, de los órganos en que estaban hundidos.
+  - Entre órganos de grupos distintos cede el más pequeño. Así se separan:
+    - la suprarrenal, del riñón, el bazo y el hígado;
+    - el colon y sus tenias, del riñón y el páncreas;
+    - las vesículas seminales, del sigma;
+    - los aritenoides, del esófago;
+    - el timo, de la pleura.
+  - Dentro de un grupo hay continuidades y uniones reales y no se tocan. Con todos los pares, la úvula salía del paladar blando y las glándulas salivales de la encía.
+  - Auditoría: choques de 63 a 36. Los que quedan son, casi todos, naturales: nodos intraglandulares de la parótida, nodos de los mesos, epidídimo, paratiroides, conductos.
+- **Teclado:** el atajo fallaba si el destino del evento no era un elemento.
+- **Selector de modelo:** sin nombre accesible en pantallas estrechas.
+
+**Revisado y correcto:**
+- El ligamento rotuliano está en el tendón del cuádriceps (Z-Anatomy no lo separa).
+- La «escalera» del muslo es la arteria femoral profunda con sus perforantes.
+- El pene, con la piel, cuelga con normalidad (sin piel parecía un gancho).
+- Los músculos occipitales son láminas rectangulares en Z-Anatomy (se ven así).
+
 ## Auditoría (`tools/audit_models.py`)
 
 ```bash

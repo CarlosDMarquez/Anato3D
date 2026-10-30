@@ -17,7 +17,8 @@ import bpy, bmesh, os, re, sys, json, collections
 sys.path.insert(0, os.path.dirname(__file__))
 from anato3d_fit import (Fitter, Extractor, Groups, bonus_paths, es, la, sanitize, source_name, principled, save,
                          log, parse_args)
-from mathutils import Vector, bvhtree
+from mathutils import Matrix, Vector, bvhtree
+import numpy as np
 
 opt = parse_args({'budget': 260000, 'only': None})
 argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
@@ -132,12 +133,8 @@ def skin_out(p):
     depth = (p - loc).dot(nrm)
     return (depth, nrm) if depth > -0.003 and (depth <= 0 or not fitter.inside_body(p)) else None
 
-def place_nodes(obj, superficial):
-    """Coloca cada nodo (pieza suelta de la malla) moviéndolo entero, sin deformarlo:
-    1. fuera de los huesos (el ajuste mezcla las transformaciones de huesos vecinos y alguno quedaba dentro);
-    2. si es superficial, bajo la piel: hasta 3 mm, o menos si el hueco entre hueso y piel no da (cuero cabelludo).
-    Devuelve (nodos movidos, mayor salida de la piel en m)."""
-    bm = bmesh.new(); bm.from_mesh(obj.data); bm.verts.ensure_lookup_table()
+def components(bm):
+    """Piezas sueltas de la malla (listas de vértices conectados)."""
     seen, comps = set(), []
     for v in bm.verts:
         if v.index in seen: continue
@@ -148,6 +145,15 @@ def place_nodes(obj, superficial):
                 y = e.other_vert(x)
                 if y.index not in seen: seen.add(y.index); stack.append(y)
         comps.append(comp)
+    return comps
+
+def place_nodes(obj, superficial):
+    """Coloca cada nodo (pieza suelta de la malla) moviéndolo entero, sin deformarlo:
+    1. fuera de los huesos (el ajuste mezcla las transformaciones de huesos vecinos y alguno quedaba dentro);
+    2. si es superficial, bajo la piel: hasta 3 mm, o menos si el hueco entre hueso y piel no da (cuero cabelludo).
+    Devuelve (nodos movidos, mayor salida de la piel en m)."""
+    bm = bmesh.new(); bm.from_mesh(obj.data); bm.verts.ensure_lookup_table()
+    comps = components(bm)
     def worst_bone(comp, shift):
         return max((bone_depth(obj.location + v.co + shift) for v in comp), key=lambda t: t[0])
     moved, worst = 0, 0.0
@@ -291,9 +297,119 @@ for n, it in enumerate(items):
     obj['region'] = json.dumps([sanitize(g) for g in rp])
     obj['source'] = f'Z-Anatomy object "{it['src']}" (BodyParts3D, DBCLS) CC BY-SA 4.0; refitted to the Anato3D skin'
     roots[it['system']].collection(rp).objects.link(obj)
+    it['out'] = obj
     stats[it['system']].append({'name': name, 'sub': it['sub'], 'tissue': it['tissue'], 'faces': len(obj.data.polygons),
                                 'verts': len(obj.data.vertices), 'name_es': obj['name_es']})
     if n % 25 == 0: log(f'  {n}/{len(items)} {name}: {len(obj.data.polygons)} caras')
+
+# ── Solapes entre órganos ───────────────────────────────────────────────────
+# El ajuste mezcla las transformaciones de huesos vecinos y algunos órganos acababan unos dentro de otros. La auditoría
+# encontraba:
+#   - el polo superior del riñón metido en la glándula suprarrenal (11 % de sus vértices);
+#   - una tenia del colon dentro del riñón derecho;
+#   - la vesícula seminal dentro del colon sigmoide;
+#   - 20 grupos de nodos linfáticos hundidos en el páncreas, el colon, la vejiga, la pleura, la lengua o el hígado
+#     (hasta un 33 %).
+# Los nodos se sacan moviendo cada uno entero, como ya se sacaban de los huesos; no los intraglandulares de la parótida
+# ni los de los mesos, que van dentro. Entre órganos solo se separan los de grupos distintos (riñón, suprarrenal, bazo,
+# hígado, páncreas, colon, estómago e intestino, pelvis, testículo, pulmones, timo, tiroides, laringe), y cede el más
+# pequeño: sus vértices dentro del otro pasan a su superficie (+0,5 mm) y el desplazamiento se extiende con suavidad a
+# los vecinos. Dentro de un grupo hay continuidades y uniones reales (el sigma con el colon descendente, la vesícula
+# seminal con la próstata, los segmentos del hígado); la boca, las mucosas, el peritoneo, los conductos y el tejido
+# eréctil no se tocan: con todos los pares, la úvula salía del paladar blando y las glándulas salivales de la encía.
+DIRS6 = [Vector(d) for d in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))]
+def inside(T, p):
+    odd = 0
+    for d in DIRS6:
+        o, n = p, 0
+        while n < 16:
+            hit = T.ray_cast(o + d * 1e-5, d)[0]
+            if hit is None: break
+            n += 1; o = hit
+        odd += n % 2
+    return odd >= 5
+
+def solid(it):
+    obj = it['out']
+    bm = bmesh.new(); bm.from_mesh(obj.data); bm.transform(Matrix.Translation(obj.location))
+    V = np.array([v.co[:] for v in bm.verts])
+    out = dict(it=it, name=obj.name, T=bvhtree.BVHTree.FromBMesh(bm), V=V, lo=V.min(0), hi=V.max(0),
+               closed=all(e.is_manifold for e in bm.edges), volume=abs(bm.calc_volume()),
+               sign=1.0 if bm.calc_volume(signed=True) >= 0 else -1.0)
+    bm.free()
+    return out
+
+NATURAL = [('Intraglandular', ''), ('', 'Meso')]
+def natural(a, b):
+    a, b = a.lower(), b.lower()
+    return any((x.lower() in a and y.lower() in b) or (x.lower() in b and y.lower() in a) for x, y in NATURAL)
+
+GROUP = {'kidney': 'kidney', 'renal_pelvis': 'kidney', 'adrenal': 'adrenal', 'spleen': 'spleen', 'liver': 'liver',
+         'gallbladder': 'liver', 'colon': 'colon', 'taenia': 'colon', 'stomach': 'gi', 'intestine': 'gi',
+         'bladder': 'pelvis', 'prostate': 'pelvis', 'seminal': 'pelvis', 'testis': 'testis', 'epididymis': 'testis',
+         'lung': 'lungs', 'pleura': 'lungs', 'bronchus': 'lungs', 'thymus': 'thymus', 'thyroid': 'thyroid',
+         'parathyroid': 'thyroid', 'cartilage': 'larynx'}
+def group(o):
+    return 'pancreas' if o['name'] == 'Pancreas' else GROUP.get(o['it']['tissue'])
+
+organs = [solid(it) for it in items if 'out' in it and it['tissue'] != 'node']
+organs = [o for o in organs if o['closed']]
+def overlap(a, b): return not ((a['lo'] > b['hi']).any() or (a['hi'] < b['lo']).any())
+
+# Nodos: enteros fuera de los órganos.
+nodes_moved = 0
+for it in items:
+    if 'out' not in it or it['tissue'] != 'node': continue
+    obj = it['out']; loc = Vector(obj.location)
+    bm = bmesh.new(); bm.from_mesh(obj.data); bm.verts.ensure_lookup_table()
+    for comp in components(bm):
+        P0 = np.array([(loc + v.co)[:] for v in comp]); lo, hi = P0.min(0), P0.max(0)
+        near = [o for o in organs if not natural(obj.name, o['name']) and not ((lo > o['hi']).any() or (hi < o['lo']).any())]
+        shift = Vector()
+        for _ in range(3):
+            worst = (0.0, None)
+            for o in near:
+                for p in P0:
+                    q = Vector(p) + shift
+                    if not inside(o['T'], q): continue
+                    hit, nrm, _, d = o['T'].find_nearest(q)
+                    if d > worst[0]: worst = (d, nrm * o['sign'])
+            if worst[1] is None: break
+            shift += worst[1] * (worst[0] + 0.0005)
+        if shift.length > 1e-6:
+            for v in comp: v.co += shift
+            nodes_moved += 1
+    bm.to_mesh(obj.data); bm.free(); obj.data.update()
+log(f'nodos sacados de los órganos: {nodes_moved}')
+
+# Órganos: cede el más pequeño.
+fixed_pairs = []
+for i, a in enumerate(organs):
+    for b in organs[i + 1:]:
+        ga, gb = group(a), group(b)
+        if not ga or not gb or ga == gb or not overlap(a, b): continue
+        y, k = (a, b) if a['volume'] < b['volume'] else (b, a)
+        A = y['V']; sel = np.where(((A >= k['lo']) & (A <= k['hi'])).all(1))[0]
+        inn = [j for j in sel if inside(k['T'], Vector(A[j]))]
+        frac = max(len(inn) / len(A), np.mean([inside(y['T'], Vector(p)) for p in k['V'][::max(1, len(k['V']) // 400)]]))
+        if frac <= 0.02 or not inn: continue
+        D = np.zeros_like(A); fixed = np.zeros(len(A), bool)
+        for j in inn:
+            hit, nrm, _, _ = k['T'].find_nearest(Vector(A[j]))
+            D[j] = np.array(hit + nrm * k['sign'] * 0.0005) - A[j]; fixed[j] = True
+        obj = y['it']['out']; me = obj.data
+        E = np.empty(len(me.edges) * 2, dtype=np.int64); me.edges.foreach_get('vertices', E); E = E.reshape(-1, 2)
+        deg = np.maximum(np.bincount(E.ravel(), minlength=len(A)), 1)[:, None]
+        D0 = D.copy()
+        for _ in range(6):
+            acc = np.zeros_like(D); np.add.at(acc, E[:, 0], D[E[:, 1]]); np.add.at(acc, E[:, 1], D[E[:, 0]])
+            D = np.where(fixed[:, None], D0, 0.5 * D + 0.5 * acc / deg)
+        V = A + D
+        fitter.push_out_of_bone(V)
+        me.vertices.foreach_set('co', (V - np.array(obj.location)).ravel()); me.update()
+        y.update(solid(y['it']))
+        fixed_pairs.append(f'{y["name"]} fuera de {k["name"]} ({frac * 100:.0f} %, {len(inn)} vértices)')
+log('órganos separados:', fixed_pairs)
 
 for system, groups in roots.items():
     save(f'male_{system}', groups, stats[system])

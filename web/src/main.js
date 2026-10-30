@@ -73,9 +73,10 @@ function stageOf(part) {
   return SYSTEM_BY_ID[part.system].stages.find((s) => s.id === state.stages[part.system]) ?? null;
 }
 
-// Piezas de un sistema apagado que otro sistema activo muestra como contexto (los huesos bajo los músculos…).
+// Piezas que otro sistema activo muestra como contexto (los huesos y ligamentos bajo los músculos…), también si su
+// sistema está encendido en una capa que no las incluye: con el tejido conjuntivo en «Cartílagos» (el estado inicial),
+// la vista muscular perdía la línea alba y los retináculos, y entre los rectos se veía la columna.
 function contextShown(part) {
-  if (state.stages[part.system]) return false;
   return SYSTEMS.some((s) => state.stages[s.id] && s.context?.[part.system]?.(part));
 }
 
@@ -563,7 +564,7 @@ function buildChrome() {
   });
 
   window.addEventListener('keydown', (e) => {
-    if (e.target.matches('input')) return;
+    if (e.target instanceof Element && e.target.matches('input, textarea, select')) return;
     const has = selectionParts().length > 0;
     const k = e.key.toLowerCase();
     if ((e.metaKey || e.ctrlKey) && k === 'z') { e.preventDefault(); undo(); }

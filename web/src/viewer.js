@@ -175,7 +175,8 @@ function decodeRegion(r) {
 }
 // Piezas que se ocultan enteras con «Mostrar genitales externos» desactivado (su borde entra un poco en el cuerpo), y
 // sistemas que pueden tener tramos externos (los músculos y fascias de la ingle no se recortan nunca).
-const MODEST_HIDE = new Set(['Skin_Genitals']);
+// Enteros, no recortados por la región: el recorte dejaba a la vista, en el pubis, la sección hueca de la raíz del pene.
+const MODEST_HIDE = new Set(['Skin_Genitals', 'Corpus_cavernosum_of_penis', 'Corpus_spongiosum_of_penis', 'Glans_penis']);
 const MODEST_SYSTEMS = new Set(['urogenital', 'arterial', 'venous', 'nervous', 'lymphatic']);
 
 // Las piezas izquierdas de la Fase 2 se generaron en espejo y quedaron con las caras hacia dentro.
