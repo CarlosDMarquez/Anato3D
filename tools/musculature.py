@@ -8,7 +8,7 @@ imagen de referencia (vista anterior de un atlas 3D), con la misma estatura:
 
 Cómo:
   - La piel sale un abultamiento por músculo (`targets`), medido contra la referencia: deltoides 13 mm hacia fuera,
-    bíceps y tríceps 8, antebrazo bajo el codo 6–8 (nada en la muñeca), pectoral 9, trapecio superior 22, dorsal ancho
+    bíceps y tríceps 8, antebrazo bajo el codo 6–8 (nada en la muñeca), pectoral 9, trapecio superior 14, esternocleidomastoideo 4, dorsal ancho
     y serrato 8, flancos 10, pantorrilla 7–8. Se suaviza sobre la malla y va según la normal suavizada.
     - Donde la piel tiene otra piel enfrente (el brazo frente al tórax), sale como mucho un tercio del hueco.
     - Antes era un factor de engrosamiento por región × la distancia al hueso: sobre el hombro, que el paso del
@@ -84,11 +84,26 @@ def targets(W, N, nearest, world, objs):
         u = np.abs(W[:, 0]) / abs(sh[0]); v = (W[:, 2] - (sh[2] - 0.19)) / 0.22
         chest = mine & is_('Rib', 'Costal', 'Sternum', 'Clavicle') & (N[:, 1] < -0.2)
         mm[chest] += (_tent(u, 0.05, 0.55, 1.0) * _tent(v, -0.08, 0.45, 1.05) * 9 * _smoothstep(-0.2, -0.6, N[:, 1]))[chest]
-        # Trapecio superior: de la base del cuello al acromion, la cara de arriba y la de atrás. En la referencia sube
-        # por el cuello (a 8 cm bajo el mentón, el contorno medía 0,13 de la estatura; aquí, 0,06, solo el cuello).
+        # Trapecio superior: la pendiente de la base del cuello al acromion, en la piel que mira arriba o atrás. Antes el
+        # abultamiento (22 mm) culminaba 8 cm por encima del hombro, en el propio cuello, y lo hinchaba por todos lados:
+        # 13–14 cm de ancho a la altura de C2–C3 frente a 11 en MakeHuman, un tubo hasta la mandíbula.
         u = (np.abs(W[:, 0]) - 0.04) / (abs(sh[0]) - 0.04); dz = W[:, 2] - sh[2]
-        trap = mine & (N[:, 1] > -0.35) & (dz > -0.06) & (dz < 0.22)
-        mm[trap] += (_tent(u, -0.3, 0.2, 0.85) * _tent(dz, -0.05, 0.08, 0.21) * 22 * _smoothstep(-0.35, 0.0, N[:, 1]))[trap]
+        facing = np.maximum(N[:, 2], N[:, 1])                  # arriba o atrás; no los lados del cuello
+        trap = mine & (dz > -0.06) & (dz < 0.14) & (facing > 0.1)
+        mm[trap] += (_tent(u, 0.05, 0.45, 0.95) * _tent(dz, -0.05, 0.03, 0.13) * 14 * _smoothstep(0.1, 0.5, facing))[trap]
+        # Esternocleidomastoideo: de la apófisis mastoides a la articulación esternoclavicular. En la referencia forma una
+        # «V» marcada; aquí era una cinta fina. Solo la piel sobre él (a menos de 4,5 cm de esa línea, que va de hueso a
+        # hueso, 2–3 cm por debajo de la piel) y que mira hacia delante o afuera, para no volver a hinchar el cuello entero.
+        T = world(objs[f'Temporal_Bone_{side}'])
+        back = T[T[:, 1] > np.median(T[:, 1])]
+        mastoid = back[np.argmin(back[:, 2])]                    # lo más bajo de la mitad posterior del temporal
+        C = world(objs[f'Clavicle_{side}'])
+        sterno = C[np.argsort(np.abs(C[:, 0]))[:max(3, len(C) // 20)]].mean(0)
+        ax = sterno - mastoid; L = np.linalg.norm(ax); ax /= L
+        t = (W - mastoid) @ ax / L
+        d = np.linalg.norm((W - mastoid) - np.outer(t * L, ax), axis=1)
+        scm = mine & (t > 0) & (t < 1) & (d < 0.045) & (N[:, 1] < 0.3)
+        mm[scm] += (_tent(t, 0.05, 0.6, 1.0) * (1 - _smoothstep(0.03, 0.045, d)) * 4 * _smoothstep(0.3, -0.2, N[:, 1]))[scm]
         # Dorsal ancho y serrato: los lados del tórax bajo la axila (la referencia es más ancha ahí).
         lats = mine & is_('Rib', 'Costal', 'Scapula', 'Vertebra_T') & (np.abs(N[:, 0]) > 0.35) & (N[:, 1] > -0.6)
         mm[lats] += (_tent(dz, -0.42, -0.2, -0.04) * 8 * _smoothstep(0.35, 0.8, np.abs(N[:, 0])))[lats]

@@ -576,9 +576,10 @@ export class Viewer extends EventTarget {
         if (m.geometry.userData.windingFixed) base = this.#variant(base, 'noAO', (mat) => (mat.aoMap = null));
         // Aponeurosis de los músculos anchos del abdomen: blanca; su opacidad viene por vértice (alfa del color): velo
         // delante del recto (vaina anterior), que deja verlo, y blanca a sus lados.
-        // Láminas musculares de la piel (platisma): translúcidas, dejan ver lo que cubren.
+        // Láminas musculares de la piel (platisma): casi transparentes. Con un 30 % de opacidad el cuello parecía un
+        // tubo cubierto por un velo y no se distinguían los esternocleidomastoideos.
         if (/Aponeurosis/.test(base.name ?? '')) base = this.#variant(base, 'apo', (mat) => Object.assign(mat, { transparent: true, depthWrite: false }));
-        else if (part.sheet) base = this.#variant(base, 'skinsheet', (mat) => Object.assign(mat, { transparent: true, opacity: 0.3, depthWrite: false }));
+        else if (part.sheet) base = this.#variant(base, 'skinsheet', (mat) => Object.assign(mat, { transparent: true, opacity: 0.12, depthWrite: false }));
         m.userData.baseMaterial ??= base;
         this.partByMesh.set(m, part);
       }

@@ -359,13 +359,13 @@ Encargo: «un cuerpo más ancho y musculoso como el de la referencia (hombros, b
 
 **Arreglos:**
 - **Hombros (`proportions.py`, `raise_shoulders`; `fix_neck.py`, paso 3a2):**
-  - la clavícula gira 8° sobre su extremo esternal y el acromion sube 2 cm;
+  - la clavícula gira 3° sobre su extremo esternal y el acromion sube 8 mm (2 cm el 29 oct; ver «Cuello», abajo);
   - la escápula la sigue (lo que se mueve la articulación acromioclavicular);
   - el brazo entero sube con ella y se separa 3° del tronco.
   - Todo son movimientos rígidos: los huesos siguen siendo transformaciones afines de Z-Anatomy, y los tramos de los huesos largos (`segments`) se mueven con ellos.
   - La piel sigue a cada hueso con pesos suaves.
 - **Complexión (`musculature.py`; `fix_neck.py`, paso 3c3):**
-  - La piel sale un abultamiento por músculo, medido contra la referencia: deltoides (13 mm hacia fuera), bíceps y tríceps (8), antebrazo bajo el codo (6–8), pectoral (9), trapecio superior (22), dorsal ancho y serrato (8), flancos (10) y pantorrilla (7–8). Después se suaviza y va según la normal suavizada.
+  - La piel sale un abultamiento por músculo, medido contra la referencia: deltoides (13 mm hacia fuera), bíceps y tríceps (8), antebrazo bajo el codo (6–8), pectoral (9), trapecio superior (14; 22 el 29 oct), esternocleidomastoideo (4), dorsal ancho y serrato (8), flancos (10) y pantorrilla (7–8). Después se suaviza y va según la normal suavizada.
   - Donde la piel tiene otra piel enfrente (el brazo frente al tórax), sale como mucho un tercio del hueco.
   - Un campo de desplazamiento en el volumen (rejilla de 6 mm) lleva con ella lo que hay dentro: cero en los huesos, el de la piel en la piel y armónico (Laplace, sobrerrelajación rojo-negro) entre medias.
     - Se guarda en `Anato3D_Male_30_Fase2_musculature.npz` (0,8 MB).
@@ -398,6 +398,23 @@ Encargo: «un cuerpo más ancho y musculoso como el de la referencia (hombros, b
   - manifiesto para instalarla como app en el móvil.
 - **Cabecera:** «Hombre adulto · 12 sistemas» en lugar de «Fase 4 · 12 sistemas».
 - **Errata:** «Cabeza corta músculo del bíceps braquial» → «Cabeza corta del músculo bíceps braquial».
+
+## Cuello (2026-10-30)
+
+El usuario lo veía «todo deforme», frente a una imagen de referencia con los esternocleidomastoideos marcados en «V» y el trapecio bajando en diagonal hacia los hombros.
+
+**Qué pasaba (medido):**
+- **Cuello hinchado:** el abultamiento del trapecio de la complexión musculosa (22 mm) culminaba 8 cm por encima del hombro, en el propio cuello, y lo hinchaba por todos lados.
+  - A la altura de C2–C3, el cuello medía 13,3–14 cm de ancho, frente a 11,1–11,2 cm de la piel de MakeHuman.
+  - Era un tubo recto hasta la mandíbula, y el trapecio empezaba en C4 en vez de C5.
+- **Hombros cuadrados:** al subir el acromion 2 cm, la pendiente del trapecio pasaba de ~19° a ~10°, y quedaba un escalón casi horizontal del cuello al hombro. El contorno alto de la referencia es un trapecio grueso, no un acromion alto.
+- **Velo sobre el cuello:** el platisma, con un 30 % de opacidad, lo cubría y no dejaba distinguir los esternocleidomastoideos.
+
+**Arreglos:**
+- **Trapecio (`musculature.py`):** el abultamiento va solo en la pendiente de la base del cuello al acromion, en la piel que mira arriba o atrás (14 mm). El cuello vuelve a medir 11,2 / 11,1 / 12,8 cm en C2, C3 y C4.
+- **Hombros (`proportions.py`):** el acromion sube 8 mm. El trapecio vuelve a bajar en diagonal.
+- **Esternocleidomastoideo:** abultamiento de 4 mm a lo largo de la línea mastoides–articulación esternoclavicular, solo en la piel que mira hacia delante o afuera. Así se marca la «V».
+- **Platisma:** 12 % de opacidad en el visor.
 
 ## Revisión en cinco pasadas (2026-10-29)
 

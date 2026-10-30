@@ -11,7 +11,7 @@ Qué hace:
      mandíbula–occipucio, sin mover hombros ni clavículas.
   3a. Extremidades con las proporciones de Z-Anatomy (tools/proportions.py): la rodilla baja ~4,7 cm y el codo ~3,3 cm;
      huesos largos por tramos (cada tramo, afín) y piel con el mismo campo, suavizado.
-  3a2. Hombros (tools/proportions.py): la clavícula gira sobre el esternón hasta subir el acromion 2 cm, la escápula la
+  3a2. Hombros (tools/proportions.py): la clavícula gira sobre el esternón hasta subir el acromion 8 mm, la escápula la
      sigue y el brazo se separa 3° del tronco; la piel, con ellos.
   3b–c. La piel se subdivide y se infla donde un hueso queda a menos de 3–5 mm (mandíbula, C5–C7, tibia…), con
      abultamientos anchos y unidos (sin bultos sueltos ni surcos entre ellos); la nuca se alisa.
@@ -203,8 +203,8 @@ for s, side in (('L', 'Left'), ('R', 'Right')):
 print(f'extremidades: {len(moved)} huesos reproporcionados; piel movida hasta {np.linalg.norm(limb_disp, axis=1).max() * 100:.1f} cm '
       f'(entrepierna a {crotch_z:.3f} m)')
 
-# 3a2. Hombros (tools/proportions.py): los de MakeHuman caen. La clavícula gira sobre el esternón hasta subir el acromion
-#      2 cm, la escápula la sigue y el brazo se separa 3° del tronco, como en la imagen de referencia; la piel, con ellos.
+# 3a2. Hombros (tools/proportions.py): la clavícula gira sobre el esternón hasta subir el acromion 8 mm, la escápula la
+#      sigue y el brazo se separa 3° del tronco, como en la imagen de referencia; la piel, con ellos.
 from proportions import raise_shoulders
 girdle_disp, girdle_moved, report = raise_shoulders(world, set_world, objs, world(skin), skin_edges)
 set_world(skin, world(skin) + girdle_disp)

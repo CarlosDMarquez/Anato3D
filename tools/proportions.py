@@ -163,14 +163,16 @@ def skin_displacement(W, edges, bone_objs, world, fields, crotch_z):
 
 
 # ── Cintura escapular ───────────────────────────────────────────────────────
-# Los hombros de MakeHuman caen: frente a la imagen de referencia, con la misma estatura, el acromion quedaba ~2,5 cm más
-# bajo respecto al mentón, las clavículas horizontales y el brazo más pegado al tronco (la mano, ~3 cm más adentro).
-# La clavícula gira sobre su extremo esternal hasta subir el acromion SHOULDER_RISE; la escápula la sigue (se traslada
+# Frente a la imagen de referencia, el contorno de los hombros quedaba bajo, las clavículas horizontales y el brazo más
+# pegado al tronco (la mano, ~3 cm más adentro). La clavícula gira sobre su extremo esternal hasta subir el acromion
+# SHOULDER_RISE. Con 2 cm, la pendiente del trapecio pasaba de ~19° a ~10° y los hombros quedaban cuadrados, en un
+# escalón horizontal desde el cuello: el contorno alto de la referencia es el trapecio grueso (tools/musculature.py), no
+# un acromion alto. La escápula sigue a la clavícula (se traslada
 # lo que se mueve la articulación acromioclavicular), y el brazo entero, con una abducción de ABDUCTION grados sobre el
 # hombro. Todo son movimientos rígidos (los huesos siguen siendo transformaciones afines de Z-Anatomy). La piel sigue a
 # cada hueso con pesos suaves, como en las extremidades: sube el hombro, el trapecio queda más inclinado y el cuello y
 # el tórax no se mueven.
-SHOULDER_RISE = 0.02
+SHOULDER_RISE = 0.008
 ABDUCTION = 3.0
 
 
