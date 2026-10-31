@@ -613,6 +613,16 @@ export const ANATOMIA = {
       'En este modelo esta piel se generó alrededor de los órganos de Z-Anatomy, porque la piel base no tenía genitales.',
     ],
   },
+  Vulva: {
+    nombre: 'Vulva', latin: 'Vulva', tipo: 'Órgano',
+    etimologia: 'Del latín vulva, «envoltura», «matriz». Labio, de labium; clítoris, del griego kleitorís.',
+    descripcion: 'Conjunto de los genitales externos femeninos: el monte del pubis, los labios mayores y menores, el clítoris (su glande, bajo el capuchón) y el vestíbulo, donde se abren la uretra y la vagina.',
+    datos: [
+      'Los labios mayores, con grasa y pelo, son el equivalente del escroto; los menores, finos y sin grasa, rodean el vestíbulo y se unen por delante en el capuchón y el frenillo del clítoris.',
+      'En el vestíbulo, el orificio de la uretra queda unos 2 cm por detrás del glande del clítoris y por delante del orificio de la vagina; a los lados de este se abren las glándulas vestibulares mayores (de Bartolino).',
+      'En este modelo la vulva se modeló sobre la piel base, que no tenía genitales, con medidas de mujeres adultas (Lloyd et al., 2005).',
+    ],
+  },
   Eyeball: {
     nombre: 'Globo ocular', latin: 'Bulbus oculi', tipo: 'Órgano de los sentidos',
     etimologia: 'Del latín oculus, «ojo»; globo, de globus, «esfera».',

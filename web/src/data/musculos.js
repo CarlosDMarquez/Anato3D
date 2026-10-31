@@ -43,7 +43,8 @@ export function resolveMuscle(name, x) {
     entry?.origen && { label: 'Origen', value: entry.origen },
     entry?.insercion && { label: 'Inserción', value: entry.insercion },
   ].filter(Boolean);
-  const chips = [x.tissue === 'tendon' ? 'Tendón' : 'Músculo esquelético', LAYER[x.layer], side && (side === 'L' ? 'Lado izquierdo' : 'Lado derecho')].filter(Boolean);
+  const fibrous = /^Perineal (membrane|body)$/.test(x.name_en ?? '');   // láminas y nudos fibrosos del periné
+  const chips = [fibrous ? 'Tejido fibroso' : x.tissue === 'tendon' ? 'Tendón' : 'Músculo esquelético', LAYER[x.layer], side && (side === 'L' ? 'Lado izquierdo' : 'Lado derecho')].filter(Boolean);
   return {
     key: x.name_en,
     side,

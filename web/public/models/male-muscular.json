@@ -80,6 +80,18 @@
    "nombre": "Músculos del abdomen",
    "latin": "Musculi abdominis"
   },
+  "Muscles_of_pelvis": {
+   "nombre": "Músculos de la pelvis",
+   "latin": "Musculi pelvis"
+  },
+  "Pelvic_diaphragm": {
+   "nombre": "Diafragma pélvico",
+   "latin": "Diaphragma pelvis"
+  },
+  "Levator_ani": {
+   "nombre": "Músculo elevador del ano",
+   "latin": "Musculus levator ani"
+  },
   "Muscular_system_of_upper_limb": {
    "nombre": "Sistema muscular del miembro superior",
    "latin": "Systema musculare membri superioris"
@@ -163,6 +175,10 @@
   "Muscles_of_foot": {
    "nombre": "Músculos del pie",
    "latin": "Musculi pedis"
+  },
+  "Perineal_muscles": {
+   "nombre": "Músculos perineales",
+   "latin": "Musculi perinei"
   }
  }
 }

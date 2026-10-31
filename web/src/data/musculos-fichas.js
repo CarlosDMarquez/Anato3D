@@ -352,6 +352,54 @@ export const MUSCULOS = {
     origen: 'Cóndilo lateral y mitad superior de la cara lateral de la tibia.', insercion: 'Cuneiforme medial y base del I metatarsiano.',
     accion: 'Flexión dorsal (levantar la punta del pie) e inversión del pie.', datos: ['Si se paraliza aparece el «pie caído».'],
   },
+  // ── Periné (modelo femenino: piezas paramétricas, tools/female_perineum.py) ──
+  Ischiocavernosus_muscle: {
+    descripcion: 'Músculo alargado que cubre cada raíz (pilar) del clítoris a lo largo de la rama isquiopubiana, en el espacio perineal superficial.',
+    origen: 'Tuberosidad isquiática y rama isquiopubiana.', insercion: 'Raíz y cuerpo del clítoris.',
+    accion: 'Comprime la raíz del clítoris y frena la salida de sangre: mantiene su erección.',
+    datos: ['En el hombre cubre las raíces del pene y es más grande.', 'Lo inerva el nervio perineal, ramo del pudendo (S2–S4).'],
+  },
+  Bulbospongiosus_muscle: {
+    descripcion: 'En la mujer son dos láminas, una a cada lado del vestíbulo, que cubren el bulbo del vestíbulo y la glándula vestibular mayor; por delante llegan al cuerpo del clítoris.',
+    origen: 'Cuerpo perineal.', insercion: 'Cuerpo del clítoris, membrana perineal y fascia del bulbo.',
+    accion: 'Estrecha el orificio de la vagina, comprime la glándula vestibular mayor y ayuda a la erección del clítoris.',
+    datos: ['En el hombre las dos mitades se unen bajo el bulbo del pene y vacían la uretra al final de la micción.'],
+  },
+  Superficial_transverse_perineal_muscle: {
+    descripcion: 'Banda muscular fina que cruza el periné de un lado al otro, por detrás del vestíbulo.',
+    origen: 'Cara medial de la tuberosidad isquiática.', insercion: 'Cuerpo perineal.',
+    accion: 'Fija el cuerpo perineal y sostiene el suelo de la pelvis.', datos: [],
+  },
+  Deep_transverse_perineal_muscle: {
+    descripcion: 'Lámina muscular del espacio perineal profundo, por encima de la membrana perineal. En la mujer es delgada y tiene mucho músculo liso.',
+    origen: 'Rama del isquion.', insercion: 'Cuerpo perineal y pared lateral de la vagina.',
+    accion: 'Fija el cuerpo perineal y sostiene las vísceras de la pelvis.', datos: [],
+  },
+  Compressor_urethrae: {
+    descripcion: 'Banda muscular del espacio perineal profundo que pasa en arco por delante de la uretra, de una rama isquiopubiana a la otra.',
+    origen: 'Ramas isquiopubianas.', insercion: 'Su compañero del otro lado, por delante de la uretra.',
+    accion: 'Comprime la uretra y ayuda a la continencia.', datos: ['Solo existe en la mujer; con el esfínter externo y el uretrovaginal forma el esfínter urogenital.'],
+  },
+  Sphincter_urethrovaginalis: {
+    descripcion: 'Banda muscular que rodea por delante la uretra y baja por los lados de la vagina hasta el cuerpo perineal.',
+    origen: 'Cuerpo perineal.', insercion: 'Su compañero del otro lado, por delante de la uretra.',
+    accion: 'Comprime la uretra y estrecha la vagina.', datos: ['Solo existe en la mujer.'],
+  },
+  External_urethral_sphincter: {
+    descripcion: 'Anillo de músculo estriado alrededor del tercio medio de la uretra.',
+    accion: 'Cierra la uretra de forma voluntaria: permite retener la orina.',
+    datos: ['El suelo de la pelvis y este esfínter se debilitan con los partos y la edad; los ejercicios de Kegel los fortalecen.'],
+  },
+  Perineal_membrane: {
+    descripcion: 'Lámina fibrosa triangular tendida entre las dos ramas isquiopubianas, atravesada por la uretra y la vagina. Separa el espacio perineal superficial del profundo.',
+    insercion: 'Ramas isquiopubianas y cuerpo perineal.', accion: 'Da apoyo a las raíces y bulbos del clítoris y sostiene la uretra y la vagina.', datos: [],
+  },
+  Perineal_body: {
+    descripcion: 'Nudo fibromuscular entre la vagina y el ano, donde se unen los músculos del periné: bulboesponjoso, transversos, esfínter externo del ano y fibras del elevador del ano.',
+    accion: 'Sostiene el suelo de la pelvis.',
+    datos: ['En el parto puede desgarrarse; la episiotomía es un corte quirúrgico que evita un desgarro mayor.'],
+  },
+
   Fibularis_longus_muscle: {
     descripcion: 'Músculo de la cara lateral de la pierna cuyo tendón cruza la planta del pie.',
     origen: 'Cabeza y dos tercios superiores de la cara lateral de la fíbula.', insercion: 'Cuneiforme medial y base del I metatarsiano.',

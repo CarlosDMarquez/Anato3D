@@ -13,9 +13,8 @@ Medidas (cm):
     y ligamentos propios del ovario;
   - uretra femenina 4 × 0,6, del cuello de la vejiga al vestíbulo, delante de la vagina;
   - vestíbulo (orificios de la vagina y de la uretra) a la altura de la piel del periné, 3 cm por detrás del borde
-    inferior de la sínfisis: la piel de MakeHuman no tiene vulva y la de build_female_skin.py le añade los labios;
-  - clítoris: glande (bajo la piel, 2,2 cm por delante de la uretra), cuerpo (2,5) y raíces (5) a lo largo de las ramas
-    isquiopubianas; bulbos del vestíbulo (3) a los lados del vestíbulo; glándulas vestibulares mayores (1) detrás;
+    inferior de la sínfisis: la piel de MakeHuman no tiene vulva; build_female_skin.py la modela;
+  - genitales externos profundos (clítoris, bulbos del vestíbulo, glándulas vestibulares mayores): female_perineum.py;
   - glándula mamaria: del borde del esternón a la línea axilar media y de la 2.ª a la 6.ª costilla, con prolongación
     axilar; 8 mm bajo la piel (3 mm tras el pezón) y delante del pectoral; 15 lóbulos; 14 conductos galactóforos con su
     seno, del pezón al interior de la glándula.
@@ -135,27 +134,24 @@ def curve(points, n=24):
 def pelvic_organs(objs, bladder_world, skin_world=None):
     """Lista de (nombre, tejido, vértices, caras, externo) de los órganos pélvicos femeninos.
     `skin_world`: vértices de la piel; los orificios del vestíbulo y el glande del clítoris se colocan sobre ella."""
+    from female_perineum import frame, deep_genitals                        # (importa este módulo)
     L = landmarks(objs)
     out = []
     ps_b, ps_t = L['ps_bottom'], L['ps_top']
-    tub = (L['tuber_L'] + L['tuber_R']) / 2
-    # Piel del periné en la línea media (la piel de MakeHuman no tiene vulva: el vestíbulo queda a su altura y la piel de
-    # la vulva, build_female_skin.py, añade los labios por fuera).
-    perineum = skin_world[(np.abs(skin_world[:, 0]) < 0.008) & (skin_world[:, 2] < ps_b[2])] if skin_world is not None else None
-    def at_skin(y, depth, z_default):
-        sel = perineum[np.abs(perineum[:, 1] - y) < 0.004] if perineum is not None else []
-        return np.array([0.0, y, sel[:, 2].min() + depth if len(sel) else z_default])
-    # Vestíbulo: 3 cm por detrás del borde inferior de la sínfisis; el orificio de la uretra, 1,7 cm por delante del de
-    # la vagina, y el glande del clítoris, 2,2 cm por delante de él, bajo su capuchón.
-    introitus = at_skin(ps_b[1] + 0.03, 0.008, min(ps_b[2] - 0.02, (ps_b[2] + tub[2]) / 2))
-    urethral_os = at_skin(introitus[1] - 0.017, 0.004, introitus[2] + 0.004)
+    # Vestíbulo, orificios y uretra (female_perineum.frame, común con la vulva y los músculos del periné): el orificio
+    # vaginal, 3 cm por detrás del borde inferior de la sínfisis; el de la uretra, 1,7 cm por delante; el glande del
+    # clítoris, 2,2 cm por delante de él, bajo su capuchón.
+    Fp = frame(objs, skin_world, bladder_world)
+    introitus, urethral_os = Fp['introitus'], Fp['urethral_os']
     dv = _dir(60)                                                    # vagina: arriba y atrás
     v_len = 0.08
     vagina_path = curve([introitus, introitus + dv * v_len * 0.5 + np.array([0, -0.004, 0]), introitus + dv * v_len], 16)
     s = np.linspace(0, 1, len(vagina_path))
-    # El orificio, estrecho (en la ranura entre los muslos no cabe más); más ancha arriba (fondos de saco).
-    va = np.interp(s, [0, 0.25, 0.7, 1], [0.0065, 0.011, 0.015, 0.014])
-    V, F = tube(vagina_path, va, np.interp(s, [0, 0.3, 1], [0.0045, 0.006, 0.008]))
+    # El orificio, una hendidura de delante atrás (8 × 5 mm), como el de la vulva (build_female_skin.py); más arriba, la
+    # luz se aplana de lado a lado y se ensancha (fondos de saco).
+    va = np.interp(s, [0, 0.12, 0.25, 0.7, 1], [0.0024, 0.0075, 0.011, 0.015, 0.014])    # de lado a lado
+    rb = np.interp(s, [0, 0.12, 0.3, 1], [0.0042, 0.0055, 0.006, 0.008])                # de delante atrás
+    V, F = tube(vagina_path, va, rb, caps=(False, True))                 # abierta en el orificio (con casquete, asomaba)
     out.append(('Vagina', 'vagina', V, F, False))
     # Útero: el orificio externo del cuello, dentro de la bóveda de la vagina; cuello en anteversión, cuerpo en anteflexión.
     # Con la anteversión y la anteflexión habituales (90° y 20°) el fondo llega por delante del pubis en esta pelvis (corta
@@ -220,32 +216,11 @@ def pelvic_organs(objs, bladder_world, skin_world=None):
         V2, F2 = tube(curve([deep_ring, sup_ring, labium], 14), 0.0022, 0.002, seg=12, caps=(False, True))
         out.append((f'Round_ligament_of_uterus_{side}', 'ligament', np.vstack([V, V2]), F + [tuple(i + len(V) for i in f) for f in F2], False))
     # Uretra femenina: del punto más bajo de la vejiga (junto a la línea media) al vestíbulo.
-    if bladder_world is not None and len(bladder_world):
-        mid = bladder_world[np.abs(bladder_world[:, 0]) < 0.01]
-        neck = mid[np.argmin(mid[:, 2])] if len(mid) else bladder_world[np.argmin(bladder_world[:, 2])]
-    else:
-        neck = ps_b + np.array([0, 0.03, 0.02])
-    V, F = tube(curve([neck, (neck + urethral_os) / 2 + np.array([0, -0.004, 0]), urethral_os], 12), 0.003, 0.003, seg=12)
+    ur = np.interp(np.linspace(0, 1, len(Fp['urethra'])), [0, 0.75, 1], [0.003, 0.003, 0.0012])   # el meato, estrecho
+    V, F = tube(Fp['urethra'], ur, ur, seg=12)
     out.append(('Urethra', 'urethra', V, F, False))
-    # Genitales externos profundos: clítoris (glande, cuerpo y raíces), bulbos y glándulas vestibulares mayores.
-    glans = at_skin(urethral_os[1] - 0.022, 0.0045, urethral_os[2] + 0.012)
-    angle = np.array([0, ps_b[1] + 0.006, ps_b[2] - 0.004])
-    V, F = ellipsoid(glans, [[0.0032, 0, 0], [0, 0.0035, 0], [0, 0, 0.004]])
-    out.append(('Glans_of_clitoris', 'erectile', V, F, True))
-    V, F = tube(curve([glans + np.array([0, 0.002, 0.002]), glans + np.array([0, 0.004, 0.016]), angle], 12), 0.0038, 0.0036, seg=14)
-    out.append(('Body_of_clitoris', 'erectile', V, F, True))
-    for side, sx in (('L', 1), ('R', -1)):
-        tub_s = L[f'tuber_{side}']
-        crus_end = angle + 0.65 * (tub_s - angle) + np.array([0, 0, 0.01])
-        V, F = tube(curve([angle + np.array([sx * 0.003, 0, 0]), angle + np.array([sx * 0.018, 0.012, -0.008]), crus_end], 16),
-                    np.linspace(0.0036, 0.002, 16), np.linspace(0.0033, 0.0018, 16), seg=12)
-        out.append((f'Crus_of_clitoris_{side}', 'erectile', V, F, True))
-        bulb_c = introitus + np.array([sx * 0.014, -0.004, 0.009])     # a los lados del vestíbulo, bajo los labios
-        ax = _unit(np.array([0, 0.9, -0.43]))
-        V, F = ellipsoid(bulb_c, [[0.0045 * sx, 0, 0], np.cross([sx, 0, 0], ax) * 0.006, ax * 0.016])
-        out.append((f'Bulb_of_vestibule_{side}', 'erectile', V, F, True))
-        V, F = ellipsoid(introitus + np.array([sx * 0.012, 0.02, 0.005]), [[0.005, 0, 0], [0, 0.005, 0], [0, 0, 0.0045]])
-        out.append((f'Greater_vestibular_gland_{side}', 'gland_f', V, F, True))
+    # Genitales externos profundos (female_perineum.py): clítoris, bulbos, glándulas vestibulares mayores y sus conductos.
+    out += deep_genitals(Fp)
     return out, L
 
 

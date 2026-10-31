@@ -95,6 +95,10 @@ function apply() {
       && !(viewer.modesty && part.modestEmpty);
     part.ghost = !!stage?.ghost || state.faded.has(part.id);
   }
+  // La piel lisa del pubis femenino (female.glb) y la vulva (female-integumentary.glb) tienen el mismo borde: la lisa
+  // solo se ve cuando no se ve la vulva (genitales ocultos, o aún sin descargar).
+  const vulva = viewer.parts.find((p) => p.id === 'Skin_Genitals' && p.extras.name_en === 'Vulva');
+  for (const part of viewer.parts) if (part.id === 'Skin_Vulva_Smooth' && vulva?.visible) part.visible = false;
   viewer.updateParts();
   if (current && !viewer.selection.size) current = null;
   if (current?.kind === 'group') current.parts = current.parts.filter((p) => viewer.selection.has(p));

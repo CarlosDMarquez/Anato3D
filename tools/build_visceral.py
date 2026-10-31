@@ -330,6 +330,7 @@ FEMALE_PARTS = {   # nombre: (español, latín, ruta)
     'Crus_of_clitoris': ('Raíz del clítoris', 'Crus clitoridis', 'external'),
     'Bulb_of_vestibule': ('Bulbo del vestíbulo', 'Bulbus vestibuli', 'external'),
     'Greater_vestibular_gland': ('Glándula vestibular mayor', 'Glandula vestibularis major', 'external'),
+    'Duct_of_greater_vestibular_gland': ('Conducto de la glándula vestibular mayor', 'Ductus glandulae vestibularis majoris', 'external'),
     'Mammary_gland': ('Glándula mamaria', 'Glandula mammaria', 'breast'),
     'Lactiferous_ducts': ('Conductos galactóforos', 'Ductus lactiferi', 'breast'),
 }

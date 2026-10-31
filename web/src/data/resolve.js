@@ -99,6 +99,10 @@ export function resolvePart(name, extras = {}) {
     chips.push(hand ? 'Mano' : 'Pie');
   } else if (base === 'Eyeball') {
     key = 'Eyeball';
+  } else if (base === 'Skin_Genitals' && extras.name_en === 'Vulva') {
+    key = 'Vulva';                     // el modelo femenino usa el mismo nombre de pieza que la piel del pene
+  } else if (base === 'Skin_Vulva_Smooth') {
+    key = 'Skin_Body';                 // la piel lisa del pubis, que sustituye a la vulva al ocultar los genitales
   }
 
   const entry = ANATOMIA[key] ?? null;

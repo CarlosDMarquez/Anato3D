@@ -7,11 +7,11 @@ Uso (desde la raíz del proyecto):
 
 Salida: build/male_muscular.blend, build/male_muscular.json y web/public/models/male-muscular.json.
 """
-import bpy, bmesh, os, sys, json, collections
+import bpy, bmesh, os, sys, re, json, collections
 import numpy as np
 from mathutils import Matrix, Vector, bvhtree
 sys.path.insert(0, os.path.dirname(__file__))
-from anato3d_fit import (Fitter, Extractor, Groups, bonus_paths, deepest, es, la, sanitize, source_name,
+from anato3d_fit import (MODEL, Fitter, Extractor, Groups, bonus_paths, deepest, es, la, sanitize, source_name,
                          is_structure, principled, save, log, parse_args)
 
 opt = parse_args({'budget': 500000, 'only': None})
@@ -48,9 +48,20 @@ fitter = Fitter()
 paths = bonus_paths()
 superficial = {o.name for o in bpy.data.collections['Superficial muscles'].objects}
 
+# Z-Anatomy no agrupa el suelo de la pelvis ni el periné: sin región, la ficha no decía dónde estaban.
+PELVIC_REGIONS = {
+    'Pubococcygeus muscle': ('Muscles of pelvis', 'Pelvic diaphragm', 'Levator ani'),
+    'Pubo-analis muscle': ('Muscles of pelvis', 'Pelvic diaphragm', 'Levator ani'),
+    'Iliococcygeus muscle': ('Muscles of pelvis', 'Pelvic diaphragm', 'Levator ani'),
+    'Tendinous arch of levator ani': ('Muscles of pelvis', 'Pelvic diaphragm', 'Levator ani'),
+    'Coccygeus muscle': ('Muscles of pelvis', 'Pelvic diaphragm'),
+    'External anal sphincter': ('Perineal muscles',),
+}
+
 def region_path(name):
     cands = [p[1:] for p in paths[name] if p[0] == 'Muscular system' and p[1] not in GENERIC]
-    return max(cands, key=len) if cands else ()
+    if not cands: return PELVIC_REGIONS.get(source_name(name)[0], ())
+    return max(cands, key=len)
 
 items = []
 for o in bpy.data.collections['4: Muscular system'].objects:
@@ -117,6 +128,52 @@ for n, it in enumerate(items):
     it.update(out=obj, region=rp)
     stats.append({'name': name, 'faces': len(me.polygons), 'moved_out_of_skin': moved, 'verts': len(me.vertices), 'worst_mm': round(worst * 1000, 1)})
     if n % 50 == 0: log(f'  {n}/{len(items)} {name}: {len(me.polygons)} caras, {moved}/{len(me.vertices)} vértices corregidos por la piel')
+
+# ── Periné femenino (tools/female_perineum.py) ──────────────────────────────
+# Z-Anatomy no tiene los músculos del triángulo urogenital ni la membrana ni el cuerpo perineal: en la mujer se generan
+# sobre las mismas referencias que la vulva y los genitales profundos, y entran en las capas y en la separación entre
+# músculos como los demás.
+PERINEUM = {   # inglés (traducción oficial de Z-Anatomy): (ruta, acción)
+    'Ischiocavernosus muscle': (('Perineal muscles', 'Superficial perineal space'), 'Erección del clítoris'),
+    'Bulbospongiosus muscle': (('Perineal muscles', 'Superficial perineal space'), 'Cierre de orificios (esfínter)'),
+    'Superficial transverse perineal muscle': (('Perineal muscles', 'Superficial perineal space'), 'Sostén del cuerpo perineal'),
+    'Deep transverse perineal muscle': (('Perineal muscles', 'Deep perineal space'), 'Sostén del cuerpo perineal'),
+    'Compressor urethrae': (('Perineal muscles', 'Deep perineal space'), 'Cierre de orificios (esfínter)'),
+    'Sphincter urethrovaginalis': (('Perineal muscles', 'Deep perineal space'), 'Cierre de orificios (esfínter)'),
+    'External urethral sphincter': (('Perineal muscles', 'Deep perineal space'), 'Cierre de orificios (esfínter)'),
+    'Perineal membrane': (('Perineal muscles',), ''),
+    'Perineal body': (('Perineal muscles',), ''),
+}
+if MODEL == 'female' and (not opt['only'] or any(k in 'perineal perineum bulbospongiosus ischiocavernosus urethr' for k in opt['only'])):
+    from female_perineum import frame, perineal_muscles
+    ref = {re.sub(r'\.\d{3}$', '', o.name): o for o in bpy.data.collections['Fase2_ref'].objects}
+    bladder = fitter.deform(Fitter._world(bpy.data.objects['Urinary bladder']))
+    PF = frame(ref, Fitter._world(ref['Skin_Body']), bladder)
+    for k, m in enumerate(perineal_muscles(PF)):
+        V = m['V'].copy()
+        fitter.push_out_of_bone(V)
+        center = (V.min(0) + V.max(0)) / 2
+        me = bpy.data.meshes.new(m['name']); me.from_pydata((V - center).tolist(), [], m['F']); me.update()
+        bm = bmesh.new(); bm.from_mesh(me)
+        bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-7)            # polos de los tubos
+        if all(e.is_manifold for e in bm.edges) and bm.calc_volume(signed=True) < 0: bmesh.ops.reverse_faces(bm, faces=bm.faces)
+        for f in bm.faces: f.smooth = True
+        bm.to_mesh(me); bm.free(); me.update()
+        obj = bpy.data.objects.new(m['name'], me); obj.location = center
+        me.materials.append(MATS['tendon'] if m['tissue'] == 'tendon' else MATS[f'muscle_{sum(map(ord, m["en"])) % 5}'])
+        rp, action = PERINEUM[m['en']]
+        side = m['name'][-1] if m['name'].endswith(('_L', '_R')) else None
+        obj['anato3d_id'] = 'muscle_' + m['name'].lower()
+        obj['system'] = 'muscular'; obj['tissue'] = m['tissue']; obj['superficial'] = m['superficial']
+        obj['name_en'] = m['en']; obj['name_la'] = la(m['en']) or ''; obj['name_es'] = es(m['en']) or ''
+        obj['region'] = json.dumps([sanitize(g) for g in rp])
+        obj['innervation_es'] = json.dumps(['Nervio perineal (ramo del nervio pudendo)'] if m['tissue'] == 'muscle' else [], ensure_ascii=False)
+        obj['function_es'] = action
+        obj['source'] = 'Anato3D (forma paramétrica con medidas anatómicas de adulta; tools/female_perineum.py)'
+        items.append({'obj': None, 'src': m['en'], 'base': m['en'], 'side': side, 'mat': None, 'tissue': m['tissue'],
+                      'slots': [], 'out': obj, 'region': rp})
+        stats.append({'name': m['name'], 'faces': len(me.polygons), 'moved_out_of_skin': 0, 'verts': len(me.vertices), 'worst_mm': 0.0})
+    log(f'periné femenino: {sum(1 for it in items if it["obj"] is None)} piezas (músculos, membrana y cuerpo perineal)')
 
 # ── Capas: superficial / intermedia / profunda ──────────────────────────────
 # Superficial: lo que se ve al quitar la piel. Profunda: lo que queda cubierto y descansa directamente sobre el hueso

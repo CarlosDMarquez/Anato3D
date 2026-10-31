@@ -19,14 +19,15 @@ Qué hace:
      hombros, brazos y tórax; el campo en el volumen queda en Anato3D_Male_30_Fase2_musculature.npz.
   4. Lo mismo para la piel femenina (misma malla base de MakeHuman), escalado a su estatura; el esqueleto masculino se
      lleva a ella (tools/female.py) y la pelvis toma la forma femenina (tools/female_pelvis.py; el campo para los demás
-     tejidos queda en Anato3D_Female_30_Fase2_pelvis.npz).
+     tejidos queda en Anato3D_Female_30_Fase2_pelvis.npz). La región de la vulva se guarda en la piel (atributo «vulva»)
+     y, al exportar, se recorta de ella y queda aparte («Skin_Vulva_Smooth»): la vulva de build_female_skin.py la sustituye.
 
 Guarda una copia de los originales en sources/originals/ la primera vez.
 
 Uso (desde la raíz del proyecto):
   /Applications/Blender.app/Contents/MacOS/Blender -b --disable-autoexec --python tools/fix_neck.py
 """
-import bpy, os, re, sys, shutil
+import bpy, bmesh, os, re, sys, shutil
 from mathutils import Vector, kdtree, bvhtree
 sys.path.insert(0, os.path.dirname(__file__))
 from skin_tone import male_layers, female_layers, apply_layers
@@ -505,5 +506,33 @@ skin, objs = fskin, {o.name: o for o in bpy.data.objects}
 cover(['Mandible', 'Hyoid_Bone'] + NAPE)
 cover_close([n for n in fbones if not n.startswith(CAVITY)])
 apply_layers(fskin, female_layers(fskin, MALE_TONE, world))
+# Región de la vulva (tools/female_perineum.py): se guarda en la piel (atributo de cara «vulva») para que
+# build_female_skin.py modele la vulva con el mismo borde. La piel de la Fase 2 queda entera (los sistemas la usan para
+# saber qué está dentro del cuerpo); solo al exportar se recorta.
+from female_perineum import frame as perineum_frame, vulva_region
+fW, fP = world(fskin), [p.vertices[:] for p in fskin.data.polygons]
+vmask = vulva_region(perineum_frame({o.name: o for o in bpy.data.objects}, fW), fW, fP, bvhtree.BVHTree.FromPolygons(fW.tolist(), fP))
+fskin.data.attributes.new('vulva', 'INT8', 'FACE').data.foreach_set('value', vmask.astype(np.int8))
+print(f'vulva: {int(vmask.sum())} caras de la piel')
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT, f'{FEMALE_OUT}.blend'))
+
+def split_vulva(skin, mask):
+    """Pasa las caras de la vulva a un objeto aparte, «Skin_Vulva_Smooth» (la piel lisa que se ve con los genitales
+    ocultos; la vulva de build_female_skin.py la sustituye con el mismo borde). Los dos conservan las normales de la piel
+    entera: en el borde, sin costura de sombreado a ningún lado."""
+    me = skin.data
+    normals = np.array([v.normal[:] for v in me.vertices])
+    me.attributes.new('orig_index', 'INT', 'POINT').data.foreach_set('value', np.arange(len(me.vertices), dtype=np.int32))
+    part = skin.copy(); part.data = me.copy(); part.name = part.data.name = 'Skin_Vulva_Smooth'
+    for c in skin.users_collection: c.objects.link(part)
+    for obj, drop in ((skin, mask), (part, ~mask)):
+        bm = bmesh.new(); bm.from_mesh(obj.data); bm.faces.ensure_lookup_table()
+        bmesh.ops.delete(bm, geom=[bm.faces[i] for i in np.nonzero(drop)[0]], context='FACES')
+        bm.to_mesh(obj.data); bm.free()
+        idx = np.empty(len(obj.data.vertices), dtype=np.int32); obj.data.attributes['orig_index'].data.foreach_get('value', idx)
+        obj.data.attributes.remove(obj.data.attributes['orig_index'])
+        obj.data.normals_split_custom_set_from_vertices([tuple(n) for n in normals[idx]])
+    for k, v in {'anato3d_id': 'integument_skin_vulva_smooth', 'system': 'integumentary', 'subsystem': 'skin'}.items(): part[k] = v
+    return part
+split_vulva(fskin, vmask)
 export([os.path.join(ROOT, f'{FEMALE_OUT}_draco.glb'), os.path.join(ROOT, 'web/public/models/female.glb')], 'Anato3D_Female_30')

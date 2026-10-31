@@ -17,7 +17,7 @@ Abre http://localhost:5173 (o el puerto que indique Vite). Para producción: `np
 | Ruta | Qué es |
 |---|---|
 | `*.blend`, `*.glb` (raíz) | Modelos fuente. Fase 1 = piel + ojos; Fase 2 = piel + esqueleto completo (`Anato3D_Male_30_Fase2`, `Anato3D_Female_30_Fase2`). |
-| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_organs.py` (órganos femeninos), `build_female_skin.py` (piel de la vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app) y `audit_models.py` (busca errores medibles en los modelos). |
+| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app) y `audit_models.py` (busca errores medibles en los modelos). |
 | `Anato3D_Male_30_Fase2_musculature.npz` | Campo de desplazamiento de la complexión musculosa (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas). |
 | `Anato3D_Female_30_Fase2_pelvis.npz` | Campo de desplazamiento de la pelvis femenina y los huesos de la pelvis antes de deformarla (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas femeninos). |
 | `sources/originals/` | Copia de los modelos tal como estaban antes de corregir el cuello. |
@@ -417,6 +417,52 @@ El usuario lo veía «todo deforme», frente a una imagen de referencia con los 
 - **Esternocleidomastoideo:** abultamiento de 4 mm a lo largo de la línea mastoides–articulación esternoclavicular, solo en la piel que mira hacia delante o afuera. Así se marca la «V».
 - **Platisma:** 12 % de opacidad en el visor.
 
+## Vulva, genitales externos profundos y músculos del periné (2026-10-31)
+
+**Referencias comunes** (`tools/female_perineum.py`, nuevo). `frame()` calcula, solo con la pelvis y la piel, las referencias que usan la vulva, los genitales profundos y los músculos:
+- orificio vaginal y uretral, glande y rodilla del clítoris;
+- cuerpo perineal y uretra;
+- cara inferomedial de las ramas isquiopubianas, con rayos sobre el coxal.
+
+**Genitales externos profundos** (`deep_genitals`, desde `female_organs.py`), con medidas de O'Connell (2005) y Lloyd (2005):
+- glande cónico de 6 mm;
+- cuerpo acodado hasta la rodilla bajo la sínfisis;
+- raíces aplanadas contra las ramas;
+- bulbos en media luna;
+- glándulas de Bartolino con su conducto (pieza nueva), que se abre en el vestíbulo a las 5 y a las 7.
+- La vagina queda abierta en el orificio, que es una hendidura de 8 × 5 mm; la uretra se estrecha a 2,4 mm en el meato.
+
+**Músculos del periné** (`perineal_muscles`, desde `build_muscular.py`, solo en la mujer). Z-Anatomy no tiene los del triángulo urogenital, ni en el hombre ni en la mujer.
+- Piezas: isquiocavernoso, bulboesponjoso, transversos superficial y profundo, compresor de la uretra, esfínter uretrovaginal, esfínter externo de la uretra, membrana perineal y cuerpo perineal (16 en total).
+- Llevan el nombre oficial de la traducción de Z-Anatomy y la ruta «Músculos perineales › Espacio perineal superficial / profundo».
+- Entran en las capas y en la separación entre músculos.
+- Fichas en `musculos-fichas.js`; la membrana y el cuerpo perineal llevan la etiqueta «Tejido fibroso».
+- En los dos modelos, el suelo de la pelvis (elevador del ano, coccígeo) y el esfínter externo del ano tienen ahora región; antes no tenían ninguna.
+
+**Vulva sin parche** (`build_female_skin.py`, reescrito):
+- La región de la vulva (el techo entre los muslos) se guarda en la piel femenina (atributo de cara «vulva», `fix_neck.py`).
+- Al exportar `female.glb`, esa región se recorta y queda aparte, lisa («Skin_Vulva_Smooth»).
+- La vulva la sustituye con el mismo borde: 1.600 vértices idénticos, normales del cuerpo en el borde y tono del cuerpo × un matiz por zona. No hay costura de forma, de normales ni de color.
+- `main.js` muestra la piel lisa solo cuando no se ve la vulva (genitales ocultos o aún sin descargar).
+- Relieve: subdivisión de las caras de la región (~0,25 mm), curvada con la interpolación de Phong.
+  - Labios mayores de contorno elíptico (5 mm) con la hendidura entre ellos.
+  - Labios menores, capuchón y glande.
+  - Vestíbulo con el meato uretral y el orificio vaginal (9 mm de hondo, con el borde del himen).
+- Problemas resueltos:
+  - la piel tiene vértices duplicados en algunas filas, que dentro de la región eran bordes;
+  - la línea proyectada en la piel zigzagueaba y la posición a lo largo de ella saltaba (relieve escalonado);
+  - el borde de la región va en dientes de sierra (8 mm): el relieve se desvanece con una envolvente suave por dentro de él.
+- Ficha propia «Vulva». Antes, el modelo femenino mostraba la de la piel del pene y del escroto.
+
+**Verificado:**
+- **Auditoría femenina:** 39 choques entre órganos, los mismos que antes.
+  - Ninguna de las 18 piezas nuevas sale de la piel; los músculos solo tocan el hueso en sus inserciones (≤ 0,3 mm).
+  - Simetría izquierda/derecha de las piezas del periné: diferencia ≤ 1,3 mm.
+- **Auditoría masculina:** igual (36 choques, las mismas medidas).
+- **Web:** sin errores de consola, en las vistas de piel (y con los genitales ocultos), muscular y urogenital.
+
+**Pendiente:** el músculo bulboesponjoso, el isquiocavernoso y los transversos son formas paramétricas, no disecadas; al hombre le faltan los mismos músculos del periné.
+
 ## Pelvis femenina (2026-10-30)
 
 La pelvis del modelo femenino era la masculina con las proporciones de la piel de la mujer: una pelvis androide (estrecho superior acorazonado, arco del pubis de 54°, espinas ciáticas a 8,0 cm, coxal más alto que en el hombre). `tools/female_pelvis.py`, llamado desde `fix_neck.py`, le da forma ginecoide.
@@ -499,15 +545,12 @@ A3D_MODEL=female zsh tools/build_all.sh
 
 **Pendiente (para perfeccionar):**
 - ~~**Pelvis:** tiene las proporciones de la piel femenina, no la forma de una pelvis femenina.~~ Hecho (ver «Pelvis femenina»). Sigue algo corta de delante atrás, así que el útero queda más vertical de lo habitual.
-- **Vulva:**
-  - Primera versión, con relieves bajos, porque los muslos de la piel de MakeHuman dejan una ranura de ~14 mm.
-  - El borde anterior del parche aún se nota en algunas vistas.
-  - Los genitales externos profundos (clítoris, bulbos) son formas simples.
+- ~~**Vulva:** primera versión, con relieves bajos; el borde del parche se notaba; genitales profundos simples.~~ Rehecha el 2026-10-31 (ver «Vulva, genitales externos profundos y músculos del periné»).
 - **Mamas:** las forma la piel de MakeHuman. La glándula es una lente bajo ella, sin la grasa ni los ligamentos de Cooper.
 - **Cabeza:**
   - Los labios de la piel femenina quedan entreabiertos: se ven los dientes.
   - La auditoría marca algunos músculos del ojo y nodos retrofaríngeos junto a las cavidades.
-- **Músculos:** los del periné son los de Z-Anatomy (masculinos), ajustados a la pelvis femenina.
+- ~~**Músculos:** los del periné son los de Z-Anatomy (masculinos), ajustados a la pelvis femenina.~~ Era impreciso: Z-Anatomy no tiene los del triángulo urogenital. Hecho el 2026-10-31 (ver «Vulva, genitales externos profundos y músculos del periné»).
 
 **Arreglos que afectan también al hombre:**
 - **Tramos de la tibia** (`anato3d_fit._segments`): al unir un primer tramo pequeño con el siguiente, se duplicaba el segundo y se perdía el último (el distal, junto al tobillo). Le pasaba a las dos tibias masculinas. Con dos tramos fallaba (así apareció en la mujer).

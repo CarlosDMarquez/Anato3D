@@ -179,7 +179,8 @@ function decodeRegion(r) {
 const MODEST_HIDE = new Set(['Skin_Genitals', 'Corpus_cavernosum_of_penis', 'Corpus_spongiosum_of_penis', 'Glans_penis',
   // Mujer: la piel de la vulva (también Skin_Genitals) y los genitales externos profundos.
   'Glans_of_clitoris', 'Body_of_clitoris', 'Crus_of_clitoris_L', 'Crus_of_clitoris_R', 'Bulb_of_vestibule_L',
-  'Bulb_of_vestibule_R', 'Greater_vestibular_gland_L', 'Greater_vestibular_gland_R']);
+  'Bulb_of_vestibule_R', 'Greater_vestibular_gland_L', 'Greater_vestibular_gland_R', 'Duct_of_greater_vestibular_gland_L',
+  'Duct_of_greater_vestibular_gland_R']);
 const MODEST_SYSTEMS = new Set(['urogenital', 'arterial', 'venous', 'nervous', 'lymphatic']);
 
 // Las piezas izquierdas de la Fase 2 se generaron en espejo y quedaron con las caras hacia dentro.
