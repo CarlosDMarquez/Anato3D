@@ -17,7 +17,7 @@ Cómo:
     masculino.
   - Los tramos de los huesos largos («segments», en coordenadas de mundo) se mueven con su hueso.
   - La pelvis, el sacro y el tórax toman las proporciones de la piel femenina (más ancha de cadera, más estrecha de
-    hombros), no la forma propia de la pelvis femenina: es un primer paso.
+    hombros), no su forma propia; la pelvis la toma después, en tools/female_pelvis.py.
 """
 import json
 import numpy as np

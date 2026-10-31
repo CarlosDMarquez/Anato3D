@@ -17,7 +17,9 @@ Qué hace:
      abultamientos anchos y unidos (sin bultos sueltos ni surcos entre ellos); la nuca se alisa.
   3c2–3. La piel se infla sobre el deltoides de Z-Anatomy, y la complexión musculosa (tools/musculature.py) engrosa
      hombros, brazos y tórax; el campo en el volumen queda en Anato3D_Male_30_Fase2_musculature.npz.
-  4. Lo mismo para la piel femenina (misma malla base de MakeHuman), escalado a su estatura.
+  4. Lo mismo para la piel femenina (misma malla base de MakeHuman), escalado a su estatura; el esqueleto masculino se
+     lleva a ella (tools/female.py) y la pelvis toma la forma femenina (tools/female_pelvis.py; el campo para los demás
+     tejidos queda en Anato3D_Female_30_Fase2_pelvis.npz).
 
 Guarda una copia de los originales en sources/originals/ la primera vez.
 
@@ -489,6 +491,13 @@ for o in dst.objects:
     if seg2: o['segments'] = seg2
 fbones = [o.name for o in dst.objects]
 print(f'esqueleto femenino: {len(fbones)} huesos; estatura de la piel {world(fskin)[:, 2].max():.3f} m')
+# Pelvis con forma femenina (tools/female_pelvis.py), con el campo para los demás tejidos.
+from female_pelvis import reshape
+pel_before, pel_after, pel_moved, pel_report = reshape({o.name: o for o in bpy.data.objects}, fskin, world, set_world,
+                                                       os.path.join(ROOT, f'{FEMALE_OUT}_pelvis.npz'))
+print('pelvis femenina, campo:', pel_report, '; huesos movidos hasta (mm):', {n: round(v * 1000, 1) for n, v in pel_moved.items()})
+for key in pel_before:
+    print(f'  {key}: {pel_before[key]:.1f} → {pel_after[key]:.1f}')
 subdivide(fskin)
 assert len(fskin.data.vertices) == len(MALE_TONE['pliegues'][0]), 'la piel femenina no comparte la topología subdividida'
 # Ningún hueso a menos de 3 mm de la piel femenina, como en la masculina (las mismas funciones, sobre su piel).

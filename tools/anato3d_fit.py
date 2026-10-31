@@ -5,6 +5,8 @@ Cómo funciona el ajuste:
   la suya. Cada vértice se mueve con la mezcla de las transformaciones de los huesos más cercanos,
   ponderadas por la inversa de la distancia, como la piel con su esqueleto. Luego se aplica la complexión
   musculosa (tools/musculature.py: el campo que engrosa hombros, brazos y tórax, el mismo que infló la piel).
+  En la mujer, en su lugar, la pelvis femenina (tools/female_pelvis.py): el ajuste se hace con la pelvis antes de
+  deformarla, guardada con el campo, y después se suma el campo, que lleva cada tejido con ella.
   Después, opcionalmente, se meten bajo la piel los vértices que quedaran fuera de ella.
 """
 import bpy, bmesh, sys, os, re, csv, json, time, collections
@@ -18,6 +20,7 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 MODEL = os.environ.get('A3D_MODEL', 'male')
 FASE2 = os.path.join(ROOT, 'Anato3D_Male_30_Fase2.blend' if MODEL == 'male' else 'Anato3D_Female_30_Fase2.blend')
 MUSCULATURE = os.path.join(ROOT, 'Anato3D_Male_30_Fase2_musculature.npz') if MODEL == 'male' else ''  # fix_neck.py
+PELVIS = os.path.join(ROOT, 'Anato3D_Female_30_Fase2_pelvis.npz') if MODEL == 'female' else ''          # fix_neck.py
 TRANSLATIONS = os.path.join(ROOT, 'sources/z-anatomy/translations.csv')
 OUT_DIR = os.path.join(ROOT, 'build')
 WEB_MODELS = os.path.join(ROOT, 'web/public/models')
@@ -109,11 +112,16 @@ class Fitter:
     def __init__(self, objects=None):
         """`objects`: los objetos de la Fase 2 ya cargados (fix_neck.py ajusta así músculos al esqueleto que está
         corrigiendo); sin ellos se cargan de Anato3D_Male_30_Fase2.blend, con su complexión musculosa."""
-        self.bulk = None
+        self.bulk = self.pelvis = None
+        pre = {}                                               # huesos antes de la pelvis femenina (mundo)
         if objects is None:
             if MUSCULATURE and os.path.exists(MUSCULATURE):
                 from musculature import Field
                 self.bulk = Field.load(MUSCULATURE)
+            if PELVIS and os.path.exists(PELVIS):
+                from musculature import Field
+                self.pelvis = Field.load(PELVIS)
+                z = np.load(PELVIS); pre = {k[4:]: z[k].astype(float) for k in z.files if k.startswith('pre_')}
             with bpy.data.libraries.load(FASE2) as (src, dst):
                 dst.objects = list(src.objects)
             ref = bpy.data.collections.new('Fase2_ref')
@@ -130,7 +138,8 @@ class Fitter:
             m = re.search(r'Z-Anatomy object "(.+?)"', o.get('source', ''))
             z = bpy.data.objects.get(m.group(1)) if m else None
             if not z: continue
-            A, Z = self._world(o), self._world(z)
+            # Junto a Z-Anatomy, Sacrum y Coccyx de la Fase 2 se cargan como «.001».
+            A, Z = pre.get(re.sub(r'\.\d{3}$', '', o.name), self._world(o)), self._world(z)
             if len(A) != len(Z): continue
             base = sum(len(x) for x in allV)
             allV.append(Z); allF += [[base + i for i in pl.vertices] for pl in z.data.polygons]
@@ -236,6 +245,7 @@ class Fitter:
             w = 1.0 / np.maximum(d, 1e-3) ** IDW_POWER; w /= w.sum()
             out[i] = np.einsum('b,bk->k', w, np.append(v, 1.0) @ self.BM[ids])
         if self.bulk is not None: out += self.bulk.sample(out)
+        if self.pelvis is not None: out += self.pelvis.sample(out)
         return out
 
     # La piel de MakeHuman tiene cavidades (boca, ojos): estar «fuera» según la superficie más cercana no

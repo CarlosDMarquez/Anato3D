@@ -162,13 +162,19 @@ class Field:
         self.o = np.asarray(origin, float); self.h = float(h); self.D = np.asarray(D, np.float32)
 
     @classmethod
-    def solve(cls, W, polys, disp, bones_bvh, h=0.006, iterations=600, omega=1.85, extend=False):
+    def solve(cls, W, polys, disp, bones_bvh, h=0.006, iterations=600, omega=1.85, extend=False, box=None, bone_disp=None, tol=2e-6):
         """`extend`: fuera del cuerpo, el desplazamiento del vértice de piel más cercano en lugar de cero. Para el campo
         hombre→mujer: la boca de MakeHuman es una cavidad cerrada (fuera del cuerpo) y los dientes, el maxilar y la
-        mandíbula, que la rodean, quedaban con desplazamiento cero (la mandíbula salía con 114 mm de error afín)."""
-        active = np.linalg.norm(disp, axis=1) > 2e-4
-        lo = np.maximum(W[active].min(0) - 0.04, W.min(0) - h)
-        hi = np.minimum(W[active].max(0) + 0.04, W.max(0) + h)
+        mandíbula, que la rodean, quedaban con desplazamiento cero (la mandíbula salía con 114 mm de error afín).
+        `box`: (mín, máx) de la rejilla, si no la da la piel que se mueve (en la pelvis femenina la piel no se mueve).
+        `bone_disp`: desplazamiento en las celdas de hueso (función de sus centros) en lugar de cero.
+        `tol`: cambio máximo (m) en una pasada para darlo por resuelto."""
+        if box is None:
+            active = np.linalg.norm(disp, axis=1) > 2e-4
+            lo = np.maximum(W[active].min(0) - 0.04, W.min(0) - h)
+            hi = np.minimum(W[active].max(0) + 0.04, W.max(0) + h)
+        else:
+            lo, hi = (np.asarray(b, float) for b in box)
         xs, ys, zs = (np.arange(lo[a], hi[a] + h, h) for a in range(3))
         n = (len(xs), len(ys), len(zs))
         T = bvhtree.BVHTree.FromPolygons(W.tolist(), polys)
@@ -197,11 +203,13 @@ class Field:
         D = np.zeros(n + (3,), np.float32)
         si = np.nonzero(surf)
         D[si] = disp[[kd.find(p)[1] for p in C(si)]]
-        # Hueso: cero dentro y a menos de una celda de su superficie.
+        # Hueso: cero (o `bone_disp`) dentro y a menos de una celda de su superficie.
         zero = np.zeros(n, bool)
         ii = np.nonzero(inside & ~surf)
         if bones_bvh is not None:                               # sin huesos (el campo hombre→mujer los mueve también)
             zero[ii] = [bones_bvh.find_nearest(Vector(p), 0.9 * h)[0] is not None for p in C(ii)]
+            if bone_disp is not None:
+                zi = np.nonzero(zero); D[zi] = bone_disp(C(zi))
         free = inside & ~surf & ~zero
         free[[0, -1], :, :] = free[:, [0, -1], :] = free[:, :, [0, -1]] = False
         # Laplace por sobrerrelajación rojo-negro sobre las celdas libres (índices planos).
@@ -219,7 +227,7 @@ class Field:
                 delta = omega * (avg - flat[g])
                 flat[g] += delta
                 change = max(change, float(np.abs(delta).max()) if len(g) else 0.0)
-            if change < 2e-6: break
+            if change < tol: break
         if extend:
             oi = np.nonzero(~inside & ~surf)
             D[oi] = disp[[kd.find(p)[1] for p in C(oi)]]

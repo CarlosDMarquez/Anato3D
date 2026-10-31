@@ -17,8 +17,9 @@ Abre http://localhost:5173 (o el puerto que indique Vite). Para producción: `np
 | Ruta | Qué es |
 |---|---|
 | `*.blend`, `*.glb` (raíz) | Modelos fuente. Fase 1 = piel + ojos; Fase 2 = piel + esqueleto completo (`Anato3D_Male_30_Fase2`, `Anato3D_Female_30_Fase2`). |
-| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (piel de la vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app) y `audit_models.py` (busca errores medibles en los modelos). |
+| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_organs.py` (órganos femeninos), `build_female_skin.py` (piel de la vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app) y `audit_models.py` (busca errores medibles en los modelos). |
 | `Anato3D_Male_30_Fase2_musculature.npz` | Campo de desplazamiento de la complexión musculosa (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas). |
+| `Anato3D_Female_30_Fase2_pelvis.npz` | Campo de desplazamiento de la pelvis femenina y los huesos de la pelvis antes de deformarla (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas femeninos). |
 | `sources/originals/` | Copia de los modelos tal como estaban antes de corregir el cuello. |
 | `sources/z-anatomy/` | Z-Anatomy descargado, con su traducción oficial (`translations.csv`) y TA2. No se publica. |
 | `build/` | Resultados intermedios (`male_muscular.blend`, estadísticas). |
@@ -416,6 +417,47 @@ El usuario lo veía «todo deforme», frente a una imagen de referencia con los 
 - **Esternocleidomastoideo:** abultamiento de 4 mm a lo largo de la línea mastoides–articulación esternoclavicular, solo en la piel que mira hacia delante o afuera. Así se marca la «V».
 - **Platisma:** 12 % de opacidad en el visor.
 
+## Pelvis femenina (2026-10-30)
+
+La pelvis del modelo femenino era la masculina con las proporciones de la piel de la mujer: una pelvis androide (estrecho superior acorazonado, arco del pubis de 54°, espinas ciáticas a 8,0 cm, coxal más alto que en el hombre). `tools/female_pelvis.py`, llamado desde `fix_neck.py`, le da forma ginecoide.
+
+- **Deformación de los huesos:**
+  - se detectan referencias en coxales, sacro y cóccix: acetábulo, sínfisis, tubérculo del pubis, pecten, línea arcuata, articulación sacroilíaca, alas y vértice del sacro, cóccix, espina y tuberosidad isquiáticas, rama isquiopubiana, cresta y espinas ilíacas;
+  - cada referencia lleva un desplazamiento en mm (`DESIGN`), con su imagen especular;
+  - un spline poliarmónico (r³ con parte lineal) lo extiende a los tres huesos;
+  - al ser una sola función, las articulaciones sacroilíacas y la sínfisis siguen encajadas;
+  - acetábulo y base del sacro quedan fijos (menos de 2 mm y 0,3 mm): fémures y columna lumbar no se mueven.
+- **Lo demás la sigue:**
+  - un campo armónico en el volumen (`musculature.Field.solve` con `box` y `bone_disp`) vale la deformación en la pelvis y cero en los demás huesos y en la piel;
+  - se guarda con los huesos sin deformar en `Anato3D_Female_30_Fase2_pelvis.npz`;
+  - `anato3d_fit.Fitter` ajusta con esos huesos (el coxal deformado ya no es afín al de Z-Anatomy) y después suma el campo;
+  - en el hueso, el campo coincide con la deformación: 0,05 mm de mediana y 1,2 mm como máximo.
+- **Órganos pélvicos:** `female_organs.py` los coloca sobre las referencias de la pelvis nueva.
+  - El útero queda en anteversión 70° y anteflexión 15° (antes, 65° y 10°): es la más próxima a la habitual (90° y 20°) con el fondo detrás del pubis.
+  - Ovarios 6 mm más afuera; raíces del clítoris abiertas con el arco del pubis; vestíbulo 5–7 mm más adelante.
+
+| Medida (`pelvimetry`) | Antes | Después |
+|---|---|---|
+| Arco del pubis | 54° | 88° |
+| Entre espinas ciáticas | 8,0 cm | 10,1 cm |
+| Estrecho superior, ancho | 12,7 cm | 13,6 cm |
+| Conjugada obstétrica | 9,8 cm | 10,1 cm |
+| Sínfisis–cóccix | 8,1 cm | 9,3 cm |
+| Sacro (ancho × largo) | 11,0 × 10,1 cm | 11,9 × 9,6 cm |
+| Altura del coxal | 20,4 cm | 19,2 cm |
+
+**Verificado:**
+- **Modelo masculino:** sale idéntico (mismos GLB).
+- **Auditoría femenina:**
+  - 39 choques entre órganos (antes 38); el nuevo es un solape del 4 % entre los nodos posvesicales y la vejiga;
+  - las trompas ya no entran en el hueso;
+  - el glúteo mayor izquierdo aparece a 2,7 mm dentro del hueso, pero es un falso positivo de la normal del sacro (malla abierta): por paridad no entra más de 0,3 mm.
+- **Web:** carga la pelvis nueva y la vulva sigue en su sitio.
+
+**Fallo corregido:** al cargar la Fase 2 junto a Z-Anatomy, el sacro se llama `Sacrum.001` y el ajuste no encontraba su versión sin deformar. Quedaba fuera de la guía del ajuste (5,7 mm de error afín). Ahora se busca sin el sufijo.
+
+**Pendiente:** la conjugada obstétrica sigue corta (10,1 cm; en la mujer, ~11–12). Alargarla movería la sínfisis hacia la piel del pubis (le quedan 2,7 cm) o la base del sacro, sobre la que va L5.
+
 ## Modelo femenino (2026-10-30)
 
 Primera versión del modelo femenino con los 12 sistemas, para perfeccionar después. Se construye igual que el masculino:
@@ -432,7 +474,7 @@ A3D_MODEL=female zsh tools/build_all.sh
 - El desplazamiento que mueve los huesos no lleva las mamas (se rellena con Laplace) y está suavizado (40 pasadas, ~9 cm). Sin ello, las mamas doblaban las costillas 5–8 y la tibia se cizallaba hasta 2 cm.
 - Cada hueso es la transformación afín que mejor sigue al campo; los huesos largos, una por trozo de ~6 cm, unidas en ±5 mm. Mayor separación del campo: 7,2 mm (tibias).
 - Así cada hueso sigue siendo una transformación afín de Z-Anatomy y `anato3d_fit.py` ajusta músculos, vasos, nervios y vísceras al esqueleto femenino igual que al masculino.
-- Resultado: 258 huesos dentro de la piel femenina (1,574 m), con las mismas comprobaciones de distancia a la piel que el hombre. La pelvis toma las proporciones de la piel (más ancha); su forma propia es un trabajo pendiente.
+- Resultado: 258 huesos dentro de la piel femenina (1,574 m), con las mismas comprobaciones de distancia a la piel que el hombre. La pelvis toma las proporciones de la piel (más ancha); su forma propia, después (ver «Pelvis femenina»).
 
 **Sistemas** (`A3D_MODEL=female`, `anato3d_fit.MODEL`): mismos scripts, sin la complexión musculosa ni las piezas que solo tiene el hombre (`male_only`: pene, testículos, epidídimo, escroto, cordón espermático, próstata, vesículas seminales, conducto deferente, glándulas bulbouretrales y la uretra masculina).
 
@@ -441,7 +483,7 @@ A3D_MODEL=female zsh tools/build_all.sh
 - Clítoris (glande, cuerpo y raíces), bulbos del vestíbulo y glándulas vestibulares mayores. El vestíbulo queda a la altura de la piel del periné.
 - Glándulas mamarias: una lente bajo el relieve de la mama de la piel (8 mm bajo ella, 3 mm tras el pezón), sobre el pectoral, del borde del esternón a la línea axilar media y de la 2.ª a la 6.ª costilla, con prolongación axilar y 15 lóbulos. Además, 14 conductos galactóforos por lado.
 
-**Piel de la vulva** (`tools/build_female_skin.py`). La piel de MakeHuman tiene el pubis liso. Se genera como la piel genital masculina: función de distancia con «surface nets», unida con suavidad a la piel del cuerpo y recortada.
+**Piel de la vulva** (`tools/build_female_skin.py`). La piel de MakeHuman tiene el pubis liso. Es una copia subdividida de la piel del cuerpo alrededor de la línea de la vulva, con relieve a lo largo de la normal. Asoma solo donde hay relieve y en el borde se hunde bajo la piel. Una función de distancia, como la de la piel genital masculina, sacaba los labios por los muslos.
 - Labios mayores y menores a lo largo de la línea de la vulva, sobre la piel, y capuchón del clítoris.
 - Color propio («Tono»).
 - Con «Mostrar genitales externos» desactivado se ocultan enteros, como en el hombre, la piel de la vulva y los genitales externos profundos.
@@ -456,7 +498,7 @@ A3D_MODEL=female zsh tools/build_all.sh
   - Los órganos internos femeninos que asomaban (el extremo de la vagina) se meten 1,5 mm bajo la piel.
 
 **Pendiente (para perfeccionar):**
-- **Pelvis:** tiene las proporciones de la piel femenina, no la forma de una pelvis femenina. Es algo corta de delante atrás, así que el útero queda más vertical de lo habitual.
+- ~~**Pelvis:** tiene las proporciones de la piel femenina, no la forma de una pelvis femenina.~~ Hecho (ver «Pelvis femenina»). Sigue algo corta de delante atrás, así que el útero queda más vertical de lo habitual.
 - **Vulva:**
   - Primera versión, con relieves bajos, porque los muslos de la piel de MakeHuman dejan una ranura de ~14 mm.
   - El borde anterior del parche aún se nota en algunas vistas.

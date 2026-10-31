@@ -158,8 +158,9 @@ def pelvic_organs(objs, bladder_world, skin_world=None):
     V, F = tube(vagina_path, va, np.interp(s, [0, 0.3, 1], [0.0045, 0.006, 0.008]))
     out.append(('Vagina', 'vagina', V, F, False))
     # Útero: el orificio externo del cuello, dentro de la bóveda de la vagina; cuello en anteversión, cuerpo en anteflexión.
-    # Con la anteversión y la anteflexión habituales (90° y 20°) el fondo llegaba por delante del pubis en esta pelvis (es
-    # la masculina adaptada, algo corta de delante atrás): se usa la más inclinada con el fondo a 1,2 cm por detrás.
+    # Con la anteversión y la anteflexión habituales (90° y 20°) el fondo llega por delante del pubis en esta pelvis (corta
+    # de delante atrás: conjugada obstétrica de 10,1 cm): se usa la más inclinada con el fondo a 1,2 cm por detrás. Con la
+    # pelvis femenina (female_pelvis.py) queda en 70° y 15°; con la masculina adaptada, en 65° y 10°.
     os_ext = introitus + dv * (v_len - 0.016) + np.array([0, -0.004, 0])
     s = np.linspace(0, 1, 24)
     ra = np.interp(s, [0, 0.35, 0.45, 0.8, 1.0], [0.011, 0.012, 0.013, 0.025, 0.022])   # ancho (lateral)
@@ -170,6 +171,7 @@ def pelvic_organs(objs, bladder_world, skin_world=None):
         p_fundus = p_isthmus + db * 0.042
         upath = curve([os_ext, os_ext + dc * 0.02, p_isthmus + dc * 0.012, p_isthmus + db * 0.02, p_fundus], 24)
         if p_fundus[1] - rb[-1] >= ps_t[1] + 0.012: break
+    L['uterus_pose'] = (version, flexion)
     # Por encima de la vejiga (la anteflexión la apoya sobre ella): sube el útero si la atraviesa.
     if bladder_world is not None and len(bladder_world):
         top_b = bladder_world[bladder_world[:, 1] > np.percentile(bladder_world[:, 1], 40)][:, 2].max()

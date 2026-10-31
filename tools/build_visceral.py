@@ -390,7 +390,8 @@ if MODEL == 'female' and 'urogenital' in wanted:
         items.append({'out': obj, 'tissue': tissue, 'system': 'urogenital', 'base': base})
         stats['urogenital'].append({'name': name, 'sub': sub, 'tissue': tissue, 'faces': len(me.polygons),
                                     'verts': len(me.vertices), 'name_es': es_name})
-    log(f'órganos femeninos: {len(merged)} piezas; vestíbulo a {LM["ps_bottom"][2]:.3f} m (borde inferior de la sínfisis)')
+    log(f'órganos femeninos: {len(merged)} piezas; vestíbulo a {LM["ps_bottom"][2]:.3f} m (borde inferior de la sínfisis); '
+        f'útero en anteversión {LM["uterus_pose"][0]}° y anteflexión {LM["uterus_pose"][1]}°')
 
 # ── Solapes entre órganos ───────────────────────────────────────────────────
 # El ajuste mezcla las transformaciones de huesos vecinos y algunos órganos acababan unos dentro de otros. La auditoría
