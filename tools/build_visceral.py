@@ -500,10 +500,13 @@ for it in items:
     obj = it['out']; loc = Vector(obj.location)
     bm = bmesh.new(); bm.from_mesh(obj.data); bm.verts.ensure_lookup_table()
     for comp in components(bm):
-        P0 = np.array([(loc + v.co)[:] for v in comp]); lo, hi = P0.min(0), P0.max(0)
-        near = [o for o in organs if not natural(obj.name, o['name']) and not ((lo > o['hi']).any() or (hi < o['lo']).any())]
+        P0 = np.array([(loc + v.co)[:] for v in comp])
         shift = Vector()
-        for _ in range(3):
+        # Los órganos cercanos se buscan en cada intento, con el nodo ya movido: al salir de uno podía entrar en el de al
+        # lado (los retrofaríngeos, entre la faringe y el paladar blando) sin que se comprobara. Hasta 8 intentos.
+        for _ in range(8):
+            lo, hi = P0.min(0) + np.array(shift), P0.max(0) + np.array(shift)
+            near = [o for o in organs if not natural(obj.name, o['name']) and not ((lo > o['hi']).any() or (hi < o['lo']).any())]
             worst = (0.0, None)
             for o in near:
                 for p in P0:

@@ -507,7 +507,22 @@ Encargo: «Busca todos los errores e intenta perfeccionarlos», tras llevar la u
 
 **Otros:**
 - tiroides femenina 1,5 mm bajo la piel (asomaba 3,2 mm);
+- 4 regiones de las articulaciones con «Art.» abreviado: ahora «Articulaciones…»;
 - epidídimo fuera del testículo (en Z-Anatomy, 47 % dentro).
+
+**Picos en los pliegues** (`Fitter.keep_inside_skin` y `skin_out` de `build_visceral.py`):
+- Vértices a 5–8 cm de la piel, dentro del cuerpo, se llevaban a la piel del pliegue entre las nalgas o de la axila.
+  - Formaban picos de hasta 8 cm en el piriforme, el glúteo mayor, el ciático, el cutáneo femoral posterior, las fascias, el bíceps, el serrato, el mediano, la torácica lateral y las venas de la axila, en los dos modelos.
+- Causa: «a menos de 1,5 mm de la piel» se medía solo con la normal de la cara más cercana, que en un pliegue queda casi perpendicular. Ahora también se exige la distancia.
+- Resultado: las parejas izquierda/derecha afectadas coinciden ahora a ≤ 2 mm (antes, hasta 68 mm).
+
+**Nodos linfáticos entre órganos:**
+- Los órganos cercanos se buscan en cada intento de sacar un nodo, hasta 8; antes, solo con su posición inicial y 3 intentos.
+- Resueltos los nodos retrovesicales en la vejiga y el sigma, el del ligamento arterioso en la pleura, los cólicos derechos en el colon transverso y los retrofaríngeos en el paladar.
+
+**Auditoría masculina** (antes → después):
+- choques entre órganos 36 → 30, ninguno nuevo;
+- más de un 3 % dentro del hueso: conjuntivo 185 → 3, arterias 89 → 42, venas 36 → 8, nervios 34 → 26. Lo que queda de vasos y nervios es casi todo del cráneo, donde van por conductos.
 
 **Web:**
 - Carrera al cambiar de modelo durante una descarga: las piezas del modelo anterior acababan en el nuevo. Ahora un número de carga lo impide (`viewer.generation`, `loadSeq`).

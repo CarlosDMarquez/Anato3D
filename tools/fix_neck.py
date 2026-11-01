@@ -488,15 +488,27 @@ print('esqueleto femenino, mayor separación del campo (mm):',
 with bpy.data.libraries.load(os.path.join(ROOT, f'{MALE}.blend')) as (src, dst):
     dst.objects = [n for n in src.objects if n in MALE_BONES_3A]
 def female_collection(name):
-    """La colección con ese nombre en el archivo femenino, creada bajo su madre masculina si no existe."""
+    """La colección con ese nombre en el archivo femenino, bajo su madre masculina. La piel femenina (Fase 1) ya traía
+    colecciones del esqueleto con otra jerarquía (sin «Axial_Skeleton»: el cráneo, la columna y la caja torácica colgaban
+    del sistema esquelético, y la capa «Axial» de la web salía vacía): se cuelgan como en el hombre."""
     if name == 'Anato3D_Male_30': return bpy.data.collections['Anato3D_Female_30']
+    parent = female_collection(MALE_PARENT.get(name, 'Anato3D_Male_30'))
     col = bpy.data.collections.get(name)
     if col is None:
         col = bpy.data.collections.new(name)
-        female_collection(MALE_PARENT.get(name, 'Anato3D_Male_30')).children.link(col)
+        parent.children.link(col)
+    elif col.name not in parent.children:
+        for p in bpy.data.collections:
+            if col.name in p.children: p.children.unlink(col)
+        parent.children.link(col)
     return col
 for o in dst.objects:
     female_collection(MALE_BONES_3A[o.name][2]).objects.link(o)
+def empty_tree(c):
+    return not c.objects and all(empty_tree(ch) for ch in c.children)
+for c in list(bpy.data.collections['Skeletal_System'].children_recursive):
+    if c.name not in MALE_PARENT and empty_tree(c):          # restos vacíos de la Fase 1 («Upper_Limb_Bones»…)
+        bpy.data.collections.remove(c)
 bpy.context.view_layer.update()                   # matrix_world de los objetos recién añadidos (el cráneo tiene ubicación)
 for o in dst.objects:
     V, _, seg2 = fem[o.name]

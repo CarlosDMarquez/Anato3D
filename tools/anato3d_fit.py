@@ -75,6 +75,10 @@ ES_OVERRIDES = {
     'Ventral parts of lateral intertransversarii lumborum muscles': 'Partes ventrales de los músculos intertransversarios laterales lumbares',
     'Anterior basal segmental bronchus of right lung (BVIII)': 'Bronquio segmentario basal anterior del pulmón derecho (BVIII)',
     'Inferior lingular segmental bronchus of left lung (BV)': 'Bronquio segmentario lingular inferior del pulmón izquierdo (BV)',
+    'Fibrous joints of free upper limb': 'Articulaciones fibrosas de la parte libre del miembro superior',
+    'Synovial joints of free upper limb': 'Articulaciones sinoviales de la parte libre del miembro superior',
+    'Fibrous joints of free lower limb': 'Articulaciones fibrosas de la parte libre del miembro inferior',
+    'Synovial joints of free lower limb': 'Articulaciones sinoviales de la parte libre del miembro inferior',
     # Periné (piezas de Anato3D): Z-Anatomy solo lo tiene como «Esfínter uretral externo masculino (Sistema muscular)».
     'External urethral sphincter': 'Músculo esfínter externo de la uretra',
 }
