@@ -133,7 +133,7 @@
    "latin": "Substantia alba telencephali"
   },
   "Internal_capsule": {
-   "nombre": "Capsula interna",
+   "nombre": "Cápsula interna",
    "latin": "Capsula interna"
   },
   "Commissural_fibres_of_telencephalon": {
@@ -341,7 +341,7 @@
    "latin": "Nervus cochlearis"
   },
   "Glossopharyngeal_nerve_IX": {
-   "nombre": "Nervio glosofaringeo (IX)",
+   "nombre": "Nervio glosofaríngeo (IX)",
    "latin": "Nervus glossopharyngeus (IX)"
   },
   "Vagus_nerve_X": {
@@ -425,7 +425,7 @@
    "latin": "Nervus pectoralis lateralis"
   },
   "Musculocutaneous_nerve": {
-   "nombre": "Nervio musculocutáneo",
+   "nombre": "Nervio músculocutáneo",
    "latin": "Nervus musculocutaneus"
   },
   "Radial_nerve": {

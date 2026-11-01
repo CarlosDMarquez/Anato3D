@@ -4,8 +4,9 @@ El cuello quedó un 23 % más largo que el de referencia anatómica (Z-Anatomy),
 rodilla, a media pierna (tibia un 24 % más larga que la real), y el codo, 3,6 cm alto (húmero un 13 % más corto).
 
 Qué hace:
-  1. Las vértebras C1–C7 se rehacen con la forma de Z-Anatomy (escala uniforme y la orientación del ajuste
-     anterior) y se apilan desde C7 con la separación vertical real de Z-Anatomy, conservando la curvatura.
+  1. Las vértebras C1–C7 se rehacen con la forma de Z-Anatomy (escala uniforme y un solo giro para todo el cuello,
+     el que mejor sigue al ajuste anterior) y se apilan desde C7 con la separación vertical real de Z-Anatomy,
+     conservando la curvatura.
   2. La cabeza (cráneo, mandíbula, dientes, ojos) baja en vertical, de forma rígida, lo mismo que baja C1.
   3. La piel del cuello se acorta con una transición suave entre la base del cuello y la línea
      mandíbula–occipucio, sin mover hombros ni clavículas.
@@ -145,13 +146,24 @@ new_c = {'Vertebra_C7': old_c['Vertebra_C7']}
 for upper, lower in zip(CERVICAL[-2::-1], CERVICAL[:0:-1]):
     new_c[upper] = old_c[upper].copy()
     new_c[upper][2] = new_c[lower][2] + (za_c[upper][2] - za_c[lower][2])
+# Un solo giro para todo el cuello (Procrustes de C1–C7 de Z-Anatomy sobre las del ajuste anterior, cada vértebra centrada
+# en la suya): con el giro de cada una sacado de su ajuste anterior (deformado), C3–C5 y C7 quedaban unos 10° más
+# inclinadas que C2 y C6, en zigzag, y C6 se apoyaba en C7 sin espacio para el disco (0,2 mm; en Z-Anatomy, 4 mm: el
+# núcleo pulposo C6–C7 quedaba dentro de C7). Así los discos tienen la altura de Z-Anatomy (3–7 mm).
+Pz = np.vstack([world(za[k]) - za_c[k] for k in CERVICAL]); Pa = np.vstack([world(objs[k]) - old_c[k] for k in CERVICAL])
+U, S, Vt = np.linalg.svd(Pz.T @ Pa)
+D = np.diag([1.0, 1.0, np.sign(np.linalg.det(U @ Vt))])
+R = (U @ D @ Vt).T                                             # columna: a = R·z
+spread = []
 for k in CERVICAL:
     Z = world(za[k]); A = world(objs[k])
     M, *_ = np.linalg.lstsq(np.c_[Z, np.ones(len(Z))], A, rcond=None)
-    U, S, Vt = np.linalg.svd(M[:3].T)                          # columna: a = L·z
-    R = U @ Vt
+    U, S, Vt = np.linalg.svd(M[:3].T)
     s = float(np.prod(S) ** (1 / 3))                           # misma escala en todas direcciones
+    Rk = U @ Vt
+    spread.append(np.degrees(np.arccos(np.clip((np.trace(Rk.T @ R) - 1) / 2, -1, 1))))
     set_world(objs[k], s * (Z - za_c[k]) @ R.T + new_c[k])
+print('cuello: un giro común; el de cada vértebra se separaba de él', ', '.join(f'{k[9:]} {d:.1f}°' for k, d in zip(CERVICAL, spread)))
 head_shift = new_c['Vertebra_C1_Atlas'] - old_c['Vertebra_C1_Atlas']
 print('desplazamiento de la cabeza (cm):', np.round(head_shift * 100, 2))
 for o in za.values(): bpy.data.objects.remove(o)

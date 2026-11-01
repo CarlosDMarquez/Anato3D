@@ -52,12 +52,29 @@ with open(TRANSLATIONS, encoding='utf-8') as f:
 ES_FIXES = [(r'^Musculo\b', 'Músculo'), (r'\bulmonar', 'pulmonar'), (r'\bcorazon\b', 'corazón'), (r'farínge', 'faringe'),
             (r'^Gingiva$', 'Encía'), (r'accessori', 'accesori'), (r'pancreáticoduodenal', 'pancreaticoduodenal'),
             (r'\bsegm\. ', 'segmentario '), (r'\bsup\. ', 'superior '), (r'-pulmón\b', ' del pulmón'), (r'-arteria\b', ' de la arteria'),
-            (r'^Septum pellucidum$', 'Septo pelúcido'), (r'\bdel la\b', 'de la')]
+            (r'^Septum pellucidum$', 'Septo pelúcido'), (r'\bdel la\b', 'de la'),
+            # Tildes que faltan (o sobran) en la traducción (revisión del 2026-10-31).
+            (r'\bangulo\b', 'ángulo'), (r'\barticulacion\b', 'articulación'), (r'\b([Cc])apsula', r'\1ápsula'),
+            (r'\bfibula\b', 'fíbula'), (r'\bhumero\b', 'húmero'), (r'\b([Mm])usculo', r'\1úsculo'), (r'\boftalmic', 'oftálmic'),
+            (r'faring(e[oa]s?)\b', r'faríng\1'), (r'^Linea\b', 'Línea'), (r'\b([Ll])ingula\b', r'\1íngula'), (r'^Fornix\b', 'Fórnix'),
+            (r'multifido', 'multífido'), (r'interfalangeas', 'interfalángicas'), (r'metatarsofalangeas', 'metatarsofalángicas'),
+            (r'calcáneocuboideo', 'calcaneocuboideo'), (r'masétero', 'masetero'), (r'intertransvarios', 'intertransversarios')]
 # Traducciones oficiales equivocadas (clave: término inglés de Z-Anatomy).
 ES_OVERRIDES = {
     'Posterior septal branches of sphenopalatine artery': 'Ramas septales posteriores de la arteria esfenopalatina',
     'Anterior septal branches of anterior ethmoidal artery': 'Ramas septales anteriores de la arteria etmoidal anterior',
     'Short head of biceps brachii': 'Cabeza corta del músculo bíceps braquial',
+    # Abreviaturas de la traducción («art.», «m.», «lat.», «ant.»…) en el título de la ficha.
+    'Articular capsule of interphalangeal joint of great toe': 'Cápsula articular de la articulación interfalángica del dedo gordo del pie',
+    'Articular capsules of distal interphalangeal joints of foot': 'Cápsulas articulares de las articulaciones interfalángicas distales del pie',
+    'Articular capsules of proximal interphalangeal joints of foot': 'Cápsulas articulares de las articulaciones interfalángicas proximales del pie',
+    'Articular capsules of distal interphalangeal joints': 'Cápsulas articulares de las articulaciones interfalángicas distales de la mano',
+    'Articular capsules of proximal interphalangeal joints': 'Cápsulas articulares de las articulaciones interfalángicas proximales de la mano',
+    'Articular capsules of metacarpophalangeal joints': 'Cápsulas articulares de las articulaciones metacarpofalángicas',
+    'Dorsal parts of lateral intertransversarii lumborum muscles': 'Partes dorsales de los músculos intertransversarios laterales lumbares',
+    'Ventral parts of lateral intertransversarii lumborum muscles': 'Partes ventrales de los músculos intertransversarios laterales lumbares',
+    'Anterior basal segmental bronchus of right lung (BVIII)': 'Bronquio segmentario basal anterior del pulmón derecho (BVIII)',
+    'Inferior lingular segmental bronchus of left lung (BV)': 'Bronquio segmentario lingular inferior del pulmón izquierdo (BV)',
     # Periné (piezas de Anato3D): Z-Anatomy solo lo tiene como «Esfínter uretral externo masculino (Sistema muscular)».
     'External urethral sphincter': 'Músculo esfínter externo de la uretra',
 }
@@ -111,6 +128,20 @@ def deepest(paths, name, root):
     return [p for p in ps if not any(q != p and q[:len(p)] == p for q in ps)]
 
 # ── Ajuste a los huesos y a la piel de la Fase 2 ────────────────────────────
+# Huesos del cráneo (y dientes y huesecillos del oído): vasos, nervios y ligamentos van por sus conductos y surcos, que
+# las mallas de BodyParts3D no tienen; no se sacan de ellos.
+SKULL = re.compile(r'Frontal|Parietal|Temporal|Occipital|Sphenoid|Ethmoid|Maxilla|Mandible|Palatine|Zygomatic|Nasal_Bone|'
+                   r'Lacrimal|Vomer|Concha|Tooth|Malleus|Incus|Stapes', re.I)
+skull_bone = lambda name: bool(SKULL.search(name))
+
+def ring_size(V):
+    """Vértices por anillo si V es un tubo hecho de anillos consecutivos (curva de Z-Anatomy con grosor), si no None."""
+    for k in range(4, 33):
+        if len(V) % k or len(V) // k < 2: continue
+        G = V.reshape(-1, k, 3); r = np.linalg.norm(G - G.mean(1)[:, None], axis=2)
+        if np.median(r.std(1) / np.maximum(r.mean(1), 1e-9)) < 0.12: return k
+    return None
+
 class Fitter:
     def __init__(self, objects=None):
         """`objects`: los objetos de la Fase 2 ya cargados (fix_neck.py ajusta así músculos al esqueleto que está
@@ -177,8 +208,10 @@ class Fitter:
         # Huesos de la Fase 2 juntos, con la orientación de cada uno (las piezas _L tienen las normales hacia dentro y
         # algunos huesos son mallas abiertas: se usa la cara más cercana, no la paridad).
         bm = bmesh.new(); self.bone_sign = []; self.bone_closed = []; self.bone_of_face = []; self.bone_trees = []
+        self.bone_names = []
         for o in objects:
             if o is None or o.type != 'MESH' or o.get('system') != 'skeletal': continue
+            self.bone_names.append(re.sub(r'\.\d{3}$', '', o.name))
             b = bmesh.new(); b.from_mesh(o.data); b.transform(o.matrix_world)
             self.bone_sign += [1.0 if b.calc_volume(signed=True) >= 0 else -1.0] * len(b.faces)
             self.bone_closed += [all(e.is_manifold for e in b.edges)] * len(b.faces)
@@ -187,27 +220,67 @@ class Fitter:
             me = bpy.data.meshes.new('tmp'); b.to_mesh(me); b.free(); bm.from_mesh(me); bpy.data.meshes.remove(me)
         self.fase2_bones = bvhtree.BVHTree.FromBMesh(bm); bm.free()
 
-    def push_out_of_bone(self, V, margin=0.0005, rounds=2):
+    def bone_depth(self, v, skip=None):
+        """(cuánto está v dentro del hueso más cercano, en m; normal hacia fuera de ese hueso; punto más cercano de su
+        superficie), o (0, None, None) si está fuera o el hueso es uno de los que `skip(nombre)` excluye."""
+        loc, nrm, idx, dist = self.fase2_bones.find_nearest(Vector(v))
+        if loc is None: return 0.0, None, None
+        if skip is not None and skip(self.bone_names[self.bone_of_face[idx]]): return 0.0, None, None
+        # En huesos abiertos (el occipital) la normal de la cara más cercana no es fiable lejos de ella: un punto de la
+        # cavidad craneal a 2 cm salía «dentro». Ahí solo se corrige cerca de la superficie.
+        if not self.bone_closed[idx] and dist > 0.004: return 0.0, None, None
+        n = np.array(nrm) * self.bone_sign[idx]
+        depth = -np.dot(v - np.array(loc), n)
+        # Lejos de un hueso fino (una costilla, un cartílago costal), la normal de su cara más cercana puede apuntar al
+        # revés: un punto del recto a 5 cm de una costilla salía «dentro» y se llevaba a ella, en un pico. Más de 6 mm
+        # se confirma por paridad en ese hueso.
+        if depth > 0.006 and not self._parity_inside(self.bone_trees[self.bone_of_face[idx]], v): return 0.0, None, None
+        return depth, n, np.array(loc)
+
+    def push_out_of_bone(self, V, margin=0.0005, rounds=2, skip=None):
         """Saca de los huesos de la Fase 2 los vértices que quedaron dentro (más de 0,3 mm), hasta `margin` por fuera.
         Para tejidos que nunca están dentro de un hueso (el encéfalo): la mezcla de transformaciones de huesos vecinos
-        (occipital y atlas, p. ej.) podía meter el cerebelo en el occipital."""
+        (occipital y atlas, p. ej.) podía meter el cerebelo en el occipital. `skip(nombre del hueso)`: huesos que no
+        se tocan (p. ej. el cráneo, con sus conductos y surcos)."""
         moved = 0
         for _ in range(rounds):
             for i, v in enumerate(V):
-                loc, nrm, idx, dist = self.fase2_bones.find_nearest(Vector(v))
-                if loc is None: continue
-                # En huesos abiertos (el occipital) la normal de la cara más cercana no es fiable lejos de ella: un
-                # punto de la cavidad craneal a 2 cm salía «dentro». Ahí solo se corrige cerca de la superficie.
-                if not self.bone_closed[idx] and dist > 0.004: continue
-                n = np.array(nrm) * self.bone_sign[idx]
-                depth = -np.dot(v - np.array(loc), n)
-                # Lejos de un hueso fino (una costilla, un cartílago costal), la normal de su cara más cercana puede
-                # apuntar al revés: un punto del recto a 5 cm de una costilla salía «dentro» y se llevaba a ella, en un
-                # pico. Más de 6 mm se confirma por paridad en ese hueso.
-                if depth > 0.006 and not self._parity_inside(self.bone_trees[self.bone_of_face[idx]], v): continue
+                depth, n, loc = self.bone_depth(v, skip)
                 if depth > 0.0003:
-                    V[i] = np.array(loc) + n * margin; moved += 1
+                    V[i] = loc + n * margin; moved += 1
         return moved
+
+    def push_tube_out_of_bone(self, V, margin=0.0005, rounds=5, skip=None):
+        """Como push_out_of_bone, para tubos (vasos y nervios: curvas de Z-Anatomy, anillos de k vértices en orden):
+        cada anillo se traslada entero, lo justo para sacar su vértice más hondo, y los anillos vecinos le siguen con
+        suavidad. Moviendo vértice a vértice, el tubo se aplastaba contra el hueso. Sin anillos, vértice a vértice.
+        Devuelve cuántos anillos (o vértices) se movieron."""
+        k = ring_size(V)
+        if k is None: return self.push_out_of_bone(V, margin, 2, skip)
+        G = V.reshape(-1, k, 3).copy()
+        C = G.mean(1)
+        step = np.linalg.norm(np.diff(C, axis=0), axis=1)
+        cuts = np.r_[0, np.flatnonzero(step > 4 * max(np.median(step), 1e-4)) + 1, len(C)]   # tramos (splines)
+        moved = np.zeros(len(G), bool)
+        for _ in range(rounds):
+            D = np.zeros((len(G), 3)); fixed = np.zeros(len(G), bool)
+            for i in range(len(G)):
+                best, nb = 0.0, None
+                for v in G[i]:
+                    depth, n, _ = self.bone_depth(v, skip)
+                    if depth > best: best, nb = depth, n
+                if best > 0.0003: D[i] = nb * (best + margin); fixed[i] = True
+            if not fixed.any(): break
+            moved |= fixed
+            for a, b in zip(cuts[:-1], cuts[1:]):                         # transición suave en cada tramo
+                d, f = D[a:b].copy(), fixed[a:b]
+                for _ in range(4):
+                    sm = d.copy(); sm[1:-1] = (d[:-2] + 2 * d[1:-1] + d[2:]) / 4
+                    d = np.where(f[:, None], D[a:b], sm)
+                D[a:b] = d
+            G += D[:, None]
+        V[:] = G.reshape(-1, 3)
+        return int(moved.sum())
 
     @staticmethod
     def _segments(o, A):
@@ -272,11 +345,14 @@ class Fitter:
         moved = 0; worst = 0.0
         for i, v in enumerate(V):
             p = Vector(v)
-            loc, nrm, _, _ = self.skin.find_nearest(p)
+            loc, nrm, _, dist = self.skin.find_nearest(p)
             if loc is None: continue
             depth = (p - loc).dot(nrm)
-            # Dentro pero a menos de `offset` de la piel, o fuera de verdad (no en una cavidad): se mete.
-            if depth > -offset and (depth <= 0 or not self.inside_body(p)):
+            # Dentro pero a menos de `offset` de la piel, o fuera de verdad (no en una cavidad): se mete. «A menos de
+            # `offset`» también por distancia: en los pliegues (entre las nalgas, la axila) la normal de la cara más
+            # cercana queda casi perpendicular, la «profundidad» salía casi cero a 5–8 cm de la piel y el vértice se
+            # llevaba a ella (picos de hasta 8 cm en el piriforme, el glúteo mayor, el ciático, el bíceps o el mediano).
+            if (depth > 0 and not self.inside_body(p)) or (-offset < depth <= 0 and dist < 2 * offset):
                 worst = max(worst, depth); moved += 1
                 V[i] = np.array(loc - nrm * offset)
         return moved, worst
@@ -299,6 +375,10 @@ class GenitalPose:
         les sigue entero; el cordón espermático (conducto deferente, vasos testiculares, rama genital del
         genitofemoral) y las ramas escrotales de los vasos pudendos externos, cada vez menos hasta el anillo inguinal
         superficial, que no se mueve.
+      - uretra: en Z-Anatomy, ya ajustada, sale de la próstata por encima del bulbo, cruza la unión de las raíces (los
+        cuerpos cavernosos) y entra en el cuerpo esponjoso 2,5 cm por delante del extremo posterior del bulbo, rozando
+        su superficie. Aquí baja desde el vértice de la próstata (uretra membranosa), entra en el bulbo por su cara
+        superior y sigue por dentro, en su tercio superior, hasta unirse a su camino original (urethra_map).
     Solo se aplica a las piezas cuyo nombre de Z-Anatomy coincide con PENIS o SCROTAL: los aductores o los vasos
     femorales, a pocos centímetros, no se tocan.
     """
@@ -353,6 +433,12 @@ class GenitalPose:
             shift = np.array(self.TESTIS_SHIFT[s]) + np.array([sx * self.TESTIS_CENTER_X - ct[0], 0, 0])
             top = (P @ np.array([0, 0, 1.0])).max()
             self.testes[s] = dict(c=ct, M=M, shift=shift, E=E, half=half, z_top=top + 0.012, z_ring=top + 0.06)
+        def bvh(n):
+            o = bpy.data.objects[n]
+            V = self.penis_map(fitted(n))
+            return V, bvhtree.BVHTree.FromPolygons([Vector(v) for v in V], [list(p.vertices) for p in o.data.polygons])
+        self.cs = bvh('Corpus spongiosum of penis') if 'Corpus spongiosum of penis' in bpy.data.objects else None
+        self.prostate = bvh('Prostate') if 'Prostate' in bpy.data.objects else None
         log(f'genitales: pene {(s_tip - s_exit) * 100:.1f} → {visible(F) * 100:.1f} cm fuera de la piel (λ = {lam:.2f}); '
             f'testículos ×{self.TESTIS_SCALE}, bajan ' + ', '.join(f'{s} {-self.TESTIS_SHIFT[s][2] * 100:.1f} cm' for s in 'LR'))
 
@@ -373,9 +459,77 @@ class GenitalPose:
         wh = 1 - _smoothstep((V[:, 2] - t['z_top']) / (t['z_ring'] - t['z_top']))  # hasta el anillo inguinal
         return V + wh[:, None] * (t['shift'] + wt[:, None] * (d @ (t['M'] - np.eye(3)).T))
 
+    RING = 12                           # vértices por anillo del tubo de la uretra (curva de Z-Anatomy)
+
+    def urethra_map(self, V):
+        """Lleva la uretra dentro del bulbo (ver la clase). V: vértices del tubo (anillos de RING vértices, en orden).
+        Se recoloca la línea central entre el vértice de la próstata y el punto donde la uretra ya va por dentro del
+        cuerpo esponjoso; cada anillo se traslada a su nuevo centro y se gira con la nueva tangente."""
+        k = self.RING
+        if self.cs is None or self.prostate is None or len(V) % k: return V
+        G = V.reshape(-1, k, 3); C = G.mean(1)
+        r = np.linalg.norm(G - C[:, None], axis=2)
+        if r.std() > 0.3 * r.mean():
+            log('  uretra: no es un tubo de anillos; se deja como está'); return V
+        rev = C[0, 2] < C[-1, 2]                                          # del cuello de la vejiga a la punta
+        if rev: G, C = G[::-1], C[::-1]
+        r_u = float(np.median(r))
+        CS, T_cs = self.cs; PR, T_pr = self.prostate
+        def inside(T, p):
+            loc, nrm, _, _ = T.find_nearest(Vector(p))
+            return loc is not None and (Vector(p) - loc).dot(nrm) < 0
+        sign_pr = 1.0 if inside(T_pr, PR.mean(0)) else -1.0               # orientación de la malla de la próstata
+        in_pr = np.array([inside(T_pr, c) == (sign_pr > 0) for c in C])
+        if not in_pr.any(): return V
+        i0 = int(np.flatnonzero(in_pr)[-1])                               # último anillo dentro de la próstata
+        z_hi = PR[:, 2].max()
+        def top(y): h = T_cs.ray_cast(Vector((0.0, y, z_hi)), Vector((0, 0, -1)), 0.2)[0]; return None if h is None else h.z
+        def bot(y): h = T_cs.ray_cast(Vector((0.0, y, CS[:, 2].min() - 0.01)), Vector((0, 0, 1)), 0.2)[0]; return None if h is None else h.z
+        # Bulbo: su extremo posterior y la altura que debe llevar la uretra dentro (tercio superior, y nunca a menos de
+        # 1,2 mm de su cara superior).
+        root = CS[CS[:, 2] > C[i0, 2] - 0.03]
+        y_back = root[:, 1].max()
+        def track(y):
+            t, b = top(y), bot(y)
+            if t is None or b is None: return None
+            return t - max(0.33 * (t - b), r_u + 0.0012)
+        y_e = y_back - 0.012                                              # entrada, en la cara superior
+        if top(y_e) is None: return V
+        # Unión con el camino original: el primer anillo, por delante de la entrada, que ya va a esa profundidad.
+        j = None
+        for i in range(i0 + 1, len(C)):
+            if C[i, 1] > y_e - 0.012: continue
+            z = track(C[i, 1])
+            if z is None or C[i, 1] < y_e - 0.06: break
+            if C[i, 2] <= z: j = i; break
+        if j is None: return V
+        ys = np.arange(y_e - 0.004, C[j, 1] + 0.003, -0.002)
+        pts = [C[i0], np.array([0.0, y_e + 0.001, top(y_e) + 0.002])] + \
+              [np.array([0.0, y, track(y)]) for y in ys if track(y) is not None] + [C[j]]
+        P = np.array(pts)
+        for _ in range(3):                                                # suave, con los extremos fijos
+            P[1:-1] = (P[:-2] + 2 * P[1:-1] + P[2:]) / 4
+        # Los anillos de i0 a j se reparten por el camino nuevo, a distancias iguales.
+        d = np.r_[0, np.cumsum(np.linalg.norm(np.diff(P, axis=0), axis=1))]
+        u = np.linspace(0, d[-1], j - i0 + 1)
+        N = np.column_stack([np.interp(u, d, P[:, a]) for a in range(3)])
+        T_old = np.gradient(C, axis=0); T_old /= np.linalg.norm(T_old, axis=1)[:, None]
+        C2 = C.copy(); C2[i0:j + 1] = N
+        T_new = np.gradient(C2, axis=0); T_new /= np.linalg.norm(T_new, axis=1)[:, None]
+        G2 = G.copy()
+        for i in range(max(i0 - 1, 0), min(j + 2, len(C))):
+            R = _rotation(T_old[i], T_new[i])
+            G2[i] = C2[i] + (G[i] - C[i]) @ R.T
+        moved = float(np.linalg.norm(C2 - C, axis=1).max())
+        log(f'  uretra: entra en el bulbo a {(y_back - y_e) * 100:.1f} cm de su extremo posterior; '
+            f'{j - i0 + 1} anillos recolocados (hasta {moved * 1000:.1f} mm)')
+        if rev: G2 = G2[::-1]
+        return G2.reshape(-1, 3)
+
     def apply(self, source_name, V):
         """V: vértices ya ajustados (m). `source_name`: nombre del objeto en Z-Anatomy."""
         base = re.sub(r'\.(l|r)$', '', source_name)
+        if base.lower() == 'urethra': return self.urethra_map(self.penis_map(V))
         if self.PENIS.search(base): return self.penis_map(V)
         if self.SCROTAL.search(base):
             if source_name.endswith('.l') or base.lower().startswith('left'): return self.testis_map(V, 'L')
@@ -426,7 +580,8 @@ class Extractor:
         log(f'{len(sources)} objetos: {total} caras de mallas → proporción de reducción {self.ratio:.3f}'
             + (f'; {curves} caras de curvas (sin reducir)' if curves else ''))
 
-    def fit(self, o, name, skin_offset=None, inflate=0.0, detail=1.0, smooth=0, keep_slots=False, pin=0.006, out_of_bone=False):
+    def fit(self, o, name, skin_offset=None, inflate=0.0, detail=1.0, smooth=0, keep_slots=False, pin=0.006, out_of_bone=False,
+            bone_skip=None):
         """Devuelve (objeto nuevo, vértices corregidos por la piel, peor salida en m).
         `inflate` acerca la malla a la piel esa distancia (p. ej. fascias, para que no las atraviesen los músculos).
         `detail` multiplica la proporción de reducción (p. ej. 0,35 para estructuras que casi siempre quedan ocultas).
@@ -434,7 +589,9 @@ class Extractor:
         las transformaciones de huesos vecinos (pliegues en el hígado junto al reborde costal) sin tocar el modelo.
         `keep_slots`: conserva el índice de material de cada cara (el que tenía en Z-Anatomy); si no, todas a 0.
         `pin`: hasta esa distancia de un hueso no se suaviza (músculos y ligamentos insertados en él); en las vísceras,
-        que no se insertan en hueso, basta con 2 mm."""
+        que no se insertan en hueso, basta con 2 mm.
+        `out_of_bone`: True saca del hueso los vértices que quedaron dentro; 'tube', los anillos enteros (vasos y nervios).
+        `bone_skip(nombre)`: huesos que no se tocan."""
         # Las curvas (vasos) no admiten «Decimate»: su detalle se ajusta con la resolución de la curva.
         dec = None
         if o.type == 'MESH':
@@ -479,7 +636,9 @@ class Extractor:
             for i, v in enumerate(V):
                 loc, _, _, dist = self.fitter.skin.find_nearest(Vector(v))
                 if loc is not None and dist > 1e-6: V[i] = v + (np.array(loc) - v) / dist * inflate
-        if out_of_bone: self.fitter.push_out_of_bone(V)
+        if out_of_bone == 'tube': self.bone_moved = self.fitter.push_tube_out_of_bone(V, skip=bone_skip)
+        elif out_of_bone: self.bone_moved = self.fitter.push_out_of_bone(V, skip=bone_skip)
+        else: self.bone_moved = 0
         moved, worst = (0, 0.0) if skin_offset is None else self.fitter.keep_inside_skin(V, skin_offset)
         center = (V.min(0) + V.max(0)) / 2
         me.vertices.foreach_set('co', (V - center).ravel())

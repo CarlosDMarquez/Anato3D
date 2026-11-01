@@ -11,7 +11,7 @@ Salida: build/male_connective.blend, build/male_connective.json y web/public/mod
 import bpy, os, re, sys, json, collections
 sys.path.insert(0, os.path.dirname(__file__))
 from anato3d_fit import (Fitter, Extractor, Groups, bonus_paths, es, la, sanitize, source_name, is_structure,
-                         principled, save, log, parse_args)
+                         principled, save, log, parse_args, skull_bone)
 
 opt = parse_args({'budget': 200000, 'only': None})
 
@@ -82,6 +82,7 @@ MATS = {
 
 groups = Groups('Connective_System', NAMES_ES)
 stats = []
+bone_fixed = collections.Counter()
 for n, it in enumerate(items):
     o = it['obj']
     rp = region_path(it['src'], it['tissue'])
@@ -91,8 +92,12 @@ for n, it in enumerate(items):
     deep = not superficial and (any(g in DEEP_JOINTS for g in rp) or any(k in it['base'].lower() for k in DEEP_NAMES))
     name = sanitize(it['base']) + (f'_{it["side"]}' if it['side'] else '')
     # Las fascias se separan 1,2 mm de los músculos que envuelven para que no los atraviesen.
+    # Fuera del hueso (salvo en el cráneo): la bolsa subtendinosa del redondo mayor quedaba entera dentro del húmero
+    # (7,8 mm) y el ligamento costoclavicular, en la clavícula. Los discos intervertebrales no: se aplastarían.
+    disc = 'intervertebral' in it['base'].lower() or 'nucleus pulposus' in it['base'].lower()
     obj, moved, worst = ex.fit(o, name, skin_offset=None if deep else SKIN_OFFSET[it['tissue']],
-                               inflate=0.0012 if it['tissue'] == 'fascia' else 0.0)
+                               inflate=0.0012 if it['tissue'] == 'fascia' else 0.0, out_of_bone=not disc, bone_skip=skull_bone)
+    if ex.bone_moved: bone_fixed[it['tissue']] += 1
     obj.data.materials.append(MATS[it['tissue']])
     obj['anato3d_id'] = 'connective_' + name.lower()
     obj['system'] = 'connective'
@@ -107,4 +112,5 @@ for n, it in enumerate(items):
                   'verts': len(obj.data.vertices), 'worst_mm': round(worst * 1000, 1), 'name_es': obj['name_es']})
     if n % 50 == 0: log(f'  {n}/{len(items)} {name}: {len(obj.data.polygons)} caras, {moved}/{len(obj.data.vertices)} vértices corregidos por la piel')
 
+log('piezas sacadas del hueso, por tejido:', dict(bone_fixed))
 save('male_connective', groups, stats, {'ratio': ex.ratio, 'tissues': dict(collections.Counter(it['tissue'] for it in items))})

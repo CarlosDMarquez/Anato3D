@@ -15,7 +15,7 @@ Salida: build/male_arterial.* y build/male_venous.*, y sus .json en web/public/m
 import bpy, os, re, sys, json, collections
 sys.path.insert(0, os.path.dirname(__file__))
 from anato3d_fit import (Fitter, Extractor, Groups, bonus_paths, es, la, sanitize, source_name, principled, save,
-                         log, parse_args, male_only, MODEL)
+                         log, parse_args, male_only, MODEL, skull_bone)
 
 opt = parse_args({'budget': 120000, 'only': None})   # presupuesto de caras para las mallas (corazón)
 
@@ -128,12 +128,18 @@ NAMES_ES = {'Systemic arteries': 'Arterias sistémicas', 'Systemic veins': 'Vena
             'Upper limb': 'Miembro superior', 'Lower limb': 'Miembro inferior', 'Foot': 'Pie', 'Hand': 'Mano'}
 roots = {'arterial': Groups('Arterial_System', NAMES_ES), 'venous': Groups('Venous_System', NAMES_ES)}
 stats = {'arterial': [], 'venous': []}
+bone_fixed = collections.Counter()
 for n, it in enumerate(items):
     o = it['obj']
     name = sanitize(it['base']) + (f'_{it["side"]}' if it['side'] else '')
     low = it['base'].lower()
     deep = it['heart'] or (any(k in low for k in DEEP) and not any(k in low for k in SUBCUTANEOUS))
-    obj, moved, worst = ex.fit(o, name, skin_offset=None if deep else 0.002, smooth=30 if it['heart'] else 0)
+    # Fuera del hueso, anillo a anillo (salvo en el cráneo, con sus conductos y surcos): las ramas calcáneas de la arteria
+    # fibular quedaban enteras dentro del calcáneo (8,8 mm), las circunflejas humerales en el húmero (7,5 mm), las venas
+    # torácicas internas en el esternón (5 mm) y los vasos testiculares en el pubis (7,7 mm).
+    obj, moved, worst = ex.fit(o, name, skin_offset=None if deep else 0.002, smooth=30 if it['heart'] else 0,
+                               out_of_bone=False if it['heart'] else 'tube', bone_skip=skull_bone)
+    if ex.bone_moved: bone_fixed[it['system']] += 1
     obj.data.materials.append(MATS[it['tissue']])
     rp = region_path(it['src'], it['system'])
     obj['anato3d_id'] = f'{it["system"]}_{name.lower()}'
@@ -152,5 +158,6 @@ for n, it in enumerate(items):
                                 'name_es': obj['name_es']})
     if n % 100 == 0: log(f'  {n}/{len(items)} {name}: {len(obj.data.polygons)} caras, {moved}/{len(obj.data.vertices)} vértices corregidos por la piel')
 
+log('vasos sacados del hueso:', dict(bone_fixed))
 for system, groups in roots.items():
     save(f'male_{system}', groups, stats[system], {'major': sum(s['major'] for s in stats[system])})

@@ -16,7 +16,7 @@ Salida: build/male_nervous.blend, build/male_nervous.json y web/public/models/ma
 import bpy, os, re, sys, json, collections
 sys.path.insert(0, os.path.dirname(__file__))
 from anato3d_fit import (Fitter, Extractor, Groups, bonus_paths, es, la, sanitize, source_name, principled, save,
-                         log, parse_args, male_only, MODEL)
+                         log, parse_args, male_only, MODEL, skull_bone)
 
 opt = parse_args({'budget': 220000, 'only': None})
 
@@ -162,7 +162,11 @@ for n, it in enumerate(items):
     obj, moved, worst = ex.fit(o, name, skin_offset=0.002 if near_skin else None,
                                detail=DETAIL.get(it['tissue'], 1.0),
                                # El encéfalo nunca está dentro de un hueso (sí la cóclea o los nervios en sus conductos).
-                               out_of_bone=it['tissue'] in ('cortex', 'cerebellum', 'white_matter', 'brainstem', 'meninges'))
+                               # Los nervios y ganglios, fuera del hueso anillo a anillo, salvo en el cráneo (el safeno
+                               # entraba 4,9 mm en la tibia).
+                               out_of_bone=True if it['tissue'] in ('cortex', 'cerebellum', 'white_matter', 'brainstem', 'meninges')
+                               else 'tube' if it['tissue'] in ('nerve', 'ganglion') else False,
+                               bone_skip=None if it['tissue'] in ('cortex', 'cerebellum', 'white_matter', 'brainstem', 'meninges') else skull_bone)
     obj.data.materials.append(SENSE.get(it['mat'], SENSE_DEFAULT) if it['tissue'] == 'sense' else MATS[it['tissue']])
     obj['anato3d_id'] = 'nervous_' + name.lower()
     obj['system'] = 'nervous'

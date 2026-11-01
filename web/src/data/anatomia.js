@@ -434,7 +434,7 @@ export const ANATOMIA = {
     nombre: 'Grande', latin: 'Os capitatum', tipo: 'Hueso corto · carpo',
     etimologia: 'Del latín caput, «cabeza», por su extremo redondeado.',
     descripcion: 'El hueso más grande del carpo, situado en el centro de la muñeca.',
-    datos: ['Es el primer hueso del carpo en osificarse, hacia el primer año de vida.', 'Se articula con el tercer metacarpiano.'],
+    datos: ['Es el primer hueso del carpo en osificarse, a los 2–3 meses de vida.', 'Se articula con el tercer metacarpiano.'],
   },
   Hamate: {
     nombre: 'Ganchoso', latin: 'Os hamatum', tipo: 'Hueso corto · carpo',

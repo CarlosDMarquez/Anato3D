@@ -47,6 +47,10 @@ const DISCO = {
   descripcion: 'Disco de fibrocartílago entre dos cuerpos vertebrales. Tiene un anillo fibroso externo y un núcleo pulposo gelatinoso en el centro, que reparte y amortigua las cargas.',
   datos: ['Si el núcleo pulposo sale a través del anillo se produce una hernia de disco, más frecuente entre L4–L5 y L5–S1.', 'Con la edad pierden agua y altura: por eso la estatura disminuye ligeramente.'],
 };
+const NUCLEO = {
+  descripcion: 'Centro gelatinoso del disco intervertebral, con mucha agua, rodeado por el anillo fibroso. Reparte la presión entre las vértebras como un cojín de agua.',
+  datos: ['Es lo que sale en una hernia de disco al romperse el anillo fibroso.', 'Es el resto de la notocorda del embrión.'],
+};
 export const CONECTIVO = {
   Anterior_cruciate_ligament: {
     descripcion: 'Ligamento intraarticular de la rodilla que va de la tibia (delante) al cóndilo lateral del fémur (detrás). Impide que la tibia se desplace hacia delante.',
@@ -124,7 +128,7 @@ export function resolveConnective(name, x) {
   const side = /_L$/.test(name) ? 'L' : /_R$/.test(name) ? 'R' : null;
   const region = parse(x.region);
   const key = String(x.name_en ?? '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '');
-  const own = CONECTIVO[key] ?? (key.startsWith('Intervertebral_disc') ? DISCO : null);
+  const own = CONECTIVO[key] ?? (key.startsWith('Intervertebral_disc') ? DISCO : key.startsWith('Nucleus_pulposus') ? NUCLEO : null);
   const tissue = TEJIDO[x.tissue] ?? TEJIDO.ligament;
   const group = [...region].reverse().map((g) => GRUPOS[g]).find(Boolean);
   return {

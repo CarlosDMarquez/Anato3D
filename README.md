@@ -463,6 +463,61 @@ El usuario lo veía «todo deforme», frente a una imagen de referencia con los 
 
 **Pendiente:** el músculo bulboesponjoso, el isquiocavernoso y los transversos son formas paramétricas, no disecadas. ~~Al hombre le faltan los mismos músculos del periné.~~ Hecho el 2026-10-31 (ver «Periné masculino»).
 
+## Revisión completa de errores (2026-10-31)
+
+Encargo: «Busca todos los errores e intenta perfeccionarlos», tras llevar la uretra del hombre dentro del cuerpo esponjoso.
+
+**Uretra masculina** (`GenitalPose.urethra_map`, en `anato3d_fit.py`; vale para todos los sistemas):
+- Medida a lo largo de sus 121 anillos:
+  - salía de la próstata por encima del bulbo;
+  - cruzaba la unión de las raíces del pene (cuerpos cavernosos);
+  - entraba en el cuerpo esponjoso 2,5 cm por delante del extremo posterior del bulbo, rozando su superficie.
+- Ahora:
+  - baja desde el vértice de la próstata (uretra membranosa, ~6 mm);
+  - entra en el bulbo por su cara superior, a 1,2 cm de su extremo posterior;
+  - sigue en su tercio superior, a 4–5 mm de profundidad, hasta unirse a su camino original;
+  - 30 anillos recolocados (hasta 6,7 mm) y girados con la nueva tangente.
+
+**Nombres** (`ES_FIXES`, `ES_OVERRIDES`):
+- Las 5.756 piezas de los dos modelos se pasan en Node por las mismas funciones de fichas que la web.
+- Sin títulos en inglés ni guiones bajos.
+- Corregidas las erratas de la traducción de Z-Anatomy:
+  - tildes: «angulo», «capsula», «fibula», «humero», «musculo», «oftalmica», «-faringeo», «multifido», «Linea alba», «Lingula», «Fornix», «interfalangeas»…;
+  - tildes que sobraban: «calcáneocuboideo», «masétero»;
+  - errata: «intertransvarios»;
+  - 10 títulos con abreviaturas («art.», «m.», «lat.»…).
+
+**Fuera del hueso:**
+- Los vasos y nervios periféricos no se sacaban del hueso al construirse; tampoco el tejido conjuntivo ni las vísceras.
+- Errores encontrados:
+  - ramas calcáneas de la arteria fibular, enteras dentro del calcáneo (8,8 mm);
+  - circunflejas humerales en el húmero (7,5 mm);
+  - vasos testiculares en el pubis (7,7 mm);
+  - bolsa del redondo mayor, entera dentro del húmero (7,8 mm).
+- Arreglo (`anato3d_fit.py`), sin tocar los huesos del cráneo (`skull_bone`), por donde vasos y nervios van por conductos:
+  - `push_tube_out_of_bone` saca vasos y nervios anillo a anillo, sin aplastarlos;
+  - el conjuntivo (salvo los discos) y las vísceras, vértice a vértice.
+- Resultado: vasos dentro del hueso fuera del cráneo, de 121 a 6.
+
+**Cuello** (`fix_neck.py`):
+- El disco C6–C7 quedaba dentro de C7: no había hueco entre los cuerpos vertebrales (0,2 mm; en Z-Anatomy, 4 mm).
+- Causa: cada vértebra cervical tomaba el giro de su ajuste anterior, deformado (en zigzag, con diferencias de hasta 18°).
+- Ahora hay un solo giro para todo el cuello: discos cervicales de 3,6–7,4 mm en los dos modelos.
+- Solo cambian las 7 vértebras y la piel de la nuca.
+
+**Otros:**
+- tiroides femenina 1,5 mm bajo la piel (asomaba 3,2 mm);
+- epidídimo fuera del testículo (en Z-Anatomy, 47 % dentro).
+
+**Web:**
+- Carrera al cambiar de modelo durante una descarga: las piezas del modelo anterior acababan en el nuevo. Ahora un número de carga lo impide (`viewer.generation`, `loadSeq`).
+- Fichas corregidas:
+  - cricotiroidotomía: se hace por encima del cricoides, no por debajo;
+  - origen del psoas mayor;
+  - osificación del grande (carpo);
+  - giro supramarginal;
+  - ficha propia del núcleo pulposo y dato del bulbo del pene.
+
 ## Periné masculino (2026-10-31)
 
 Z-Anatomy tampoco tiene en el hombre los músculos del triángulo urogenital: solo el suelo de la pelvis y el esfínter externo del ano.
@@ -515,7 +570,7 @@ Z-Anatomy tampoco tiene en el hombre los músculos del triángulo urogenital: so
   - sin errores de consola; `npm run build` correcto.
 
 **Pendiente** (de Z-Anatomy):
-- la uretra va pegada por encima del cuerpo esponjoso en la raíz del pene (2–3 mm), en vez de por dentro;
+- ~~la uretra va pegada por encima del cuerpo esponjoso en la raíz del pene (2–3 mm), en vez de por dentro;~~ Corregido el 2026-10-31 (ver «Revisión completa de errores»);
 - el esfínter externo del ano queda ~2 cm por encima de la piel y no hay conducto anal.
 
 ## Pelvis femenina (2026-10-30)

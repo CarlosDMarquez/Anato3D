@@ -267,7 +267,7 @@ export const MUSCULOS = {
   },
   Psoas_major: {
     descripcion: 'Músculo largo a ambos lados de la columna lumbar que baja hasta el muslo.',
-    origen: 'Cuerpos vertebrales y apófisis transversas de T12 a L4.', insercion: 'Trocánter menor del fémur.',
+    origen: 'Caras laterales de los cuerpos de T12 a L5 y de sus discos, y apófisis transversas de las vértebras lumbares.', insercion: 'Trocánter menor del fémur.',
     accion: 'Flexión de la cadera y flexión lateral del tronco.', datos: ['Con el ilíaco forma el iliopsoas.'],
   },
   Tensor_fasciae_latae: {

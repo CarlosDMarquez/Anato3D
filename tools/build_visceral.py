@@ -16,7 +16,7 @@ Salida: build/male_<sistema>.blend y .json, y web/public/models/male-<sistema>.j
 import bpy, bmesh, os, re, sys, json, collections
 sys.path.insert(0, os.path.dirname(__file__))
 from anato3d_fit import (Fitter, Extractor, Groups, bonus_paths, es, la, sanitize, source_name, principled, save,
-                         log, parse_args, male_only, MODEL)
+                         log, parse_args, male_only, MODEL, skull_bone)
 from mathutils import Matrix, Vector, bvhtree
 import numpy as np
 
@@ -128,10 +128,12 @@ def bone_depth(p):
 
 def skin_out(p):
     """(cuánto sale de la piel en m, normal de la piel), o None si está dentro."""
-    loc, nrm, _, _ = fitter.skin.find_nearest(p)
+    loc, nrm, _, dist = fitter.skin.find_nearest(p)
     if loc is None: return None
     depth = (p - loc).dot(nrm)
-    return (depth, nrm) if depth > -0.003 and (depth <= 0 or not fitter.inside_body(p)) else None
+    # Cerca de la piel también por distancia (en los pliegues la normal de la cara más cercana engaña: ver
+    # Fitter.keep_inside_skin).
+    return (depth, nrm) if (depth > 0 and not fitter.inside_body(p)) or (-0.003 < depth <= 0 and dist < 0.006) else None
 
 def components(bm):
     """Piezas sueltas de la malla (listas de vértices conectados)."""
@@ -284,13 +286,19 @@ PARTS_ES = {
 
 roots = {s: Groups(f'{s.capitalize()}_System', NAMES_ES) for s in wanted}
 stats = {s: [] for s in wanted}
+bone_fixed = collections.Counter()
 for n, it in enumerate(items):
     o = it['obj']
     name = sanitize(it['base']) + (f'_{it["side"]}' if it['side'] else '')
     superficial = it['tissue'] == 'node' and any(k in it['base'].lower() for k in SUPERFICIAL_NODES)
-    # Los cartílagos de la nariz forman la nariz externa: sí se corrigen por la piel (asomaban hasta 4 mm).
-    nose = it['tissue'] == 'cartilage' and any(k in it['base'].lower() for k in ('alar', 'nasal'))
-    obj, moved, worst = ex.fit(o, name, skin_offset=0.0015 if nose else None, smooth=30, pin=0.002)
+    # Los cartílagos de la nariz forman la nariz externa: sí se corrigen por la piel (asomaban hasta 4 mm). Y la tiroides
+    # (en el cuello de la mujer, más fino, asomaba 3,2 mm por delante).
+    nose = (it['tissue'] == 'cartilage' and any(k in it['base'].lower() for k in ('alar', 'nasal'))) or it['base'].lower() == 'thyroid gland'
+    # Fuera del hueso, salvo en el cráneo (la tenia mesocólica entraba 4,6 mm en el ilion). Los nodos no: place_nodes los
+    # saca enteros (vértice a vértice, los retrofaríngeos acababan en el paladar blando).
+    obj, moved, worst = ex.fit(o, name, skin_offset=0.0015 if nose else None, smooth=30, pin=0.002,
+                               out_of_bone=it['tissue'] != 'node', bone_skip=skull_bone)
+    if ex.bone_moved: bone_fixed[it['system']] += 1
     if nose and moved: log(f'  {name}: {moved} vértices metidos bajo la piel (salían hasta {worst * 1000:.1f} mm)')
     if it['tissue'] == 'node':
         moved, worst = place_nodes(obj, superficial)
@@ -438,12 +446,48 @@ def natural(a, b):
 
 GROUP = {'kidney': 'kidney', 'renal_pelvis': 'kidney', 'adrenal': 'adrenal', 'spleen': 'spleen', 'liver': 'liver',
          'gallbladder': 'liver', 'colon': 'colon', 'taenia': 'colon', 'stomach': 'gi', 'intestine': 'gi',
-         'bladder': 'pelvis', 'prostate': 'pelvis', 'seminal': 'pelvis', 'testis': 'testis', 'epididymis': 'testis',
+         'bladder': 'pelvis', 'prostate': 'pelvis', 'seminal': 'pelvis', 'testis': 'testis',
+         # El epidídimo va pegado al borde posterior del testículo, no dentro: en Z-Anatomy ya está un 47 % dentro de él
+         # (53 % tras el ajuste). Como grupo propio, cede y queda apoyado en su superficie.
+         'epididymis': 'epididymis',
          'lung': 'lungs', 'pleura': 'lungs', 'bronchus': 'lungs', 'thymus': 'thymus', 'thyroid': 'thyroid',
          'parathyroid': 'thyroid', 'cartilage': 'larynx', 'uterus': 'female', 'vagina': 'female', 'ovary': 'female',
          'tube': 'female'}
 def group(o):
     return 'pancreas' if o['name'] == 'Pancreas' else GROUP.get(o['it']['tissue'])
+
+# El epidídimo va pegado al borde posterior del testículo, no dentro: en Z-Anatomy ya está un 47 % dentro de él (53 % tras
+# el ajuste). Se saca por secciones a lo largo de su eje (cada una entera, lo justo para sacar su punto más hondo), y no
+# vértice a vértice: así su cuerpo quedaba como una tira fina de borde dentado sobre el testículo.
+def push_sections_out(obj, other, bins=24, rounds=3):
+    me = obj.data; loc = np.array(obj.location)
+    V = np.array([v.co[:] for v in me.vertices]) + loc
+    c = V.mean(0); ax = np.linalg.svd(V - c)[2][0]
+    t = (V - c) @ ax
+    edges = np.linspace(t.min(), t.max(), bins + 1); mid = (edges[:-1] + edges[1:]) / 2
+    idx = np.clip(np.digitize(t, edges) - 1, 0, bins - 1)
+    moved = 0
+    for _ in range(rounds):
+        D = np.zeros((bins, 3))
+        for k in range(bins):
+            best, n = 0.0, None
+            for i in np.flatnonzero(idx == k):
+                if not inside(other['T'], Vector(V[i])): continue
+                hit, nrm, _, dist = other['T'].find_nearest(Vector(V[i]))
+                if dist > best: best, n = dist, np.array(nrm) * other['sign']
+            if n is not None: D[k] = n * (best + 0.0005)
+        if not D.any(): break
+        moved += int((np.linalg.norm(D, axis=1) > 0).sum())
+        for _ in range(2):                                            # transición suave entre secciones
+            S = D.copy(); S[1:-1] = (D[:-2] + 2 * D[1:-1] + D[2:]) / 4
+            D = np.where((np.linalg.norm(D, axis=1) >= np.linalg.norm(S, axis=1))[:, None], D, S)
+        V = V + np.column_stack([np.interp(t, mid, D[:, j]) for j in range(3)])
+    me.vertices.foreach_set('co', (V - loc).ravel()); me.update()
+    return moved
+for side in 'LR':
+    epi = next((it for it in items if 'out' in it and it['out'].name == f'Epididymis_{side}'), None)
+    tes = next((it for it in items if 'out' in it and it['out'].name == f'Testis_{side}'), None)
+    if epi and tes: log(f'epidídimo {side}: {push_sections_out(epi["out"], solid(tes))} secciones sacadas del testículo')
 
 organs = [solid(it) for it in items if 'out' in it and it['tissue'] != 'node']
 organs = [o for o in organs if o['closed']]
@@ -503,6 +547,7 @@ for i, a in enumerate(organs):
         y.update(solid(y['it']))
         fixed_pairs.append(f'{y["name"]} fuera de {k["name"]} ({frac * 100:.0f} %, {len(inn)} vértices)')
 log('órganos separados:', fixed_pairs)
+log('órganos sacados del hueso, por sistema:', dict(bone_fixed))
 
 for system, groups in roots.items():
     save(f'male_{system}', groups, stats[system])

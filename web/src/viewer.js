@@ -230,6 +230,9 @@ export class Viewer extends EventTarget {
     this.genitalRegion = null;
     this.variantCache = new Map();
     this.cache = new Map();
+    // Número de la carga de modelo en curso: una descarga que termina después de cambiar de modelo no se añade (las piezas
+    // de un sistema masculino acababan en el cuerpo femenino si se cambiaba de modelo mientras se descargaba).
+    this.generation = 0;
     this.needsRender = true;
     this.tween = null;
     this.selFade = null;
@@ -360,11 +363,13 @@ export class Viewer extends EventTarget {
   }
 
   async loadModel(url, onProgress) {
+    const generation = ++this.generation;
     let gltf = this.cache.get(url);
     if (!gltf) {
       gltf = await this.loader.loadAsync(url, (e) => e.total && onProgress?.(e.loaded / e.total));
       this.cache.set(url, gltf);
     }
+    if (generation !== this.generation) return null;               // se pidió otro modelo mientras tanto
     for (const r of this.roots ?? []) this.scene.remove(r);
     this.select([]);
     this.partByMesh.clear();
@@ -382,11 +387,13 @@ export class Viewer extends EventTarget {
 
   // Añade el GLB de un sistema (p. ej. el muscular) al modelo cargado; se descarga solo al activarlo.
   async addSystem(url, onProgress) {
+    const generation = this.generation;
     let gltf = this.cache.get(url);
     if (!gltf) {
       gltf = await this.loader.loadAsync(url, (e) => e.total && onProgress?.(e.loaded / e.total));
       this.cache.set(url, gltf);
     }
+    if (generation !== this.generation) return null;               // el modelo cambió durante la descarga
     if (this.roots.includes(gltf.scene)) return [];
     this.roots.push(gltf.scene);
     const parts = this.#collectParts(gltf.scene);
@@ -394,6 +401,10 @@ export class Viewer extends EventTarget {
     // compilaban, el sistema recién descargado se veía un instante blanco y translúcido.
     for (const p of parts) for (const m of p.meshes) m.material = m.userData.baseMaterial;
     await this.renderer.compileAsync(gltf.scene, this.camera, this.scene).catch(() => {});
+    if (generation !== this.generation) {                          // o mientras se compilaba
+      this.roots.splice(this.roots.indexOf(gltf.scene), 1);
+      return null;
+    }
     this.scene.add(gltf.scene);
     this.parts.push(...parts);
     if (this.modesty) this.#applyModesty(parts);

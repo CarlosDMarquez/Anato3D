@@ -127,7 +127,12 @@ async function ensureSystem(id, quiet = false) {
     say(`Cargando ${label}…`, 0);
     const meta = await fetch(def.meta).then((r) => r.json());
     for (const [gid, g] of Object.entries(meta.groups ?? {})) GRUPOS[gid] ??= g;
-    await viewer.addSystem(def.url, (k) => say(`Cargando ${label}… ${Math.round(k * 100)} %`, 0));
+    const parts = await viewer.addSystem(def.url, (k) => say(`Cargando ${label}… ${Math.round(k * 100)} %`, 0));
+    if (!parts) {                                        // se cambió de modelo durante la descarga
+      def.loading = null;
+      if (!quiet) $('#toast').classList.remove('show');  // el aviso «Cargando… %» no caduca solo
+      return;
+    }
     def.loaded = true;
     computeAvailability();
     say(`${label[0].toUpperCase()}${label.slice(1)} listo`);
@@ -601,7 +606,9 @@ async function loadRegion(url) {
   return regions.get(url);
 }
 
+let loadSeq = 0;
 async function loadModel(id) {
+  const seq = ++loadSeq;
   const loader = $('#loader');
   const bar = $('#loader-bar');
   loader.hidden = false;
@@ -609,8 +616,10 @@ async function loadModel(id) {
   bar.style.width = '0%';
   $('#loader-label').textContent = `Cargando modelo ${MODELS[id].label.toLowerCase()}…`;
   try {
-    await viewer.loadModel(MODELS[id].url, (k) => (bar.style.width = `${Math.round(k * 100)}%`));
-    viewer.setGenitalRegion(await loadRegion(MODELS[id].genitalRegion));
+    if (!(await viewer.loadModel(MODELS[id].url, (k) => (bar.style.width = `${Math.round(k * 100)}%`)))) return;
+    const region = await loadRegion(MODELS[id].genitalRegion);
+    if (seq !== loadSeq) return;                         // se eligió otro modelo mientras tanto
+    viewer.setGenitalRegion(region);
   } catch (err) {
     $('#loader-label').textContent = 'No se pudo cargar el modelo. Revisa la consola.';
     throw err;

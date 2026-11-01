@@ -58,7 +58,7 @@ export const NERVIOSO = {
   Triangular_part_of_inferior_frontal_gyrus: BROCA,
   Opercular_part_of_inferior_frontal_gyrus: BROCA,
   Transverse_temporal_gyri: { descripcion: 'Giros en el interior del surco lateral, en el lóbulo temporal: son la corteza auditiva primaria.', funcion: 'Audición.', datos: [] },
-  Supramarginal_gyrus: { descripcion: 'Giro del lóbulo parietal inferior. En el hemisferio dominante forma parte del área de Wernicke.', funcion: 'Comprensión del lenguaje.', datos: [] },
+  Supramarginal_gyrus: { descripcion: 'Giro del lóbulo parietal inferior, que rodea el final del surco lateral. En el hemisferio dominante, con el giro angular, rodea el área de Wernicke (en la parte posterior del giro temporal superior) y participa en el lenguaje.', funcion: 'Lenguaje y sensibilidad.', datos: [] },
   Angular_gyrus: { descripcion: 'Giro del lóbulo parietal inferior que integra información visual, auditiva y del lenguaje.', funcion: 'Lectura y escritura.', datos: [] },
   Optic_chiasm: { descripcion: 'Punto donde se cruzan parcialmente los nervios ópticos: las fibras de la mitad nasal de cada retina pasan al lado opuesto.', datos: ['Un tumor de hipófisis que lo comprime causa la pérdida de la visión lateral de ambos ojos.'] },
   Red_nucleus: { descripcion: 'Núcleo del mesencéfalo, rojizo por su abundante hierro, que participa en la coordinación de los movimientos.', datos: [] },
