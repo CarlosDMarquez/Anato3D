@@ -17,7 +17,7 @@ Abre http://localhost:5173 (o el puerto que indique Vite). Para producción: `np
 | Ruta | Qué es |
 |---|---|
 | `*.blend`, `*.glb` (raíz) | Modelos fuente. Fase 1 = piel + ojos; Fase 2 = piel + esqueleto completo (`Anato3D_Male_30_Fase2`, `Anato3D_Female_30_Fase2`). |
-| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app), `audit_models.py` (busca errores medibles en los modelos) y `backup.sh` (copia de seguridad en este Mac). |
+| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app), `audit_models.py` (busca errores medibles en los modelos), `vessel_regions.py` (región del cuerpo de cada vaso) y `backup.sh` (copia de seguridad en este Mac). |
 | `Anato3D_Male_30_Fase2_musculature.npz` | Campo de desplazamiento de la complexión musculosa (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas). |
 | `Anato3D_Female_30_Fase2_pelvis.npz` | Campo de desplazamiento de la pelvis femenina y los huesos de la pelvis antes de deformarla (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas femeninos). |
 | `sources/originals/` | Copia de los modelos tal como estaban antes de corregir el cuello. |
@@ -479,6 +479,50 @@ El usuario lo veía «todo deforme», frente a una imagen de referencia con los 
 - **Fuentes en la ficha:** una sección «Fuentes», plegada al final, con enlaces (`.info-refs`).
 - **Comprobación:** `node scripts/check-cards.mjs` (desde `web/`): 5.756 piezas, ninguna sin latín ni músculo sin ficha, inervación o fuentes.
 - **Peso:** el código de la web pasa de 919 a 1.044 kB (280 kB comprimido) por los textos nuevos.
+
+## Región real de los vasos (2026-11-01)
+
+La ficha de los vasos tomaba la región de las colecciones de Z-Anatomy, que no son regiones del cuerpo: todas las arterias de la cabeza, el cuello y el tronco están en «Aorta» (la arteria prefrontal decía «Región: Aorta»), y las de los miembros, en «Miembro superior/inferior».
+
+`tools/vessel_regions.py` (Blender) calcula dónde está cada vaso:
+- **Muestra:** hasta 400 vértices por vaso.
+- **Encéfalo y corazón:**
+  - encéfalo, si el punto está a menos de 2 mm de él, o a menos de 6 mm y dentro de la cavidad del cráneo (los rayos chocan con el cráneo en 11 de 14 direcciones);
+  - «cavidad craneal», más lejos pero rodeado de cráneo;
+  - corazón, a menos de 4 mm, solo en los vasos propios del corazón.
+- **Hueso más cercano:** fuera de eso, cráneo → cabeza, vértebras cervicales → cuello, húmero → brazo, etc.
+- **Correcciones con referencias del esqueleto:**
+  - codo y rodilla;
+  - cuello por debajo del hioides y por encima de la abertura superior del tórax;
+  - axila;
+  - abdomen por debajo del diafragma;
+  - ligamento inguinal;
+  - región glútea;
+  - periné y genitales externos.
+- **Resultado:** la región del vaso son las que reúnen al menos el 20 % de sus vértices.
+- **Revisión:** la lista se revisó vaso a vaso. Lo que no encajaba se corrige en `OVERRIDES`, con el motivo; los senos de la duramadre se llevan a «cavidad craneal».
+
+**Datos y resultado:**
+- La tabla está en `web/src/data/regiones-vasos.js` (413 vasos, calculada en el hombre). En la mujer da lo mismo salvo 9 vasos en el límite del 20 %, igual de válidos.
+- Ningún vaso de los dos modelos queda sin región ni con la de una colección (666 en el hombre, 656 en la mujer).
+- Ejemplos:
+
+| Vaso | Región |
+|---|---|
+| Arteria prefrontal | Encéfalo |
+| Seno sagital superior | Cavidad craneal |
+| Carótida interna | Cavidad craneal, cabeza y cuello |
+| Gran vena safena | Pie, pierna y muslo |
+| Arteria axilar | Axila |
+| Arteria genicular media | Rodilla |
+
+**Uso:**
+
+```
+Blender -b --factory-startup --python tools/vessel_regions.py -- male
+```
+
+Necesita `build/male_{arterial,venous,nervous,muscular}.blend`.
 
 ## Copia de seguridad (2026-11-01)
 

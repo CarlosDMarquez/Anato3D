@@ -1,5 +1,6 @@
 import { GRUPOS } from './grupos.js';
 import { latinEtymology } from './musculos.js';
+import { REGIONES_VASOS } from './regiones-vasos.js';
 
 // Fichas de los sistemas arterial y venoso y del corazón. Cada tipo de vaso tiene una descripción
 // general; los vasos y cavidades principales tienen ficha propia (clave: nombre inglés con «_»).
@@ -102,7 +103,8 @@ export function resolveVessel(name, x) {
     tissue: null,
     chips: [tipo.tipo, x.major && x.tissue !== 'heart' && x.tissue !== 'valve' && 'Vaso principal', side && (side === 'L' ? 'Lado izquierdo' : 'Lado derecho')].filter(Boolean),
     fields: [
-      group && { label: 'Región', value: group.nombre },
+      // Región real del cuerpo (tools/vessel_regions.py); las colecciones de Z-Anatomy («Aorta»…) solo como reserva.
+      (REGIONES_VASOS[key] ?? group) && { label: 'Región', value: REGIONES_VASOS[key] ?? group.nombre },
       tipo.sangre && { label: 'Sangre', value: tipo.sangre },
     ].filter(Boolean),
     entry: {
