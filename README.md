@@ -17,7 +17,7 @@ Abre http://localhost:5173 (o el puerto que indique Vite). Para producción: `np
 | Ruta | Qué es |
 |---|---|
 | `*.blend`, `*.glb` (raíz) | Modelos fuente. Fase 1 = piel + ojos; Fase 2 = piel + esqueleto completo (`Anato3D_Male_30_Fase2`, `Anato3D_Female_30_Fase2`). |
-| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app) y `audit_models.py` (busca errores medibles en los modelos). |
+| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app) y `audit_models.py` (busca errores medibles en los modelos). |
 | `Anato3D_Male_30_Fase2_musculature.npz` | Campo de desplazamiento de la complexión musculosa (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas). |
 | `Anato3D_Female_30_Fase2_pelvis.npz` | Campo de desplazamiento de la pelvis femenina y los huesos de la pelvis antes de deformarla (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas femeninos). |
 | `sources/originals/` | Copia de los modelos tal como estaban antes de corregir el cuello. |
@@ -461,7 +461,62 @@ El usuario lo veía «todo deforme», frente a una imagen de referencia con los 
 - **Auditoría masculina:** igual (36 choques, las mismas medidas).
 - **Web:** sin errores de consola, en las vistas de piel (y con los genitales ocultos), muscular y urogenital.
 
-**Pendiente:** el músculo bulboesponjoso, el isquiocavernoso y los transversos son formas paramétricas, no disecadas; al hombre le faltan los mismos músculos del periné.
+**Pendiente:** el músculo bulboesponjoso, el isquiocavernoso y los transversos son formas paramétricas, no disecadas. ~~Al hombre le faltan los mismos músculos del periné.~~ Hecho el 2026-10-31 (ver «Periné masculino»).
+
+## Periné masculino (2026-10-31)
+
+Z-Anatomy tampoco tiene en el hombre los músculos del triángulo urogenital: solo el suelo de la pelvis y el esfínter externo del ano.
+
+**Cómo** (`tools/male_perineum.py`, nuevo; usa los generadores de `female_perineum.py`):
+- **Sobre los órganos de Z-Anatomy, no con medidas supuestas:**
+  - raíces de los cuerpos cavernosos, bulbo del cuerpo esponjoso, uretra y próstata;
+  - `build_muscular.py` los ajusta igual que `build_visceral.py` (misma pose genital y suavizado), sin reducir.
+- **Cada músculo envuelve el órgano que cubre:**
+  - el órgano se corta con planos a lo largo de su eje y cada corte se mide cada 5°;
+  - la lámina sigue ese perfil a 0,4 mm;
+  - con elipses salían bloques planos y separados del bulbo.
+- **Los extremos se afilan** (arco y grosor). `shell()` admite ahora ángulos que varían a lo largo del músculo, marcos dados y perfil por ángulo; la mujer sale igual.
+- **Lo que quede dentro de un órgano** se saca a su superficie (+0,4 mm) en dos rondas, con suavidad.
+
+**Piezas (11):**
+- **Isquiocavernoso:** cubre la cara libre de cada raíz, de la unión de las raíces hacia la tuberosidad.
+- **Bulboesponjoso:** dos mitades unidas por el rafe bajo el bulbo, desde el cuerpo perineal; sigue 1 cm sobre el cuerpo esponjoso, adelgazándose.
+- **Transversos superficial y profundo del periné.**
+- **Membrana perineal:**
+  - una sola lámina de rama a rama (en la mujer son dos);
+  - va sobre las raíces y el bulbo y bajo la próstata y la uretra.
+- **Esfínter externo de la uretra:**
+  - funda en herradura abierta hacia atrás sobre el vértice de la próstata, por donde sale la uretra, hasta el 60 % de su altura;
+  - en Z-Anatomy la próstata se apoya en el bulbo y falta la uretra membranosa (1–2 cm), así que no cabe un anillo propio alrededor de la uretra;
+  - un primer intento salía arrugado entre el bulbo, la próstata y la unión de las raíces.
+- **Cuerpo perineal:** entre el bulbo y el esfínter externo del ano.
+
+**Web:**
+- cada pieza lleva `sex`;
+- `musculos.js` busca primero la ficha de su sexo («Bulbospongiosus_muscle@male»);
+- las fichas masculinas están en `musculos-fichas.js`.
+
+**Nombre del esfínter externo de la uretra:**
+- no tenía nombre en español ni en latín en ninguno de los dos modelos; la ficha de la mujer salía en inglés desde el 2026-10-31;
+- Z-Anatomy solo lo traduce como «Male/Female external urethral sphincter (part of muscular system)»;
+- ahora va en `ES_OVERRIDES` y en `LA_OVERRIDES` (`anato3d_fit.py`).
+
+**Verificado:**
+- **Piezas:**
+  - todas cerradas; ninguna sale de la piel; en el hueso, ≤ 0,1 mm;
+  - dentro de un órgano, solo el 3 % del bulboesponjoso y del isquiocavernoso derechos, donde la raíz y el bulbo se tocan;
+  - simetría ≤ 1,5 mm, salvo el isquiocavernoso (4,2 mm), porque las raíces de Z-Anatomy ya son asimétricas.
+- **Separación entre músculos:** solo mueve puboanales y semimembranosos (≤ 1,2 mm).
+- **Auditoría masculina:** los mismos 36 choques; 2.870 objetos.
+- **Modelo femenino:** `female_perineum.py` da exactamente las mismas piezas que antes.
+- **Web:**
+  - fichas masculinas;
+  - capas superficial, intermedia y profunda vistas desde abajo;
+  - sin errores de consola; `npm run build` correcto.
+
+**Pendiente** (de Z-Anatomy):
+- la uretra va pegada por encima del cuerpo esponjoso en la raíz del pene (2–3 mm), en vez de por dentro;
+- el esfínter externo del ano queda ~2 cm por encima de la piel y no hay conducto anal.
 
 ## Pelvis femenina (2026-10-30)
 

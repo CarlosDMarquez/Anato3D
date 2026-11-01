@@ -129,27 +129,56 @@ for n, it in enumerate(items):
     stats.append({'name': name, 'faces': len(me.polygons), 'moved_out_of_skin': moved, 'verts': len(me.vertices), 'worst_mm': round(worst * 1000, 1)})
     if n % 50 == 0: log(f'  {n}/{len(items)} {name}: {len(me.polygons)} caras, {moved}/{len(me.vertices)} vértices corregidos por la piel')
 
-# ── Periné femenino (tools/female_perineum.py) ──────────────────────────────
-# Z-Anatomy no tiene los músculos del triángulo urogenital ni la membrana ni el cuerpo perineal: en la mujer se generan
-# sobre las mismas referencias que la vulva y los genitales profundos, y entran en las capas y en la separación entre
-# músculos como los demás.
-PERINEUM = {   # inglés (traducción oficial de Z-Anatomy): (ruta, acción)
-    'Ischiocavernosus muscle': (('Perineal muscles', 'Superficial perineal space'), 'Erección del clítoris'),
-    'Bulbospongiosus muscle': (('Perineal muscles', 'Superficial perineal space'), 'Cierre de orificios (esfínter)'),
-    'Superficial transverse perineal muscle': (('Perineal muscles', 'Superficial perineal space'), 'Sostén del cuerpo perineal'),
-    'Deep transverse perineal muscle': (('Perineal muscles', 'Deep perineal space'), 'Sostén del cuerpo perineal'),
-    'Compressor urethrae': (('Perineal muscles', 'Deep perineal space'), 'Cierre de orificios (esfínter)'),
-    'Sphincter urethrovaginalis': (('Perineal muscles', 'Deep perineal space'), 'Cierre de orificios (esfínter)'),
-    'External urethral sphincter': (('Perineal muscles', 'Deep perineal space'), 'Cierre de orificios (esfínter)'),
-    'Perineal membrane': (('Perineal muscles',), ''),
-    'Perineal body': (('Perineal muscles',), ''),
+# ── Periné (tools/female_perineum.py, tools/male_perineum.py) ──────────────
+# Z-Anatomy no tiene los músculos del triángulo urogenital ni la membrana ni el cuerpo perineal, en ninguno de los dos
+# sexos. En la mujer se generan sobre las mismas referencias que la vulva y los genitales profundos; en el hombre, sobre
+# las raíces del pene, el bulbo, la uretra y la próstata de Z-Anatomy ajustados al cuerpo. Entran en las capas y en la
+# separación entre músculos como los demás.
+PERINEUM = {   # inglés (traducción oficial de Z-Anatomy): (ruta, acción en la mujer, acción en el hombre)
+    'Ischiocavernosus muscle': (('Perineal muscles', 'Superficial perineal space'), 'Erección del clítoris', 'Erección del pene'),
+    'Bulbospongiosus muscle': (('Perineal muscles', 'Superficial perineal space'), 'Cierre de orificios (esfínter)',
+                               'Vaciado de la uretra (micción y eyaculación)'),
+    'Superficial transverse perineal muscle': (('Perineal muscles', 'Superficial perineal space'), 'Sostén del cuerpo perineal',
+                                               'Sostén del cuerpo perineal'),
+    'Deep transverse perineal muscle': (('Perineal muscles', 'Deep perineal space'), 'Sostén del cuerpo perineal', 'Sostén del cuerpo perineal'),
+    'Compressor urethrae': (('Perineal muscles', 'Deep perineal space'), 'Cierre de orificios (esfínter)', ''),
+    'Sphincter urethrovaginalis': (('Perineal muscles', 'Deep perineal space'), 'Cierre de orificios (esfínter)', ''),
+    'External urethral sphincter': (('Perineal muscles', 'Deep perineal space'), 'Cierre de orificios (esfínter)',
+                                    'Cierre de orificios (esfínter)'),
+    'Perineal membrane': (('Perineal muscles',), '', ''),
+    'Perineal body': (('Perineal muscles',), '', ''),
 }
-if MODEL == 'female' and (not opt['only'] or any(k in 'perineal perineum bulbospongiosus ischiocavernosus urethr' for k in opt['only'])):
-    from female_perineum import frame, perineal_muscles
+
+def genital_organs():
+    """Raíces del pene, bulbo, uretra y próstata de Z-Anatomy, ajustados al cuerpo como en build_visceral.py pero sin
+    reducir: {clave: (vértices en mundo, caras triangulares)}."""
+    names = {'cc': 'Corpus cavernosum of penis', 'cs': 'Corpus spongiosum of penis', 'urethra': 'Urethra', 'prostate': 'Prostate'}
+    ox = Extractor(fitter, [bpy.data.objects[n] for n in names.values()], 10 ** 9, keep_subsurf_below=2000)
+    out = {}
+    for k, n in names.items():
+        obj, _, _ = ox.fit(bpy.data.objects[n], f'perineum_ref_{k}', smooth=30, pin=0.002)
+        bm = bmesh.new(); bm.from_mesh(obj.data); bm.transform(Matrix.Translation(obj.location))
+        bmesh.ops.triangulate(bm, faces=bm.faces)
+        out[k] = (np.array([v.co[:] for v in bm.verts]), np.array([[v.index for v in f.verts] for f in bm.faces]))
+        bm.free(); me = obj.data; bpy.data.objects.remove(obj); bpy.data.meshes.remove(me)
+    return out
+
+if not opt['only'] or any(k in 'perineal perineum bulbospongiosus ischiocavernosus urethr' for k in opt['only']):
     ref = {re.sub(r'\.\d{3}$', '', o.name): o for o in bpy.data.collections['Fase2_ref'].objects}
-    bladder = fitter.deform(Fitter._world(bpy.data.objects['Urinary bladder']))
-    PF = frame(ref, Fitter._world(ref['Skin_Body']), bladder)
-    for k, m in enumerate(perineal_muscles(PF)):
+    if MODEL == 'female':
+        from female_perineum import frame, perineal_muscles
+        bladder = fitter.deform(Fitter._world(bpy.data.objects['Urinary bladder']))
+        PF = frame(ref, Fitter._world(ref['Skin_Body']), bladder)
+        source = 'Anato3D (forma paramétrica con medidas anatómicas de adulta; tools/female_perineum.py)'
+    else:
+        from male_perineum import frame, perineal_muscles
+        anal = [it['out'] for it in items if it['base'] == 'External anal sphincter']
+        anal = np.vstack([np.array([v.co[:] for v in o.data.vertices]) + np.array(o.location) for o in anal]) if anal else None
+        PF = frame(ref, genital_organs(), anal)
+        source = ('Anato3D (envuelve las raíces del pene, el bulbo y la próstata de Z-Anatomy ajustados al cuerpo; '
+                  'tools/male_perineum.py)')
+    pieces = perineal_muscles(PF)
+    for m in pieces:
         V = m['V'].copy()
         fitter.push_out_of_bone(V)
         center = (V.min(0) + V.max(0)) / 2
@@ -161,19 +190,23 @@ if MODEL == 'female' and (not opt['only'] or any(k in 'perineal perineum bulbosp
         bm.to_mesh(me); bm.free(); me.update()
         obj = bpy.data.objects.new(m['name'], me); obj.location = center
         me.materials.append(MATS['tendon'] if m['tissue'] == 'tendon' else MATS[f'muscle_{sum(map(ord, m["en"])) % 5}'])
-        rp, action = PERINEUM[m['en']]
+        rp, action_f, action_m = PERINEUM[m['en']]
         side = m['name'][-1] if m['name'].endswith(('_L', '_R')) else None
         obj['anato3d_id'] = 'muscle_' + m['name'].lower()
         obj['system'] = 'muscular'; obj['tissue'] = m['tissue']; obj['superficial'] = m['superficial']
+        obj['sex'] = MODEL                                                 # la web elige la ficha de cada sexo
         obj['name_en'] = m['en']; obj['name_la'] = la(m['en']) or ''; obj['name_es'] = es(m['en']) or ''
         obj['region'] = json.dumps([sanitize(g) for g in rp])
         obj['innervation_es'] = json.dumps(['Nervio perineal (ramo del nervio pudendo)'] if m['tissue'] == 'muscle' else [], ensure_ascii=False)
-        obj['function_es'] = action
-        obj['source'] = 'Anato3D (forma paramétrica con medidas anatómicas de adulta; tools/female_perineum.py)'
+        obj['function_es'] = action_f if MODEL == 'female' else action_m
+        obj['source'] = source
         items.append({'obj': None, 'src': m['en'], 'base': m['en'], 'side': side, 'mat': None, 'tissue': m['tissue'],
                       'slots': [], 'out': obj, 'region': rp})
         stats.append({'name': m['name'], 'faces': len(me.polygons), 'moved_out_of_skin': 0, 'verts': len(me.vertices), 'worst_mm': 0.0})
-    log(f'periné femenino: {sum(1 for it in items if it["obj"] is None)} piezas (músculos, membrana y cuerpo perineal)')
+    log(f'periné ({MODEL}): {sum(1 for it in items if it["obj"] is None)} piezas (músculos, membrana y cuerpo perineal)')
+    if MODEL == 'male':
+        log(f'  raíces unidas a y = {PF["y_join"] * 100:.1f} cm; cuerpo perineal en {np.round(PF["perineal_body"] * 100, 1)} cm; '
+            f'vértices sacados de los órganos: {sum(m["pushed"] for m in pieces)}')
 
 # ── Capas: superficial / intermedia / profunda ──────────────────────────────
 # Superficial: lo que se ve al quitar la piel. Profunda: lo que queda cubierto y descansa directamente sobre el hueso

@@ -34,7 +34,8 @@ export function resolveMuscle(name, x) {
   const nerves = parse(x.innervation_es);
   // Ficha escrita: primero la del propio músculo, después la del músculo o grupo que lo contiene.
   const key = String(x.name_en ?? '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '');
-  const entry = MUSCULOS[key] ?? [...region].reverse().map((g) => MUSCULOS[g]).find(Boolean) ?? null;
+  // Músculos del periné: cada sexo tiene su ficha («Bulbospongiosus_muscle@male»); sin ella, la general.
+  const entry = (x.sex && MUSCULOS[`${key}@${x.sex}`]) ?? MUSCULOS[key] ?? [...region].reverse().map((g) => MUSCULOS[g]).find(Boolean) ?? null;
   const group = [...region].reverse().map((g) => GRUPOS[g]).find(Boolean);
   const fields = [
     group && { label: 'Región', value: group.nombre },

@@ -65,10 +65,17 @@ def frame(objs, skin_world, bladder_world=None):
     else:
         neck = ps_b + np.array([0, 0.03, 0.02])
     F['urethra'] = curve([neck, (neck + F['urethral_os']) / 2 + np.array([0, -0.004, 0]), F['urethral_os']], 12)
-    # Ramas isquiopubianas: su cara inferomedial (la del periné), de la sínfisis a la tuberosidad, con rayos.
-    F['ramus'], F['ramus_dir'], F['hip'] = {}, {}, {}
+    F['ramus'], F['ramus_dir'], F['hip'] = rami(objs, L)
+    return F
+
+
+def rami(objs, L):
+    """Cara inferomedial de las ramas isquiopubianas (la del periné), de la sínfisis a la tuberosidad, con rayos:
+    (20 puntos por lado, dirección hacia el periné por lado, BVH de cada coxal). También para el periné masculino."""
+    ps_b = np.array([0.0, L['ps_bottom'][1], L['ps_bottom'][2]])
+    ramus, ramus_dir, hip = {}, {}, {}
     for s, sx in (('L', 1.0), ('R', -1.0)):
-        T = F['hip'][s] = _bvh([objs[f'Hip_Bone_{s}']])
+        T = hip[s] = _bvh([objs[f'Hip_Bone_{s}']])
         start = np.array([sx * abs(L['ps_bottom'][0]), ps_b[1], ps_b[2]])
         end = L[f'tuber_{s}']
         m = _unit(np.array([-sx, 0.0, -1.2]))                              # hacia el periné: dentro y abajo
@@ -77,8 +84,8 @@ def frame(objs, skin_world, bladder_world=None):
             p = start + t * (end - start)
             hit = T.ray_cast(Vector(p + m * 0.03), Vector(-m), 0.05)[0]
             pts.append(np.array(hit) if hit is not None else p)
-        F['ramus'][s] = np.array(pts); F['ramus_dir'][s] = m
-    return F
+        ramus[s] = np.array(pts); ramus_dir[s] = m
+    return ramus, ramus_dir, hip
 
 
 def ramus_medial(F, s, t, dz, gap=0.003):
@@ -152,21 +159,27 @@ def _frames(path, ref):
     return T, N, np.cross(T, N)
 
 
-def shell(path, ra, rb, ref, th0=-np.pi, th1=np.pi, gap=0.0004, thick=0.0018, seg=20):
+def shell(path, ra, rb, ref, th0=-np.pi, th1=np.pi, gap=0.0004, thick=0.0018, seg=20, frames=None, profile=None):
     """Lámina de grosor `thick` que envuelve, a `gap` de distancia, la sección elíptica (ra según `ref`, rb
-    perpendicular) a lo largo de `path`, entre los ángulos th0 y th1 (medidos desde `ref`). Con la vuelta entera, un
-    anillo. Malla cerrada. Devuelve (vértices, caras)."""
+    perpendicular) a lo largo de `path`, entre los ángulos th0 y th1 (medidos desde `ref`; pueden variar a lo largo del
+    camino, para afilar los extremos). Con la vuelta entera, un anillo. Malla cerrada. Devuelve (vértices, caras).
+    `frames`: (N, B) de cada anillo, en vez de transportarlos desde `ref`; `profile(i, ángulos)`: radio de la sección
+    del anillo i en cada ángulo, en vez de la elipse (ra y rb no se usan)."""
     path = np.asarray(path, float); n = len(path)
     ra = np.broadcast_to(ra, n).astype(float); rb = np.broadcast_to(rb, n).astype(float)
     thick = np.broadcast_to(thick, n).astype(float)
-    T, N, B = _frames(path, np.asarray(ref, float))
-    full = th1 - th0 >= 2 * np.pi - 1e-6
-    th = np.linspace(th0, th1, seg, endpoint=not full)
-    k = len(th)
+    th0 = np.broadcast_to(th0, n).astype(float); th1 = np.broadcast_to(th1, n).astype(float)
+    N, B = _frames(path, np.asarray(ref, float))[1:] if frames is None else frames
+    full = bool((th1 - th0 >= 2 * np.pi - 1e-6).all())
+    k = seg
     V = []
     for i in range(n):
+        th = np.linspace(th0[i], th1[i], seg, endpoint=not full)
         for r_off in (gap, gap + thick[i]):                                # anillo interior y exterior
-            V += list(path[i] + np.outer(np.cos(th), N[i] * (ra[i] + r_off)) + np.outer(np.sin(th), B[i] * (rb[i] + r_off)))
+            if profile is None:
+                V += list(path[i] + np.outer(np.cos(th), N[i] * (ra[i] + r_off)) + np.outer(np.sin(th), B[i] * (rb[i] + r_off)))
+            else:
+                V += list(path[i] + (np.outer(np.cos(th), N[i]) + np.outer(np.sin(th), B[i])) * (profile(i, th) + r_off)[:, None])
     V = np.array(V)
     idx = lambda i, layer, j: (2 * i + layer) * k + j
     F = []

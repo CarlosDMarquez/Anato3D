@@ -399,6 +399,45 @@ export const MUSCULOS = {
     accion: 'Sostiene el suelo de la pelvis.',
     datos: ['En el parto puede desgarrarse; la episiotomía es un corte quirúrgico que evita un desgarro mayor.'],
   },
+  // ── Periné (modelo masculino: envuelven los órganos de Z-Anatomy, tools/male_perineum.py) ──
+  'Ischiocavernosus_muscle@male': {
+    descripcion: 'Músculo alargado que cubre cada raíz (pilar) del pene a lo largo de la rama isquiopubiana, en el espacio perineal superficial.',
+    origen: 'Tuberosidad isquiática y rama isquiopubiana.', insercion: 'Caras inferior y medial de la raíz del pene, hasta la unión de las dos raíces.',
+    accion: 'Comprime la raíz del pene y frena la salida de sangre: mantiene la erección.',
+    datos: ['Es más grande que en la mujer, donde cubre las raíces del clítoris.', 'Lo inerva el nervio perineal, ramo del pudendo (S2–S4).'],
+  },
+  'Bulbospongiosus_muscle@male': {
+    descripcion: 'Dos mitades unidas por un rafe en la línea media, bajo el bulbo del pene. Lo envuelven por abajo y por los lados, y por delante rodean el cuerpo esponjoso.',
+    origen: 'Cuerpo perineal y rafe medio bajo el bulbo.', insercion: 'Membrana perineal, cara dorsal del cuerpo esponjoso y fascia de los cuerpos cavernosos.',
+    accion: 'Vacía la uretra al final de la micción y expulsa el semen en la eyaculación; ayuda a la erección.',
+    datos: ['Sus contracciones rítmicas producen la eyaculación.', 'En la mujer son dos láminas separadas por el vestíbulo.'],
+  },
+  'Superficial_transverse_perineal_muscle@male': {
+    descripcion: 'Banda muscular fina que cruza el periné de un lado al otro, por detrás del bulbo del pene.',
+    origen: 'Cara medial de la tuberosidad isquiática.', insercion: 'Cuerpo perineal.',
+    accion: 'Fija el cuerpo perineal y sostiene el suelo de la pelvis.', datos: [],
+  },
+  'Deep_transverse_perineal_muscle@male': {
+    descripcion: 'Lámina muscular del espacio perineal profundo, por encima de la membrana perineal y detrás del esfínter externo de la uretra.',
+    origen: 'Rama del isquion.', insercion: 'Cuerpo perineal.',
+    accion: 'Fija el cuerpo perineal y sostiene la próstata y las vísceras de la pelvis.', datos: ['En el hombre está mejor definido que en la mujer.'],
+  },
+  'External_urethral_sphincter@male': {
+    descripcion: 'Músculo estriado en herradura, abierto hacia atrás, alrededor de la uretra membranosa. Sube por la cara anterior de la próstata.',
+    accion: 'Cierra la uretra de forma voluntaria: permite retener la orina.',
+    datos: [
+      'Tras extirpar la próstata es el principal mecanismo de continencia; por eso se conserva en la cirugía.',
+      'En este modelo (como en Z-Anatomy) la próstata se apoya en el bulbo y falta el tramo membranoso de la uretra: el esfínter se ve sobre el vértice de la próstata, donde sale la uretra.',
+    ],
+  },
+  'Perineal_membrane@male': {
+    descripcion: 'Lámina fibrosa triangular tendida entre las dos ramas isquiopubianas, bajo la próstata y atravesada por la uretra. Separa el espacio perineal superficial del profundo.',
+    insercion: 'Ramas isquiopubianas y cuerpo perineal.', accion: 'Las raíces y el bulbo del pene se fijan en su cara inferior; sostiene la uretra.', datos: [],
+  },
+  'Perineal_body@male': {
+    descripcion: 'Nudo fibromuscular entre el bulbo del pene y el ano, donde se unen los músculos del periné: bulboesponjoso, transversos, esfínter externo del ano y fibras del elevador del ano.',
+    accion: 'Sostiene el suelo de la pelvis.', datos: [],
+  },
 
   Fibularis_longus_muscle: {
     descripcion: 'Músculo de la cara lateral de la pierna cuyo tendón cruza la planta del pie.',

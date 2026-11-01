@@ -58,7 +58,10 @@ ES_OVERRIDES = {
     'Posterior septal branches of sphenopalatine artery': 'Ramas septales posteriores de la arteria esfenopalatina',
     'Anterior septal branches of anterior ethmoidal artery': 'Ramas septales anteriores de la arteria etmoidal anterior',
     'Short head of biceps brachii': 'Cabeza corta del músculo bíceps braquial',
+    # Periné (piezas de Anato3D): Z-Anatomy solo lo tiene como «Esfínter uretral externo masculino (Sistema muscular)».
+    'External urethral sphincter': 'Músculo esfínter externo de la uretra',
 }
+LA_OVERRIDES = {'External urethral sphincter': 'Musculus sphincter urethrae externus'}
 _UNACCENT = str.maketrans('áéíóú', 'aeiou')
 
 def es(term):
@@ -72,7 +75,7 @@ def es(term):
     return s
 
 def la(term):
-    return TR.get(term, (None, None))[0]
+    return LA_OVERRIDES.get(term) or TR.get(term, (None, None))[0]
 
 def sanitize(s):
     return re.sub(r'[^A-Za-z0-9]+', '_', s).strip('_')

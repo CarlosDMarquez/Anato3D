@@ -179,6 +179,14 @@
   "Perineal_muscles": {
    "nombre": "Músculos perineales",
    "latin": "Musculi perinei"
+  },
+  "Superficial_perineal_space": {
+   "nombre": "Espacio perineal superficial",
+   "latin": "Spatium superficiale perinei"
+  },
+  "Deep_perineal_space": {
+   "nombre": "Espacio perineal profundo",
+   "latin": "Spatium profundum perinei"
   }
  }
 }
