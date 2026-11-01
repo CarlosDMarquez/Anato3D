@@ -4,6 +4,7 @@ import { resolveConnective } from './conectivo.js';
 import { resolveVessel } from './vasos.js';
 import { resolveNervous } from './nervios.js';
 import { resolveVisceral } from './visceras.js';
+import { LATIN_EXTRA, fuentesLatin } from './fuentes.js';
 
 // Convierte el nombre de un objeto del modelo (p. ej. "Rib_7_L", "Tooth_Upper_Canine_R")
 // en la ficha que muestra la app: título, latín, etiquetas y datos adicionales.
@@ -32,6 +33,15 @@ function ribClass(n) {
 export const sideOf = (name) => splitSide(name).side;
 
 export function resolvePart(name, extras = {}) {
+  // Latín que no trae la traducción de Z-Anatomy (fuentes.js): entra como si viniera en el modelo, con su fuente.
+  const nameKey = String(extras.name_en ?? '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '');
+  const extra = !extras.name_la && LATIN_EXTRA[nameKey];
+  const info = resolveBySystem(name, extra ? { ...extras, name_la: extra[0] } : extras);
+  if (extra) info.fuentes ??= fuentesLatin(nameKey);
+  return info;
+}
+
+function resolveBySystem(name, extras) {
   if (extras.system === 'muscular') return resolveMuscle(name, extras);
   if (extras.system === 'connective') return resolveConnective(name, extras);
   if (extras.system === 'arterial' || extras.system === 'venous') return resolveVessel(name, extras);

@@ -64,6 +64,13 @@ export function renderInfo(el, sel, { system, faded, collapsed, onAction, onCrum
         ${info.datos.length ? `<section><h3>Puntos clave</h3><ul class="facts">${info.datos.map((d) => `<li>${esc(d)}</li>`).join('')}</ul></section>` : ''}
       ` : '<section><p class="muted">Ficha en preparación.</p></section>'}
       ${!isGroup && info.source ? `<p class="info-source">Modelo 3D: ${esc(info.source)}</p>` : ''}
+      ${!isGroup && info.fuentes ? `
+        <details class="info-refs"><summary>Fuentes</summary>
+          <ul>${info.fuentes.lista.map((f) => `
+            <li><b>${esc(f.papel)}:</b> <a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.texto)}</a></li>`).join('')}
+          </ul>
+          <p>${esc(info.fuentes.nota)}</p>
+        </details>` : ''}
     </div>`;
   el.querySelectorAll('[data-act]').forEach((b) => b.addEventListener('click', () => onAction(b.dataset.act)));
   el.querySelectorAll('[data-crumb]').forEach((b) => b.addEventListener('click', () => onCrumb(b.dataset.crumb)));

@@ -130,6 +130,19 @@ kbd { display: inline-block; min-width: 22px; padding: 2px 6px; border-radius: 5
 .members .ui-icon { width: 14px; height: 14px; color: var(--muted); }
 .members button:not(:has(small)) .ui-icon { margin-left: auto; }
 .info-source { margin-top: 20px !important; font-size: 11px !important; color: var(--muted) !important; line-height: 1.5 !important; }
+/* Fuentes de la ficha: plegadas al final, para quien quiera comprobarlas. */
+.info-refs { margin-top: 10px; font-size: 11px; color: var(--muted); }
+.info-refs summary { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; list-style: none; user-select: none; }
+.info-refs summary::-webkit-details-marker { display: none; }
+.info-refs summary::before { content: ''; width: 5px; height: 5px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(-45deg); transition: transform 0.15s; }
+.info-refs[open] summary::before { transform: rotate(45deg); }
+.info-refs summary:hover { color: var(--text-2); }
+.info-refs ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.info-body .info-refs li { font-size: 11px; line-height: 1.5; color: var(--muted); }
+.info-refs li b { font-weight: 500; color: var(--text-2); }
+.info-refs a { color: inherit; text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 2px; }
+.info-refs a:hover { color: var(--text); }
+.info-body .info-refs p { margin-top: 6px; font-size: 11px; color: var(--muted); }
 
 /* ── Etiqueta con línea guía ──────────────────── */
 .pin { position: absolute; inset: 0; pointer-events: none; z-index: 4; }

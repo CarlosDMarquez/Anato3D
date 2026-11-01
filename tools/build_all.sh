@@ -4,6 +4,7 @@
 # Modelo femenino: A3D_MODEL=female zsh tools/build_all.sh   (por defecto, el masculino)
 set -e
 cd "$(dirname "$0")/.."
+mkdir -p build                     # no está en git: en una copia recién clonada o restaurada no existe
 B=/Applications/Blender.app/Contents/MacOS/Blender
 Z=sources/z-anatomy/extracted/Z-Anatomy/Startup.blend
 M=${A3D_MODEL:-male}

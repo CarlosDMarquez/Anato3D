@@ -17,7 +17,7 @@ Abre http://localhost:5173 (o el puerto que indique Vite). Para producción: `np
 | Ruta | Qué es |
 |---|---|
 | `*.blend`, `*.glb` (raíz) | Modelos fuente. Fase 1 = piel + ojos; Fase 2 = piel + esqueleto completo (`Anato3D_Male_30_Fase2`, `Anato3D_Female_30_Fase2`). |
-| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app) y `audit_models.py` (busca errores medibles en los modelos). |
+| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app), `audit_models.py` (busca errores medibles en los modelos) y `backup.sh` (copia de seguridad en este Mac). |
 | `Anato3D_Male_30_Fase2_musculature.npz` | Campo de desplazamiento de la complexión musculosa (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas). |
 | `Anato3D_Female_30_Fase2_pelvis.npz` | Campo de desplazamiento de la pelvis femenina y los huesos de la pelvis antes de deformarla (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas femeninos). |
 | `sources/originals/` | Copia de los modelos tal como estaban antes de corregir el cuello. |
@@ -27,7 +27,9 @@ Abre http://localhost:5173 (o el puerto que indique Vite). Para producción: `np
 | `web/src/systems.js` | Los 12 sistemas de la barra, sus capas y cómo se clasifica cada pieza. |
 | `web/src/data/anatomia.js` | Fichas en español: nombre, latín (TA), etimología, descripción y puntos clave. |
 | `web/src/data/resolve.js` | Convierte el nombre de un objeto (`Rib_7_L`) en su ficha (`Séptima costilla`, lado, FDI…). |
-| `web/src/data/musculos*.js`, `conectivo.js`, `vasos.js`, `nervios.js`, `visceras.js`, `latin.js` | Fichas de músculos y de tejido conjuntivo, y glosario latino para generar etimologías. |
+| `web/src/data/musculos*.js`, `conectivo.js`, `vasos.js`, `nervios.js`, `visceras.js`, `latin.js` | Fichas de músculos y de tejido conjuntivo, y glosario latino para generar etimologías. Todos los músculos tienen ficha propia (`musculos-fichas.js` y `musculos-fichas-resto.js`). |
+| `web/src/data/fuentes.js` | Fuentes de cada ficha de músculo y del latín añadido (la ficha las muestra plegadas al final), y latín que no trae Z-Anatomy. |
+| `web/scripts/check-cards.mjs` | Revisa las fichas de todas las piezas: `node scripts/check-cards.mjs` (desde `web/`). |
 | `web/src/data/grupos.js` | Regiones de la ruta jerárquica (los grupos musculares llegan en `male-muscular.json`). |
 | `web/src/viewer.js` | Escena three.js: carga Draco, materiales, brillo de selección, cámara. |
 | `web/src/main.js` | Estado de la app (capas, ocultar/aislar/transparentar, deshacer), barra y paneles. |
@@ -462,6 +464,30 @@ El usuario lo veía «todo deforme», frente a una imagen de referencia con los 
 - **Web:** sin errores de consola, en las vistas de piel (y con los genitales ocultos), muscular y urogenital.
 
 **Pendiente:** el músculo bulboesponjoso, el isquiocavernoso y los transversos son formas paramétricas, no disecadas. ~~Al hombre le faltan los mismos músculos del periné.~~ Hecho el 2026-10-31 (ver «Periné masculino»).
+
+## Fichas de todos los músculos, latín y fuentes (2026-11-01)
+
+- **Fichas:** los 154 músculos que no tenían ficha propia la tienen ahora (`web/src/data/musculos-fichas-resto.js`): descripción, origen, inserción, acción, inervación y puntos clave.
+  - Las cabezas, vientres y porciones de un músculo tienen ficha propia: las del bíceps, el tríceps, el gastrocnemio, el bíceps femoral, el masetero, el orbicular del ojo, el deltoides, el trapecio, el pectoral mayor y las nueve partes del erector de la columna, que antes compartían texto o la ficha del grupo.
+  - Las fichas antiguas sin inervación ni origen (los dos modelos no la traen) la tienen ahora. La inervación y la acción de la ficha tienen prioridad sobre las del modelo, que en algunos músculos eran erróneas (el aductor del pulgar y el del dedo gordo venían con el nervio mediano y el ulnar).
+  - Cada dato está contrastado con dos fuentes: el artículo de Wikipedia en inglés del músculo y la página de su región en TeachMeAnatomy. Los nombres, con la Terminologia Anatomica 2 (FIPAT, 2019). Las fichas antiguas se revisaron contra las mismas fuentes, sin errores.
+- **Latín:** las 215 piezas (57 nombres) que no lo tenían lo tienen ahora (`LATIN_EXTRA` en `fuentes.js`; no hace falta reconstruir).
+  - 44 nombres son términos oficiales: TA2, TA98 (tablas de la IFAA) o la Terminologia Neuroanatomica (ten Donkelaar et al., 2018).
+  - 13 son subdivisiones del atlas cerebral de Destrieux u otras piezas sin término propio: su latín se forma con términos oficiales y la ficha lo dice.
+  - El esfínter externo de la uretra usa el término de TA2 de cada sexo (*Sphincter externus urethrae masculinae/femininae*).
+- **Fuentes en la ficha:** una sección «Fuentes», plegada al final, con enlaces (`.info-refs`).
+- **Comprobación:** `node scripts/check-cards.mjs` (desde `web/`): 5.756 piezas, ninguna sin latín ni músculo sin ficha, inervación o fuentes.
+- **Peso:** el código de la web pasa de 919 a 1.044 kB (280 kB comprimido) por los textos nuevos.
+
+## Copia de seguridad (2026-11-01)
+
+`zsh tools/backup.sh` guarda en `~/Copias de seguridad/Anato3D/AAAA-MM-DD_HHMM/` lo que no se puede regenerar:
+
+- el historial de git en un archivo (`anato3d.bundle`, unos 300 MB);
+- `sources/` (`sources.tar`), que no está en git;
+- una sola vez, Blender comprimido (`../blender/`), porque los modelos se calibraron con esa compilación (5.4.0 alfa).
+
+Cada copia lleva sus sumas de comprobación y un `RESTAURAR.md`. Probado: la copia se restauró en otra carpeta y el tejido conjuntivo reconstruido desde ella salió idéntico, byte a byte. La prueba encontró un fallo: `build_all.sh` no creaba `build/` en una copia recién clonada (corregido). La copia queda en el mismo disco, por decisión de Carlos: protege de borrados, no de que falle el disco.
 
 ## Revisión completa de errores (2026-10-31)
 
