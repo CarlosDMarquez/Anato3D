@@ -469,11 +469,12 @@ El usuario lo veía «todo deforme», frente a una imagen de referencia con los 
 
 - **Fichas:** los 154 músculos que no tenían ficha propia la tienen ahora (`web/src/data/musculos-fichas-resto.js`): descripción, origen, inserción, acción, inervación y puntos clave.
   - Las cabezas, vientres y porciones de un músculo tienen ficha propia: las del bíceps, el tríceps, el gastrocnemio, el bíceps femoral, el masetero, el orbicular del ojo, el deltoides, el trapecio, el pectoral mayor y las nueve partes del erector de la columna, que antes compartían texto o la ficha del grupo.
-  - Las fichas antiguas sin inervación ni origen (los dos modelos no la traen) la tienen ahora. La inervación y la acción de la ficha tienen prioridad sobre las del modelo, que en algunos músculos eran erróneas (el aductor del pulgar y el del dedo gordo venían con el nervio mediano y el ulnar).
+  - Las fichas antiguas que no mostraban inervación (22, porque el modelo no la trae) u origen e inserción (8) los tienen ahora. La inervación y la acción de la ficha tienen prioridad sobre las del modelo, que en algunos músculos eran erróneas (el aductor del pulgar y el del dedo gordo venían con el nervio mediano y el ulnar).
   - Cada dato está contrastado con dos fuentes: el artículo de Wikipedia en inglés del músculo y la página de su región en TeachMeAnatomy. Los nombres, con la Terminologia Anatomica 2 (FIPAT, 2019). Las fichas antiguas se revisaron contra las mismas fuentes, sin errores.
 - **Latín:** las 215 piezas (57 nombres) que no lo tenían lo tienen ahora (`LATIN_EXTRA` en `fuentes.js`; no hace falta reconstruir).
-  - 44 nombres son términos oficiales: TA2, TA98 (tablas de la IFAA) o la Terminologia Neuroanatomica (ten Donkelaar et al., 2018).
-  - 13 son subdivisiones del atlas cerebral de Destrieux u otras piezas sin término propio: su latín se forma con términos oficiales y la ficha lo dice.
+  - 45 nombres son términos oficiales: TA2 (16), TA98 (22, tablas de la IFAA) o la Terminologia Neuroanatomica (7, ten Donkelaar et al., 2018).
+  - 1 usa el nombre latino de Z-Anatomy (*Frenula capsulae*, los retináculos de Weitbrecht de la cadera, sin término en TA).
+  - 11 son subdivisiones del atlas cerebral de Destrieux u otras piezas sin término propio: su latín se forma con términos oficiales y la ficha lo dice.
   - El esfínter externo de la uretra usa el término de TA2 de cada sexo (*Sphincter externus urethrae masculinae/femininae*).
 - **Fuentes en la ficha:** una sección «Fuentes», plegada al final, con enlaces (`.info-refs`).
 - **Comprobación:** `node scripts/check-cards.mjs` (desde `web/`): 5.756 piezas, ninguna sin latín ni músculo sin ficha, inervación o fuentes.
