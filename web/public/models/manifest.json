@@ -1,0 +1,253 @@
+{
+ "release": "20261102T182411-d786740",
+ "generated": "2026-11-02T18:24:11+00:00",
+ "note": "Versión de los modelos de la web: un archivo solo es de esta versión si su SHA-256 coincide.",
+ "builds": {
+  "male": {
+   "date": "2026-11-02T18:24:11+00:00",
+   "systems": [
+    "vascular"
+   ],
+   "git": {
+    "commit": "d786740",
+    "uncommitted_changes": []
+   },
+   "tools": {
+    "blender": "Blender 5.4.0 Alpha (c31386f6fc84)",
+    "python": "3.14.2",
+    "node": "v26.12.1"
+   },
+   "sources": {
+    "sources/z-anatomy/Z-Anatomy.zip": {
+     "bytes": 86734957,
+     "sha256": "e029688545627bd0214b269e1063143abb580aad72b2c2445d6d8a9a0d9da736"
+    },
+    "sources/z-anatomy/translations.csv": {
+     "bytes": 981441,
+     "sha256": "a9216ae28e4abd2c7896e1a72caff7c9f361e7e9646ea9917b098cb5caf6aa24"
+    },
+    "sources/z-anatomy/TA2.csv": {
+     "bytes": 1510396,
+     "sha256": "0f9092a328b27dcd15d696d9f9a4087deb229a1aad21b75876657622de835974"
+    },
+    "sources/z-anatomy/definitions_en.json": {
+     "bytes": 12603027,
+     "sha256": "6ae4927d488b410e6d7e785eaa32e06678f8845a01cb996a1f5af630ca45b7e0"
+    },
+    "Anato3D_Male_30_Fase2.blend": {
+     "bytes": 68672320,
+     "sha256": "e78496ca6f340026d34c3da410b4b2cc834d975fd550b602439094ad95aedece"
+    },
+    "Anato3D_Male_30_Fase2_musculature.npz": {
+     "bytes": 1128121,
+     "sha256": "f50459187fac1ef0154d57193e482b1758cb80d6a3823e55cfa42790caa5e9ba"
+    }
+   },
+   "checks": "validate_models: 5 archivos correctos; check-cards: todo correcto",
+   "audit": {
+    "file": "build/audit.json",
+    "sha256": "fa11c6c0e5b360ff45aca8280b20104d2486f26d895d3dc009869e02fe539b10",
+    "modified": "2026-11-02T04:41:55+00:00",
+    "note": "Auditoría más reciente de build/; no se ejecuta en cada construcción, así que puede no corresponder a estos archivos."
+   }
+  }
+ },
+ "files": {
+  "female-arterial.glb": {
+   "bytes": 2776404,
+   "sha256": "f8f431440191860c472235cff2adc7af181b32c79ee49d62df07328047f24b27"
+  },
+  "female-arterial.json": {
+   "bytes": 1481,
+   "sha256": "edc0e504d68f34a55325a5d35fbad4963a8dc4d5fafb78a8196c4edd71bace50"
+  },
+  "female-connective.glb": {
+   "bytes": 2080500,
+   "sha256": "26501ddd32b010159fa379f01c751c65e2f361c3c062c02dd9593f86665117db"
+  },
+  "female-connective.json": {
+   "bytes": 11757,
+   "sha256": "d6954869a05c92a46db751a9a5b49863be0b9969a48848a19a89fc050db9b4df"
+  },
+  "female-digestive.glb": {
+   "bytes": 809968,
+   "sha256": "715f5a66073d0a7b409eb66ee1f9e895e59a3ea0172763ee6bbccd76fd8c25e5"
+  },
+  "female-digestive.json": {
+   "bytes": 485,
+   "sha256": "eecd59d4c8ee06fddb8a246fc40dca5ee3dd718e4aa39ec5a37593b91c2e70a0"
+  },
+  "female-endocrine.glb": {
+   "bytes": 48088,
+   "sha256": "6468a7d52af2c1bfc65eb776d02f81ae67e15f3f90e3974ba9481daadc8cad35"
+  },
+  "female-endocrine.json": {
+   "bytes": 93,
+   "sha256": "5e996ee9d1f158d2b25841746494d45d751a988fa73e35b922258df560c3d1c8"
+  },
+  "female-index.json": {
+   "bytes": 527700,
+   "sha256": "4dc30191e806be681f19df431c2aa049992c688f1ab89e9d14d98105fce6e705"
+  },
+  "female-integumentary.glb": {
+   "bytes": 184372,
+   "sha256": "67802c724b4f224399ff12b968288d244fde95d9321547125619ce54bbdf691f"
+  },
+  "female-integumentary.json": {
+   "bytes": 14,
+   "sha256": "d181e80bc5b8ca0ab05e7a561e6b29e9a739ca90f42cd59341294bada853440e"
+  },
+  "female-lymphatic.glb": {
+   "bytes": 826996,
+   "sha256": "941d2e549828c81728a5b5ed771d9aa3676acb83ed06b123dd5c605e72e11ec2"
+  },
+  "female-lymphatic.json": {
+   "bytes": 1075,
+   "sha256": "bcf82a8254e81b4fdab3709d9e83a4771f7ac885e9d82577786a5c8ec107c966"
+  },
+  "female-muscular.glb": {
+   "bytes": 3035084,
+   "sha256": "f458cc231a021d796c7ed11fd80663d644cc623a3c6ab69d8b9faf1065960ae3"
+  },
+  "female-muscular.json": {
+   "bytes": 5651,
+   "sha256": "e1f26e777954db211aed9c2c786745f5dbaf56afd57f87ddbab279af71633872"
+  },
+  "female-nervous.glb": {
+   "bytes": 3418344,
+   "sha256": "52b97e1ffcd30699bb79bd78f3f6f279858e0a8131fc17acc516d45968d22da3"
+  },
+  "female-nervous.json": {
+   "bytes": 17109,
+   "sha256": "45021e6f7c7bb69d02f87afe612b880ba675f0abe06fa51ae597b8793903d412"
+  },
+  "female-respiratory.glb": {
+   "bytes": 627940,
+   "sha256": "4db896dd34209001635745ee8cc7daae4d834ef720dcb48d86c633eb50520e5c"
+  },
+  "female-respiratory.json": {
+   "bytes": 481,
+   "sha256": "3f08a8d6f95792cbf9456335859f775064b4188aea2bcf7a1131678353ade72f"
+  },
+  "female-urogenital.glb": {
+   "bytes": 210360,
+   "sha256": "2626bb8dbd39228ce7e4fd275d804f9c02c0febdeac49a3f81aefe6b5868b4bd"
+  },
+  "female-urogenital.json": {
+   "bytes": 611,
+   "sha256": "6c4ec98bd278f32f3d3b507f8ce6fa74ebc7ec7ba850b01f8286d4d86b86f71a"
+  },
+  "female-venous.glb": {
+   "bytes": 1338720,
+   "sha256": "8c0e6b70869ef80bcc9f332a63cb8576765094356af049eb258f518743dfbd3d"
+  },
+  "female-venous.json": {
+   "bytes": 1378,
+   "sha256": "620c4f4f46de46d25adeaddbf0d11ec992c70524d05c0304d391c76f4ba63814"
+  },
+  "female.glb": {
+   "bytes": 11432452,
+   "sha256": "d51c2dd5fa9d3cc28ee7878e56dc1de14b4936b250bb45cf3c90528c642c3e95"
+  },
+  "male-arterial.glb": {
+   "bytes": 2797732,
+   "sha256": "ca0892be0adaedd852b430e7bc1476ea70b748a46d2340c78bf06ad3b99588d5"
+  },
+  "male-arterial.json": {
+   "bytes": 1481,
+   "sha256": "edc0e504d68f34a55325a5d35fbad4963a8dc4d5fafb78a8196c4edd71bace50"
+  },
+  "male-connective.glb": {
+   "bytes": 2076696,
+   "sha256": "1f57e75ae56fbea621b1779b977217e39c891a3775942b4cdab204b32df68e57"
+  },
+  "male-connective.json": {
+   "bytes": 11757,
+   "sha256": "d6954869a05c92a46db751a9a5b49863be0b9969a48848a19a89fc050db9b4df"
+  },
+  "male-digestive.glb": {
+   "bytes": 802928,
+   "sha256": "ad5b3569fa313e780abcbe4132b6a19032b16667392d1ed8916856191d05de26"
+  },
+  "male-digestive.json": {
+   "bytes": 485,
+   "sha256": "eecd59d4c8ee06fddb8a246fc40dca5ee3dd718e4aa39ec5a37593b91c2e70a0"
+  },
+  "male-endocrine.glb": {
+   "bytes": 47508,
+   "sha256": "b5653a611ecfd0b09324dc106b6fc51c7a4cdaffa3322b80fa65f7c5ebfc1ed8"
+  },
+  "male-endocrine.json": {
+   "bytes": 93,
+   "sha256": "5e996ee9d1f158d2b25841746494d45d751a988fa73e35b922258df560c3d1c8"
+  },
+  "male-genital-region.json": {
+   "bytes": 22509,
+   "sha256": "c255985a200bab12c042c55e628bf2e87e8404f0dc0e549dc9a3d2594d05c927"
+  },
+  "male-index.json": {
+   "bytes": 526147,
+   "sha256": "07aeefe375d151506b986e1d46d99c5b6d4657ac288aa611f2eec21ca6e153ef"
+  },
+  "male-integumentary.glb": {
+   "bytes": 173668,
+   "sha256": "c747f81468d423cadea9054a190f0c2de1aacdd4ec9bdf070d143c447cd95a56"
+  },
+  "male-integumentary.json": {
+   "bytes": 14,
+   "sha256": "d181e80bc5b8ca0ab05e7a561e6b29e9a739ca90f42cd59341294bada853440e"
+  },
+  "male-lymphatic.glb": {
+   "bytes": 821172,
+   "sha256": "fbc314c6ec0ff86741982b3b9a18b710cb87090a28eee7fa9eded32069ca278e"
+  },
+  "male-lymphatic.json": {
+   "bytes": 1075,
+   "sha256": "bcf82a8254e81b4fdab3709d9e83a4771f7ac885e9d82577786a5c8ec107c966"
+  },
+  "male-muscular.glb": {
+   "bytes": 3016280,
+   "sha256": "4c07ae7d45cd1615e12bd16b02b2a355d94ee757f000a87dcbb60799ccb94b90"
+  },
+  "male-muscular.json": {
+   "bytes": 5651,
+   "sha256": "e1f26e777954db211aed9c2c786745f5dbaf56afd57f87ddbab279af71633872"
+  },
+  "male-nervous.glb": {
+   "bytes": 3398744,
+   "sha256": "082198f42556be33664a6e25db0c3b7b8e1960ef83fa00493748befe3f33452f"
+  },
+  "male-nervous.json": {
+   "bytes": 17109,
+   "sha256": "45021e6f7c7bb69d02f87afe612b880ba675f0abe06fa51ae597b8793903d412"
+  },
+  "male-respiratory.glb": {
+   "bytes": 624408,
+   "sha256": "6a93e03e85ee184f6e6d5dbd4d6e3e27ef13dbb635e3cfa15a354ab2eb98de1b"
+  },
+  "male-respiratory.json": {
+   "bytes": 481,
+   "sha256": "3f08a8d6f95792cbf9456335859f775064b4188aea2bcf7a1131678353ade72f"
+  },
+  "male-urogenital.glb": {
+   "bytes": 158504,
+   "sha256": "2545b858f3241d17932b4c413b5e44ec05c1b1da2204796e60cfac1dfd104c24"
+  },
+  "male-urogenital.json": {
+   "bytes": 608,
+   "sha256": "88fd4c0a654050aded8b7059fec9c128a02cd9836565d99cfec018d3c705b689"
+  },
+  "male-venous.glb": {
+   "bytes": 1353616,
+   "sha256": "ebf587a09b028a8cf75c3508b16d0a4f282e9cea135b474fce91031f23cc6401"
+  },
+  "male-venous.json": {
+   "bytes": 1378,
+   "sha256": "620c4f4f46de46d25adeaddbf0d11ec992c70524d05c0304d391c76f4ba63814"
+  },
+  "male.glb": {
+   "bytes": 11405932,
+   "sha256": "db4ce1950c5570f1bf7f078eaf67e5375f31814dad0649b56cee70c70f0ab8cc"
+  }
+ }
+}
