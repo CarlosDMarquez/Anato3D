@@ -1,5 +1,5 @@
 // Revisa las fichas de todas las piezas de los modelos de la web, como las construye la app (resolvePart).
-// Uso (desde web/): node scripts/check-cards.mjs
+// Uso (desde web/): node scripts/check-cards.mjs [--models <carpeta>]
 // Cuenta, por modelo: piezas sin nombre en español o con guiones bajos, sin latín, músculos sin ficha propia (descripción),
 // sin inervación o sin fuentes, y textos raros («undefined», dobles espacios…). Termina con código 1 si algo falla.
 import fs from 'fs';
@@ -8,7 +8,9 @@ import { fileURLToPath } from 'url';
 import { resolvePart } from '../src/data/resolve.js';
 import { classify } from '../src/systems.js';
 
-const MODELS = path.join(path.dirname(fileURLToPath(import.meta.url)), '../public/models');
+// --models <carpeta>: revisa otra carpeta (build_all.sh revisa así el candidato antes de publicarlo).
+const flag = process.argv.indexOf('--models');
+const MODELS = flag > 0 ? path.resolve(process.argv[flag + 1]) : path.join(path.dirname(fileURLToPath(import.meta.url)), '../public/models');
 
 // Nodos (nombre y datos) de un .glb: el JSON va en el primer bloque, tras la cabecera de 12 bytes.
 function nodes(file) {

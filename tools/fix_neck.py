@@ -38,6 +38,7 @@ from skin_tone import male_layers, female_layers, apply_layers
 import numpy as np
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+WEB = os.environ.get('A3D_WEB_MODELS') or os.path.join(ROOT, 'web/public/models')   # build_all.sh base: preparación
 ZA = os.path.join(ROOT, 'sources/z-anatomy/extracted/Z-Anatomy/Startup.blend')
 MALE = 'Anato3D_Male_30_Fase2'
 FEMALE = 'Anato3D_Female_30_Fase1'
@@ -462,7 +463,7 @@ bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT, f'{MALE}.blend'))
 #    usan para saber qué queda dentro del cuerpo.
 import skin_regions
 skin_regions.split(skin, skin_regions.label(skin, {o.name: o for o in bpy.data.objects}))
-export([os.path.join(ROOT, f'{MALE}_draco.glb'), os.path.join(ROOT, 'web/public/models/male.glb')], 'Anato3D_Male_30')
+export([os.path.join(ROOT, f'{MALE}_draco.glb'), os.path.join(WEB, 'male.glb')], 'Anato3D_Male_30')
 
 # ── Modelo femenino (Fase 2): misma malla base, misma corrección a escala, y el esqueleto masculino transformado ──
 FEMALE_OUT = 'Anato3D_Female_30_Fase2'
@@ -567,4 +568,4 @@ def split_vulva(skin, mask):
     return part
 split_vulva(fskin, vmask)
 skin_regions.split(fskin, skin_regions.label(fskin, {o.name: o for o in bpy.data.objects}, female=True))
-export([os.path.join(ROOT, f'{FEMALE_OUT}_draco.glb'), os.path.join(ROOT, 'web/public/models/female.glb')], 'Anato3D_Female_30')
+export([os.path.join(ROOT, f'{FEMALE_OUT}_draco.glb'), os.path.join(WEB, 'female.glb')], 'Anato3D_Female_30')

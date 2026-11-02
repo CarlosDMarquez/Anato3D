@@ -14,12 +14,14 @@ Abre http://localhost:5173 (o el puerto que indique Vite). Para producción: `np
 
 Pruebas: `npm --prefix web test` (lógica de carga, sin navegador) y `npm --prefix web run check` (fichas de todas las piezas).
 
+Modelos: `zsh tools/build_all.sh` (masculino) y `A3D_MODEL=female zsh tools/build_all.sh`. Solo publica en `web/public/models` lo que pasa las comprobaciones. Herramientas, fuentes que no están en git y sus sumas, y pasos desde una copia nueva: `docs/construccion.md`. Pruebas de fallos: `zsh tools/tests/test_build.sh`. Los comandos de Blender sueltos de las secciones de cada fase son históricos: escriben directamente en `web/public/models` si no se define `A3D_WEB_MODELS`.
+
 ## Estructura
 
 | Ruta | Qué es |
 |---|---|
 | `*.blend`, `*.glb` (raíz) | Modelos fuente. Fase 1 = piel + ojos; Fase 2 = piel + esqueleto completo (`Anato3D_Male_30_Fase2`, `Anato3D_Female_30_Fase2`). |
-| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app), `audit_models.py` (busca errores medibles en los modelos), `vessel_regions.py` (región del cuerpo de cada vaso), `skin_regions.py` (divide la piel en zonas al exportar) y `backup.sh` (copia de seguridad en este Mac). |
+| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app), `audit_models.py` (busca errores medibles en los modelos), `vessel_regions.py` (región del cuerpo de cada vaso), `skin_regions.py` (divide la piel en zonas al exportar), `backup.sh` (copia de seguridad en este Mac), `build_lib.sh` (funciones de `build_all.sh`: Blender con código de salida, preparación, validación y publicación), `validate_models.py` (valida los archivos nuevos antes de publicarlos), `manifest.py` (manifiesto de versiones y sumas) y `tests/` (pruebas de fallos de la construcción, con un Blender falso). |
 | `Anato3D_Male_30_Fase2_musculature.npz` | Campo de desplazamiento de la complexión musculosa (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas). |
 | `Anato3D_Female_30_Fase2_pelvis.npz` | Campo de desplazamiento de la pelvis femenina y los huesos de la pelvis antes de deformarla (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas femeninos). |
 | `sources/originals/` | Copia de los modelos tal como estaban antes de corregir el cuello. |
@@ -52,6 +54,35 @@ Pruebas: `npm --prefix web test` (lógica de carga, sin navegador) y `npm --pref
 - **Región genital obligatoria** para el modelo masculino: si no se puede descargar, falla la carga del modelo (y se puede reintentar). Sin ella, con «Mostrar genitales externos» desactivado se verían los testículos.
 
 **Comprobado:** 11 pruebas automáticas (`npm --prefix web test`) y, en el navegador, metadatos lentos, GLB lento, cambios rápidos con y sin caché, peticiones repetidas (una sola descarga), red caída y recuperación con Reintentar, 404, archivo base que falta en la primera carga y recuperación, fallo al cambiar de modelo e índice de búsqueda lento o caído. Detalle en `docs/hitos/01-carga-fiable.md`.
+
+## Construcción que falla de verdad (2026-11-02)
+
+**Qué fallaba (leído en el código y comprobado):**
+- `build_all.sh` tenía `set -e`, pero pasaba la salida de Blender por `grep` sin `pipefail`.
+- Además, Blender termina con 0 aunque su script lance una excepción. Comprobado: sin `--python-exit-code`, un `raise RuntimeError` da 0.
+- `export_glb` filtraba con `grep -E "exportado|Error|Traceback"`, que acaba con éxito precisamente cuando encuentra un error.
+- Los scripts escribían directamente en `web/public/models`.
+
+**Ahora** (`tools/build_all.sh`, `tools/build_lib.sh`):
+- Blender se ejecuta con `--python-exit-code 1` y `set -euo pipefail`.
+- Cada paso tiene que dejar sus archivos, escritos en esa ejecución.
+- **Preparación:** los scripts escriben en `build/staging/…` (`A3D_WEB_MODELS`, que leen `anato3d_fit`, `build_genital_skin`, `build_female_skin`, `fix_neck` y `search_index`).
+- **Comprobaciones antes de publicar:**
+  - se arma un candidato (lo publicado más lo nuevo);
+  - se validan los archivos nuevos (`tools/validate_models.py`): cabecera y bloques del GLB, vistas de búfer, piezas con sistema, y que no desaparezca más del 5 % de las piezas;
+  - se regenera y valida el índice de búsqueda;
+  - se revisan las fichas de los dos modelos (`check-cards --models`);
+  - se escribe el manifiesto (`web/public/models/manifest.json`: versión, sumas de cada archivo, herramientas y fuentes).
+- **Solo entonces** se publican los archivos que cambian (temporales y luego renombrado). Los anteriores quedan en `build/staging/…/previous`.
+- **Nuevo objetivo `base`** (`fix_neck.py`): pasa por la misma preparación.
+
+**Comprobado** (`zsh tools/tests/test_build.sh --real`), 22 de 22 pruebas correctas, con un Blender falso que simula fallos y publicando en una copia:
+- excepción de Blender, paso que «termina bien» sin escribir nada y GLB roto: `build_all` falla y no publica nada;
+- `validate_models` rechaza HTML en lugar de GLB, GLB cortado, pérdida del 10 % de las piezas, JSON roto y metadatos sin `groups`;
+- **construcción real** del sistema vascular masculino: termina bien y los GLB salen **idénticos byte a byte** a los publicados;
+- `web/public/models` no cambió durante las pruebas.
+
+Detalle en `docs/hitos/01b-construccion-fiable.md`.
 
 ## Contrato de datos para nuevas fases
 

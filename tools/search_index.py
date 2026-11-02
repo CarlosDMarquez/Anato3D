@@ -11,7 +11,8 @@ Uso (desde la raíz del proyecto; lo llama tools/build_all.sh al final):
 import glob, json, os, struct, sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-MODELS = os.path.join(ROOT, 'web/public/models')
+# build_all.sh lo genera sobre el candidato (lo publicado más lo nuevo) antes de validarlo y publicarlo.
+MODELS = os.environ.get('A3D_WEB_MODELS') or os.path.join(ROOT, 'web/public/models')
 KEEP = ('system', 'subsystem', 'tissue', 'name_es', 'name_en', 'name_la')
 
 

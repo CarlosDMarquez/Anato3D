@@ -30,6 +30,7 @@ import numpy as np
 from mathutils import Vector, Matrix, bvhtree, kdtree
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+WEB = os.environ.get('A3D_WEB_MODELS') or os.path.join(ROOT, 'web/public/models')   # build_all.sh: preparación
 VOX = 0.0008              # m, rejilla de la función de distancia
 SKIN = 0.002              # grosor de la piel del pene sobre lo más externo (vena dorsal superficial)
 COVER = 0.0045            # piel sobre los vasos y el cordón que quedan fuera de la piel del cuerpo
@@ -520,7 +521,7 @@ for o in bpy.data.objects:
             i, j, k = q.astype(int); bits[i + rdims[0] * (j + rdims[1] * k)] = True
 json.dump({'voxel': RVOX, 'origin': [round(float(v), 5) for v in rlo], 'dims': rdims.tolist(),
            'bits': base64.b64encode(np.packbits(bits, bitorder='little').tobytes()).decode()},
-          open(os.path.join(ROOT, 'web/public/models/male-genital-region.json'), 'w'))
+          open(os.path.join(WEB, 'male-genital-region.json'), 'w'))
 log(f'región externa: {rdims.tolist()} celdas de {RVOX * 1000:.0f} mm, {bits.mean() * 100:.0f} % fuera del cuerpo')
 def external(p):
     q = (np.array([p.x, p.z, -p.y]) - rlo) / RVOX
@@ -599,5 +600,5 @@ for k, v in {'anato3d_id': 'integument_skin_genitals', 'system': 'integumentary'
 col = bpy.data.collections.new('Genital_Skin'); col.objects.link(obj)   # «Integumentary_System» ya existe en la Fase 2
 out = os.path.join(ROOT, 'build', 'male_integumentary.blend')
 bpy.data.libraries.write(out, {col}, fake_user=True)
-json.dump({'groups': {}}, open(os.path.join(ROOT, 'web/public/models/male-integumentary.json'), 'w'))
+json.dump({'groups': {}}, open(os.path.join(WEB, 'male-integumentary.json'), 'w'))
 log('guardado', out)

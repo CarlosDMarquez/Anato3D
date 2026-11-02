@@ -23,7 +23,9 @@ MUSCULATURE = os.path.join(ROOT, 'Anato3D_Male_30_Fase2_musculature.npz') if MOD
 PELVIS = os.path.join(ROOT, 'Anato3D_Female_30_Fase2_pelvis.npz') if MODEL == 'female' else ''          # fix_neck.py
 TRANSLATIONS = os.path.join(ROOT, 'sources/z-anatomy/translations.csv')
 OUT_DIR = os.path.join(ROOT, 'build')
-WEB_MODELS = os.path.join(ROOT, 'web/public/models')
+# Archivos para la web: build_all.sh los escribe en una carpeta de preparación (A3D_WEB_MODELS) y solo los publica en
+# web/public/models si pasan las comprobaciones.
+WEB_MODELS = os.environ.get('A3D_WEB_MODELS') or os.path.join(ROOT, 'web/public/models')
 
 SKIN_OFFSET = 0.0015      # profundidad mínima bajo la piel tras la corrección
 IDW_POWER = 4

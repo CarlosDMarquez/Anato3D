@@ -33,6 +33,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from female_perineum import frame, vulva_controls, vulva_line, line_coords, vulva_region
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+WEB = os.environ.get('A3D_WEB_MODELS') or os.path.join(ROOT, 'web/public/models')   # build_all.sh: preparación
 FACES = 60000
 _t0 = time.time()
 def log(*a): print(f'[vulva] {time.time() - _t0:5.1f}s', *a, flush=True)
@@ -271,5 +272,5 @@ for k, v in {'anato3d_id': 'integument_skin_genitals', 'system': 'integumentary'
 colc = bpy.data.collections.new('Genital_Skin'); colc.objects.link(obj)
 out = os.path.join(ROOT, 'build', 'female_integumentary.blend')
 bpy.data.libraries.write(out, {colc}, fake_user=True)
-json.dump({'groups': {}}, open(os.path.join(ROOT, 'web/public/models/female-integumentary.json'), 'w'))
+json.dump({'groups': {}}, open(os.path.join(WEB, 'female-integumentary.json'), 'w'))
 log('guardado', out)
