@@ -11,6 +11,9 @@ escroto), como una función de distancia con signo muestreada en una rejilla de 
     tabique y un cuello que entra en el periné, unidos con unión suave; un elipsoide por lado envuelve el cordón y los
     vasos pudendos externos donde quedan fuera de la piel del cuerpo; el izquierdo cuelga más; arrugas (rugae)
     irregulares y rafe en la línea media; donde roza los muslos se aplana contra ellos en vez de cruzarlos;
+  - pene y escroto, una sola pieza: en la base del pene el escroto sube hasta su cara ventral y se une a ella (unión
+    penoescrotal); más abajo el pene cuelga libre por delante y el escroto cede donde se apoya, con una holgura de GAP
+    (sin ella se fundían a lo largo del tronco);
   - unión con la piel del cuerpo: donde nacen el pene y el escroto, unión suave con la piel de MakeHuman (sin escalón);
     lo que es solo piel del cuerpo se quita, y la franja que la toca se hunde 1,2 mm bajo ella (sin borde ni rendija).
 Color por vértice («Tono», multiplicador del color de la piel): más pigmentado que el tronco, más oscuro en el escroto,
@@ -31,6 +34,8 @@ VOX = 0.0008              # m, rejilla de la función de distancia
 SKIN = 0.002              # grosor de la piel del pene sobre lo más externo (vena dorsal superficial)
 COVER = 0.0045            # piel sobre los vasos y el cordón que quedan fuera de la piel del cuerpo
 WALL = 0.0055             # pared del escroto (piel, dartos, fascias, túnica vaginal) sobre testículo y epidídimo
+GAP = 0.0015              # holgura entre el pene y el escroto donde el pene se apoya en él
+J_LEN = 0.012             # tramo de la cara ventral del pene, desde la salida de la piel, unido al escroto
 FACES = 40000
 PENIS = ('Corpus_cavernosum_of_penis', 'Corpus_spongiosum_of_penis', 'Glans_penis')
 PENIS_TUBE = ('Corpus_cavernosum_of_penis', 'Corpus_spongiosum_of_penis', 'Dorsal_artery_of_penis_L',
@@ -294,6 +299,21 @@ def scrotum_full(P):
     for c, E, r in cover_ell: d = smin(d, ellipsoid_sd(P, c, E, r), 0.012)
     return d
 
+def genitals(P):
+    """Pene (distancia y posición s en su eje) y escroto como una sola pieza: en los primeros J_LEN del pene, el escroto
+    se une a su cara ventral con una unión suave ancha (unión penoescrotal; antes quedaba entre los dos piel del cuerpo y
+    el pene parecía salir solo del bajo vientre); más abajo, el escroto cede donde se apoya el pene (máximo suave con
+    GAP − distancia al pene) y el pene cuelga libre delante."""
+    sp, s_ax = penis_sd(P)
+    ss = scrotum_full(P)
+    wj = 1 - sm((s_ax - s_exit - J_LEN) / 0.014)
+    # Solo por la cara ventral (y algo por los lados): unida también por los lados, la base quedaba como un bloque de
+    # techo plano, más ancho que el pene.
+    hv = ((P - pc) @ EH - np.interp(s_ax, S_GRID, prof[:, 1])) / (np.interp(s_ax, S_GRID, prof[:, 3]) + SKIN)
+    joined = smin(ss, sp, 0.016 * (1 - sm((hv + 0.2) / 0.6)))
+    carved = -smin(-ss, sp - GAP, 0.004)
+    return sp, s_ax, wj * joined + (1 - wj) * carved
+
 # ── Campo completo en la rejilla ───────────────────────────────────────────
 def bounds():
     ext = [GL, pts['Corpus_cavernosum_of_penis'][((pts['Corpus_cavernosum_of_penis'] - pc) @ U) > s_exit - 0.02]]
@@ -308,8 +328,7 @@ G = np.stack(np.meshgrid(gx, gy, gz, indexing='ij'), -1).reshape(-1, 3)
 log(f'rejilla {dims.tolist()} ({len(G) / 1e6:.1f} M puntos)')
 def field(P, verbose=False):
     """La función completa: pene y escroto, con su unión con la piel del cuerpo."""
-    sp, s_ax = penis_sd(P)
-    ss = scrotum_full(P)
+    sp, s_ax, ss = genitals(P)
     gen = np.minimum(sp, ss)
     # Distancia a la piel del cuerpo, solo en la banda donde importa (cerca de los genitales).
     band = gen < 0.014
@@ -394,7 +413,7 @@ bdv = body_sd(P)
 # Lo que es solo piel del cuerpo (pegado a ella y a más de 4 mm de los órganos) o queda hondo dentro de él, fuera.
 # El borde del recorte queda así bajo la piel del cuerpo; además, la franja que la toca se hunde 1,2 mm (ver abajo):
 # cortar a ras dejaba un borde dentado asomando.
-sp_v, _ = penis_sd(P); genv = np.minimum(sp_v, scrotum_full(P))
+sp_v, _, ss_v = genitals(P); genv = np.minimum(sp_v, ss_v)
 drop = ((bdv < 0.0003) & (genv > 0.004)) | (bdv < -0.004)
 bmesh.ops.delete(bm, geom=[f for f in bm.faces if all(drop[v.index] for v in f.verts)], context='FACES')
 bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context='VERTS')
@@ -416,7 +435,7 @@ bmesh.ops.triangulate(bm, faces=bm.faces[:])
 # Normales hacia fuera: la función de distancia crece en esa dirección.
 bm.faces.ensure_lookup_table()
 FC = np.array([f.calc_center_median()[:] for f in bm.faces]); FN = np.array([f.normal[:] for f in bm.faces])
-probe = lambda X: np.minimum(penis_sd(X)[0], scrotum_full(X))
+probe = lambda X: np.minimum(*genitals(X)[::2])
 if np.mean(probe(FC + FN * 0.0005) > probe(FC - FN * 0.0005)) < 0.5:
     bmesh.ops.reverse_faces(bm, faces=bm.faces[:])
 bm.to_mesh(me); bm.free()

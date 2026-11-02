@@ -374,8 +374,10 @@ class GenitalPose:
     para un adulto) y quedaban altos, a la altura del glande y a sus lados. Aquí:
       - pene: la parte péndula se alarga (sin el glande) hasta ~8,5 cm visibles, como un pene flácido adulto, y engrosa
         un 12 %; con él, la uretra, los cuerpos cavernosos y esponjoso, y las arterias y venas del pene;
-      - testículos: tamaño adulto (4,5 × 2,7 × 2,5 cm, unos 16 ml), más bajos (el izquierdo ~8 mm más que el derecho),
-        algo delante para no chocar con los muslos, con el polo superior inclinado hacia delante y afuera. El epidídimo
+      - testículos: tamaño adulto (4,5 × 2,7 × 2,5 cm, unos 16 ml), justo detrás y debajo de la base del pene (el
+        escroto nace de ella y se ve de perfil; antes quedaban 1,2 cm más atrás y más abajo, ocultos entre los muslos, y
+        el pene parecía salir solo del bajo vientre), a 9 mm del pene sin tocarlo, el izquierdo ~8 mm más bajo que el
+        derecho, con el polo superior inclinado hacia delante y afuera. El epidídimo
         les sigue entero; el cordón espermático (conducto deferente, vasos testiculares, rama genital del
         genitofemoral) y las ramas escrotales de los vasos pudendos externos, cada vez menos hasta el anillo inguinal
         superficial, que no se mueve.
@@ -392,7 +394,7 @@ class GenitalPose:
     VISIBLE = 0.085                     # m de pene fuera de la piel, de la salida del eje a la punta del glande
     GIRTH = 1.12
     TESTIS_SCALE = (1.2, 1.22, 1.2)     # eje largo, y los otros dos
-    TESTIS_SHIFT = {'L': (0.0, -0.002, -0.016), 'R': (0.0, -0.002, -0.008)}   # m; el izquierdo, más bajo
+    TESTIS_SHIFT = {'L': (0.0, -0.014, -0.004), 'R': (0.0, -0.014, 0.004)}    # m; el izquierdo, más bajo
     TESTIS_CENTER_X = 0.020             # m desde la línea media
 
     def __init__(self, fitter):
@@ -444,7 +446,7 @@ class GenitalPose:
         self.cs = bvh('Corpus spongiosum of penis') if 'Corpus spongiosum of penis' in bpy.data.objects else None
         self.prostate = bvh('Prostate') if 'Prostate' in bpy.data.objects else None
         log(f'genitales: pene {(s_tip - s_exit) * 100:.1f} → {visible(F) * 100:.1f} cm fuera de la piel (λ = {lam:.2f}); '
-            f'testículos ×{self.TESTIS_SCALE}, bajan ' + ', '.join(f'{s} {-self.TESTIS_SHIFT[s][2] * 100:.1f} cm' for s in 'LR'))
+            f'testículos ×{self.TESTIS_SCALE}, se mueven ' + ', '.join(f'{s} {np.round(np.array(self.TESTIS_SHIFT[s]) * 100, 1)} cm' for s in 'LR'))
 
     def penis_map(self, V):
         p = self.penis; c, u = p['c'], p['u']

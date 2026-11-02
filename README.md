@@ -265,7 +265,9 @@ Los tres salen de `build_visceral.py` (`classify_new`) con el mismo ajuste:
 
 **Genitales (`anato3d_fit.GenitalPose`, en el ajuste de todos los sistemas):**
 - **Pene:** la parte péndula se alarga sin el glande hasta unos 8,5 cm fuera de la piel, en el rango de un pene flácido adulto, y engrosa un 12 %. Lo siguen la uretra, los cuerpos cavernosos y el esponjoso, y las arterias y venas del pene.
-- **Testículos:** tamaño adulto (4,5 × 2,7 × 2,5 cm, unos 16 ml). Bajan 8 mm el derecho y 16 mm el izquierdo, que cuelga más bajo. El polo superior queda inclinado hacia delante y afuera.
+- **Testículos:** tamaño adulto (4,5 × 2,7 × 2,5 cm, unos 16 ml), justo detrás y debajo de la base del pene: 1,4 cm por delante de donde los deja Z-Anatomy, el derecho 4 mm más alto y el izquierdo 4 mm más bajo, que cuelga más. El polo superior queda inclinado hacia delante y afuera.
+  - Quedan a 9 mm del pene, sin tocarlo.
+  - Antes (hasta el 2026-11-01) bajaban 8 y 16 mm sin adelantarse: el escroto quedaba entre los muslos, sin verse de perfil, y el pene parecía salir solo del bajo vientre.
   - El epidídimo los sigue entero.
   - El cordón espermático y las ramas escrotales de los vasos pudendos externos se mueven cada vez menos hasta el anillo inguinal superficial.
 - **Qué piezas se mueven:** solo las que coinciden por nombre de Z-Anatomy. Los aductores y los vasos femorales, a pocos centímetros, no se tocan.
@@ -279,6 +281,7 @@ Los tres salen de `build_visceral.py` (`classify_new`) con el mismo ajuste:
 - **Escroto:** un solo saco formado por dos lóbulos orientados con cada testículo, un tabique, un cuello que entra en el periné y los cordones.
   - Arrugas transversales irregulares y rafe en la línea media.
   - Donde roza los muslos se aplana contra ellos (1,5 mm de holgura) en vez de atravesarlos.
+- **Pene y escroto, una sola pieza:** en los primeros 1,2 cm del pene, el escroto se une a su cara ventral (unión penoescrotal), solo por esa cara: unido también por los lados, la base quedaba como un bloque de techo plano. Más abajo, el pene cuelga libre por delante y el escroto cede donde se apoya, con 1,5 mm de holgura; sin ella se fundían a lo largo del tronco.
 - **Unión con el cuerpo:** unión suave con la piel de MakeHuman donde nacen el pene y el escroto. La franja que la toca se hunde 1,2 mm, así que no queda borde, rendija ni parpadeo.
 - **Tono:** más pigmentado que el tronco y más oscuro en el escroto, en los surcos y en el rafe. Junto a la unión, el mismo tono de la piel del cuerpo.
 
