@@ -64,7 +64,7 @@ npm --prefix web run build                           # web de producción en web
    - Se arma un candidato: lo publicado más lo nuevo.
    - Se validan los archivos nuevos (`tools/validate_models.py`).
    - Se regenera y valida el índice de búsqueda.
-   - Se revisan las fichas de los dos modelos (`check-cards --models`).
+   - Se revisan las fichas del modelo construido (`check-cards --models … --model …`; con `base`, las de los dos), incluidas las erratas conocidas del pipeline.
    - Se escribe el manifiesto.
 3. **Publica solo lo que cambia.** Primero copia todo a temporales en la misma carpeta y después los renombra. Lo que había queda en `build/staging/…/previous`.
 4. **Deja constancia.** El registro completo de cada paso queda en `build/logs/<modelo>_<paso>.log` y el resumen filtrado, en `build/build_<paso>.log`.
@@ -96,4 +96,7 @@ Aún no lo lee la app. Para publicar habrá que comprobar que el manifiesto coin
   - comprueba estructura, piezas y cambios frente a lo publicado, no la anatomía.
 - **Auditoría geométrica:** `tools/audit_models.py` no forma parte de la construcción, y sus resultados no llevan el hash de los modelos que miden.
 - **Plataforma y CI:** solo probado en este Mac y no hay integración continua.
-- **Reproducibilidad:** el sistema vascular masculino se reconstruyó el 2026-11-02 y salió **idéntico byte a byte** al publicado. No se ha comprobado con todos los sistemas ni en otro equipo.
+- **Reproducibilidad (2026-11-02):**
+  - el sistema vascular masculino se reconstruyó y salió **idéntico byte a byte** al publicado;
+  - al republicar vascular y nervioso de los dos modelos para corregir tres nombres, solo cambiaron esos nombres, **salvo la cámara anterior del ojo** del nervioso masculino: 1.751 → 1.753 y 1.754 vértices. Ese paso no es del todo determinista en esas dos mallas; el femenino salió idéntico;
+  - no se ha comprobado con todos los sistemas ni en otro equipo.

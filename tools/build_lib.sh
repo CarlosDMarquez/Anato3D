@@ -65,7 +65,11 @@ publish() {
   A3D_WEB_MODELS=$PWD/$cand python3 tools/search_index.py $M
   python3 tools/validate_models.py $cand $pub ${M}-index.json || { print -u2 "✗ índice de búsqueda: no se publica nada"; return 1; }
   changed+=(${M}-index.json)
-  cards=$(node web/scripts/check-cards.mjs --models $cand 2>&1) || { print -u2 "$cards"; print -u2 "✗ check-cards: no se publica nada"; return 1; }
+  # check-cards del modelo construido (con «base» cambian los dos): el otro no cambia y sus problemas no deben
+  # bloquear esta publicación.
+  local -a scope=(--model $M)
+  [[ " $ALL " == *" base "* ]] && scope=()
+  cards=$(node web/scripts/check-cards.mjs --models $cand $scope 2>&1) || { print -u2 "$cards"; print -u2 "✗ check-cards: no se publica nada"; return 1; }
   print -- "$cards" | tail -n 3
   python3 tools/manifest.py $cand --model $M --systems "$ALL" --blender "$(blender_version)" \
     --checks "validate_models: ${#changed} archivos correctos; check-cards: ${${(f)cards}[-1]}"

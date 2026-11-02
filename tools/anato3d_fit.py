@@ -55,9 +55,10 @@ ES_FIXES = [(r'^Musculo\b', 'Músculo'), (r'\bulmonar', 'pulmonar'), (r'\bcorazo
             (r'^Gingiva$', 'Encía'), (r'accessori', 'accesori'), (r'pancreáticoduodenal', 'pancreaticoduodenal'),
             (r'\bsegm\. ', 'segmentario '), (r'\bsup\. ', 'superior '), (r'-pulmón\b', ' del pulmón'), (r'-arteria\b', ' de la arteria'),
             (r'^Septum pellucidum$', 'Septo pelúcido'), (r'\bdel la\b', 'de la'),
-            # Tildes que faltan (o sobran) en la traducción (revisión del 2026-10-31).
+            # Tildes que faltan (o sobran) en la traducción (revisión del 2026-10-31). «musculo» solo como palabra:
+            # sin el final de palabra, la regla escribía «músculocutáneo» y «músculofrénica» (corregido el 2026-11-02).
             (r'\bangulo\b', 'ángulo'), (r'\barticulacion\b', 'articulación'), (r'\b([Cc])apsula', r'\1ápsula'),
-            (r'\bfibula\b', 'fíbula'), (r'\bhumero\b', 'húmero'), (r'\b([Mm])usculo', r'\1úsculo'), (r'\boftalmic', 'oftálmic'),
+            (r'\bfibula\b', 'fíbula'), (r'\bhumero\b', 'húmero'), (r'\b([Mm])usculo(s?)\b', r'\1úsculo\2'), (r'\boftalmic', 'oftálmic'),
             (r'faring(e[oa]s?)\b', r'faríng\1'), (r'^Linea\b', 'Línea'), (r'\b([Ll])ingula\b', r'\1íngula'), (r'^Fornix\b', 'Fórnix'),
             (r'multifido', 'multífido'), (r'interfalangeas', 'interfalángicas'), (r'metatarsofalangeas', 'metatarsofalángicas'),
             (r'calcáneocuboideo', 'calcaneocuboideo'), (r'masétero', 'masetero'), (r'intertransvarios', 'intertransversarios')]

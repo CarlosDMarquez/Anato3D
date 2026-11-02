@@ -71,7 +71,7 @@ Modelos: `zsh tools/build_all.sh` (masculino) y `A3D_MODEL=female zsh tools/buil
   - se arma un candidato (lo publicado más lo nuevo);
   - se validan los archivos nuevos (`tools/validate_models.py`): cabecera y bloques del GLB, vistas de búfer, piezas con sistema, y que no desaparezca más del 5 % de las piezas;
   - se regenera y valida el índice de búsqueda;
-  - se revisan las fichas de los dos modelos (`check-cards --models`);
+  - se revisan las fichas del modelo construido (`check-cards --models … --model …`; con `base`, las de los dos), incluidas las erratas conocidas;
   - se escribe el manifiesto (`web/public/models/manifest.json`: versión, sumas de cada archivo, herramientas y fuentes).
 - **Solo entonces** se publican los archivos que cambian (temporales y luego renombrado). Los anteriores quedan en `build/staging/…/previous`.
 - **Nuevo objetivo `base`** (`fix_neck.py`): pasa por la misma preparación.
@@ -83,6 +83,11 @@ Modelos: `zsh tools/build_all.sh` (masculino) y `A3D_MODEL=female zsh tools/buil
 - `web/public/models` no cambió durante las pruebas.
 
 Detalle en `docs/hitos/01b-construccion-fiable.md`.
+
+**Primera publicación real con el sistema nuevo (2026-11-02): errata de terminología.**
+- **Errata:** «Nervio músculocutáneo», «Arteria músculofrénica» y «Venas músculofrénicas», en los dos modelos. Las escribía la regla `\b([Mm])usculo` de `ES_FIXES` (sin final de palabra).
+- **Arreglo:** regla corregida; `check-cards` la detecta (`errata`) y revisa solo el modelo construido.
+- **Publicación:** `build_all.sh vascular nervous` en los dos modelos, unos 3 min cada uno. Solo cambiaron esos nombres, salvo 2–3 vértices de la cámara anterior del ojo en el nervioso masculino (ver `docs/construccion.md`).
 
 ## Contrato de datos para nuevas fases
 

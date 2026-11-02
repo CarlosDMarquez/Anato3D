@@ -1,5 +1,5 @@
 // Revisa las fichas de todas las piezas de los modelos de la web, como las construye la app (resolvePart).
-// Uso (desde web/): node scripts/check-cards.mjs [--models <carpeta>]
+// Uso (desde web/): node scripts/check-cards.mjs [--models <carpeta>] [--model male|female]
 // Cuenta, por modelo: piezas sin nombre en español o con guiones bajos, sin latín, músculos sin ficha propia (descripción),
 // sin inervación o sin fuentes, y textos raros («undefined», dobles espacios…). Termina con código 1 si algo falla.
 import fs from 'fs';
@@ -20,11 +20,16 @@ function nodes(file) {
 }
 
 const RARO = /\s{2,}|\bdel el\b|\bde el\b|\ba el\b| ,|\(\s|\s\)|undefined|null|NaN/;
+// Erratas conocidas del pipeline: tilde en el primer elemento de un compuesto («músculocutáneo», «músculofrénica»; en
+// español van sin ella: musculocutáneo, musculofrénica). La introdujo una regla de ES_FIXES (tools/anato3d_fit.py).
+const ERRATA = /\b[Mm]úsculo(?!s?\b)[a-záéíóúñ]/;
 let fallos = 0;
-for (const model of ['male', 'female']) {
+// --model: solo ese modelo (build_all.sh revisa el que construye; con «base» cambian los dos y revisa ambos).
+const only = process.argv.indexOf('--model');
+for (const model of only > 0 ? [process.argv[only + 1]] : ['male', 'female']) {
   const files = fs.readdirSync(MODELS).filter((f) => f.endsWith('.glb') && (f === `${model}.glb` || f.startsWith(`${model}-`)));
   const c = { piezas: 0, musculos: 0 };
-  const malos = { titulo: [], latin: [], ficha: [], inervacion: [], fuentes: [], raro: [] };
+  const malos = { titulo: [], latin: [], ficha: [], inervacion: [], fuentes: [], raro: [], errata: [] };
   for (const file of files) {
     for (const n of nodes(file)) {
       const x = n.extras ?? {};
@@ -35,6 +40,7 @@ for (const model of ['male', 'female']) {
       if (!info.title || /_/.test(info.title)) malos.titulo.push(name);
       if (!info.latin) malos.latin.push(name);
       if (RARO.test(`${info.title} ${info.latin ?? ''} ${info.entry?.descripcion ?? ''}`)) malos.raro.push(name);
+      if (ERRATA.test(`${info.title} ${info.entry?.descripcion ?? ''}`)) malos.errata.push(name);
       if (x.system !== 'muscular') continue;
       c.musculos++;
       if (!info.entry?.descripcion) malos.ficha.push(name);
