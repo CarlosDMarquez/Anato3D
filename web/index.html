@@ -111,11 +111,12 @@
 
       <div id="popover" class="popover" hidden></div>
       <div id="tooltip" class="tooltip" hidden></div>
-      <div id="toast" class="toast" hidden></div>
+      <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
       <div id="loader" class="loader">
         <p class="brand big">Anato<b>3D</b></p>
         <div class="loader-track"><div id="loader-bar"></div></div>
-        <p id="loader-label">Cargando…</p>
+        <p id="loader-label" role="status" aria-live="polite">Cargando…</p>
+        <button id="loader-retry" class="loader-retry" type="button">Reintentar</button>
       </div>
     </div>
     <script type="module" src="/src/main.js"></script>

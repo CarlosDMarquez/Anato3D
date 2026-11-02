@@ -5,6 +5,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 import { classify } from './systems.js';
+import { fetchBuffer, assertGLB } from './loading.js';
 import { resolvePart, sideOf } from './data/resolve.js';
 import { SSAO, profileFor, toPhysical, applyProfile, NEEDS_FIBERS } from './realism.js';
 
@@ -230,6 +231,7 @@ export class Viewer extends EventTarget {
     this.genitalRegion = null;
     this.variantCache = new Map();
     this.cache = new Map();
+    this.adding = new Map();     // `${generación} ${url}` → carga de sistema en curso
     // Número de la carga de modelo en curso: una descarga que termina después de cambiar de modelo no se añade (las piezas
     // de un sistema masculino acababan en el cuerpo femenino si se cambiaba de modelo mientras se descargaba).
     this.generation = 0;
@@ -362,14 +364,24 @@ export class Viewer extends EventTarget {
     return { prof, fiberMode, mat: this.#variant(src, `real-${prof}`, (mat) => applyProfile(mat, prof, addPatch, fiberMode)) };
   }
 
-  async loadModel(url, onProgress) {
-    const generation = ++this.generation;
-    let gltf = this.cache.get(url);
-    if (!gltf) {
-      gltf = await this.loader.loadAsync(url, (e) => e.total && onProgress?.(e.loaded / e.total));
-      this.cache.set(url, gltf);
-    }
-    if (generation !== this.generation) return null;               // se pidió otro modelo mientras tanto
+  // GLB descargado con fetch (abortable, con estado HTTP comprobado) y decodificado; se guarda solo si salió bien.
+  async #gltf(url, { signal, onProgress } = {}) {
+    const cached = this.cache.get(url);
+    if (cached) return cached;
+    const buffer = await fetchBuffer(url, { signal, onProgress });
+    assertGLB(buffer, url);
+    signal?.throwIfAborted();
+    const gltf = await this.loader.parseAsync(buffer, url.slice(0, url.lastIndexOf('/') + 1));
+    this.cache.set(url, gltf);
+    return gltf;
+  }
+
+  // Descarga un modelo base y, si `wanted()` sigue siendo cierto al terminar, lo instala. La generación solo cambia al
+  // instalarlo: si la descarga falla, el modelo que se ve y sus sistemas en curso siguen siendo válidos.
+  async loadModel(url, { signal, onProgress, wanted = () => true } = {}) {
+    const gltf = await this.#gltf(url, { signal, onProgress });
+    if (!wanted()) return null;                                     // se pidió otro modelo mientras tanto
+    this.generation++;
     for (const r of this.roots ?? []) this.scene.remove(r);
     this.select([]);
     this.partByMesh.clear();
@@ -386,25 +398,37 @@ export class Viewer extends EventTarget {
   }
 
   // Añade el GLB de un sistema (p. ej. el muscular) al modelo cargado; se descarga solo al activarlo.
-  async addSystem(url, onProgress) {
-    const generation = this.generation;
-    let gltf = this.cache.get(url);
-    if (!gltf) {
-      gltf = await this.loader.loadAsync(url, (e) => e.total && onProgress?.(e.loaded / e.total));
-      this.cache.set(url, gltf);
+  // `generation`: la del modelo para el que se pidió, fijada por quien lo pide antes de cualquier espera (antes se leía
+  // aquí, después de esperar los metadatos, y aceptaba el GLB masculino en el cuerpo femenino). Devuelve null si el
+  // visor ya muestra otro modelo.
+  addSystem(url, { generation = this.generation, signal, onProgress } = {}) {
+    if (generation !== this.generation) return Promise.resolve(null);
+    // Una sola carga en curso por sistema y generación: dos a la vez creaban dos juegos de piezas para las mismas mallas.
+    const key = `${generation} ${url}`;
+    if (!this.adding.has(key)) {
+      const p = this.#addSystem(url, generation, { signal, onProgress });
+      this.adding.set(key, p);
+      p.finally(() => this.adding.get(key) === p && this.adding.delete(key)).catch(() => {});
     }
+    return this.adding.get(key);
+  }
+
+  async #addSystem(url, generation, { signal, onProgress }) {
+    const gltf = await this.#gltf(url, { signal, onProgress });
     if (generation !== this.generation) return null;               // el modelo cambió durante la descarga
     if (this.roots.includes(gltf.scene)) return [];
-    this.roots.push(gltf.scene);
     const parts = this.#collectParts(gltf.scene);
     // Los programas nuevos (perfiles de tejido, fibras) se compilan antes de añadir el sistema a la escena: mientras se
     // compilaban, el sistema recién descargado se veía un instante blanco y translúcido.
     for (const p of parts) for (const m of p.meshes) m.material = m.userData.baseMaterial;
     await this.renderer.compileAsync(gltf.scene, this.camera, this.scene).catch(() => {});
-    if (generation !== this.generation) {                          // o mientras se compilaba
-      this.roots.splice(this.roots.indexOf(gltf.scene), 1);
+    // El sistema solo entra en `roots` aquí, ya comprobado: antes entraba antes de compilar y, si el modelo cambiaba
+    // mientras tanto, la limpieza hacía splice(indexOf(...) = −1) y quitaba la última raíz del modelo nuevo.
+    if (generation !== this.generation) {
+      for (const p of parts) for (const m of p.meshes) if (this.partByMesh.get(m) === p) this.partByMesh.delete(m);
       return null;
     }
+    this.roots.push(gltf.scene);
     this.scene.add(gltf.scene);
     this.parts.push(...parts);
     if (this.modesty) this.#applyModesty(parts);

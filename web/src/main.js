@@ -9,6 +9,7 @@ import { systemIcon, uiIcon } from './ui/icons.js';
 import { renderInfo } from './ui/info.js';
 import { GRUPOS } from './data/grupos.js';
 import { resolvePart, sideOf } from './data/resolve.js';
+import { Sessions, Stale, createSystemLoader, fetchJSON, describeError, onceByKey } from './loading.js';
 
 const MODELS = {
   male: {
@@ -45,7 +46,16 @@ const MODELS = {
 
 const $ = (sel) => document.querySelector(sel);
 const isMobile = () => window.innerWidth < 760;
-const viewer = new Viewer($('#stage'));
+let viewer;
+try {
+  viewer = new Viewer($('#stage'));
+} catch (err) {
+  // Sin WebGL (navegador antiguo, aceleración gráfica desactivada…) no hay visor: se explica en vez de quedar en blanco.
+  console.error(err);
+  $('#loader-label').textContent = 'Este navegador no puede mostrar gráficos 3D (WebGL). Prueba con otro navegador o activa la aceleración por hardware en sus ajustes.';
+  $('.loader-track').hidden = true;
+  throw err;
+}
 const state = { model: 'male', stages: {}, hidden: new Set(), isolated: null, faded: new Set() };
 const history = [];
 let available = {};
@@ -112,37 +122,63 @@ function computeAvailability() {
   const lazy = MODELS[state.model].systems ?? {};
   for (const sys of SYSTEMS) {
     const parts = viewer.parts.filter((p) => p.system === sys.id);
-    const pending = lazy[sys.id] && !lazy[sys.id].loaded;
+    const pending = lazy[sys.id] && !sessions.current?.loaded(sys.id);
     available[sys.id] = new Set(sys.stages.filter((st) => pending || parts.some((p) => st.filter(p))).map((st) => st.id));
   }
 }
 
-// Descarga el GLB de un sistema la primera vez que se activa.
-async function ensureSystem(id, quiet = false) {
-  const def = MODELS[state.model].systems?.[id];
-  if (!def || def.loaded) return true;
-  const label = SYSTEM_BY_ID[id].noun ?? `sistema ${SYSTEM_BY_ID[id].label.toLowerCase()}`;
-  const say = quiet ? () => {} : toast;               // el contexto de otro sistema se carga sin avisos
-  def.loading ??= (async () => {
-    say(`Cargando ${label}…`, 0);
-    const meta = await fetch(def.meta).then((r) => r.json());
-    for (const [gid, g] of Object.entries(meta.groups ?? {})) GRUPOS[gid] ??= g;
-    const parts = await viewer.addSystem(def.url, (k) => say(`Cargando ${label}… ${Math.round(k * 100)} %`, 0));
-    if (!parts) {                                        // se cambió de modelo durante la descarga
-      def.loading = null;
-      if (!quiet) $('#toast').classList.remove('show');  // el aviso «Cargando… %» no caduca solo
-      return;
+// ── Carga de sistemas, a nombre del modelo que los pidió ─────────
+// Cada modelo instalado abre una sesión (loading.js). Una petición queda a nombre de la sesión activa al pedirse; si el
+// modelo cambia mientras espera, se descarta sin avisos ni cambios en la escena. Las descargas de la sesión anterior
+// se abortan al instalar otro modelo.
+const sessions = new Sessions();
+// Grupos de los metadatos de cada modelo (male-muscular.json…), además de los de grupos.js: solo los del modelo activo
+// están en GRUPOS.
+const BASE_GROUPS = new Set(Object.keys(GRUPOS));
+const metaGroups = { male: {}, female: {} };
+function useGroupsOf(model) {
+  for (const id of Object.keys(GRUPOS)) if (!BASE_GROUPS.has(id)) delete GRUPOS[id];
+  for (const [id, g] of Object.entries(metaGroups[model])) GRUPOS[id] ??= g;
+}
+const loadSystem = createSystemLoader({
+  sessions,
+  systemsOf: (model) => MODELS[model].systems,
+  fetchMeta: (url, opts) => fetchJSON(url, opts),
+  addSystem: (url, opts) => viewer.addSystem(url, opts),
+  onMeta: (s, meta) => {
+    for (const [gid, g] of Object.entries(meta.groups ?? {})) {
+      metaGroups[s.model][gid] ??= g;
+      GRUPOS[gid] ??= g;
     }
-    def.loaded = true;
-    computeAvailability();
-    say(`${label[0].toUpperCase()}${label.slice(1)} listo`);
-  })().catch((err) => {
+  },
+});
+
+// Descarga el GLB de un sistema la primera vez que se activa. Devuelve true si está cargado para el modelo activo.
+// `retry`: qué repetir con el botón «Reintentar» (por defecto, volver a cargarlo y aplicar la vista).
+async function ensureSystem(id, { quiet = false, retry = null } = {}) {
+  const s = sessions.current;
+  if (!s) return false;
+  if (!MODELS[s.model].systems?.[id] || s.loaded(id)) return true;
+  const label = SYSTEM_BY_ID[id].noun ?? `sistema ${SYSTEM_BY_ID[id].label.toLowerCase()}`;
+  const mine = () => sessions.isCurrent(s);
+  const say = (msg, ms) => !quiet && mine() && toast(msg, ms);  // el contexto de otro sistema se carga sin avisos
+  say(`Cargando ${label}…`, 0);
+  try {
+    await loadSystem(id, { onProgress: (k) => say(`Cargando ${label}… ${Math.round(k * 100)} %`, 0) });
+  } catch (err) {
+    if (err instanceof Stale || !mine()) return false;           // se cambió de modelo: nada que avisar
     console.error(err);
-    toast(`No se pudo cargar: ${label}`);
-    def.loading = null;
-  });
-  await def.loading;
-  return !!def.loaded;
+    // También las cargas silenciosas avisan si fallan: sin ellas faltan los huesos o ligamentos de contexto.
+    toast(`No se pudo cargar el ${label}: ${describeError(err)}.`, 0, {
+      label: 'Reintentar',
+      run: retry ?? (() => ensureSystem(id).then((ok) => ok && apply())),
+    });
+    return false;
+  }
+  if (!mine()) return false;
+  computeAvailability();
+  say(`${label[0].toUpperCase()}${label.slice(1)} listo`);
+  return true;
 }
 
 // ── Dock de sistemas ────────────────────────────────────────────
@@ -197,12 +233,16 @@ function renderDock() {
     btn.querySelector('.dock-stage').textContent = empty ? 'Pronto' : stage ? stage.label : 'Apagado';
     btn.title = `${sys.label}${stage ? ` · ${stage.label}` : ''} — clic: siguiente capa · mantener: todas las capas`;
   }
-  document.querySelectorAll('#model-switch [data-model]').forEach((b) => b.classList.toggle('on', b.dataset.model === state.model));
+  document.querySelectorAll('#model-switch [data-model]').forEach((b) => {
+    b.classList.toggle('on', b.dataset.model === state.model);
+    b.setAttribute('aria-pressed', String(b.dataset.model === state.model));
+    b.setAttribute('aria-busy', String(b.dataset.model === requested));     // pedido, todavía descargándose
+  });
 }
 
 // Descarga (sin avisos) los sistemas de los que un sistema activo muestra piezas como contexto.
 function loadContext(id) {
-  for (const src of Object.keys(SYSTEM_BY_ID[id].context ?? {})) ensureSystem(src, true).then((ok) => ok && apply());
+  for (const src of Object.keys(SYSTEM_BY_ID[id].context ?? {})) ensureSystem(src, { quiet: true }).then((ok) => ok && apply());
 }
 
 function cycleStage(id) {
@@ -212,7 +252,7 @@ function cycleStage(id) {
 }
 
 async function setStage(id, stageId) {
-  if (stageId && !(await ensureSystem(id))) return;
+  if (stageId && !(await ensureSystem(id, { retry: () => setStage(id, stageId) }))) return;
   change(() => {
     state.stages[id] = stageId;
     state.isolated = null;
@@ -261,13 +301,30 @@ document.addEventListener('pointerdown', (e) => {
 });
 
 let toastTimer;
-function toast(msg, ms = 1800) {
+// `action`: { label, run } — un botón en el aviso (p. ej. «Reintentar»). Un aviso con botón no caduca solo.
+function toast(msg, ms = 1800, action = null) {
   const el = $('#toast');
   el.textContent = msg;
+  el.classList.toggle('actionable', !!action);
+  if (action) {
+    const b = document.createElement('button');
+    b.textContent = action.label;
+    b.addEventListener('click', () => { hideToast(); action.run(); });
+    const close = document.createElement('button');
+    close.className = 'toast-close';
+    close.setAttribute('aria-label', 'Cerrar aviso');
+    close.textContent = '×';
+    close.addEventListener('click', hideToast);
+    el.append(b, close);
+  }
   el.hidden = false;
   el.classList.add('show');
   clearTimeout(toastTimer);
-  if (ms) toastTimer = setTimeout(() => el.classList.remove('show'), ms);
+  if (ms && !action) toastTimer = setTimeout(hideToast, ms);
+}
+function hideToast() {
+  const el = $('#toast');
+  el.classList.remove('show', 'actionable');
 }
 
 const tooltip = $('#tooltip');
@@ -463,24 +520,27 @@ const norm = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 // Piezas de los sistemas aún sin descargar: buscar «bíceps» antes de abrir el sistema muscular solo encontraba dos bolsas
 // del bíceps femoral. Al elegir una, se descarga su sistema y se muestra.
-const pendingIndex = new Map();                        // url del índice → promesa de [{ id, key, system, side, info }]
 const GENITAL_NAME = /penis|Glans|Testis|Epididym|Scrot|Spermatic|Cremaster|Dartos|clitoris|vestibul|Labi|Vulva/i;
+// Índice de cada modelo (una promesa por modelo; si falla, se olvida y se vuelve a pedir la próxima vez).
+const indexOf = onceByKey((model) => fetchJSON(MODELS[model].index).then((data) => Object.entries(data).flatMap(([key, list]) =>
+  list.flatMap(([name, extras]) => {
+    const cls = classify(extras);
+    return cls ? [{ id: name, key, system: cls.system, side: sideOf(name), info: resolvePart(name, extras) }] : [];
+  }))));
+let unloaded = { model: null, parts: [], failed: false };      // índice que usa el buscador, siempre de un modelo
 function loadPendingIndex() {
-  const url = MODELS[state.model].index;
-  if (!url) return Promise.resolve([]);
-  if (!pendingIndex.has(url)) {
-    pendingIndex.set(url, fetch(url).then((r) => r.json()).then((data) => Object.entries(data).flatMap(([key, list]) =>
-      list.flatMap(([name, extras]) => {
-        const cls = classify(extras);
-        return cls ? [{ id: name, key, system: cls.system, side: sideOf(name), info: resolvePart(name, extras) }] : [];
-      }))).catch(() => []));
-  }
-  return pendingIndex.get(url).then((list) => {
-    pendingParts = list;
+  const model = state.model;
+  if (!MODELS[model].index) return Promise.resolve();
+  return indexOf(model).then(
+    (parts) => ({ parts, failed: false }),
+    (err) => { console.error(err); return { parts: [], failed: true }; },
+  ).then((r) => {
+    // Una respuesta que llega después de cambiar de modelo no toca el buscador (ni el índice) del modelo nuevo.
+    if (model !== state.model) return;
+    unloaded = { model, ...r };
     if ($('#panel-search').classList.contains('open')) renderSearch($('#search-input').value);
   });
 }
-let pendingParts = [];
 
 function renderSearch(q) {
   const list = $('#search-results');
@@ -500,8 +560,9 @@ function renderSearch(q) {
     .slice(0, 80);
   // Lo que todavía no está descargado (nunca con «Mostrar genitales externos» desactivado: no se sabe qué quedaría oculto).
   const systems = MODELS[state.model].systems ?? {};
-  const pending = !term ? [] : pendingParts
-    .filter((p) => systems[p.key] && !systems[p.key].loaded && !(viewer.modesty && GENITAL_NAME.test(p.id)))
+  const own = unloaded.model === state.model;
+  const later = !term || !own ? [] : unloaded.parts
+    .filter((p) => systems[p.key] && !sessions.current?.loaded(p.key) && !(viewer.modesty && GENITAL_NAME.test(p.id)))
     .filter((p) => norm(`${p.info.title} ${p.info.latin ?? ''} ${p.info.entry?.nombre ?? ''}`).includes(term))
     .sort((a, b) => a.info.title.localeCompare(b.info.title, 'es'))
     .filter((p) => {
@@ -509,18 +570,23 @@ function renderSearch(q) {
       return !seen.has(k) && seen.add(k);
     })
     .slice(0, Math.max(0, 80 - parts.length));
-  list.innerHTML = groups.map((g) => `
+  // Sin índice, el buscador solo ve lo ya descargado: se dice y se ofrece reintentar.
+  const note = own && unloaded.failed && term
+    ? '<li class="muted search-note">No se pudo cargar el índice de las estructuras aún sin descargar. <button data-retry-index>Reintentar</button></li>'
+    : '';
+  list.innerHTML = note + groups.map((g) => `
       <li><button data-group="${g.group}"><span class="res-kind">Región</span><span class="res-name">${g.label}</span></button></li>`).join('') +
-    (parts.length || groups.length || pending.length
-      ? [...parts, ...pending].map((p) => `
+    (parts.length || groups.length || later.length
+      ? [...parts, ...later].map((p) => `
       <li><button ${p.key ? `data-pending="${p.key}" ` : ''}data-id="${p.id}" style="--sys:${SYSTEM_BY_ID[p.system].color}">
         <i></i><span class="res-name">${p.info.title}${p.side ? ` <em>${p.side === 'L' ? 'izq.' : 'der.'}</em>` : ''}</span>
         <small>${SYSTEM_BY_ID[p.system].label}</small>
       </button></li>`).join('')
       : '<li class="muted empty">Sin resultados en este modelo.</li>');
-  list.querySelectorAll('[data-id]').forEach((b) => b.addEventListener('click', async () => {
+  list.querySelector('[data-retry-index]')?.addEventListener('click', () => loadPendingIndex());
+  list.querySelectorAll('[data-id]').forEach((b) => b.addEventListener('click', async function open() {
     if (isMobile()) closePanels();
-    if (b.dataset.pending && !(await ensureSystem(b.dataset.pending))) return;
+    if (b.dataset.pending && !(await ensureSystem(b.dataset.pending, { retry: open }))) return;
     const part = viewer.parts.find((p) => p.id === b.dataset.id);
     if (part) reveal(part);
   }));
@@ -538,8 +604,13 @@ function buildChrome() {
     b.innerHTML = uiIcon('close');
     b.addEventListener('click', closePanels);
   });
+  // Gana el último clic: volver al modelo que se ve mientras se descarga el otro cancela esa descarga (antes se ignoraba
+  // el clic y el otro modelo acababa sustituyéndolo).
   document.querySelectorAll('#model-switch [data-model]').forEach((b) => b.addEventListener('click', () => {
-    if (b.dataset.model !== state.model) loadModel(b.dataset.model);
+    const m = b.dataset.model;
+    if (m === (requested ?? state.model)) return;
+    if (m === state.model) cancelModelLoad();
+    else loadModel(m);
   }));
 
   $('#btn-home').addEventListener('click', () => { selectPart(null); viewer.home(); });
@@ -594,39 +665,67 @@ function buildChrome() {
 }
 
 // ── Carga de modelos ────────────────────────────────────────────
-const regions = new Map();
-async function loadRegion(url) {
-  if (!url) return null;
-  if (!regions.has(url)) {
-    regions.set(url, fetch(url).then((r) => (r.ok ? r.json() : null)).catch((err) => {
-      console.warn('Sin región genital:', err);
-      return null;
-    }));
-  }
-  return regions.get(url);
-}
+// Región genital: necesaria para «Mostrar genitales externos» en el hombre. Si falla, falla la carga del modelo (y se
+// puede reintentar): sin ella, con la opción desactivada se verían los testículos.
+const regionOf = onceByKey((url) => fetchJSON(url));
 
 let loadSeq = 0;
+let modelAbort = null;
+let requested = null;                                    // modelo pedido que aún no se ve
+function cancelModelLoad() {
+  loadSeq++;
+  modelAbort?.abort();
+  requested = null;
+  toast(`Modelo ${MODELS[state.model].label.toLowerCase()}`);
+  renderDock();
+}
 async function loadModel(id) {
   const seq = ++loadSeq;
+  modelAbort?.abort();                                   // la descarga del modelo pedido antes ya no hace falta
+  const abort = (modelAbort = new AbortController());
+  const wanted = () => seq === loadSeq;
+  requested = id;
+  renderDock();
+  const first = !sessions.current;
   const loader = $('#loader');
   const bar = $('#loader-bar');
-  loader.hidden = false;
-  loader.classList.remove('done');
-  bar.style.width = '0%';
-  $('#loader-label').textContent = `Cargando modelo ${MODELS[id].label.toLowerCase()}…`;
+  const label = MODELS[id].label.toLowerCase();
+  // La primera carga cubre la pantalla; un cambio de modelo deja usar el actual mientras tanto.
+  if (first) {
+    loader.hidden = false;
+    loader.classList.remove('done', 'failed');
+    bar.style.width = '0%';
+    $('#loader-label').textContent = `Cargando modelo ${label}…`;
+  } else toast(`Cargando modelo ${label}…`, 0);
+  const progress = (k) => {
+    if (!wanted()) return;
+    if (first) bar.style.width = `${Math.round(k * 100)}%`;
+    else toast(`Cargando modelo ${label}… ${Math.round(k * 100)} %`, 0);
+  };
+  let region = null;
   try {
-    if (!(await viewer.loadModel(MODELS[id].url, (k) => (bar.style.width = `${Math.round(k * 100)}%`)))) return;
-    const region = await loadRegion(MODELS[id].genitalRegion);
-    if (seq !== loadSeq) return;                         // se eligió otro modelo mientras tanto
-    viewer.setGenitalRegion(region);
+    if (MODELS[id].genitalRegion) region = await regionOf(MODELS[id].genitalRegion);
+    if (!wanted()) return;
+    if (!(await viewer.loadModel(MODELS[id].url, { signal: abort.signal, onProgress: progress, wanted }))) return;
   } catch (err) {
-    $('#loader-label').textContent = 'No se pudo cargar el modelo. Revisa la consola.';
-    throw err;
+    if (!wanted() || err?.name === 'AbortError') return;  // se pidió otro modelo mientras tanto
+    requested = null;
+    renderDock();
+    console.error(err);
+    const msg = `No se pudo cargar el modelo ${label}: ${describeError(err)}.`;
+    if (first) {
+      loader.classList.add('failed');
+      $('#loader-label').textContent = msg;
+    } else toast(`${msg} Sigues viendo el modelo ${MODELS[state.model].label.toLowerCase()}.`, 0, { label: 'Reintentar', run: () => loadModel(id) });
+    return;
   }
+  // Instalado: nueva sesión (cierra la anterior y aborta sus descargas) y estado del modelo nuevo.
+  requested = null;
+  sessions.open(id, viewer.generation);
+  viewer.setGenitalRegion(region);
   state.model = id;
+  useGroupsOf(id);
   current = null;
-  for (const def of Object.values(MODELS[id].systems ?? {})) Object.assign(def, { loaded: false, loading: null });
   computeAvailability();
   const previous = state.stages;
   state.stages = {};
@@ -640,17 +739,26 @@ async function loadModel(id) {
   state.isolated = null;
   history.length = 0;
   $('#model-detail').textContent = MODELS[id].detail;
+  // Buscador abierto: se redibuja ya con el modelo nuevo (si no, seguían a la vista los resultados del anterior hasta
+  // que llegaba su índice) y luego se completa con lo no descargado.
+  if ($('#panel-search').classList.contains('open')) {
+    renderSearch($('#search-input').value);
+    loadPendingIndex();
+  }
   apply();
   viewer.home();
-  bar.style.width = '100%';
-  loader.classList.add('done');
-  setTimeout(() => (loader.hidden = true), 400);
+  if (first) {
+    bar.style.width = '100%';
+    loader.classList.add('done');
+    setTimeout(() => (loader.hidden = true), 400);
+  } else toast(`Modelo ${label}`);
   // Los sistemas en archivo aparte que ya empiezan activos (p. ej. los cartílagos) se completan al cargar.
   for (const sys of Object.keys(MODELS[id].systems ?? {})) {
     if (state.stages[sys]) ensureSystem(sys).then((ok) => ok && apply());
   }
   for (const sys of SYSTEMS) if (state.stages[sys.id]) loadContext(sys.id);
 }
+$('#loader-retry').addEventListener('click', () => loadModel(state.model));
 
 buildChrome();
 buildDock();

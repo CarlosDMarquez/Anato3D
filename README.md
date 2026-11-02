@@ -12,6 +12,8 @@ npm --prefix web run dev
 
 Abre http://localhost:5173 (o el puerto que indique Vite). Para producción: `npm --prefix web run build` (salida en `web/dist`).
 
+Pruebas: `npm --prefix web test` (lógica de carga, sin navegador) y `npm --prefix web run check` (fichas de todas las piezas).
+
 ## Estructura
 
 | Ruta | Qué es |
@@ -32,7 +34,24 @@ Abre http://localhost:5173 (o el puerto que indique Vite). Para producción: `np
 | `web/scripts/check-cards.mjs` | Revisa las fichas de todas las piezas: `node scripts/check-cards.mjs` (desde `web/`). |
 | `web/src/data/grupos.js` | Regiones de la ruta jerárquica (los grupos musculares llegan en `male-muscular.json`). |
 | `web/src/viewer.js` | Escena three.js: carga Draco, materiales, brillo de selección, cámara. |
+| `web/src/loading.js` | Propiedad de las peticiones de carga (una sesión por modelo instalado), descargas con estado HTTP y aborto, y errores explicables. Pruebas en `web/tests/loading.test.mjs`. |
 | `web/src/main.js` | Estado de la app (capas, ocultar/aislar/transparentar, deshacer), barra y paneles. |
+
+## Carga fiable de modelos (2026-11-02)
+
+**Qué fallaba (reproducido en el navegador).** Con los metadatos del sistema muscular masculino retrasados 5 s, se activó el sistema muscular y se cambió al modelo femenino mientras esperaba: los **481 músculos masculinos** acabaron en el cuerpo femenino y el muscular femenino nunca se descargó. La comprobación de generación del visor se hacía después de esperar los metadatos, cuando ya era la del modelo nuevo.
+
+**Arreglo (`web/src/loading.js`, `main.js`, `viewer.js`):**
+- **Sesión por modelo instalado.** Cada petición (metadatos, GLB de un sistema, índice de búsqueda) queda a nombre de la sesión activa *antes* de la primera espera y se comprueba después de cada una. Si el modelo cambió, se descarta sin tocar la escena ni la interfaz. Al instalar otro modelo, las descargas de la sesión anterior se abortan.
+- **El visor recibe la generación del que pide** (`addSystem(url, { generation, signal })`) y solo añade la raíz a `roots` después de compilar y comprobar. Antes la limpieza de una carga obsoleta hacía `splice(indexOf(...) = −1, 1)` y quitaba la última raíz del modelo nuevo.
+- **La generación del visor cambia solo al instalar un modelo**: si la descarga del otro modelo falla, el que se ve y sus sistemas en curso siguen siendo válidos.
+- **Gana el último clic** en el selector de modelo: volver al que se ve cancela la descarga del otro (antes se ignoraba ese clic y el otro modelo lo sustituía).
+- **Índice de búsqueda y grupos por modelo**: una respuesta tardía no llena el buscador del otro modelo; un índice que falla no se guarda vacío para siempre y el buscador ofrece «Reintentar».
+- **Descargas con `fetch`**: estado HTTP comprobado, aborto real y progreso. Un archivo que falta en un servidor que responde con el `index.html` (el de desarrollo, muchos alojamientos estáticos) se trata como no disponible.
+- **Errores recuperables**: «No se pudo cargar el sistema arterial: sin conexión o el servidor no responde.» con **Reintentar**, que repite la acción pedida (p. ej. activar esa capa). Si falla el primer modelo, la pantalla de carga lo explica y ofrece Reintentar; si falla un cambio de modelo, se sigue usando el actual. Sin WebGL, un mensaje en lugar de una página en blanco.
+- **Región genital obligatoria** para el modelo masculino: si no se puede descargar, falla la carga del modelo (y se puede reintentar). Sin ella, con «Mostrar genitales externos» desactivado se verían los testículos.
+
+**Comprobado:** 11 pruebas automáticas (`npm --prefix web test`) y, en el navegador, metadatos lentos, GLB lento, cambios rápidos con y sin caché, peticiones repetidas (una sola descarga), red caída y recuperación con Reintentar, 404, archivo base que falta en la primera carga y recuperación, fallo al cambiar de modelo e índice de búsqueda lento o caído. Detalle en `docs/hitos/01-carga-fiable.md`.
 
 ## Contrato de datos para nuevas fases
 
