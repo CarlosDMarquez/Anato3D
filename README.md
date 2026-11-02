@@ -17,7 +17,7 @@ Abre http://localhost:5173 (o el puerto que indique Vite). Para producción: `np
 | Ruta | Qué es |
 |---|---|
 | `*.blend`, `*.glb` (raíz) | Modelos fuente. Fase 1 = piel + ojos; Fase 2 = piel + esqueleto completo (`Anato3D_Male_30_Fase2`, `Anato3D_Female_30_Fase2`). |
-| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app), `audit_models.py` (busca errores medibles en los modelos), `vessel_regions.py` (región del cuerpo de cada vaso) y `backup.sh` (copia de seguridad en este Mac). |
+| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app), `audit_models.py` (busca errores medibles en los modelos), `vessel_regions.py` (región del cuerpo de cada vaso), `skin_regions.py` (divide la piel en zonas al exportar) y `backup.sh` (copia de seguridad en este Mac). |
 | `Anato3D_Male_30_Fase2_musculature.npz` | Campo de desplazamiento de la complexión musculosa (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas). |
 | `Anato3D_Female_30_Fase2_pelvis.npz` | Campo de desplazamiento de la pelvis femenina y los huesos de la pelvis antes de deformarla (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas femeninos). |
 | `sources/originals/` | Copia de los modelos tal como estaban antes de corregir el cuello. |
@@ -479,6 +479,48 @@ El usuario lo veía «todo deforme», frente a una imagen de referencia con los 
 - **Fuentes en la ficha:** una sección «Fuentes», plegada al final, con enlaces (`.info-refs`).
 - **Comprobación:** `node scripts/check-cards.mjs` (desde `web/`): 5.756 piezas, ninguna sin latín ni músculo sin ficha, inervación o fuentes.
 - **Peso:** el código de la web pasa de 919 a 1.044 kB (280 kB comprimido) por los textos nuevos.
+
+## Zonas de la piel (2026-11-01)
+
+La piel era una sola pieza («Piel»): al tocarla se seleccionaba entera.
+
+**Ahora `fix_neck.py` la divide al exportar** (`tools/skin_regions.py`), sin tocar las Fase 2, que guardan la piel entera para los sistemas.
+
+**Zonas.** 36 en el hombre y 38 en la mujer (más la piel lisa de la vulva, que ya era aparte):
+- **Cabeza:** cuero cabelludo, cara, párpados (izquierdo y derecho), nariz, labios y orejas.
+- **Cuello.**
+- **Tronco:** tórax, mamas (en la mujer), abdomen, espalda, región lumbar, glúteos y periné.
+- **Miembro superior:** hombro, axila, brazo, codo, antebrazo y mano, de cada lado.
+- **Miembro inferior:** muslo, rodilla, pierna y pie, de cada lado.
+
+Los ojos ya eran piezas propias.
+
+**Cómo se asigna cada cara de la piel.** Por referencias del esqueleto de la Fase 2:
+- **Cabeza:** el plano de la mandíbula al occipital. Dentro de ella:
+  - párpados alrededor de los globos oculares;
+  - labios alrededor de los incisivos;
+  - nariz donde la piel sobresale de la línea de las mejillas;
+  - orejas donde la piel es una lámina fina y está lejos del hueso;
+  - cara por delante de las orejas y bajo el nacimiento del pelo.
+- **Miembros:** el hueso más cercano y planos perpendiculares a su eje en el hombro, el codo, la muñeca, la cadera, la rodilla y el tobillo.
+- **Tronco:**
+  - delante y detrás, separados por el centro de cada corte;
+  - el reborde costal (curva ajustada a los cartílagos 7–10);
+  - el ligamento inguinal, la 12.ª vértebra torácica, la cresta ilíaca y el pliegue glúteo;
+  - la axila, donde la piel del hueco mira hacia abajo o de lado.
+- **Limpieza:** un filtro de mayoría suaviza los bordes, y cada zona queda en un solo trozo. Así, la piel del muslo junto a los dedos no sale como «mano».
+
+**Sin costuras:** cada pieza conserva las normales de la piel entera.
+
+**En la web:**
+- cada zona tiene su ficha en `anatomia.js`, con nombre latino de TA2 y fuentes (`fuentesPiel` en `fuentes.js`);
+- la ruta de grupos va «Sistema tegumentario > Piel de la cabeza / del cuello / del tronco / del miembro superior / del miembro inferior» (`grupos.js`).
+
+**Comprobado en el navegador:**
+- un clic en el antebrazo selecciona «Piel del antebrazo»;
+- la piel completa se ve continua;
+- en la mujer, la nariz, las mamas y la vulva funcionan como antes;
+- sin errores de consola.
 
 ## Región real de los vasos (2026-11-01)
 

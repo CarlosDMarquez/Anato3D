@@ -22,6 +22,9 @@ Qué hace:
      lleva a ella (tools/female.py) y la pelvis toma la forma femenina (tools/female_pelvis.py; el campo para los demás
      tejidos queda en Anato3D_Female_30_Fase2_pelvis.npz). La región de la vulva se guarda en la piel (atributo «vulva»)
      y, al exportar, se recorta de ella y queda aparte («Skin_Vulva_Smooth»): la vulva de build_female_skin.py la sustituye.
+  5. Al exportar, la piel se divide en zonas (tools/skin_regions.py: cuero cabelludo, cara, párpados, nariz, labios,
+     orejas, cuello, hombros, brazos, manos, tronco, piernas…) para que la web pueda seleccionar cada una. Las Fase 2
+     guardan la piel entera.
 
 Guarda una copia de los originales en sources/originals/ la primera vez.
 
@@ -455,6 +458,10 @@ MALE_TONE = male_layers(skin, objs, world)
 apply_layers(skin, MALE_TONE)
 
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT, f'{MALE}.blend'))
+# 5. Zonas de la piel (tools/skin_regions.py): solo en lo exportado; la Fase 2 guarda la piel entera, que los sistemas
+#    usan para saber qué queda dentro del cuerpo.
+import skin_regions
+skin_regions.split(skin, skin_regions.label(skin, {o.name: o for o in bpy.data.objects}))
 export([os.path.join(ROOT, f'{MALE}_draco.glb'), os.path.join(ROOT, 'web/public/models/male.glb')], 'Anato3D_Male_30')
 
 # ── Modelo femenino (Fase 2): misma malla base, misma corrección a escala, y el esqueleto masculino transformado ──
@@ -559,4 +566,5 @@ def split_vulva(skin, mask):
     for k, v in {'anato3d_id': 'integument_skin_vulva_smooth', 'system': 'integumentary', 'subsystem': 'skin'}.items(): part[k] = v
     return part
 split_vulva(fskin, vmask)
+skin_regions.split(fskin, skin_regions.label(fskin, {o.name: o for o in bpy.data.objects}, female=True))
 export([os.path.join(ROOT, f'{FEMALE_OUT}_draco.glb'), os.path.join(ROOT, 'web/public/models/female.glb')], 'Anato3D_Female_30')

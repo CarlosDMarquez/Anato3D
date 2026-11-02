@@ -138,6 +138,11 @@ export const GRUPOS = {
     nombre: 'Sistema tegumentario', latin: 'Integumentum commune',
     descripcion: 'La piel y sus anexos (pelo, uñas y glándulas). Es la barrera que separa y protege el cuerpo del exterior.',
   },
+  Skin_of_head: { nombre: 'Piel de la cabeza', latin: 'Caput', descripcion: 'Cuero cabelludo, cara, párpados, nariz, labios y orejas.' },
+  Skin_of_neck: { nombre: 'Piel del cuello', latin: 'Collum', descripcion: 'Piel que cubre el cuello, de la mandíbula y la nuca a las clavículas.' },
+  Skin_of_trunk: { nombre: 'Piel del tronco', latin: 'Truncus', descripcion: 'Piel del tórax, el abdomen, la espalda, la región lumbar, los glúteos y el periné.' },
+  Skin_of_upper_limb: { nombre: 'Piel del miembro superior', latin: 'Membrum superius', descripcion: 'Piel del hombro, la axila, el brazo, el codo, el antebrazo y la mano.' },
+  Skin_of_lower_limb: { nombre: 'Piel del miembro inferior', latin: 'Membrum inferius', descripcion: 'Piel del muslo, la rodilla, la pierna y el pie.' },
   Special_Senses: {
     nombre: 'Órganos de los sentidos', latin: 'Organa sensuum',
     descripcion: 'Órganos especializados en captar estímulos: vista, oído, equilibrio, olfato y gusto.',

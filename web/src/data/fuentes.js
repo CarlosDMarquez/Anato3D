@@ -395,3 +395,25 @@ export function fuentesLatin(nameKey) {
   const extra = LATIN_EXTRA[nameKey];
   return extra ? { lista: [{ papel: 'Nombre latino', ...fuenteLatin(extra[1]) }], nota: CONSULTA } : null;
 }
+
+// Zonas de la piel: [término de TA2, artículos de Wikipedia con los datos de la ficha], por la clave de la ficha.
+const PIEL = {
+  Skin_Scalp: ['7113', ['Scalp']], Skin_Face: ['112', ['Face', 'Facial_nerve']], Skin_Eyelids: ['6822', ['Eyelid']],
+  Skin_Nose: ['117', ['Human_nose']], Skin_Lips: ['2775', ['Lip']], Skin_Ear: ['104', ['Auricle_(anatomy)', 'Cauliflower_ear']],
+  Skin_Neck: ['123', ['Neck']], Skin_Chest: ['125', ['Dermatome_(anatomy)']], Skin_Breast: ['7097', ['Breast', "Peau_d'orange"]],
+  Skin_Abdomen: ['127', ['Dermatome_(anatomy)', 'Stretch_marks']], Skin_Back: ['136', ['Human_back', 'Pressure_ulcer']],
+  Skin_Lumbar: ['269', ['Lumbar_puncture']], Skin_Buttock: ['313', ['Buttocks', 'Pressure_ulcer']], Skin_Perineum: ['131', ['Perineum']],
+  Skin_Shoulder: ['283', ['Axillary_nerve']], Skin_Axilla: ['281', ['Axilla']], Skin_Arm: ['144', ['Arm']],
+  Skin_Elbow: ['289', ['Olecranon_bursitis', 'Median_cubital_vein']], Skin_Forearm: ['146', ['Forearm']],
+  Skin_Hand: ['148', ['Hand', 'Human_skin']], Skin_Thigh: ['160', ['Thigh']], Skin_Knee: ['161', ['Prepatellar_bursa']],
+  Skin_Leg: ['163', ['Tibia', 'Great_saphenous_vein']], Skin_Foot: ['166', ['Sole_(foot)', 'Pressure_ulcer']],
+};
+
+export function fuentesPiel(key) {
+  const p = PIEL[key];
+  if (!p) return null;
+  return {
+    lista: [{ papel: 'Nombre', ...TA2, texto: `${TA2.texto}, término n.º ${p[0]}` }, ...p[1].map((w) => ({ papel: 'Ficha', ...WIKI(w) }))],
+    nota: CONSULTA,
+  };
+}

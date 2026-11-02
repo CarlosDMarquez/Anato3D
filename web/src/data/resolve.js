@@ -4,7 +4,8 @@ import { resolveConnective } from './conectivo.js';
 import { resolveVessel } from './vasos.js';
 import { resolveNervous } from './nervios.js';
 import { resolveVisceral } from './visceras.js';
-import { LATIN_EXTRA, fuentesLatin } from './fuentes.js';
+import { LATIN_EXTRA, fuentesLatin, fuentesPiel } from './fuentes.js';
+import { latinEtymology } from './musculos.js';
 
 // Convierte el nombre de un objeto del modelo (p. ej. "Rib_7_L", "Tooth_Upper_Canine_R")
 // en la ficha que muestra la app: título, latín, etiquetas y datos adicionales.
@@ -126,8 +127,10 @@ function resolveBySystem(name, extras) {
     latin: latin ?? entry?.latin ?? extras.name_la ?? null,
     tissue: TISSUE[extras.tissue] ?? null,
     chips,
-    entry,
+    // Zonas de la piel: etimología generada del latín y fuentes de la ficha.
+    entry: entry && key.startsWith('Skin_') && !entry.etimologia ? { ...entry, etimologia: latinEtymology(entry.latin) } : entry,
     datos: [...extra, ...(entry?.datos ?? [])],
     source: extras.source ?? null,
+    fuentes: fuentesPiel(key),
   };
 }

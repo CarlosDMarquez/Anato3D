@@ -603,6 +603,127 @@ export const ANATOMIA = {
       'Sus anexos son el pelo, las uñas y las glándulas sudoríparas y sebáceas.',
     ],
   },
+  // Zonas de la piel (tools/skin_regions.py): la piel se exporta dividida para poder seleccionar cada zona.
+  Skin_Scalp: {
+    nombre: 'Cuero cabelludo', latin: 'Calva', tipo: 'Zona de la piel',
+    descripcion: 'Piel de la cabeza donde crece el pelo, con numerosos folículos pilosos y glándulas sebáceas. Se describe con cinco capas: piel, tejido conjuntivo denso, aponeurosis epicraneal, tejido areolar laxo y pericráneo.',
+    datos: ['En inglés, las iniciales de sus capas forman la palabra SCALP («cuero cabelludo»).', 'Sus vasos corren en el tejido conjuntivo denso, que los mantiene abiertos: por eso sus heridas sangran mucho.'],
+  },
+  Skin_Face: {
+    nombre: 'Piel de la cara', latin: 'Facies', tipo: 'Zona de la piel',
+    descripcion: 'Piel de la cara, en la que se insertan los músculos de la expresión facial, que la mueven.',
+    datos: ['Su sensibilidad la recoge el nervio trigémino, en tres territorios (oftálmico, maxilar y mandibular); sus músculos los mueve el nervio facial.'],
+  },
+  Skin_Eyelids: {
+    nombre: 'Párpados', latin: 'Palpebrae', tipo: 'Zona de la piel',
+    descripcion: 'Pliegues finos de piel que cubren y protegen el ojo. De fuera adentro tienen piel, tejido subcutáneo, el músculo orbicular del ojo, el septo orbitario con los tarsos y la conjuntiva.',
+    datos: ['Su piel es relativamente fina y tiene más células pigmentadas que la de otras zonas.', 'Las glándulas tarsales (de Meibomio) segregan la capa de grasa de la lágrima.', 'El parpadeo reflejo protege el ojo de los cuerpos extraños.'],
+  },
+  Skin_Nose: {
+    nombre: 'Nariz', latin: 'Nasus externus', tipo: 'Zona de la piel',
+    descripcion: 'Parte externa de la nariz: huesos y cartílagos cubiertos de piel. La piel de la punta es gruesa y tiene muchas glándulas sebáceas grandes.',
+    datos: ['El vestíbulo, la entrada de cada fosa nasal, está tapizado de piel con pelos y glándulas sebáceas.'],
+  },
+  Skin_Lips: {
+    nombre: 'Labios', latin: 'Labia oris', tipo: 'Zona de la piel',
+    descripcion: 'Pliegues que rodean la boca, con el músculo orbicular de la boca dentro. En su zona roja (bermellón), la piel tiene solo de tres a cinco capas de células, frente a las hasta dieciséis de la cara: por eso se transparentan los vasos y se ve roja.',
+    datos: ['La piel del labio no tiene pelo ni glándulas sudoríparas.', 'El borde del labio superior forma el «arco de Cupido».'],
+  },
+  Skin_Ear: {
+    nombre: 'Oreja', latin: 'Auricula', tipo: 'Zona de la piel',
+    descripcion: 'Pabellón auricular: cartílago elástico cubierto de una piel muy fina, casi sin grasa debajo y muy unida al pericondrio. El lóbulo no tiene cartílago.',
+    datos: ['Un golpe puede despegar la piel del cartílago y acumular sangre entre ambos: si no se drena, el cartílago se daña y queda la «oreja en coliflor».', 'Por estar expuesta, sufre a menudo congelaciones y quemaduras de sol.'],
+  },
+  Skin_Neck: {
+    nombre: 'Piel del cuello', latin: 'Collum', tipo: 'Zona de la piel',
+    descripcion: 'Piel fina y móvil del cuello; por delante, bajo ella, está el músculo platisma.',
+    datos: ['A través de ella suele verse la vena yugular externa, en la línea que va del ángulo de la mandíbula a la mitad de la clavícula.'],
+  },
+  Skin_Chest: {
+    nombre: 'Piel del tórax', latin: 'Thorax', tipo: 'Zona de la piel',
+    descripcion: 'Piel de la parte anterior y lateral del tórax. Su sensibilidad la recogen los nervios intercostales, cada uno en una franja (dermatoma).',
+    datos: ['El dermatoma T4 llega a la altura de los pezones.'],
+  },
+  Skin_Breast: {
+    nombre: 'Mama', latin: 'Mamma', tipo: 'Zona de la piel',
+    descripcion: 'Relieve del pecho formado por la glándula mamaria, grasa y tejido conjuntivo, cubiertos de piel. En el centro están el pezón y la areola.',
+    datos: ['Los ligamentos suspensorios (de Cooper) van de la fascia a la piel y sostienen la mama.', 'La areola tiene glándulas sudoríparas modificadas, las glándulas de Montgomery.', 'Una piel con aspecto de «piel de naranja» puede ser signo de un cáncer de mama inflamatorio y obliga a consultar.'],
+  },
+  Skin_Abdomen: {
+    nombre: 'Piel del abdomen', latin: 'Abdomen', tipo: 'Zona de la piel',
+    descripcion: 'Piel de la pared anterior y lateral del abdomen, con el ombligo en el centro.',
+    datos: ['El ombligo está en el dermatoma T10.', 'Si la piel se estira deprisa (embarazo, aumento de peso) pueden aparecer estrías.'],
+  },
+  Skin_Back: {
+    nombre: 'Piel de la espalda', latin: 'Dorsum thoracis', tipo: 'Zona de la piel',
+    descripcion: 'Piel de la parte posterior del tórax, sobre las escápulas y la columna torácica. Es más gruesa y tiene menos terminaciones nerviosas que la del resto del tronco.',
+    datos: ['Su sensibilidad la recogen los ramos posteriores de los nervios espinales.', 'En personas encamadas pueden aparecer úlceras por presión sobre la parte posterior de los hombros.'],
+  },
+  Skin_Lumbar: {
+    nombre: 'Piel de la región lumbar', latin: 'Regio lumbalis', tipo: 'Zona de la piel',
+    descripcion: 'Piel de la parte baja de la espalda, entre las últimas costillas y las crestas ilíacas.',
+    datos: ['La punción lumbar se hace en esta zona, entre las vértebras L3 y L4 o L4 y L5, por debajo del final de la médula espinal (L1).'],
+  },
+  Skin_Buttock: {
+    nombre: 'Piel de la región glútea', latin: 'Regio glutea', tipo: 'Zona de la piel',
+    descripcion: 'Piel de la nalga, sobre una capa gruesa de grasa subcutánea y los músculos glúteos.',
+    datos: ['Sobre el sacro, el cóccix y las caderas aparecen con más frecuencia las úlceras por presión de las personas encamadas.', 'Las inyecciones intramusculares se ponen en el cuadrante superior externo, lejos del nervio ciático.'],
+  },
+  Skin_Perineum: {
+    nombre: 'Piel del periné', latin: 'Perineum', tipo: 'Zona de la piel',
+    descripcion: 'Piel de la región entre los muslos, de los genitales al ano. En la línea media tiene un rafe.',
+    datos: [],
+  },
+  Skin_Shoulder: {
+    nombre: 'Piel del hombro', latin: 'Regio deltoidea', tipo: 'Zona de la piel',
+    descripcion: 'Piel que cubre el relieve redondeado del hombro, sobre el músculo deltoides.',
+    datos: ['La sensibilidad de su parte inferior la recoge el nervio axilar: si se lesiona, esa zona se queda dormida.'],
+  },
+  Skin_Axilla: {
+    nombre: 'Piel de la axila', latin: 'Regio axillaris', tipo: 'Zona de la piel',
+    descripcion: 'Piel del hueco entre el brazo y el tórax: blanda, con mucho pelo y muchas glándulas sudoríparas.',
+    datos: ['El olor corporal se produce sobre todo en la axila.', 'Bajo ella están los nodos linfáticos axilares, que se palpan en la exploración de la mama.'],
+  },
+  Skin_Arm: {
+    nombre: 'Piel del brazo', latin: 'Brachium', tipo: 'Zona de la piel',
+    descripcion: 'Piel del brazo, entre el hombro y el codo.',
+    datos: [],
+  },
+  Skin_Elbow: {
+    nombre: 'Piel del codo', latin: 'Regio cubitalis', tipo: 'Zona de la piel',
+    descripcion: 'Por detrás, sobre el olécranon, la piel es gruesa y holgada para que el codo pueda doblarse; por delante, en la flexura, es fina.',
+    datos: ['En la flexura está la vena cubital mediana, que comunica la cefálica con la basílica; es la que más se usa para sacar sangre.', 'Bajo la piel del olécranon hay una bolsa sinovial que se inflama con el apoyo repetido (bursitis olecraniana).'],
+  },
+  Skin_Forearm: {
+    nombre: 'Piel del antebrazo', latin: 'Antebrachium', tipo: 'Zona de la piel',
+    descripcion: 'Piel del antebrazo, entre el codo y la muñeca.',
+    datos: [],
+  },
+  Skin_Hand: {
+    nombre: 'Piel de la mano', latin: 'Manus', tipo: 'Zona de la piel',
+    descripcion: 'La piel de la palma y de la cara palmar de los dedos es gruesa, sin pelo, con muchas glándulas sudoríparas y crestas que forman las huellas dactilares; la del dorso es fina y móvil.',
+    datos: ['La piel sin pelo (glabra) de palmas y plantas no tiene glándulas sebáceas y tiene una capa más de epidermis, el estrato lúcido.', 'Las uñas son anexos de la piel.'],
+  },
+  Skin_Thigh: {
+    nombre: 'Piel del muslo', latin: 'Femur', tipo: 'Zona de la piel',
+    descripcion: 'Piel del muslo, entre la ingle y la rodilla.',
+    datos: [],
+  },
+  Skin_Knee: {
+    nombre: 'Piel de la rodilla', latin: 'Genu', tipo: 'Zona de la piel',
+    descripcion: 'Por delante, sobre la rótula, la piel es gruesa y holgada; por detrás, en la fosa poplítea, es fina.',
+    datos: ['Bajo la piel de la rótula está la bolsa prerrotuliana, que se inflama en quienes trabajan de rodillas («rodilla de ama de casa»).'],
+  },
+  Skin_Leg: {
+    nombre: 'Piel de la pierna', latin: 'Crus', tipo: 'Zona de la piel',
+    descripcion: 'Piel de la pierna, entre la rodilla y el tobillo. Por delante está directamente sobre la tibia, sin músculo entre medias.',
+    datos: ['Por eso las heridas de la espinilla llegan enseguida al hueso.', 'Por su cara medial sube la vena safena mayor; su dilatación forma varices.'],
+  },
+  Skin_Foot: {
+    nombre: 'Piel del pie', latin: 'Pes', tipo: 'Zona de la piel',
+    descripcion: 'La planta tiene la piel más gruesa del cuerpo, sin pelo ni pigmento y con muchas glándulas sudoríparas, porque soporta el peso; la del dorso es fina.',
+    datos: ['El talón es uno de los sitios donde más aparecen úlceras por presión en personas encamadas.'],
+  },
   Skin_Genitals: {
     nombre: 'Piel del pene y del escroto', latin: null, tipo: 'Órgano',
     etimologia: 'Escroto, del latín scrotum, «bolsa de cuero»; pene, de penis, «cola».',
