@@ -10,6 +10,7 @@ import { renderInfo } from './ui/info.js';
 import { GRUPOS } from './data/grupos.js';
 import { resolvePart, sideOf } from './data/resolve.js';
 import { Sessions, Stale, createSystemLoader, fetchJSON, describeError, onceByKey } from './loading.js';
+import { FICHA_POR_ID } from './content/index.js';
 
 const MODELS = {
   male: {
@@ -390,6 +391,8 @@ function renderSelection() {
     onAction: selectionAction,
     onCrumb: (g) => selectGroup(g),
     onMember: (kind, id) => (kind === 'group' ? selectGroup(id) : selectPart(viewer.parts.find((p) => p.id === id), null, { focus: true })),
+    modelo: state.model,
+    onFicha: openFicha,
   });
   updateInsets();
   updatePin();
@@ -470,6 +473,26 @@ function showAll() {
     state.faded.clear();
     state.isolated = null;
   });
+}
+
+// Abre la estructura de una relación de una ficha de módulo (del mismo lado si existe), aunque su sistema esté apagado o
+// sin descargar.
+async function openFicha(id) {
+  const ficha = FICHA_POR_ID.get(id);
+  if (!ficha) return;
+  const side = current?.kind === 'part' ? current.part.side : null;
+  const lados = side === 'R' ? ['_R', '_L'] : ['_L', '_R'];
+  const nombres = ficha.piezas.flatMap((p) => (ficha.lado === 'bilateral' ? lados.map((l) => p + l) : [p]));
+  const find = () => nombres.map((n) => viewer.parts.find((p) => p.id === n)).find(Boolean);
+  let part = find();
+  if (!part) {
+    await loadPendingIndex();
+    const hit = unloaded.model === state.model && unloaded.parts.find((p) => nombres.includes(p.id));
+    if (!hit) return toast('Esa estructura no está en este modelo');
+    if (!(await ensureSystem(hit.key, { retry: () => openFicha(id) }))) return;
+    part = find();
+  }
+  if (part) reveal(part);
 }
 
 // Muestra una estructura desde el buscador aunque su sistema esté apagado.

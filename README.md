@@ -36,6 +36,7 @@ Modelos: `zsh tools/build_all.sh` (masculino) y `A3D_MODEL=female zsh tools/buil
 | `web/scripts/check-cards.mjs` | Revisa las fichas de todas las piezas: `node scripts/check-cards.mjs` (desde `web/`). |
 | `web/src/data/grupos.js` | Regiones de la ruta jerárquica (los grupos musculares llegan en `male-muscular.json`). |
 | `web/src/viewer.js` | Escena three.js: carga Draco, materiales, brillo de selección, cámara. |
+| `web/src/content/` | Contenido de estudio: esquema (`schema.js`), fuentes (`fuentes.js`), módulos (`brazo.js`) e índice por pieza (`index.js`). |
 | `web/src/loading.js` | Propiedad de las peticiones de carga (una sesión por modelo instalado), descargas con estado HTTP y aborto, y errores explicables. Pruebas en `web/tests/loading.test.mjs`. |
 | `web/src/main.js` | Estado de la app (capas, ocultar/aislar/transparentar, deshacer), barra y paneles. |
 
@@ -88,6 +89,27 @@ Detalle en `docs/hitos/01b-construccion-fiable.md`.
 - **Errata:** «Nervio músculocutáneo», «Arteria músculofrénica» y «Venas músculofrénicas», en los dos modelos. Las escribía la regla `\b([Mm])usculo` de `ES_FIXES` (sin final de palabra).
 - **Arreglo:** regla corregida; `check-cards` la detecta (`errata`) y revisa solo el modelo construido.
 - **Publicación:** `build_all.sh vascular nervous` en los dos modelos, unos 3 min cada uno. Solo cambiaron esos nombres, salvo 2–3 vértices de la cámara anterior del ojo en el nervioso masculino (ver `docs/construccion.md`).
+
+## Contenido de estudio: módulo del brazo (2026-11-02)
+
+**Esquema** (`web/src/content/schema.js`). Cada ficha lleva:
+- un identificador estable y los campos generales (nombre, sinónimos, latín y número de TA2, región, lado, modelos, mallas, descripción, función);
+- los campos propios de su tipo: músculo, nervio, arteria, vena, hueso, ligamento u órgano;
+- relaciones y simplificaciones del modelo;
+- **fuentes de terminología separadas de las de contenido**, y en estas, qué campos respalda cada una;
+- el estado de revisión. Nadie figura como revisor sin haberlo hecho.
+
+**Módulo «El brazo»** (`web/src/content/brazo.js`):
+- 15 fichas: 10 evaluables (húmero, bíceps, coracobraquial, braquial, tríceps, nervios musculocutáneo, radial, mediano y ulnar, arteria braquial) y 5 de contexto;
+- redactadas a partir de 9 páginas de TeachMeAnatomy leídas el 2026-11-02, más la TA2 para los nombres;
+- estado «Borrador · sin revisar por un especialista»;
+- sin correlaciones clínicas hasta que se revisen.
+
+**En la app:** las piezas del módulo muestran esa ficha (contenido, relaciones con botón **Ver**, simplificaciones, estado y fuentes divididas). El resto de las piezas, la de siempre.
+
+**Revisión:** `npm --prefix web run check` valida las fichas. Detecta campos obligatorios, textos genéricos, afirmaciones sin fuente, relaciones rotas y piezas que no existen en un modelo declarado (o existen en uno no declarado). También informa de las descripciones genéricas que quedan por sistema. Pruebas: `web/tests/content.test.mjs`.
+
+Detalle: `docs/hitos/02-contenido-brazo.md`.
 
 ## Contrato de datos para nuevas fases
 
