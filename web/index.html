@@ -33,14 +33,21 @@
         <button id="btn-home" data-icon="home" data-tip="Inicio" aria-label="Inicio"></button>
         <button id="btn-undo" data-icon="undo" data-tip="Deshacer" aria-label="Deshacer"></button>
         <hr />
+        <button data-panel="study" data-icon="study" data-tip="Estudiar" aria-label="Estudiar"></button>
         <button data-panel="search" data-icon="search" data-tip="Buscar" aria-label="Buscar"></button>
         <button data-panel="tools" data-icon="tools" data-tip="Herramientas" aria-label="Herramientas"></button>
         <button data-panel="settings" data-icon="settings" data-tip="Ajustes" aria-label="Ajustes"></button>
         <button data-panel="help" data-icon="help" data-tip="Ayuda" aria-label="Ayuda"></button>
       </nav>
 
+      <section class="panel panel-study" id="panel-study" aria-label="Estudiar">
+        <div class="panel-head"><h2>Estudiar</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+        <div id="study-body"></div>
+      </section>
+
       <section class="panel" id="panel-search" aria-label="Buscar">
         <div class="panel-head"><h2>Buscar</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
+        <label class="sr-only" for="search-input">Buscar una estructura, región o término latino</label>
         <input id="search-input" type="search" placeholder="Estructura, región o término latino" autocomplete="off" />
         <ul id="search-results" class="results"></ul>
       </section>

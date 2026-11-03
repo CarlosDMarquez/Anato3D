@@ -36,6 +36,7 @@ Modelos: `zsh tools/build_all.sh` (masculino) y `A3D_MODEL=female zsh tools/buil
 | `web/scripts/check-cards.mjs` | Revisa las fichas de todas las piezas: `node scripts/check-cards.mjs` (desde `web/`). |
 | `web/src/data/grupos.js` | Regiones de la ruta jerárquica (los grupos musculares llegan en `male-muscular.json`). |
 | `web/src/viewer.js` | Escena three.js: carga Draco, materiales, brillo de selección, cámara. |
+| `web/src/study/`, `web/src/ui/study.js` | Progreso (local, con versión), preguntas y panel «Estudiar» (lección, evaluación, repaso). |
 | `web/src/content/` | Contenido de estudio: esquema (`schema.js`), fuentes (`fuentes.js`), módulos (`brazo.js`) e índice por pieza (`index.js`). |
 | `web/src/loading.js` | Propiedad de las peticiones de carga (una sesión por modelo instalado), descargas con estado HTTP y aborto, y errores explicables. Pruebas en `web/tests/loading.test.mjs`. |
 | `web/src/main.js` | Estado de la app (capas, ocultar/aislar/transparentar, deshacer), barra y paneles. |
@@ -89,6 +90,22 @@ Detalle en `docs/hitos/01b-construccion-fiable.md`.
 - **Errata:** «Nervio músculocutáneo», «Arteria músculofrénica» y «Venas músculofrénicas», en los dos modelos. Las escribía la regla `\b([Mm])usculo` de `ES_FIXES` (sin final de palabra).
 - **Arreglo:** regla corregida; `check-cards` la detecta (`errata`) y revisa solo el modelo construido.
 - **Publicación:** `build_all.sh vascular nervous` en los dos modelos, unos 3 min cada uno. Solo cambiaron esos nombres, salvo 2–3 vértices de la cámara anterior del ojo en el nervioso masculino (ver `docs/construccion.md`).
+
+## Estudiar: lección, evaluación y repaso (2026-11-03)
+
+El botón **Estudiar** (birrete) abre el módulo «El brazo».
+- **Lección guiada** de 5 pasos: aísla y resalta las estructuras de cada paso con el esqueleto, con un texto breve y su fuente.
+- **Evaluación** de 14 preguntas: 10 identificaciones de la estructura resaltada (4 nombres o «No lo sé») y 4 de texto de un banco de 12.
+  - Mientras se responde no hay etiqueta, ficha (tampoco en el DOM), texto al pasar el ratón ni buscador.
+  - La barra de sistemas es la misma en todas las preguntas.
+- **Explicación con fuente** y **Ver en 3D**.
+- **Progreso** en `localStorage` (`anato3d.progreso`, formato versión 1).
+  - **Repaso** espaciado por cajas (0, 1, 3, 7 y 21 días), empezando por lo fallado o dudoso.
+  - **Portada:** rendimiento reciente (última evaluación) separado del dominio a largo plazo.
+- **Teclado:** 1–4 responden, 5 = «No lo sé», Intro pasa a la siguiente.
+- **Accesibilidad:** los paneles cerrados son ahora `inert` y el foco vuelve al botón que los abrió.
+- **Código:** `web/src/study/` (`progress.js` y `quiz.js`, sin DOM, con pruebas) y `web/src/ui/study.js`.
+- **Detalle:** `docs/hitos/03-leccion-evaluacion-progreso.md`.
 
 ## Contenido de estudio: módulo del brazo (2026-11-02)
 

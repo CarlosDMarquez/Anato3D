@@ -10,7 +10,8 @@ import { renderInfo } from './ui/info.js';
 import { GRUPOS } from './data/grupos.js';
 import { resolvePart, sideOf } from './data/resolve.js';
 import { Sessions, Stale, createSystemLoader, fetchJSON, describeError, onceByKey } from './loading.js';
-import { FICHA_POR_ID } from './content/index.js';
+import { FICHA_POR_ID, MODULOS } from './content/index.js';
+import { createStudy } from './ui/study.js';
 
 const MODELS = {
   male: {
@@ -330,7 +331,7 @@ function hideToast() {
 
 const tooltip = $('#tooltip');
 viewer.addEventListener('hover', ({ detail }) => {
-  if (!detail.part || viewer.selection.has(detail.part)) return (tooltip.hidden = true);
+  if (evaluando || !detail.part || viewer.selection.has(detail.part)) return (tooltip.hidden = true);
   tooltip.textContent = detail.part.info.title;
   tooltip.hidden = false;
   tooltip.style.transform = `translate(${detail.x + 16}px, ${detail.y + 14}px)`;
@@ -382,6 +383,14 @@ function selectionParts() {
 }
 
 function renderSelection() {
+  // En la evaluación no hay ficha: ni a la vista ni en el DOM (un lector de pantalla la leería).
+  if (evaluando) {
+    infoEl.classList.remove('open');
+    infoEl.innerHTML = '';
+    updateInsets();
+    updatePin();
+    return;
+  }
   const parts = selectionParts();
   const sys = parts[0] && SYSTEM_BY_ID[parts[0].system];
   renderInfo(infoEl, current, {
@@ -424,13 +433,15 @@ function selectionAction(act) {
 }
 
 viewer.addEventListener('pick', ({ detail }) => {
-  closePanels();
+  if (evaluando) return;                                 // la estructura resaltada no cambia mientras se responde
+  closePanels({ keep: 'study' });                        // el panel de estudio sigue abierto mientras se explora
   selectPart(detail.part, detail.point);
 });
 
 // Etiqueta clavada en la estructura con línea guía, como en los atlas.
 const pin = $('#pin');
 function updatePin() {
+  if (evaluando) return (pin.hidden = true);
   const s = viewer.anchorScreen();
   const parts = selectionParts();
   if (!s || !s.visible || !parts.length) return (pin.hidden = true);
@@ -475,6 +486,91 @@ function showAll() {
   });
 }
 
+// ── Estudio (panel «Estudiar», ui/study.js) ─────────────────────
+// Modo evaluación: mientras se responde no se ve el nombre de la estructura resaltada por ninguna vía (etiqueta, ficha,
+// texto al pasar el ratón, buscador ni atajos que la seleccionen).
+let evaluando = false;
+function modoEvaluacion(on) {
+  if (evaluando === on) return;
+  evaluando = on;
+  document.body.classList.toggle('evaluando', on);
+  const searchBtn = $('.toolbar [data-panel="search"]');
+  searchBtn.disabled = on;
+  searchBtn.title = on ? 'Buscar no está disponible durante la evaluación' : '';
+  if (on) {
+    if ($('#panel-search').classList.contains('open')) closePanels({ keep: 'study' });
+    tooltip.hidden = true;
+    current = null;
+  }
+  renderSelection();
+}
+
+// Piezas de unas fichas en un lado («Long_head_of_biceps_brachii» → «…_R»).
+const piezasDe = (ids, lado) => ids.map((id) => FICHA_POR_ID.get(id)).filter(Boolean)
+  .flatMap((f) => f.piezas.map((p) => (f.lado === 'bilateral' ? `${p}_${lado}` : p)));
+
+// Muestra las estructuras de unas fichas (un lado) con el esqueleto de contexto, aisladas y resaltadas. Las capas se
+// eligen para todas las fichas de `contexto` (en la evaluación, las del módulo entero), así la barra de sistemas es la
+// misma en cada pregunta y no delata si lo resaltado es un nervio o un vaso. Devuelve si se pudo mostrar todo.
+async function mostrarFichas(ids, { quiz = false, contexto = ids, lado = 'R' } = {}) {
+  if (!ids.length) {                                     // pregunta de texto: sin resaltar nada
+    viewer.select([]);
+    current = null;
+    renderSelection();
+    return true;
+  }
+  const s = sessions.current;
+  const nombres = piezasDe(ids, lado);
+  const todos = [...new Set([...nombres, ...piezasDe(contexto, lado)])];
+  const find = (n) => viewer.parts.find((p) => p.id === n);
+  if (todos.some((n) => !find(n))) {
+    await loadPendingIndex();
+    const keys = new Set(unloaded.model === state.model ? unloaded.parts.filter((p) => todos.includes(p.id)).map((p) => p.key) : []);
+    for (const k of keys) if (!(await ensureSystem(k, { quiet: true }))) return false;
+  }
+  if (s !== sessions.current) return false;              // se cambió de modelo mientras se descargaba
+  const parts = nombres.map(find).filter(Boolean);
+  const ctx = todos.map(find).filter(Boolean);
+  change(() => {
+    // Por sistema, una capa que muestre todas sus piezas del contexto.
+    for (const sysId of new Set(ctx.map((p) => p.system))) {
+      const mine = ctx.filter((p) => p.system === sysId);
+      const sys = SYSTEM_BY_ID[sysId];
+      const ok = (st) => available[sysId].has(st.id) && !st.ghost && mine.every((p) => st.filter(p));
+      if (!(stageOf(mine[0]) && mine.every((p) => stageOf(p)?.filter(p) && !stageOf(p).ghost))) {
+        state.stages[sysId] = sys.stages.find(ok)?.id ?? sys.stages.find((st) => available[sysId].has(st.id) && !st.ghost && parts.every((p) => p.system !== sysId || st.filter(p)))?.id ?? state.stages[sysId];
+      }
+    }
+    state.stages.skeletal = 'all';
+    for (const part of parts) { state.hidden.delete(part.id); state.faded.delete(part.id); }
+    state.isolated = new Set([...parts, ...viewer.parts.filter((p) => p.system === 'skeletal')].map((p) => p.id));
+  });
+  current = null;
+  viewer.select(parts);
+  renderSelection();
+  if (parts.length) viewer.focus(parts);
+  return parts.length === nombres.length;
+}
+
+// Abre la ficha de una estructura del módulo: la pieza del lado que está resaltado, si la hay.
+function abrirFicha(id, { sinCamara = false } = {}) {
+  const f = FICHA_POR_ID.get(id);
+  if (!f) return;
+  const lado = [...viewer.selection].find((p) => p.side)?.side ?? 'R';
+  const part = [...piezasDe([id], lado), ...piezasDe([id], lado === 'R' ? 'L' : 'R')].map((n) => viewer.parts.find((p) => p.id === n)).find(Boolean);
+  if (!part) return openFicha(id);
+  if (part.visible) selectPart(part, null, { focus: !sinCamara });
+  else reveal(part);
+}
+
+const study = createStudy({
+  body: $('#study-body'),
+  modulos: MODULOS,
+  storage: (() => { try { return window.localStorage; } catch { return null; } })(),
+  toast,
+  api: { mostrar: mostrarFichas, abrirFicha, modoEvaluacion, modelo: () => state.model },
+});
+
 // Abre la estructura de una relación de una ficha de módulo (del mismo lado si existe), aunque su sistema esté apagado o
 // sin descargar.
 async function openFicha(id) {
@@ -512,24 +608,47 @@ function reveal(part) {
 function updateInsets() {
   const dockH = $('.dock-wrap').offsetHeight;
   document.documentElement.style.setProperty('--dock-h', `${dockH}px`);
-  const sheet = isMobile() && current ? infoEl.offsetHeight : 0;
+  const studyOpen = $('#panel-study').classList.contains('open');
+  const sheet = isMobile() ? Math.max(current ? infoEl.offsetHeight : 0, studyOpen ? $('#panel-study').offsetHeight + 8 : 0) : 0;
   viewer.insets = { top: isMobile() ? 56 : 64, bottom: dockH + sheet + 8 };
 }
 window.addEventListener('resize', () => { updateInsets(); updatePin(); });
 
 // ── Paneles (buscar, herramientas, ajustes, ayuda) ──────────────
-function closePanels() {
-  document.querySelectorAll('.panel.open').forEach((p) => p.classList.remove('open'));
-  document.querySelectorAll('.toolbar button.on').forEach((b) => b.classList.remove('on'));
+// Un panel cerrado queda `inert`: antes solo se hacía transparente y sus botones seguían recibiendo el foco del teclado.
+// Al cerrarlo, el foco vuelve al botón que lo abrió. `keep`: panel que no se cierra (el de estudio, al explorar).
+function closePanels({ keep = null } = {}) {
+  document.querySelectorAll('.panel.open').forEach((p) => {
+    const name = p.id.replace('panel-', '');
+    if (name === keep) return;
+    const hadFocus = p.contains(document.activeElement);
+    p.classList.remove('open');
+    p.inert = true;
+    const opener = $(`.toolbar [data-panel="${name}"]`);
+    opener?.classList.remove('on');
+    opener?.setAttribute('aria-expanded', 'false');
+    if (name === 'study') { study.cerrar(); updateInsets(); }
+    if (hadFocus) opener?.focus();
+  });
 }
 
 function togglePanel(name) {
   const panel = $(`#panel-${name}`);
   const open = !panel.classList.contains('open');
+  if (open && name === 'search' && evaluando) return;
   closePanels();
   if (!open) return;
   panel.classList.add('open');
+  panel.inert = false;
   $(`.toolbar [data-panel="${name}"]`).classList.add('on');
+  $(`.toolbar [data-panel="${name}"]`).setAttribute('aria-expanded', 'true');
+  if (name === 'study') {
+    study.abrir();
+    updateInsets();
+    panel.querySelector('h2').focus();
+    return;
+  }
+  if (name !== 'search') panel.querySelector('h2')?.focus();
   if (name === 'search') {
     loadPendingIndex();
     const input = $('#search-input');
@@ -622,7 +741,13 @@ function renderSearch(q) {
 function buildChrome() {
   document.querySelectorAll('[data-icon]').forEach((b) => b.insertAdjacentHTML('afterbegin', uiIcon(b.dataset.icon)));
   document.querySelectorAll('[data-sysicon]').forEach((b) => b.insertAdjacentHTML('afterbegin', systemIcon(b.dataset.sysicon)));
-  document.querySelectorAll('.toolbar [data-panel]').forEach((b) => b.addEventListener('click', () => togglePanel(b.dataset.panel)));
+  document.querySelectorAll('.toolbar [data-panel]').forEach((b) => {
+    b.setAttribute('aria-expanded', 'false');
+    b.setAttribute('aria-controls', `panel-${b.dataset.panel}`);
+    b.addEventListener('click', () => togglePanel(b.dataset.panel));
+  });
+  document.querySelectorAll('.panel').forEach((p) => (p.inert = true));
+  document.querySelectorAll('.panel h2').forEach((h) => h.setAttribute('tabindex', '-1'));
   document.querySelectorAll('.panel .icon-btn[data-close]').forEach((b) => {
     b.innerHTML = uiIcon('close');
     b.addEventListener('click', closePanels);
@@ -674,8 +799,9 @@ function buildChrome() {
   });
 
   window.addEventListener('keydown', (e) => {
+    if ($('#panel-study').classList.contains('open') && study.onKey(e)) { e.preventDefault(); return; }
     if (e.target instanceof Element && e.target.matches('input, textarea, select')) return;
-    const has = selectionParts().length > 0;
+    const has = !evaluando && selectionParts().length > 0;
     const k = e.key.toLowerCase();
     if ((e.metaKey || e.ctrlKey) && k === 'z') { e.preventDefault(); undo(); }
     else if (e.key === 'Escape') { closePopover(); closePanels(); selectPart(null); }
@@ -683,7 +809,7 @@ function buildChrome() {
     else if (has && k === 'i') selectionAction('isolate');
     else if (has && k === 'f') selectionAction('focus');
     else if (has && k === 'v') selectionAction('fade');
-    else if (e.key === '/') { e.preventDefault(); togglePanel('search'); }
+    else if (e.key === '/' && !evaluando) { e.preventDefault(); togglePanel('search'); }
   });
 }
 

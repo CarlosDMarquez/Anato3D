@@ -12,7 +12,7 @@ import { fileURLToPath } from 'url';
 import { resolvePart } from '../src/data/resolve.js';
 import { classify } from '../src/systems.js';
 import { MODULOS } from '../src/content/index.js';
-import { revisarFicha, GENERICOS } from '../src/content/schema.js';
+import { revisarFicha, revisarModulo, GENERICOS } from '../src/content/schema.js';
 import { FUENTES } from '../src/content/fuentes.js';
 
 // --models <carpeta>: revisa otra carpeta (build_all.sh revisa así el candidato antes de publicarlo).
@@ -77,10 +77,11 @@ for (const modulo of MODULOS) {
   if (ids.size !== modulo.estructuras.length) problemas.push({ nivel: 'error', texto: 'identificadores repetidos' });
   for (const id of [...modulo.nucleo, ...modulo.contexto]) if (!ids.has(id)) problemas.push({ nivel: 'error', texto: `${id}: en el núcleo o el contexto, pero sin ficha` });
   for (const f of modulo.estructuras) problemas.push(...revisarFicha(f, { fuentes: FUENTES, piezasDe: (m) => nombres[m], ids }));
+  problemas.push(...revisarModulo(modulo, { fuentes: FUENTES }));
   const errores = problemas.filter((p) => p.nivel === 'error');
   const avisos = problemas.filter((p) => p.nivel === 'aviso');
   const estados = Object.entries(modulo.estructuras.reduce((a, f) => ({ ...a, [f.revision.estado]: (a[f.revision.estado] ?? 0) + 1 }), {}));
-  console.log(`módulo «${modulo.id}»: ${modulo.estructuras.length} fichas (${modulo.nucleo.length} evaluables); revisión: ${estados.map(([e, n]) => `${n} ${e}`).join(', ')}`);
+  console.log(`módulo «${modulo.id}» (versión ${modulo.version}): ${modulo.estructuras.length} fichas (${modulo.nucleo.length} evaluables), ${modulo.leccion.length} pasos de lección, ${modulo.preguntas.length} preguntas de texto; revisión: ${estados.map(([e, n]) => `${n} ${e}`).join(', ')}`);
   for (const p of errores) console.log(`  error: ${p.texto}`);
   for (const p of avisos) console.log(`  aviso: ${p.texto}`);
   fallos += errores.length;

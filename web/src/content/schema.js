@@ -98,3 +98,34 @@ export function revisarFicha(f, { fuentes, piezasDe, ids }) {
   if (f.revision?.estado === 'revisado' && !(f.revision.revisor && f.revision.fecha)) err('«revisado» sin revisor ni fecha');
   return out;
 }
+
+/** Problemas del módulo fuera de las fichas: versión, lección y banco de preguntas. */
+export function revisarModulo(mod, { fuentes }) {
+  const out = [];
+  const err = (texto) => out.push({ nivel: 'error', texto });
+  const ids = new Set(mod.estructuras.map((f) => f.id));
+  if (!mod.version) err(`${mod.id}: sin «version» (el progreso guardado la necesita para saber si el contenido cambió)`);
+  for (const paso of mod.leccion ?? []) {
+    if (!paso.titulo || !paso.texto) err(`lección «${paso.id}»: sin título o sin texto`);
+    for (const id of paso.fichas ?? []) if (!ids.has(id)) err(`lección «${paso.id}»: ficha inexistente ${id}`);
+    if (!paso.fuentes?.length || paso.fuentes.some((f) => !fuentes[f])) err(`lección «${paso.id}»: sin fuente válida`);
+  }
+  const vistos = new Set();
+  for (const p of mod.preguntas ?? []) {
+    if (vistos.has(p.id)) err(`pregunta repetida: ${p.id}`);
+    vistos.add(p.id);
+    if (!p.enunciado || !p.correcta || !p.explicacion) err(`pregunta «${p.id}»: falta enunciado, respuesta o explicación`);
+    if (p.distractores?.length !== 3) err(`pregunta «${p.id}»: necesita 3 distractores`);
+    if (new Set([p.correcta, ...(p.distractores ?? [])]).size !== 1 + (p.distractores?.length ?? 0)) err(`pregunta «${p.id}»: opciones repetidas`);
+    if (!p.fichas?.length || p.fichas.some((id) => !ids.has(id))) err(`pregunta «${p.id}»: fichas inexistentes`);
+    if (!fuentes[p.fuente]) err(`pregunta «${p.id}»: sin fuente válida`);
+  }
+  // Cada estructura evaluable necesita al menos dos nombres distintos con los que confundirla.
+  for (const id of mod.nucleo) {
+    const f = mod.estructuras.find((g) => g.id === id);
+    const grupo = (t) => ({ arteria: 'vaso', vena: 'vaso' })[t] ?? t;
+    const otros = mod.estructuras.filter((g) => g.id !== id && grupo(g.tipo) === grupo(f.tipo)).length + (mod.distractoresExtra?.[id]?.length ?? 0);
+    if (otros < 3) err(`${id}: menos de 3 distractores para la pregunta de identificación`);
+  }
+  return out;
+}
