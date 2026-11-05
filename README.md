@@ -91,6 +91,17 @@ Detalle en `docs/hitos/01b-construccion-fiable.md`.
 - **Arreglo:** regla corregida; `check-cards` la detecta (`errata`) y revisa solo el modelo construido.
 - **Publicación:** `build_all.sh vascular nervous` en los dos modelos, unos 3 min cada uno. Solo cambiaron esos nombres, salvo 2–3 vértices de la cámara anterior del ojo en el nervioso masculino (ver `docs/construccion.md`).
 
+## Revisión por un especialista (2026-11-05)
+
+`node web/scripts/paquete-revision.mjs` genera el paquete de revisión de un módulo **a partir del propio contenido de la app** (`src/content`), así que lo que se revisa es exactamente lo que la app muestra.
+- **Contenido:** 198 filas con código estable, texto, fuente, veredicto y comentario.
+  - Códigos: F = ficha y campo, O = objetivos, L = lección, P = preguntas de texto, I = identificación en 3D, V = inspección en el modelo, D = decisiones.
+  - Al final, la firma de la revisión y las fuentes.
+- **Salida en Markdown:** `docs/revision/<módulo>-<versión>.md`.
+- **Salida en JSON (`--json`):** las secciones, para escribir el documento compartido.
+- **Documento compartido:** «Anato3D · Paquete de revisión del módulo del brazo», en Claude Docs, con un desplegable de veredicto por fila: Sin revisar, Correcto, Corregir o Dudoso. Es privado hasta que se comparta.
+- **Cuando vuelva revisado:** se aplican las correcciones en `src/content/brazo.js` y solo las fichas aprobadas pasan a `revision.estado = 'revisado'`, con revisor y fecha (el esquema lo exige).
+
 ## Estudiar: lección, evaluación y repaso (2026-11-03)
 
 El botón **Estudiar** (birrete) abre el módulo «El brazo».
