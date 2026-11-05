@@ -12,6 +12,7 @@ import { SSAO, profileFor, toPhysical, applyProfile, NEEDS_FIBERS } from './real
 // ?plain en la URL desactiva los materiales realistas (para comparar rendimiento y aspecto).
 const PLAIN = new URLSearchParams(location.search).has('plain');
 const HOME = { target: new THREE.Vector3(0, 0.95, 0), position: new THREE.Vector3(0, 1.05, 3.1) };
+const BLACK = new THREE.Color(0x000000);
 
 // Resalte compartido por todos los materiales seleccionados o bajo el cursor:
 // tiñe la superficie y añade un brillo de borde (fresnel), como en los atlas 3D profesionales.
@@ -239,6 +240,8 @@ export class Viewer extends EventTarget {
     this.tween = null;
     this.selFade = null;
     this.insets = { top: 56, bottom: 100 };
+    this.showcase = null;        // pantalla de inicio: { t0, frame }
+    this.lessMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -250,7 +253,8 @@ export class Viewer extends EventTarget {
     this.physCache = new Map();
 
     this.scene = new THREE.Scene();
-    this.scene.background = radialTexture(1024, [[0, '#1d2733'], [0.55, '#121820'], [1, '#07090c']]);
+    this.backdrop = radialTexture(1024, [[0, '#1d2733'], [0.55, '#121820'], [1, '#07090c']]);
+    this.scene.background = this.backdrop;
     const pmrem = new THREE.PMREMGenerator(renderer);
     this.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     this.scene.environmentIntensity = 0.5;
@@ -319,6 +323,7 @@ export class Viewer extends EventTarget {
     const buf = this.renderer.getDrawingBufferSize(new THREE.Vector2());
     this.ao.setSize(buf.x, buf.y);
     SSAO.invSize.value.set(1 / buf.x, 1 / buf.y);
+    if (this.showcase) this.#frameShowcase();
     this.needsRender = true;
   }
 
@@ -752,6 +757,42 @@ export class Viewer extends EventTarget {
     this.#animateTo(v.target, v.position);
   }
 
+  // Pantalla de inicio: fondo negro, sin controles y la cámara en el tórax y la cabeza de lo visible, girando despacio
+  // de un lado a otro (quieta si el sistema pide menos movimiento). Al salir, `home()` lleva la cámara a la vista inicial.
+  setShowcase(on) {
+    this.showcase = on ? { t0: performance.now(), frame: null } : null;
+    this.scene.background = on ? BLACK : this.backdrop;
+    this.controls.enabled = !on;
+    if (on) {
+      this.tween = null;
+      this.#frameShowcase();
+    }
+    this.needsRender = true;
+  }
+
+  // Del tórax hacia arriba: el 36 % superior de lo visible (la caja torácica entera, los hombros y la cabeza). La cabeza
+  // queda cerca del borde superior y el corte, en el inferior (la página lo funde con el negro).
+  #frameShowcase() {
+    const all = new THREE.Box3();
+    for (const p of this.parts) if (p.visible) for (const m of p.meshes) all.expandByObject(m);
+    if (all.isEmpty()) return;
+    const top = all.max.y;
+    const bottom = top - (top - all.min.y) * 0.36;
+    // Ancho y centro con las piezas de esa altura (los brazos hasta el codo, no las manos).
+    const bust = new THREE.Box3(), box = new THREE.Box3();
+    for (const p of this.parts) if (p.visible) for (const m of p.meshes) {
+      box.setFromObject(m);
+      if ((box.min.y + box.max.y) / 2 >= bottom) bust.union(box);
+    }
+    const size = bust.getSize(new THREE.Vector3());
+    const aspect = (this.container.clientWidth || 1) / (this.container.clientHeight || 1);
+    const tan = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
+    const span = Math.max((top - bottom) / 0.92, (Math.max(size.x, size.z) * 1.08) / aspect);  // alto visible
+    const target = bust.getCenter(new THREE.Vector3());
+    target.y = top + span * 0.06 - span / 2;
+    this.showcase.frame = { target, dist: span / 2 / tan };
+  }
+
   view(name) {
     const home = this.#homeView();
     const d = home.position.distanceTo(home.target);
@@ -777,6 +818,15 @@ export class Viewer extends EventTarget {
   }
 
   #frame() {
+    const show = this.showcase?.frame;
+    if (show) {
+      // De tres cuartos, mirando hacia el menú de la izquierda, con un vaivén de ±11° cada 18 s.
+      const t = (performance.now() - this.showcase.t0) / 1000;
+      const az = 0.38 + (this.lessMotion.matches ? 0 : 0.2 * Math.sin((2 * Math.PI * t) / 18));
+      this.controls.target.copy(show.target);
+      this.camera.position.set(show.target.x + Math.sin(az) * show.dist, show.target.y + show.dist * 0.04, show.target.z + Math.cos(az) * show.dist);
+      if (!this.lessMotion.matches) this.needsRender = true;
+    }
     if (this.tween) {
       const tw = this.tween;
       const k = Math.min((performance.now() - tw.t0) / tw.dur, 1);

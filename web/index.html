@@ -16,7 +16,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   </head>
-  <body>
+  <body class="inicio">
     <div id="app">
       <div id="stage"></div>
 
@@ -98,8 +98,11 @@
           <dt>Sistemas</dt><dd>Toca un sistema para pasar por sus capas; mantenlo presionado para elegir una.</dd>
         </dl>
         <h3>Créditos</h3>
-        <p class="small">Huesos, cartílagos, músculos, ligamentos, fascias, vasos, corazón, sistema nervioso, órganos de los sentidos y vísceras derivados de <b>Z-Anatomy</b> (CC BY-SA 4.0), basado en <b>BodyParts3D</b> © The Database Center for Life Science (DBCLS); nombres en español y latín de su traducción oficial. Piel derivada de <b>MakeHuman</b>. Iconos de sistemas: <b>Health Icons</b>; iconos de interfaz: <b>Lucide</b>; tipografía <b>IBM Plex</b>.</p>
-        <p class="small muted">Anato3D es una herramienta educativa y no sustituye la consulta con profesionales de la salud.</p>
+        <div id="creditos">
+          <p class="small"><b>NeuroFuture</b> · Conciencia Cerebral Mexicali (Mexicali, B.C.). Contacto: concienciacerebromexicali@gmail.com</p>
+          <p class="small">Huesos, cartílagos, músculos, ligamentos, fascias, vasos, corazón, sistema nervioso, órganos de los sentidos y vísceras derivados de <b>Z-Anatomy</b> (CC BY-SA 4.0), basado en <b>BodyParts3D</b> © The Database Center for Life Science (DBCLS); nombres en español y latín de su traducción oficial. Piel derivada de <b>MakeHuman</b>. Iconos de sistemas: <b>Health Icons</b>; iconos de interfaz: <b>Lucide</b>; tipografía <b>IBM Plex</b>.</p>
+          <p class="small muted">Anato3D es una herramienta educativa y no sustituye la consulta con profesionales de la salud.</p>
+        </div>
       </section>
 
       <aside id="info" class="info" aria-live="polite"></aside>
@@ -125,6 +128,31 @@
         <p id="loader-label" role="status" aria-live="polite">Cargando…</p>
         <button id="loader-retry" class="loader-retry" type="button">Reintentar</button>
       </div>
+
+      <!-- Pantalla de inicio (ui/start.js): nombre, menú y crédito a la izquierda; a la derecha, el visor con el esqueleto
+           del tórax hacia arriba. Configuración y Créditos reutilizan el contenido de «Ajustes» y «Ayuda». -->
+      <section id="start" class="start" aria-label="Inicio">
+        <div class="start-main">
+          <h1 class="start-brand">Anato<b>3D</b></h1>
+          <nav class="start-menu" aria-label="Menú de inicio">
+            <button class="start-item primary" type="button" data-start="iniciar">Iniciar</button>
+            <button class="start-item" type="button" data-start="configuracion">Configuración</button>
+            <button class="start-item" type="button" data-start="creditos">Créditos</button>
+          </nav>
+          <div id="start-configuracion" class="start-view" hidden>
+            <button class="start-back" type="button" data-icon="chevron" data-volver>Volver</button>
+            <h2 tabindex="-1">Configuración</h2>
+            <div class="start-settings"></div>
+          </div>
+          <div id="start-creditos" class="start-view" hidden>
+            <button class="start-back" type="button" data-icon="chevron" data-volver>Volver</button>
+            <h2 tabindex="-1">Créditos</h2>
+            <div class="start-credits"></div>
+          </div>
+        </div>
+        <p class="start-credit"><img src="/neurofuture.png" width="800" height="127" alt="NeuroFuture · Conciencia Cerebral Mexicali" /></p>
+        <div class="start-veil" aria-hidden="true"></div>
+      </section>
     </div>
     <script type="module" src="/src/main.js"></script>
   </body>

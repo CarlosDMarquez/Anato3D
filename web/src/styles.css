@@ -322,3 +322,64 @@ body.evaluando #info, body.evaluando #pin, body.evaluando #tooltip { display: no
   /* En el móvil el panel de estudio va abajo, para que el modelo quede a la vista mientras se responde. */
   .panel-study { top: auto; bottom: calc(var(--dock-h, 86px) + 6px); left: 8px; right: 8px; width: auto; max-height: 46%; }
 }
+
+/* ── Pantalla de inicio (ui/start.js) ──────────
+   Fondo negro; a la izquierda el nombre, el menú y el crédito; a la derecha el visor (#stage se estrecha y el
+   ResizeObserver del visor ajusta el lienzo). Mientras está abierta no se ve nada de la interfaz de la app. */
+:root { --start-w: clamp(360px, 40vw, 640px); }
+body.inicio { background: #000; }
+body.inicio :is(.brandbar, .toolbar, .panel, .info, .pin, .status-pill, .dock-wrap, .popover, .tooltip) { display: none !important; }
+body.inicio #stage { left: var(--start-w); overflow: hidden; pointer-events: none; }
+#stage { transition: opacity 0.35s; }
+body.saliendo #stage { opacity: 0; transition-duration: 0.25s; }
+/* Al entrar en la app, sus barras aparecen poco a poco (la animación arranca al dejar de estar ocultas). */
+.brandbar, .toolbar, .dock-wrap { animation: aparecer 0.5s ease both; }
+@keyframes aparecer { from { opacity: 0; } }
+/* La primera carga, en la parte del visor y sin repetir el nombre. */
+body.inicio .loader { left: var(--start-w); background: #000; }
+body.inicio .loader .brand { display: none; }
+/* Los avisos (p. ej. al cambiar un ajuste) quedan por encima de la columna del menú. */
+body.inicio .toast { z-index: 45; }
+
+.start { position: fixed; top: 0; bottom: 0; left: 0; width: var(--start-w); display: none; flex-direction: column; padding: clamp(28px, 7vh, 72px) clamp(36px, 5vw, 80px) clamp(24px, 5vh, 48px); background: #000; z-index: 40; transition: opacity 0.25s; }
+body.inicio .start { display: flex; }
+body.saliendo .start { opacity: 0; }
+.start-main { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: center; gap: clamp(28px, 6vh, 56px); }
+.start-brand { margin: 0; font-size: clamp(56px, 6.2vw, 96px); font-weight: 400; line-height: 1; letter-spacing: -0.025em; color: var(--text-2); }
+.start-brand b { font-weight: 600; color: var(--text); }
+.start-menu { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+/* La opción elegida lleva la marca de las etiquetas del visor: línea guía y punto con brillo azul, colgados a la izquierda. */
+.start-item { position: relative; padding: 8px 0; font-size: clamp(19px, 1.6vw, 23px); letter-spacing: 0.01em; color: var(--muted); transition: color 0.15s; }
+.start-item.primary { font-weight: 600; color: var(--text-2); }
+.start-item::before { content: ''; position: absolute; top: 50%; left: -30px; width: 16px; height: 1px; background: rgba(232, 236, 241, 0.75); transform: scaleX(0); transform-origin: left; transition: transform 0.18s; }
+.start-item::after { content: ''; position: absolute; top: 50%; left: -14px; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.4), 0 0 10px rgba(77, 163, 255, 0.8); opacity: 0; transition: opacity 0.18s; }
+.start-item:focus { outline: none; color: var(--text); }
+.start-item.primary:focus { color: var(--accent); }
+.start-item:focus::before, .start-menu:not(:focus-within) .primary::before { transform: none; }
+.start-item:focus::after, .start-menu:not(:focus-within) .primary::after { opacity: 1; }
+.start-view { max-width: 460px; min-height: 0; overflow: auto; }
+.start-view h2 { margin: 6px 0 14px; font-size: 22px; font-weight: 600; }
+.start-view h2:focus { outline: none; }
+.start-back { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; color: var(--muted); }
+.start-back:hover { color: var(--text); }
+.start-back .ui-icon { width: 15px; height: 15px; transform: rotate(180deg); }
+.start .switch { padding: 12px 0; font-size: 15px; }
+.start .setting-note { font-size: 12.5px; }
+.start-credits p { margin: 0 0 12px; font-size: 13.5px; line-height: 1.65; }
+.start-credit { margin: 0; }
+.start-credit img { display: block; width: clamp(200px, 16vw, 280px); height: auto; }
+/* El esqueleto se corta abajo: el corte se funde con el negro. */
+.start-veil { position: fixed; left: var(--start-w); right: 0; bottom: 0; height: 24%; background: linear-gradient(rgba(0, 0, 0, 0), #000 88%); pointer-events: none; }
+
+@media (max-width: 760px) {
+  /* En el móvil, el esqueleto arriba y el nombre, el menú y el crédito debajo. */
+  body.inicio #stage, body.inicio .loader { left: 0; bottom: 44%; }
+  .start { top: 56%; width: auto; right: 0; padding: 0 34px calc(18px + env(safe-area-inset-bottom)); background: none; }
+  .start-main { justify-content: flex-start; gap: 18px; }
+  .start-brand { font-size: 46px; }
+  .start-item { padding: 6px 0; font-size: 19px; }
+  .start-veil { left: 0; bottom: calc(44% - 2px); height: 18%; }  /* 2 px más: la última fila del lienzo */
+  .start-credit img { width: 150px; }
+  /* Configuración y Créditos ocupan toda la pantalla, para leerlos sin estrecheces. */
+  .start.con-vista { top: 0; padding-top: calc(28px + env(safe-area-inset-top)); background: #000; }
+}

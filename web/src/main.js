@@ -12,6 +12,7 @@ import { resolvePart, sideOf } from './data/resolve.js';
 import { Sessions, Stale, createSystemLoader, fetchJSON, describeError, onceByKey } from './loading.js';
 import { FICHA_POR_ID, MODULOS } from './content/index.js';
 import { createStudy } from './ui/study.js';
+import { createStart } from './ui/start.js';
 
 const MODELS = {
   male: {
@@ -54,6 +55,7 @@ try {
 } catch (err) {
   // Sin WebGL (navegador antiguo, aceleración gráfica desactivada…) no hay visor: se explica en vez de quedar en blanco.
   console.error(err);
+  document.body.classList.remove('inicio');              // el aviso, a pantalla completa (la de inicio no serviría)
   $('#loader-label').textContent = 'Este navegador no puede mostrar gráficos 3D (WebGL). Prueba con otro navegador o activa la aceleración por hardware en sus ajustes.';
   $('.loader-track').hidden = true;
   throw err;
@@ -799,6 +801,7 @@ function buildChrome() {
   });
 
   window.addEventListener('keydown', (e) => {
+    if (portada.abierta) return;                         // la pantalla de inicio tiene sus propias teclas
     if ($('#panel-study').classList.contains('open') && study.onKey(e)) { e.preventDefault(); return; }
     if (e.target instanceof Element && e.target.matches('input, textarea, select')) return;
     const has = !evaluando && selectionParts().length > 0;
@@ -895,15 +898,17 @@ async function loadModel(id) {
     loadPendingIndex();
   }
   apply();
-  viewer.home();
+  if (portada.abierta) viewer.setShowcase(true);         // encuadra el esqueleto del tórax hacia arriba
+  else viewer.home();
   if (first) {
     bar.style.width = '100%';
     loader.classList.add('done');
     setTimeout(() => (loader.hidden = true), 400);
   } else toast(`Modelo ${label}`);
-  // Los sistemas en archivo aparte que ya empiezan activos (p. ej. los cartílagos) se completan al cargar.
+  // Los sistemas en archivo aparte que ya empiezan activos (p. ej. los cartílagos) se completan al cargar; en la
+  // pantalla de inicio, sin avisos de progreso (los errores sí se avisan).
   for (const sys of Object.keys(MODELS[id].systems ?? {})) {
-    if (state.stages[sys]) ensureSystem(sys).then((ok) => ok && apply());
+    if (state.stages[sys]) ensureSystem(sys, { quiet: portada.abierta }).then((ok) => ok && apply());
   }
   for (const sys of SYSTEMS) if (state.stages[sys.id]) loadContext(sys.id);
 }
@@ -911,5 +916,16 @@ $('#loader-retry').addEventListener('click', () => loadModel(state.model));
 
 buildChrome();
 buildDock();
+const portada = createStart({
+  root: $('#start'),
+  ajustes: $('#panel-settings'),
+  creditos: $('#creditos'),
+  onIniciar() {
+    viewer.setShowcase(false);
+    updateInsets();
+    if (sessions.current) viewer.home();                 // si el modelo aún se descarga, lo encuadra loadModel
+  },
+});
+if (portada.abierta) viewer.setShowcase(true);
 loadModel('male');
 if (import.meta.env.DEV) window.anato3d = { viewer, state };
