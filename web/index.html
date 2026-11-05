@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" class="sin-traducir">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -17,91 +17,102 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   </head>
   <body class="inicio">
+    <!-- Los textos llevan data-t* (i18n/idioma.js): main.js los pone en el idioma elegido (inglés por defecto). -->
     <div id="app">
       <div id="stage"></div>
 
       <header class="brandbar">
         <p class="brand">Anato<b>3D</b></p>
-        <div id="model-switch" class="segmented" role="group" aria-label="Modelo">
-          <button data-model="male" data-sysicon="male" aria-label="Modelo masculino"><span>Masculino</span></button>
-          <button data-model="female" data-sysicon="female" aria-label="Modelo femenino"><span>Femenino</span></button>
+        <div id="model-switch" class="segmented" role="group" aria-label="Modelo" data-t-aria="modelo.aria">
+          <button data-model="male" data-sysicon="male" aria-label="Modelo masculino" data-t-aria="modelo.male.aria"><span data-t="modelo.male">Masculino</span></button>
+          <button data-model="female" data-sysicon="female" aria-label="Modelo femenino" data-t-aria="modelo.female.aria"><span data-t="modelo.female">Femenino</span></button>
         </div>
         <p id="model-detail" class="model-detail"></p>
       </header>
 
-      <nav class="toolbar" aria-label="Herramientas">
-        <button id="btn-home" data-icon="home" data-tip="Inicio" aria-label="Inicio"></button>
-        <button id="btn-undo" data-icon="undo" data-tip="Deshacer" aria-label="Deshacer"></button>
+      <nav class="toolbar" aria-label="Herramientas" data-t-aria="barra.aria">
+        <button id="btn-home" data-icon="home" data-tip="Inicio" aria-label="Inicio" data-t-tip="barra.inicio" data-t-aria="barra.inicio"></button>
+        <button id="btn-undo" data-icon="undo" data-tip="Deshacer" aria-label="Deshacer" data-t-tip="barra.deshacer" data-t-aria="barra.deshacer"></button>
         <hr />
-        <button data-panel="study" data-icon="study" data-tip="Estudiar" aria-label="Estudiar"></button>
-        <button data-panel="search" data-icon="search" data-tip="Buscar" aria-label="Buscar"></button>
-        <button data-panel="tools" data-icon="tools" data-tip="Herramientas" aria-label="Herramientas"></button>
-        <button data-panel="settings" data-icon="settings" data-tip="Ajustes" aria-label="Ajustes"></button>
-        <button data-panel="help" data-icon="help" data-tip="Ayuda" aria-label="Ayuda"></button>
+        <button data-panel="study" data-icon="study" data-tip="Estudiar" aria-label="Estudiar" data-t-tip="panel.estudiar" data-t-aria="panel.estudiar"></button>
+        <button data-panel="search" data-icon="search" data-tip="Buscar" aria-label="Buscar" data-t-tip="panel.buscar" data-t-aria="panel.buscar"></button>
+        <button data-panel="tools" data-icon="tools" data-tip="Herramientas" aria-label="Herramientas" data-t-tip="panel.herramientas" data-t-aria="panel.herramientas"></button>
+        <button data-panel="settings" data-icon="settings" data-tip="Ajustes" aria-label="Ajustes" data-t-tip="panel.ajustes" data-t-aria="panel.ajustes"></button>
+        <button data-panel="help" data-icon="help" data-tip="Ayuda" aria-label="Ayuda" data-t-tip="panel.ayuda" data-t-aria="panel.ayuda"></button>
       </nav>
 
-      <section class="panel panel-study" id="panel-study" aria-label="Estudiar">
-        <div class="panel-head"><h2>Estudiar</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
-        <div id="study-body"></div>
+      <section class="panel panel-study" id="panel-study" aria-label="Estudiar" data-t-aria="panel.estudiar">
+        <div class="panel-head"><h2 data-t="panel.estudiar">Estudiar</h2><button class="icon-btn" data-close aria-label="Cerrar" data-t-aria="comun.cerrar"></button></div>
+        <p id="study-aviso" class="mod-note" data-t="estudio.soloEs" hidden></p>
+        <div id="study-body" lang="es"></div>
       </section>
 
-      <section class="panel" id="panel-search" aria-label="Buscar">
-        <div class="panel-head"><h2>Buscar</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
-        <label class="sr-only" for="search-input">Buscar una estructura, región o término latino</label>
-        <input id="search-input" type="search" placeholder="Estructura, región o término latino" autocomplete="off" />
+      <section class="panel" id="panel-search" aria-label="Buscar" data-t-aria="panel.buscar">
+        <div class="panel-head"><h2 data-t="panel.buscar">Buscar</h2><button class="icon-btn" data-close aria-label="Cerrar" data-t-aria="comun.cerrar"></button></div>
+        <label class="sr-only" for="search-input" data-t="buscar.etiqueta">Buscar una estructura, región o término latino</label>
+        <input id="search-input" type="search" placeholder="Estructura, región o término latino" data-t-ph="buscar.placeholder" autocomplete="off" />
         <ul id="search-results" class="results"></ul>
       </section>
 
-      <section class="panel" id="panel-tools" aria-label="Herramientas">
-        <div class="panel-head"><h2>Herramientas</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
-        <h3>Vistas</h3>
+      <section class="panel" id="panel-tools" aria-label="Herramientas" data-t-aria="panel.herramientas">
+        <div class="panel-head"><h2 data-t="panel.herramientas">Herramientas</h2><button class="icon-btn" data-close aria-label="Cerrar" data-t-aria="comun.cerrar"></button></div>
+        <h3 data-t="herr.vistas">Vistas</h3>
         <div class="grid-btns">
-          <button data-tool="anterior">Anterior</button>
-          <button data-tool="posterior">Posterior</button>
-          <button data-tool="derecha">Lateral derecha</button>
-          <button data-tool="izquierda">Lateral izquierda</button>
-          <button data-tool="superior">Superior</button>
-          <button data-tool="rotate">Rotación automática</button>
+          <button data-tool="anterior" data-t="herr.anterior">Anterior</button>
+          <button data-tool="posterior" data-t="herr.posterior">Posterior</button>
+          <button data-tool="derecha" data-t="herr.derecha">Lateral derecha</button>
+          <button data-tool="izquierda" data-t="herr.izquierda">Lateral izquierda</button>
+          <button data-tool="superior" data-t="herr.superior">Superior</button>
+          <button data-tool="rotate" data-t="herr.rotacion">Rotación automática</button>
         </div>
-        <h3>Estructuras</h3>
+        <h3 data-t="herr.estructuras">Estructuras</h3>
         <div class="grid-btns">
-          <button data-tool="show-all" class="wide">Restaurar ocultas y atenuadas</button>
+          <button data-tool="show-all" class="wide" data-t="herr.restaurar">Restaurar ocultas y atenuadas</button>
         </div>
-        <h3>Atajos de teclado</h3>
+        <h3 data-t="herr.atajos">Atajos de teclado</h3>
         <dl class="keys">
-          <dt><kbd>H</kbd></dt><dd>Ocultar</dd>
-          <dt><kbd>I</kbd></dt><dd>Aislar</dd>
-          <dt><kbd>V</kbd></dt><dd>Transparentar</dd>
-          <dt><kbd>F</kbd></dt><dd>Centrar</dd>
-          <dt><kbd>/</kbd></dt><dd>Buscar</dd>
-          <dt><kbd>⌘Z</kbd></dt><dd>Deshacer</dd>
+          <dt><kbd>H</kbd></dt><dd data-t="accion.ocultar">Ocultar</dd>
+          <dt><kbd>I</kbd></dt><dd data-t="accion.aislar">Aislar</dd>
+          <dt><kbd>V</kbd></dt><dd data-t="accion.transparentar">Transparentar</dd>
+          <dt><kbd>F</kbd></dt><dd data-t="accion.centrar">Centrar</dd>
+          <dt><kbd>/</kbd></dt><dd data-t="panel.buscar">Buscar</dd>
+          <dt><kbd>⌘Z</kbd></dt><dd data-t="barra.deshacer">Deshacer</dd>
         </dl>
       </section>
 
-      <section class="panel" id="panel-settings" aria-label="Ajustes">
-        <div class="panel-head"><h2>Ajustes</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
-        <label class="switch"><span>Alta calidad (resolución y sombras de contacto)</span><input id="set-quality" type="checkbox" checked /></label>
-        <label class="switch"><span>Resaltar al pasar el cursor</span><input id="set-hover" type="checkbox" checked /></label>
-        <label class="switch"><span>Mostrar genitales externos</span><input id="set-genitals" type="checkbox" checked /></label>
-        <p class="setting-note">Desactívalo para usar la app con público general: se ocultan la piel genital y los genitales externos (pene y escroto con su contenido; vulva y clítoris). Los órganos internos (próstata, útero, vejiga…) siguen visibles.</p>
+      <section class="panel" id="panel-settings" aria-label="Ajustes" data-t-aria="panel.ajustes">
+        <div class="panel-head"><h2 data-t="panel.ajustes">Ajustes</h2><button class="icon-btn" data-close aria-label="Cerrar" data-t-aria="comun.cerrar"></button></div>
+        <label class="switch"><span data-t="ajustes.idioma">Idioma</span>
+          <select id="set-idioma">
+            <option value="es" lang="es">Español</option>
+            <option value="en" lang="en">English</option>
+            <option value="de" lang="de">Deutsch</option>
+            <option value="fr" lang="fr">Français</option>
+            <option value="it" lang="it">Italiano</option>
+          </select></label>
+        <label class="switch"><span data-t="ajustes.calidad">Alta calidad (resolución y sombras de contacto)</span><input id="set-quality" type="checkbox" checked /></label>
+        <label class="switch"><span data-t="ajustes.resaltar">Resaltar al pasar el cursor</span><input id="set-hover" type="checkbox" checked /></label>
+        <label class="switch"><span data-t="ajustes.genitales">Mostrar genitales externos</span><input id="set-genitals" type="checkbox" checked /></label>
+        <p class="setting-note" data-t="ajustes.nota">Desactívalo para usar la app con público general: se ocultan la piel genital y los genitales externos (pene y escroto con su contenido; vulva y clítoris). Los órganos internos (próstata, útero, vejiga…) siguen visibles.</p>
       </section>
 
-      <section class="panel" id="panel-help" aria-label="Ayuda">
-        <div class="panel-head"><h2>Ayuda</h2><button class="icon-btn" data-close aria-label="Cerrar"></button></div>
-        <h3>Cómo usar</h3>
+      <section class="panel" id="panel-help" aria-label="Ayuda" data-t-aria="panel.ayuda">
+        <div class="panel-head"><h2 data-t="panel.ayuda">Ayuda</h2><button class="icon-btn" data-close aria-label="Cerrar" data-t-aria="comun.cerrar"></button></div>
+        <h3 data-t="ayuda.comoUsar">Cómo usar</h3>
         <dl class="howto">
-          <dt>Girar</dt><dd>Arrastra con un dedo o con el ratón.</dd>
-          <dt>Zoom</dt><dd>Pellizca o usa la rueda.</dd>
-          <dt>Desplazar</dt><dd>Arrastra con dos dedos o con el botón derecho.</dd>
-          <dt>Seleccionar</dt><dd>Toca una estructura; con doble clic te acercas.</dd>
-          <dt>Regiones</dt><dd>Toca la ruta de la ficha para seleccionar el grupo completo.</dd>
-          <dt>Sistemas</dt><dd>Toca un sistema para pasar por sus capas; mantenlo presionado para elegir una.</dd>
+          <dt data-t="ayuda.girar">Girar</dt><dd data-t="ayuda.girar.d">Arrastra con un dedo o con el ratón.</dd>
+          <dt data-t="ayuda.zoom">Zoom</dt><dd data-t="ayuda.zoom.d">Pellizca o usa la rueda.</dd>
+          <dt data-t="ayuda.desplazar">Desplazar</dt><dd data-t="ayuda.desplazar.d">Arrastra con dos dedos o con el botón derecho.</dd>
+          <dt data-t="ayuda.seleccionar">Seleccionar</dt><dd data-t="ayuda.seleccionar.d">Toca una estructura; con doble clic te acercas.</dd>
+          <dt data-t="ayuda.regiones">Regiones</dt><dd data-t="ayuda.regiones.d">Toca la ruta de la ficha para seleccionar el grupo completo.</dd>
+          <dt data-t="ayuda.sistemas">Sistemas</dt><dd data-t="ayuda.sistemas.d">Toca un sistema para pasar por sus capas; mantenlo presionado para elegir una.</dd>
         </dl>
-        <h3>Créditos</h3>
+        <h3 data-t="ayuda.creditos">Créditos</h3>
         <div id="creditos">
-          <p class="small"><b>NeuroFuture</b> · Conciencia Cerebral Mexicali (Mexicali, B.C.). Contacto: concienciacerebromexicali@gmail.com</p>
-          <p class="small">Huesos, cartílagos, músculos, ligamentos, fascias, vasos, corazón, sistema nervioso, órganos de los sentidos y vísceras derivados de <b>Z-Anatomy</b> (CC BY-SA 4.0), basado en <b>BodyParts3D</b> © The Database Center for Life Science (DBCLS); nombres en español y latín de su traducción oficial. Piel derivada de <b>MakeHuman</b>. Iconos de sistemas: <b>Health Icons</b>; iconos de interfaz: <b>Lucide</b>; tipografía <b>IBM Plex</b>.</p>
-          <p class="small muted">Anato3D es una herramienta educativa y no sustituye la consulta con profesionales de la salud.</p>
+          <p class="small" data-t-html="creditos.neurofuture"><b>NeuroFuture</b> · Conciencia Cerebral Mexicali (Mexicali, B.C.). Contacto: concienciacerebromexicali@gmail.com</p>
+          <p class="small" data-t-html="creditos.modelos">Huesos, cartílagos, músculos, ligamentos, fascias, vasos, corazón, sistema nervioso, órganos de los sentidos y vísceras derivados de <b>Z-Anatomy</b> (CC BY-SA 4.0), basado en <b>BodyParts3D</b> © The Database Center for Life Science (DBCLS). Piel derivada de <b>MakeHuman</b>. Iconos de sistemas: <b>Health Icons</b>; iconos de interfaz: <b>Lucide</b>; tipografía <b>IBM Plex</b>.</p>
+          <p class="small" data-t-html="creditos.nombres"></p>
+          <p class="small muted" data-t="creditos.aviso">Anato3D es una herramienta educativa y no sustituye la consulta con profesionales de la salud.</p>
         </div>
       </section>
 
@@ -113,10 +124,10 @@
         <div class="pin-label"><b></b><i></i></div>
       </div>
 
-      <div id="status-pill" class="status-pill" hidden><span></span><button>Restaurar</button></div>
+      <div id="status-pill" class="status-pill" hidden><span></span><button data-t="estado.restaurar">Restaurar</button></div>
 
       <footer class="dock-wrap">
-        <div id="dock" class="dock" role="toolbar" aria-label="Sistemas"></div>
+        <div id="dock" class="dock" role="toolbar" aria-label="Sistemas" data-t-aria="dock.aria"></div>
       </footer>
 
       <div id="popover" class="popover" hidden></div>
@@ -125,28 +136,28 @@
       <div id="loader" class="loader">
         <p class="brand big">Anato<b>3D</b></p>
         <div class="loader-track"><div id="loader-bar"></div></div>
-        <p id="loader-label" role="status" aria-live="polite">Cargando…</p>
-        <button id="loader-retry" class="loader-retry" type="button">Reintentar</button>
+        <p id="loader-label" role="status" aria-live="polite" data-t="carga.inicial">Cargando…</p>
+        <button id="loader-retry" class="loader-retry" type="button" data-t="comun.reintentar">Reintentar</button>
       </div>
 
       <!-- Pantalla de inicio (ui/start.js): nombre, menú y crédito a la izquierda; a la derecha, el visor con el esqueleto
            del tórax hacia arriba. Configuración y Créditos reutilizan el contenido de «Ajustes» y «Ayuda». -->
-      <section id="start" class="start" aria-label="Inicio">
+      <section id="start" class="start" aria-label="Inicio" data-t-aria="inicio.aria">
         <div class="start-main">
           <h1 class="start-brand">Anato<b>3D</b></h1>
-          <nav class="start-menu" aria-label="Menú de inicio">
-            <button class="start-item primary" type="button" data-start="iniciar">Iniciar</button>
-            <button class="start-item" type="button" data-start="configuracion">Configuración</button>
-            <button class="start-item" type="button" data-start="creditos">Créditos</button>
+          <nav class="start-menu" aria-label="Menú de inicio" data-t-aria="inicio.menu">
+            <button class="start-item primary" type="button" data-start="iniciar" data-t="inicio.iniciar">Iniciar</button>
+            <button class="start-item" type="button" data-start="configuracion" data-t="inicio.configuracion">Configuración</button>
+            <button class="start-item" type="button" data-start="creditos" data-t="inicio.creditos">Créditos</button>
           </nav>
           <div id="start-configuracion" class="start-view" hidden>
-            <button class="start-back" type="button" data-icon="chevron" data-volver>Volver</button>
-            <h2 tabindex="-1">Configuración</h2>
+            <button class="start-back" type="button" data-icon="chevron" data-volver><span data-t="comun.volver">Volver</span></button>
+            <h2 tabindex="-1" data-t="inicio.configuracion">Configuración</h2>
             <div class="start-settings"></div>
           </div>
           <div id="start-creditos" class="start-view" hidden>
-            <button class="start-back" type="button" data-icon="chevron" data-volver>Volver</button>
-            <h2 tabindex="-1">Créditos</h2>
+            <button class="start-back" type="button" data-icon="chevron" data-volver><span data-t="comun.volver">Volver</span></button>
+            <h2 tabindex="-1" data-t="inicio.creditos">Créditos</h2>
             <div class="start-credits"></div>
           </div>
         </div>

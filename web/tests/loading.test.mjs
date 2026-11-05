@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import {
   Sessions, Stale, LoadError, createSystemLoader, onceByKey, fetchJSON, fetchBuffer, assertGLB, describeError,
 } from '../src/loading.js';
+import { fijarIdioma } from '../src/i18n/idioma.js';
 
 const deferred = () => {
   let resolve, reject;
@@ -178,7 +179,11 @@ test('fetchJSON: 404, HTML en lugar de JSON y red caída dan errores explicables
     (e) => e instanceof LoadError && e.kind === 'format');
   await assert.rejects(fetchJSON('/x.json', { fetchImpl: async () => { throw new TypeError('Failed to fetch'); } }),
     (e) => e instanceof LoadError && e.kind === 'network');
+  assert.equal(describeError(new LoadError('network', '/x')), 'no connection or the server is not responding');  // inglés: el predeterminado
+  fijarIdioma('es');
   assert.equal(describeError(new LoadError('network', '/x')), 'sin conexión o el servidor no responde');
+  assert.equal(describeError(new Error('x')), 'error inesperado');
+  fijarIdioma('en');
   assert.deepEqual(await fetchJSON('/x.json', { fetchImpl: async () => response('{"a":1}') }), { a: 1 });
 });
 

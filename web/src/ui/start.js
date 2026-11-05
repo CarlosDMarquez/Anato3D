@@ -2,8 +2,8 @@
 // el visor con el esqueleto (Viewer.setShowcase). La abre la clase `inicio` del <body>, presente desde la primera
 // pintura; «Iniciar» la funde a negro, la quita y llama a `onIniciar`.
 //
-// Configuración muestra copias de las casillas del panel «Ajustes»: las originales siguen mandando (un cambio aquí las
-// cambia y les manda su evento, y sus manejadores hacen el trabajo). Créditos copia los del panel «Ayuda».
+// Configuración muestra copias de los ajustes del panel «Ajustes» (idioma y casillas): los originales siguen mandando
+// (un cambio aquí los cambia y les manda su evento, y sus manejadores hacen el trabajo). Créditos copia los de «Ayuda».
 const SALIDA_MS = 250;   // la transición de opacidad de .start y #stage con body.saliendo (styles.css)
 
 export function createStart({ root, ajustes, creditos, onIniciar }) {
@@ -15,15 +15,16 @@ export function createStart({ root, ajustes, creditos, onIniciar }) {
 
   const copias = [...ajustes.querySelectorAll('.switch, .setting-note')].map((el) => {
     const copia = el.cloneNode(true);
-    const original = el.querySelector('input');
-    const input = copia.querySelector('input');
+    const original = el.querySelector('input, select');
+    const input = copia.querySelector('input, select');
     if (input) {
+      const prop = input.tagName === 'SELECT' ? 'value' : 'checked';    // el idioma es una lista; el resto, casillas
       input.removeAttribute('id');
       input.addEventListener('change', () => {
-        original.checked = input.checked;
+        original[prop] = input[prop];
         original.dispatchEvent(new Event('change'));
       });
-      copia.sincronizar = () => (input.checked = original.checked);
+      copia.sincronizar = () => (input[prop] = original[prop]);
     }
     return copia;
   });

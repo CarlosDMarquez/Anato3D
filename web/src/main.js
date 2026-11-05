@@ -13,6 +13,8 @@ import { Sessions, Stale, createSystemLoader, fetchJSON, describeError, onceByKe
 import { FICHA_POR_ID, MODULOS } from './content/index.js';
 import { createStudy } from './ui/study.js';
 import { createStart } from './ui/start.js';
+import { t, tn, etiqueta, idioma, leerIdioma, fijarIdioma, alCambiar, traducirDom } from './i18n/idioma.js';
+import { cargarNombres, nombrePieza, nombreGrupo } from './i18n/nombres.js';
 
 const MODELS = {
   male: {
@@ -49,6 +51,17 @@ const MODELS = {
 
 const $ = (sel) => document.querySelector(sel);
 const isMobile = () => window.innerWidth < 760;
+const almacen = (() => { try { return window.localStorage; } catch { return null; } })();
+
+// Idioma (inglés si no se eligió otro): los textos del HTML se ponen antes de mostrarlos (clase sin-traducir).
+fijarIdioma(leerIdioma(almacen));
+document.documentElement.lang = idioma();
+document.title = t('doc.titulo');
+traducirDom(document);
+document.documentElement.classList.remove('sin-traducir');
+// Tabla de nombres del idioma (francés e italiano); si no llega, esos idiomas muestran el latín.
+let nombresListos = cargarNombres(idioma()).catch((err) => console.error(err));
+
 let viewer;
 try {
   viewer = new Viewer($('#stage'));
@@ -56,7 +69,7 @@ try {
   // Sin WebGL (navegador antiguo, aceleración gráfica desactivada…) no hay visor: se explica en vez de quedar en blanco.
   console.error(err);
   document.body.classList.remove('inicio');              // el aviso, a pantalla completa (la de inicio no serviría)
-  $('#loader-label').textContent = 'Este navegador no puede mostrar gráficos 3D (WebGL). Prueba con otro navegador o activa la aceleración por hardware en sus ajustes.';
+  $('#loader-label').textContent = t('carga.webgl');
   $('.loader-track').hidden = true;
   throw err;
 }
@@ -85,7 +98,7 @@ function change(fn) {
 
 function undo() {
   const prev = history.pop();
-  if (!prev) return toast('No hay nada que deshacer');
+  if (!prev) return toast(t('aviso.nadaDeshacer'));
   Object.assign(state, prev);
   apply();
 }
@@ -143,17 +156,39 @@ const metaGroups = { male: {}, female: {} };
 function useGroupsOf(model) {
   for (const id of Object.keys(GRUPOS)) if (!BASE_GROUPS.has(id)) delete GRUPOS[id];
   for (const [id, g] of Object.entries(metaGroups[model])) GRUPOS[id] ??= g;
+  localizarGrupos();
 }
+
+// ── Nombres en el idioma elegido (i18n/nombres.js) ──────────────
+// El título de cada pieza y el nombre de cada grupo se guardan en español (tituloEs, nombreEs) y `title`/`nombre`
+// pasan a estar en el idioma actual: así lo usan igual la ficha, la etiqueta, el texto al pasar el ratón y el buscador.
+function localizarPieza(info, en) {
+  info.tituloEs ??= info.title;
+  info.en ??= en;
+  info.title = nombrePieza({ tituloEs: info.tituloEs, latin: info.latin, en: info.en });
+  return info;
+}
+function localizarGrupos() {
+  for (const [id, g] of Object.entries(GRUPOS)) {
+    g.nombreEs ??= g.nombre;
+    g.nombre = nombreGrupo(id, g);
+  }
+}
+localizarGrupos();
 const loadSystem = createSystemLoader({
   sessions,
   systemsOf: (model) => MODELS[model].systems,
   fetchMeta: (url, opts) => fetchJSON(url, opts),
-  addSystem: (url, opts) => viewer.addSystem(url, opts),
+  addSystem: (url, opts) => viewer.addSystem(url, opts).then((parts) => {
+    for (const part of parts ?? []) localizarPieza(part.info, part.extras.name_en);
+    return parts;
+  }),
   onMeta: (s, meta) => {
     for (const [gid, g] of Object.entries(meta.groups ?? {})) {
       metaGroups[s.model][gid] ??= g;
       GRUPOS[gid] ??= g;
     }
+    localizarGrupos();
   },
 });
 
@@ -163,25 +198,25 @@ async function ensureSystem(id, { quiet = false, retry = null } = {}) {
   const s = sessions.current;
   if (!s) return false;
   if (!MODELS[s.model].systems?.[id] || s.loaded(id)) return true;
-  const label = SYSTEM_BY_ID[id].noun ?? `sistema ${SYSTEM_BY_ID[id].label.toLowerCase()}`;
+  const que = t(`sistema.${id}.frase`);
   const mine = () => sessions.isCurrent(s);
   const say = (msg, ms) => !quiet && mine() && toast(msg, ms);  // el contexto de otro sistema se carga sin avisos
-  say(`Cargando ${label}…`, 0);
+  say(t('carga.cargando', { que }), 0);
   try {
-    await loadSystem(id, { onProgress: (k) => say(`Cargando ${label}… ${Math.round(k * 100)} %`, 0) });
+    await loadSystem(id, { onProgress: (k) => say(`${t('carga.cargando', { que })} ${Math.round(k * 100)} %`, 0) });
   } catch (err) {
     if (err instanceof Stale || !mine()) return false;           // se cambió de modelo: nada que avisar
     console.error(err);
     // También las cargas silenciosas avisan si fallan: sin ellas faltan los huesos o ligamentos de contexto.
-    toast(`No se pudo cargar el ${label}: ${describeError(err)}.`, 0, {
-      label: 'Reintentar',
+    toast(t('carga.error', { que, causa: describeError(err) }), 0, {
+      label: t('comun.reintentar'),
       run: retry ?? (() => ensureSystem(id).then((ok) => ok && apply())),
     });
     return false;
   }
   if (!mine()) return false;
   computeAvailability();
-  say(`${label[0].toUpperCase()}${label.slice(1)} listo`);
+  say(t('carga.listo', { que }));
   return true;
 }
 
@@ -192,7 +227,7 @@ function buildDock() {
   dock.innerHTML = SYSTEMS.map((s) => `
     <button class="dock-item" data-sys="${s.id}" style="--sys:${s.color}">
       <span class="dock-icon">${systemIcon(s.id)}</span>
-      <span class="dock-name">${s.label}</span>
+      <span class="dock-name">${etiqueta(s.label)}</span>
       <span class="dock-stage"></span>
     </button>`).join('');
   dock.querySelectorAll('.dock-item').forEach((btn) => {
@@ -234,8 +269,9 @@ function renderDock() {
     const stage = stageId && sys.stages.find((s) => s.id === stageId);
     btn.classList.toggle('on', !!stageId);
     btn.classList.toggle('empty', empty);
-    btn.querySelector('.dock-stage').textContent = empty ? 'Pronto' : stage ? stage.label : 'Apagado';
-    btn.title = `${sys.label}${stage ? ` · ${stage.label}` : ''} — clic: siguiente capa · mantener: todas las capas`;
+    btn.querySelector('.dock-name').textContent = etiqueta(sys.label);
+    btn.querySelector('.dock-stage').textContent = empty ? t('dock.pronto') : stage ? etiqueta(stage.label) : t('dock.apagado');
+    btn.title = `${etiqueta(sys.label)}${stage ? ` · ${etiqueta(stage.label)}` : ''} — ${t('dock.ayuda')}`;
   }
   document.querySelectorAll('#model-switch [data-model]').forEach((b) => {
     b.classList.toggle('on', b.dataset.model === state.model);
@@ -263,7 +299,7 @@ async function setStage(id, stageId) {
   });
   if (stageId) loadContext(id);
   const sys = SYSTEM_BY_ID[id];
-  toast(stageId ? `${sys.label} · ${sys.stages.find((s) => s.id === stageId).label}` : `${sys.label} · apagado`);
+  toast(`${etiqueta(sys.label)} · ${stageId ? etiqueta(sys.stages.find((s) => s.id === stageId).label) : t('dock.apagado').toLocaleLowerCase(idioma())}`);
 }
 
 function openStageMenu(id, anchor) {
@@ -271,14 +307,14 @@ function openStageMenu(id, anchor) {
   const active = state.stages[id] ?? null;
   const empty = !available[id].size;
   openPopover(anchor, `
-    <header class="pop-head" style="--sys:${sys.color}">${systemIcon(id)}<div><b>${sys.label}</b><small>Capas del sistema</small></div></header>
-    ${empty ? '<p class="pop-note">Este sistema todavía no tiene modelo 3D; llegará en una próxima fase.</p>' : ''}
+    <header class="pop-head" style="--sys:${sys.color}">${systemIcon(id)}<div><b>${etiqueta(sys.label)}</b><small>${t('capas.titulo')}</small></div></header>
+    ${empty ? `<p class="pop-note">${t('capas.sinModelo')}</p>` : ''}
     <div class="pop-list">
-      <button data-stage="" class="${active === null ? 'current' : ''}" ${empty ? 'disabled' : ''}>Apagado</button>
+      <button data-stage="" class="${active === null ? 'current' : ''}" ${empty ? 'disabled' : ''}>${t('dock.apagado')}</button>
       ${sys.stages.map((s, i) => {
         const ok = available[id].has(s.id);
         return `<button data-stage="${s.id}" class="${active === s.id ? 'current' : ''}" ${ok ? '' : 'disabled'}>
-          <span class="step">${i + 1}</span>${s.label}${ok ? '' : '<small>Pronto</small>'}</button>`;
+          <span class="step">${i + 1}</span>${etiqueta(s.label)}${ok ? '' : `<small>${t('dock.pronto')}</small>`}</button>`;
       }).join('')}
     </div>`, (el) => {
     el.querySelectorAll('[data-stage]').forEach((b) => b.addEventListener('click', () => {
@@ -316,7 +352,7 @@ function toast(msg, ms = 1800, action = null) {
     b.addEventListener('click', () => { hideToast(); action.run(); });
     const close = document.createElement('button');
     close.className = 'toast-close';
-    close.setAttribute('aria-label', 'Cerrar aviso');
+    close.setAttribute('aria-label', t('aviso.cerrar'));
     close.textContent = '×';
     close.addEventListener('click', hideToast);
     el.append(b, close);
@@ -372,7 +408,7 @@ function groupMembers(id, parts) {
 
 function selectGroup(id, { focus = true } = {}) {
   const parts = viewer.parts.filter((p) => p.visible && !p.ghost && p.groups.includes(id));
-  if (!parts.length) return toast('Ese grupo no está visible con las capas actuales');
+  if (!parts.length) return toast(t('aviso.grupoNoVisible'));
   current = { kind: 'group', id, parts, members: groupMembers(id, parts) };
   collapsed = isMobile();
   viewer.select(parts);
@@ -418,7 +454,7 @@ function selectionAction(act) {
   if (act === 'focus') return viewer.focus(parts);
   if (act === 'hide') {
     change(() => ids.forEach((id) => state.hidden.add(id)));
-    toast(`${name} oculto · Deshacer para recuperarlo`);
+    toast(t('aviso.oculto', { nombre: name }));
   }
   if (act === 'isolate') {
     change(() => (state.isolated = new Set(ids)));
@@ -449,8 +485,10 @@ function updatePin() {
   if (!s || !s.visible || !parts.length) return (pin.hidden = true);
   pin.hidden = false;
   const label = pin.querySelector('.pin-label');
-  label.querySelector('b').textContent = current.kind === 'group' ? GRUPOS[current.id].nombre : parts[0].info.title;
-  label.querySelector('i').textContent = current.kind === 'group' ? GRUPOS[current.id].latin : (parts[0].info.latin ?? '');
+  const titulo = current.kind === 'group' ? GRUPOS[current.id].nombre : parts[0].info.title;
+  const latin = (current.kind === 'group' ? GRUPOS[current.id].latin : parts[0].info.latin) ?? '';
+  label.querySelector('b').textContent = titulo;
+  label.querySelector('i').textContent = latin === titulo ? '' : latin;     // en alemán el nombre ya es el latino
   const W = window.innerWidth;
   const lw = label.offsetWidth;
   const lh = label.offsetHeight;
@@ -476,8 +514,8 @@ function renderStatus() {
   const pill = $('#status-pill');
   pill.hidden = !state.isolated && !state.hidden.size && !state.faded.size;
   pill.querySelector('span').textContent = state.isolated
-    ? 'Vista aislada'
-    : [state.hidden.size && `${state.hidden.size} oculta${state.hidden.size === 1 ? '' : 's'}`, state.faded.size && `${state.faded.size} atenuada${state.faded.size === 1 ? '' : 's'}`].filter(Boolean).join(' · ');
+    ? t('estado.aislada')
+    : [state.hidden.size && tn('estado.ocultas', state.hidden.size), state.faded.size && tn('estado.atenuadas', state.faded.size)].filter(Boolean).join(' · ');
 }
 
 function showAll() {
@@ -498,7 +536,7 @@ function modoEvaluacion(on) {
   document.body.classList.toggle('evaluando', on);
   const searchBtn = $('.toolbar [data-panel="search"]');
   searchBtn.disabled = on;
-  searchBtn.title = on ? 'Buscar no está disponible durante la evaluación' : '';
+  searchBtn.title = on ? t('evaluacion.sinBuscar') : '';
   if (on) {
     if ($('#panel-search').classList.contains('open')) closePanels({ keep: 'study' });
     tooltip.hidden = true;
@@ -568,7 +606,7 @@ function abrirFicha(id, { sinCamara = false } = {}) {
 const study = createStudy({
   body: $('#study-body'),
   modulos: MODULOS,
-  storage: (() => { try { return window.localStorage; } catch { return null; } })(),
+  storage: almacen,
   toast,
   api: { mostrar: mostrarFichas, abrirFicha, modoEvaluacion, modelo: () => state.model },
 });
@@ -586,7 +624,7 @@ async function openFicha(id) {
   if (!part) {
     await loadPendingIndex();
     const hit = unloaded.model === state.model && unloaded.parts.find((p) => nombres.includes(p.id));
-    if (!hit) return toast('Esa estructura no está en este modelo');
+    if (!hit) return toast(t('aviso.noEnModelo'));
     if (!(await ensureSystem(hit.key, { retry: () => openFicha(id) }))) return;
     part = find();
   }
@@ -669,14 +707,17 @@ const GENITAL_NAME = /penis|Glans|Testis|Epididym|Scrot|Spermatic|Cremaster|Dart
 const indexOf = onceByKey((model) => fetchJSON(MODELS[model].index).then((data) => Object.entries(data).flatMap(([key, list]) =>
   list.flatMap(([name, extras]) => {
     const cls = classify(extras);
-    return cls ? [{ id: name, key, system: cls.system, side: sideOf(name), info: resolvePart(name, extras) }] : [];
+    return cls ? [{ id: name, key, system: cls.system, side: sideOf(name), info: localizarPieza(resolvePart(name, extras), extras.name_en) }] : [];
   }))));
 let unloaded = { model: null, parts: [], failed: false };      // índice que usa el buscador, siempre de un modelo
 function loadPendingIndex() {
   const model = state.model;
   if (!MODELS[model].index) return Promise.resolve();
   return indexOf(model).then(
-    (parts) => ({ parts, failed: false }),
+    (parts) => {
+      for (const part of parts) localizarPieza(part.info, part.info.en);    // el idioma pudo cambiar desde que llegó
+      return { parts, failed: false };
+    },
     (err) => { console.error(err); return { parts: [], failed: true }; },
   ).then((r) => {
     // Una respuesta que llega después de cambiar de modelo no toca el buscador (ni el índice) del modelo nuevo.
@@ -693,10 +734,11 @@ function renderSearch(q) {
   const shown = (p) => !(viewer.modesty && p.modestEmpty);
   const groups = Object.entries(GRUPOS)
     .filter(([id, g]) => term && viewer.parts.some((p) => p.groups.includes(id) && shown(p)) && norm(`${g.nombre} ${g.latin}`).includes(term))
-    .map(([id, g]) => ({ group: id, label: g.nombre }));
+    .map(([id, g]) => ({ group: id, label: g.nombre }))
+    .sort((a, b) => a.label.localeCompare(b.label, idioma()));
   const parts = viewer.parts
-    .filter((p) => shown(p) && (!term || norm(`${p.info.title} ${p.info.latin ?? ''} ${p.info.entry?.nombre ?? ''}`).includes(term)))
-    .sort((a, b) => a.info.title.localeCompare(b.info.title, 'es'))
+    .filter((p) => shown(p) && (!term || norm(`${p.info.title} ${p.info.latin ?? ''} ${p.info.entry?.nombre ?? ''} ${p.info.en ?? ''}`).includes(term)))
+    .sort((a, b) => a.info.title.localeCompare(b.info.title, idioma()))
     .filter((p) => {
       const k = `${p.info.title}|${p.side}`;
       return !seen.has(k) && seen.add(k);
@@ -707,8 +749,8 @@ function renderSearch(q) {
   const own = unloaded.model === state.model;
   const later = !term || !own ? [] : unloaded.parts
     .filter((p) => systems[p.key] && !sessions.current?.loaded(p.key) && !(viewer.modesty && GENITAL_NAME.test(p.id)))
-    .filter((p) => norm(`${p.info.title} ${p.info.latin ?? ''} ${p.info.entry?.nombre ?? ''}`).includes(term))
-    .sort((a, b) => a.info.title.localeCompare(b.info.title, 'es'))
+    .filter((p) => norm(`${p.info.title} ${p.info.latin ?? ''} ${p.info.entry?.nombre ?? ''} ${p.info.en ?? ''}`).includes(term))
+    .sort((a, b) => a.info.title.localeCompare(b.info.title, idioma()))
     .filter((p) => {
       const k = `${p.info.title}|${p.side}`;
       return !seen.has(k) && seen.add(k);
@@ -716,17 +758,17 @@ function renderSearch(q) {
     .slice(0, Math.max(0, 80 - parts.length));
   // Sin índice, el buscador solo ve lo ya descargado: se dice y se ofrece reintentar.
   const note = own && unloaded.failed && term
-    ? '<li class="muted search-note">No se pudo cargar el índice de las estructuras aún sin descargar. <button data-retry-index>Reintentar</button></li>'
+    ? `<li class="muted search-note">${t('buscar.sinIndice')} <button data-retry-index>${t('comun.reintentar')}</button></li>`
     : '';
   list.innerHTML = note + groups.map((g) => `
-      <li><button data-group="${g.group}"><span class="res-kind">Región</span><span class="res-name">${g.label}</span></button></li>`).join('') +
+      <li><button data-group="${g.group}"><span class="res-kind">${t('buscar.region')}</span><span class="res-name">${g.label}</span></button></li>`).join('') +
     (parts.length || groups.length || later.length
       ? [...parts, ...later].map((p) => `
       <li><button ${p.key ? `data-pending="${p.key}" ` : ''}data-id="${p.id}" style="--sys:${SYSTEM_BY_ID[p.system].color}">
-        <i></i><span class="res-name">${p.info.title}${p.side ? ` <em>${p.side === 'L' ? 'izq.' : 'der.'}</em>` : ''}</span>
-        <small>${SYSTEM_BY_ID[p.system].label}</small>
+        <i></i><span class="res-name">${p.info.title}${p.side ? ` <em>${t(p.side === 'L' ? 'buscar.izq' : 'buscar.der')}</em>` : ''}</span>
+        <small>${etiqueta(SYSTEM_BY_ID[p.system].label)}</small>
       </button></li>`).join('')
-      : '<li class="muted empty">Sin resultados en este modelo.</li>');
+      : `<li class="muted empty">${t('buscar.sinResultados')}</li>`);
   list.querySelector('[data-retry-index]')?.addEventListener('click', () => loadPendingIndex());
   list.querySelectorAll('[data-id]').forEach((b) => b.addEventListener('click', async function open() {
     if (isMobile()) closePanels();
@@ -778,6 +820,10 @@ function buildChrome() {
       viewer.setAutoRotate(b.classList.contains('on'));
     } else viewer.view(tool);
   });
+  // Idioma: el guardado en este navegador (inglés si no hay); al cambiarlo, la interfaz se rehace en el nuevo.
+  const selIdioma = $('#set-idioma');
+  selIdioma.value = idioma();
+  selIdioma.addEventListener('change', () => fijarIdioma(selIdioma.value, almacen));
   // En pantallas táctiles (móviles, tabletas) se empieza en calidad baja: la oclusión ambiental dibuja la escena dos veces.
   if (matchMedia('(pointer: coarse)').matches) {
     $('#set-quality').checked = false;
@@ -792,7 +838,7 @@ function buildChrome() {
     try { localStorage.setItem('anato3d.genitals', genitals.checked ? '1' : '0'); } catch { /* sin almacenamiento */ }
     viewer.setModesty(!genitals.checked);
     apply();
-    toast(genitals.checked ? 'Genitales externos visibles' : 'Genitales externos ocultos');
+    toast(t(genitals.checked ? 'aviso.genitalesVisibles' : 'aviso.genitalesOcultos'));
   });
   $('#set-hover').addEventListener('change', (e) => {
     viewer.hoverEnabled = e.target.checked;
@@ -828,7 +874,7 @@ function cancelModelLoad() {
   loadSeq++;
   modelAbort?.abort();
   requested = null;
-  toast(`Modelo ${MODELS[state.model].label.toLowerCase()}`);
+  toast(t(`modelo.${state.model}.aria`));
   renderDock();
 }
 async function loadModel(id) {
@@ -841,22 +887,23 @@ async function loadModel(id) {
   const first = !sessions.current;
   const loader = $('#loader');
   const bar = $('#loader-bar');
-  const label = MODELS[id].label.toLowerCase();
+  const que = t(`modelo.${id}.frase`);
   // La primera carga cubre la pantalla; un cambio de modelo deja usar el actual mientras tanto.
   if (first) {
     loader.hidden = false;
     loader.classList.remove('done', 'failed');
     bar.style.width = '0%';
-    $('#loader-label').textContent = `Cargando modelo ${label}…`;
-  } else toast(`Cargando modelo ${label}…`, 0);
+    $('#loader-label').textContent = t('carga.cargando', { que });
+  } else toast(t('carga.cargando', { que }), 0);
   const progress = (k) => {
     if (!wanted()) return;
     if (first) bar.style.width = `${Math.round(k * 100)}%`;
-    else toast(`Cargando modelo ${label}… ${Math.round(k * 100)} %`, 0);
+    else toast(`${t('carga.cargando', { que })} ${Math.round(k * 100)} %`, 0);
   };
   let region = null;
   try {
-    if (MODELS[id].genitalRegion) region = await regionOf(MODELS[id].genitalRegion);
+    // La tabla de nombres del idioma (francés, italiano) llega antes de instalar el modelo; nunca falla (sin ella, latín).
+    [region] = await Promise.all([MODELS[id].genitalRegion ? regionOf(MODELS[id].genitalRegion) : null, nombresListos]);
     if (!wanted()) return;
     if (!(await viewer.loadModel(MODELS[id].url, { signal: abort.signal, onProgress: progress, wanted }))) return;
   } catch (err) {
@@ -864,11 +911,11 @@ async function loadModel(id) {
     requested = null;
     renderDock();
     console.error(err);
-    const msg = `No se pudo cargar el modelo ${label}: ${describeError(err)}.`;
+    const msg = t('carga.error', { que, causa: describeError(err) });
     if (first) {
       loader.classList.add('failed');
       $('#loader-label').textContent = msg;
-    } else toast(`${msg} Sigues viendo el modelo ${MODELS[state.model].label.toLowerCase()}.`, 0, { label: 'Reintentar', run: () => loadModel(id) });
+    } else toast(`${msg} ${t('carga.sigues')}`, 0, { label: t('comun.reintentar'), run: () => loadModel(id) });
     return;
   }
   // Instalado: nueva sesión (cierra la anterior y aborta sus descargas) y estado del modelo nuevo.
@@ -890,7 +937,8 @@ async function loadModel(id) {
   state.faded.clear();
   state.isolated = null;
   history.length = 0;
-  $('#model-detail').textContent = MODELS[id].detail;
+  $('#model-detail').textContent = t(`modelo.${id}.detalle`);
+  for (const part of viewer.parts) localizarPieza(part.info, part.extras.name_en);
   // Buscador abierto: se redibuja ya con el modelo nuevo (si no, seguían a la vista los resultados del anterior hasta
   // que llegaba su índice) y luego se completa con lo no descargado.
   if ($('#panel-search').classList.contains('open')) {
@@ -904,7 +952,7 @@ async function loadModel(id) {
     bar.style.width = '100%';
     loader.classList.add('done');
     setTimeout(() => (loader.hidden = true), 400);
-  } else toast(`Modelo ${label}`);
+  } else toast(t(`modelo.${id}.aria`));
   // Los sistemas en archivo aparte que ya empiezan activos (p. ej. los cartílagos) se completan al cargar; en la
   // pantalla de inicio, sin avisos de progreso (los errores sí se avisan).
   for (const sys of Object.keys(MODELS[id].systems ?? {})) {
@@ -913,6 +961,33 @@ async function loadModel(id) {
   for (const sys of SYSTEMS) if (state.stages[sys.id]) loadContext(sys.id);
 }
 $('#loader-retry').addEventListener('click', () => loadModel(state.model));
+
+// Cambio de idioma: textos del HTML, nombres de piezas y grupos, y lo que está a la vista.
+function localizarTodo() {
+  localizarGrupos();
+  for (const part of viewer.parts) localizarPieza(part.info, part.extras.name_en);
+  for (const part of unloaded.parts) localizarPieza(part.info, part.info.en);
+}
+alCambiar(async (id) => {
+  nombresListos = cargarNombres(id).catch((err) => console.error(err));
+  await nombresListos;
+  if (id !== idioma()) return;                           // se eligió otro mientras llegaba la tabla de nombres
+  document.documentElement.lang = id;
+  document.title = t('doc.titulo');
+  traducirDom(document);
+  $('#set-idioma').value = id;
+  $('#study-aviso').hidden = id === 'es';
+  localizarTodo();
+  if (sessions.current) $('#model-detail').textContent = t(`modelo.${state.model}.detalle`);
+  closePopover();
+  renderDock();
+  renderStatus();
+  renderSelection();
+  if ($('#panel-search').classList.contains('open')) renderSearch($('#search-input').value);
+});
+// La tabla del idioma inicial puede llegar después de nombrar los grupos (con el latín mientras tanto).
+nombresListos.then(() => localizarGrupos());
+$('#study-aviso').hidden = idioma() === 'es';
 
 buildChrome();
 buildDock();

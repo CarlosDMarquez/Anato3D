@@ -9,6 +9,8 @@
 // femenino y añadía los 481 músculos masculinos al cuerpo femenino (reproducido en el navegador el 2026-11-02).
 // Sin DOM ni Three.js: lo prueba `node --test` (web/tests/loading.test.mjs).
 
+import { t } from './i18n/idioma.js';
+
 /** Petición obsoleta: su sesión ya no es la activa. No es un error que haya que mostrar. */
 export class Stale extends Error {
   constructor() {
@@ -29,14 +31,9 @@ export class LoadError extends Error {
 
 const isAbort = (err) => err?.name === 'AbortError';
 
-/** Motivo breve, en español, para el mensaje de error. */
+/** Motivo breve, en el idioma de la interfaz (i18n/textos.js: error.*), para el mensaje de error. */
 export function describeError(err) {
-  if (err instanceof LoadError) {
-    if (err.kind === 'network') return 'sin conexión o el servidor no responde';
-    if (err.kind === 'http') return 'el archivo no está disponible en el servidor';
-    return 'el archivo recibido no es válido';
-  }
-  return 'error inesperado';
+  return t(err instanceof LoadError ? `error.${err.kind}` : 'error.inesperado');
 }
 
 async function request(url, signal, fetchImpl) {

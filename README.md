@@ -21,7 +21,7 @@ Modelos: `zsh tools/build_all.sh` (masculino) y `A3D_MODEL=female zsh tools/buil
 | Ruta | Qué es |
 |---|---|
 | `*.blend`, `*.glb` (raíz) | Modelos fuente. Fase 1 = piel + ojos; Fase 2 = piel + esqueleto completo (`Anato3D_Male_30_Fase2`, `Anato3D_Female_30_Fase2`). |
-| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app), `audit_models.py` (busca errores medibles en los modelos), `vessel_regions.py` (región del cuerpo de cada vaso), `skin_regions.py` (divide la piel en zonas al exportar), `backup.sh` (copia de seguridad en este Mac), `build_lib.sh` (funciones de `build_all.sh`: Blender con código de salida, preparación, validación y publicación), `validate_models.py` (valida los archivos nuevos antes de publicarlos), `manifest.py` (manifiesto de versiones y sumas), `logo_neurofuture.py` (logo de NeuroFuture para fondo negro) y `tests/` (pruebas de fallos de la construcción, con un Blender falso). |
+| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app), `audit_models.py` (busca errores medibles en los modelos), `vessel_regions.py` (región del cuerpo de cada vaso), `skin_regions.py` (divide la piel en zonas al exportar), `backup.sh` (copia de seguridad en este Mac), `build_lib.sh` (funciones de `build_all.sh`: Blender con código de salida, preparación, validación y publicación), `validate_models.py` (valida los archivos nuevos antes de publicarlos), `manifest.py` (manifiesto de versiones y sumas), `logo_neurofuture.py` (logo de NeuroFuture para fondo negro), `nombres_idiomas.py` (nombres de las estructuras en francés e italiano) y `tests/` (pruebas de fallos de la construcción, con un Blender falso). |
 | `Anato3D_Male_30_Fase2_musculature.npz` | Campo de desplazamiento de la complexión musculosa (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas). |
 | `Anato3D_Female_30_Fase2_pelvis.npz` | Campo de desplazamiento de la pelvis femenina y los huesos de la pelvis antes de deformarla (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas femeninos). |
 | `sources/originals/` | Copia de los modelos tal como estaban antes de corregir el cuello. |
@@ -36,11 +36,28 @@ Modelos: `zsh tools/build_all.sh` (masculino) y `A3D_MODEL=female zsh tools/buil
 | `web/scripts/check-cards.mjs` | Revisa las fichas de todas las piezas: `node scripts/check-cards.mjs` (desde `web/`). |
 | `web/src/data/grupos.js` | Regiones de la ruta jerárquica (los grupos musculares llegan en `male-muscular.json`). |
 | `web/src/viewer.js` | Escena three.js: carga Draco, materiales, brillo de selección, cámara. |
+| `web/src/i18n/`, `web/public/i18n/` | Idiomas: textos de la interfaz en español, inglés, alemán, francés e italiano (`textos.js`), idioma elegido (`idioma.js`), nombres de estructuras y grupos (`nombres.js`, con las tablas `nombres-fr.json` y `nombres-it.json`). |
 | `web/src/ui/start.js`, `web/public/neurofuture.png` | Pantalla de inicio (nombre, menú, crédito) y el logo de NeuroFuture para fondo negro. |
 | `web/src/study/`, `web/src/ui/study.js` | Progreso (local, con versión), preguntas y panel «Estudiar» (lección, evaluación, repaso). |
 | `web/src/content/` | Contenido de estudio: esquema (`schema.js`), fuentes (`fuentes.js`), módulos (`brazo.js`) e índice por pieza (`index.js`). |
 | `web/src/loading.js` | Propiedad de las peticiones de carga (una sesión por modelo instalado), descargas con estado HTTP y aborto, y errores explicables. Pruebas en `web/tests/loading.test.mjs`. |
 | `web/src/main.js` | Estado de la app (capas, ocultar/aislar/transparentar, deshacer), barra y paneles. |
+
+## Idiomas (2026-11-05)
+
+La interfaz está en **inglés (por defecto), español, alemán, francés e italiano**. Se elige en Configuración (pantalla de inicio) o en Ajustes, cambia al momento y se guarda en el navegador (`anato3d.idioma`).
+- **Interfaz:** todos los textos (pantalla de inicio, barras, paneles, avisos, errores de carga, barra de sistemas y capas, etiquetas de la ficha) en `web/src/i18n/textos.js`; el HTML los marca con `data-t*`.
+- **Nombres de las estructuras:**
+  - español: los de siempre;
+  - inglés: el de Z-Anatomy;
+  - francés: la traducción de Z-Anatomy y la lista TA2 con traducciones (97 % de las piezas);
+  - italiano: la lista TA2 (97 %);
+  - alemán: el latín, como en los atlas alemanes (no hay una tabla alemana entre las fuentes);
+  - si falta un nombre, se muestra el latino.
+- **Solo en español, por ahora:** las descripciones de las fichas (en otro idioma van plegadas bajo «Descripción (solo en español)») y el módulo de estudio (con un aviso).
+- **Tablas de nombres:** `python3 tools/nombres_idiomas.py` → `web/public/i18n/nombres-{fr,it}.json` (necesita `sources/z-anatomy/`).
+- **Comprobaciones:** `npm --prefix web test` (que cada texto esté en los cinco idiomas, que existan las claves del HTML, plurales, nombres) y `check-cards` (que cada etiqueta corta tenga traducción).
+- **Detalle:** `docs/hitos/05-idiomas.md`.
 
 ## Pantalla de inicio (2026-11-05)
 
@@ -990,6 +1007,7 @@ Escribe `build/audit.json`.
 ## Créditos y licencias
 
 - Proyecto: **NeuroFuture** · Conciencia Cerebral Mexicali (Mexicali, B.C.). Su logo aparece en la pantalla de inicio.
+- Nombres en otros idiomas: inglés y francés de la traducción de Z-Anatomy; francés e italiano también de la lista TA2 con traducciones descargada con Z-Anatomy; en alemán, el latín.
 - Huesos y cartílagos: [Z-Anatomy](https://github.com/Z-Anatomy/Models-of-human-anatomy)
   (CC BY-SA 4.0), derivado de [BodyParts3D](https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html)
   © DBCLS. Los modelos derivados deben mantener la licencia CC BY-SA y la atribución.

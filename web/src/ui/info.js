@@ -3,6 +3,7 @@ import { GRUPOS } from '../data/grupos.js';
 import { fichaDePieza } from '../content/index.js';
 import { CAMPOS, ESTADOS } from '../content/schema.js';
 import { FUENTES } from '../content/fuentes.js';
+import { t, tn, etiqueta, idioma } from '../i18n/idioma.js';
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
@@ -12,12 +13,20 @@ export function crumbsOf(groups) {
 }
 
 const ACTIONS = [
-  ['hide', 'hide', 'Ocultar'],
-  ['isolate', 'isolate', 'Aislar'],
-  ['fadeOthers', 'fadeOthers', 'Atenuar resto'],
-  ['fade', 'fade', 'Transparentar'],
-  ['focus', 'focus', 'Centrar'],
+  ['hide', 'hide', 'accion.ocultar'],
+  ['isolate', 'isolate', 'accion.aislar'],
+  ['fadeOthers', 'fadeOthers', 'accion.atenuarResto'],
+  ['fade', 'fade', 'accion.transparentar'],
+  ['focus', 'focus', 'accion.centrar'],
 ];
+
+// El texto de las fichas solo está en español: en otro idioma va plegado, con el aviso en el idioma elegido y marcado
+// como español (lang) para los lectores de pantalla.
+function soloEs(html) {
+  if (!html.trim()) return '';
+  if (idioma() === 'es') return html;
+  return `<details class="solo-es"><summary>${esc(t('ficha.soloEs'))}</summary><div lang="es">${html}</div></details>`;
+}
 
 const FIELD_LABELS_MODULO = new Set(['Origen', 'Inserción', 'Acción', 'Inervación', 'Irrigación', 'Función']);
 
@@ -33,7 +42,7 @@ function studyBody(hit, info, entry) {
     ...(info.fields ?? []).filter((f) => !FIELD_LABELS_MODULO.has(f.label) && !Object.values(labels).includes(f.label)).map((f) => [f.label, f.value]),
   ];
   const estado = ficha.revision.estado;
-  const conjunto = ficha.nombre.toLowerCase() !== info.title.toLowerCase() && ficha.piezas.length > 1;
+  const conjunto = ficha.nombre.toLowerCase() !== (info.tituloEs ?? info.title).toLowerCase() && ficha.piezas.length > 1;
   const term = ficha.fuentes.terminologia.map((t) => ({ ...FUENTES[t.fuente], texto: `${FUENTES[t.fuente].texto}, término n.º ${t.termino}` }));
   const cont = ficha.fuentes.contenido.map((c) => ({ ...FUENTES[c.fuente], apoya: c.apoya }));
   const etiqueta = (k) => (k === 'descripcion' ? 'descripción' : k === 'funcion' ? 'función' : (labels[k] ?? k).toLowerCase());
@@ -75,48 +84,52 @@ export function renderInfo(el, sel, { system, faded, collapsed, modelo, onAction
   const study = isGroup ? null : fichaDePieza(sel.part.id, modelo);
   const crumbs = isGroup ? crumbsOf(sel.parts[0].groups).slice(0, crumbsOf(sel.parts[0].groups).indexOf(sel.id)) : crumbsOf(sel.part.groups);
   const meta = isGroup
-    ? [`${sel.parts.length} estructura${sel.parts.length === 1 ? '' : 's'}`]
-    : [...info.chips, info.tissue].filter(Boolean);
+    ? [tn('ficha.estructuras', sel.parts.length)]
+    : [...info.chips, info.tissue].filter(Boolean).map(etiqueta);
+  const titulo = isGroup ? group.nombre : info.title;
+  const latin = isGroup ? group.latin : info.latin;
 
   el.style.setProperty('--sys', system.color);
   el.classList.toggle('collapsed', collapsed);
   el.innerHTML = `
-    <button class="info-grip" data-act="toggle" aria-label="${collapsed ? 'Ver ficha completa' : 'Contraer ficha'}"><span></span></button>
+    <button class="info-grip" data-act="toggle" aria-label="${esc(t(collapsed ? 'ficha.verCompleta' : 'ficha.contraer'))}"><span></span></button>
     <div class="info-head">
-      <nav class="crumbs" aria-label="Ubicación">
+      <nav class="crumbs" aria-label="${esc(t('ficha.ubicacion'))}">
         ${crumbs.map((g) => `<button data-crumb="${g}">${esc(GRUPOS[g].nombre)}</button>`).join(uiIcon('chevron'))}
       </nav>
-      <button class="icon-btn" data-act="close" aria-label="Cerrar">${uiIcon('close')}</button>
+      <button class="icon-btn" data-act="close" aria-label="${esc(t('comun.cerrar'))}">${uiIcon('close')}</button>
     </div>
-    <h2 class="info-title">${esc(isGroup ? group.nombre : info.title)}</h2>
-    ${(isGroup ? group.latin : info.latin) ? `<p class="info-latin">${esc(isGroup ? group.latin : info.latin)}</p>` : ''}
+    <h2 class="info-title">${esc(titulo)}</h2>
+    ${latin && latin !== titulo ? `<p class="info-latin">${esc(latin)}</p>` : ''}
     <p class="info-meta"><i></i>${meta.map(esc).join('<span>·</span>')}</p>
     <div class="info-actions">
-      ${ACTIONS.map(([act, icon, label]) => {
+      ${ACTIONS.map(([act, icon, clave]) => {
         const on = act === 'fade' && faded;
-        return `<button data-act="${act}" class="${on ? 'on' : ''}" title="${label}">${uiIcon(icon)}<span>${on ? 'Opaco' : label}</span></button>`;
+        const label = t(clave);
+        return `<button data-act="${act}" class="${on ? 'on' : ''}" title="${esc(label)}">${uiIcon(icon)}<span>${esc(on ? t('accion.opaco') : label)}</span></button>`;
       }).join('')}
     </div>
     <div class="info-body">
       ${isGroup ? `
-        ${group.descripcion ? `<section><p class="lead">${esc(group.descripcion)}</p></section>` : ''}
-        <section><h3>Contiene</h3><ul class="members">${sel.members.map((m) => `
+        ${group.descripcion ? soloEs(`<section><p class="lead">${esc(group.descripcion)}</p></section>`) : ''}
+        <section><h3>${esc(t('ficha.contiene'))}</h3><ul class="members">${sel.members.map((m) => `
           <li><button data-member="${esc(m.id)}" data-kind="${m.kind}">${esc(m.label)}${m.count > 1 ? `<small>${m.count}</small>` : ''}${uiIcon('chevron')}</button></li>`).join('')}
         </ul></section>
-      ` : study ? studyBody(study, info, entry) : entry ? `
-        ${entry.descripcion ? `<section><p class="lead">${esc(entry.descripcion)}</p></section>` : ''}
-        ${info.fields?.length ? `<section><dl class="fields">${info.fields.map((f) => `<dt>${esc(f.label)}</dt><dd>${esc(f.value)}</dd>`).join('')}</dl></section>` : ''}
-        ${entry.etimologia ? `<section class="etym"><h3>Etimología</h3><p>${esc(entry.etimologia)}</p></section>` : ''}
-        ${info.datos.length ? `<section><h3>Puntos clave</h3><ul class="facts">${info.datos.map((d) => `<li>${esc(d)}</li>`).join('')}</ul></section>` : ''}
-      ` : '<section><p class="muted">Ficha en preparación.</p></section>'}
-      ${!isGroup && !study && info.source ? `<p class="info-source">Modelo 3D: ${esc(info.source)}</p>` : ''}
-      ${!isGroup && !study && info.fuentes ? `
-        <details class="info-refs"><summary>Fuentes</summary>
-          <ul>${info.fuentes.lista.map((f) => `
-            <li><b>${esc(f.papel)}:</b> <a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.texto)}</a></li>`).join('')}
-          </ul>
-          <p>${esc(info.fuentes.nota)}</p>
-        </details>` : ''}
+      ` : study ? soloEs(studyBody(study, info, entry)) : `
+        ${entry ? '' : `<section><p class="muted">${esc(t('ficha.enPreparacion'))}</p></section>`}
+        ${soloEs(`${entry ? `
+          ${entry.descripcion ? `<section><p class="lead">${esc(entry.descripcion)}</p></section>` : ''}
+          ${info.fields?.length ? `<section><dl class="fields">${info.fields.map((f) => `<dt>${esc(f.label)}</dt><dd>${esc(f.value)}</dd>`).join('')}</dl></section>` : ''}
+          ${entry.etimologia ? `<section class="etym"><h3>Etimología</h3><p>${esc(entry.etimologia)}</p></section>` : ''}
+          ${info.datos.length ? `<section><h3>Puntos clave</h3><ul class="facts">${info.datos.map((d) => `<li>${esc(d)}</li>`).join('')}</ul></section>` : ''}` : ''}
+          ${info.fuentes ? `
+          <details class="info-refs"><summary>Fuentes</summary>
+            <ul>${info.fuentes.lista.map((f) => `
+              <li><b>${esc(f.papel)}:</b> <a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.texto)}</a></li>`).join('')}
+            </ul>
+            <p>${esc(info.fuentes.nota)}</p>
+          </details>` : ''}`)}
+        ${info.source ? `<p class="info-source">${esc(t('ficha.modelo3d'))} ${esc(info.source)}</p>` : ''}`}
     </div>`;
   el.querySelectorAll('[data-act]').forEach((b) => b.addEventListener('click', () => onAction(b.dataset.act)));
   el.querySelectorAll('[data-crumb]').forEach((b) => b.addEventListener('click', () => onCrumb(b.dataset.crumb)));

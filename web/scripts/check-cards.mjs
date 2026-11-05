@@ -5,12 +5,14 @@
 // Además, el contenido de estudio (src/content): cada ficha de módulo contra su esquema y los modelos (campos
 // obligatorios, textos genéricos, fuentes de terminología y de contenido para cada afirmación, piezas que existen en los
 // modelos declarados y en ningún otro, estado de revisión). Informa también de cuántas piezas muestran una descripción
-// genérica en cada sistema (solo informa: es el contenido que falta escribir). Termina con código 1 si algo falla.
+// genérica en cada sistema (solo informa: es el contenido que falta escribir). Comprueba también que las etiquetas cortas
+// (tipo de pieza, lado, tejido, sistemas y capas) tengan traducción en i18n/textos.js. Termina con código 1 si algo falla.
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { resolvePart } from '../src/data/resolve.js';
-import { classify } from '../src/systems.js';
+import { classify, SYSTEMS } from '../src/systems.js';
+import { ETIQUETAS, ETIQUETAS_PATRON } from '../src/i18n/textos.js';
 import { MODULOS } from '../src/content/index.js';
 import { revisarFicha, revisarModulo, GENERICOS } from '../src/content/schema.js';
 import { FUENTES } from '../src/content/fuentes.js';
@@ -31,13 +33,21 @@ const RARO = /\s{2,}|\bdel el\b|\bde el\b|\ba el\b| ,|\(\s|\s\)|undefined|null|N
 // español van sin ella: musculocutáneo, musculofrénica). La introdujo una regla de ES_FIXES (tools/anato3d_fit.py).
 const ERRATA = /\b[Mm]úsculo(?!s?\b)[a-záéíóúñ]/;
 let fallos = 0;
+// Una etiqueta se traduce si está en ETIQUETAS, si sigue un patrón («Par craneal XI») o si sus partes « · » lo hacen.
+const traducible = (e) => !!ETIQUETAS[e] || ETIQUETAS_PATRON.some(([re]) => re.test(e))
+  || (e.includes(' · ') && e.split(' · ').every((p) => traducible(p[0].toUpperCase() + p.slice(1))));
+const sinTraducir = SYSTEMS.flatMap((s) => [s.label, ...s.stages.map((st) => st.label)]).filter((e) => !traducible(e));
+if (sinTraducir.length) {
+  fallos += sinTraducir.length;
+  console.log(`sistemas y capas sin traducción (i18n/textos.js): ${[...new Set(sinTraducir)].join(', ')}`);
+}
 const nombres = {};                                   // modelo → Set de nombres de pieza (para la aplicabilidad)
 // --model: solo ese modelo (build_all.sh revisa el que construye; con «base» cambian los dos y revisa ambos).
 const only = process.argv.indexOf('--model');
 for (const model of only > 0 ? [process.argv[only + 1]] : ['male', 'female']) {
   const files = fs.readdirSync(MODELS).filter((f) => f.endsWith('.glb') && (f === `${model}.glb` || f.startsWith(`${model}-`)));
   const c = { piezas: 0, musculos: 0 };
-  const malos = { titulo: [], latin: [], ficha: [], inervacion: [], fuentes: [], raro: [], errata: [] };
+  const malos = { titulo: [], latin: [], ficha: [], inervacion: [], fuentes: [], raro: [], errata: [], traduccion: [] };
   const genericas = {};
   nombres[model] = new Set();
   for (const file of files) {
@@ -54,6 +64,7 @@ for (const model of only > 0 ? [process.argv[only + 1]] : ['male', 'female']) {
       if (!info.latin) malos.latin.push(name);
       if (RARO.test(`${info.title} ${info.latin ?? ''} ${info.entry?.descripcion ?? ''}`)) malos.raro.push(name);
       if (ERRATA.test(`${info.title} ${info.entry?.descripcion ?? ''}`)) malos.errata.push(name);
+      for (const e of [...(info.chips ?? []), info.tissue].filter(Boolean)) if (!traducible(e)) malos.traduccion.push(`${name} («${e}»)`);
       if (x.system !== 'muscular') continue;
       c.musculos++;
       if (!info.entry?.descripcion) malos.ficha.push(name);
