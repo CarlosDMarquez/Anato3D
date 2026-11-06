@@ -1,11 +1,12 @@
-// Pruebas de los idiomas (src/i18n/): textos completos en los cinco idiomas, claves del HTML, plurales, etiquetas y
-// nombres de piezas y grupos. `npm test`.
+// Pruebas de los idiomas (src/i18n/): textos completos en los cinco idiomas, claves del HTML, plurales, etiquetas,
+// nombres de piezas y grupos, y traducción del contenido. `npm test`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { TEXTOS, ETIQUETAS } from '../src/i18n/textos.js';
 import { IDIOMAS, PREDETERMINADO, CLAVE, t, tn, etiqueta, idioma, leerIdioma, fijarIdioma } from '../src/i18n/idioma.js';
 import { nombrePieza, nombreGrupo, ponerTabla } from '../src/i18n/nombres.js';
+import { huella, ponerMemoria, tr, traducido, trCita } from '../src/i18n/contenido.js';
 
 const IDS = IDIOMAS.map((i) => i.id);
 const marcas = (s) => [...String(s).matchAll(/\{(\w+)\}/g)].map((m) => m[1].toLowerCase()).sort().join(',');
@@ -21,7 +22,7 @@ test('los cinco idiomas, con el inglés por defecto', () => {
 });
 
 test('cada texto está en los cinco idiomas, con las mismas marcas {x} y la misma forma (texto o singular/plural)', () => {
-  const vaciosEs = new Set(['estudio.soloEs']);            // en español no se muestra (el módulo ya está en español)
+  const vaciosEs = new Set(['ficha.traduccion', 'estudio.traduccion']);   // avisos de traducción: en español no se muestran
   for (const [clave, e] of Object.entries(TEXTOS)) {
     for (const id of IDS) {
       assert.ok(id in e, `${clave}: falta ${id}`);
@@ -101,4 +102,29 @@ test('las tablas de nombres publicadas traen los nombres oficiales', () => {
   assert.equal(it.Humerus, 'Omero');
   assert.equal(fr.Heart, 'Cœur');
   assert.ok(Object.keys(fr).length > 1500 && Object.keys(it).length > 1500);
+});
+
+test('contenido: traducción por la huella del texto español, español si falta, y citas con el formato del idioma', () => {
+  ponerMemoria('fr', { [huella('Flexión del codo.')]: 'Flexion du coude.' });
+  fijarIdioma('fr');
+  assert.equal(tr('Flexión del codo.'), 'Flexion du coude.');
+  assert.equal(tr('Texto sin traducir.'), 'Texto sin traducir.');
+  assert.equal(traducido('Texto sin traducir.'), false);
+  assert.equal(trCita('Terminologia Anatomica, 2.ª ed. (FIPAT, 2019), término n.º 1180'), 'Terminologia Anatomica, 2e éd. (FIPAT, 2019), terme n° 1180');
+  assert.equal(trCita('TeachMeAnatomy: «The Humerus»'), 'TeachMeAnatomy : « The Humerus »');
+  fijarIdioma('de');
+  assert.equal(trCita('Wikipedia (en inglés): «Lip»'), 'Wikipedia (englisch): „Lip“');
+  fijarIdioma('es');
+  assert.equal(tr('Flexión del codo.'), 'Flexión del codo.');
+  assert.equal(trCita('TeachMeAnatomy: «The Humerus»'), 'TeachMeAnatomy: «The Humerus»');
+  fijarIdioma('en');
+});
+
+test('las memorias de contenido publicadas tienen las mismas huellas en los cuatro idiomas, sin textos vacíos', () => {
+  const leer = (id) => JSON.parse(readFileSync(new URL(`../public/i18n/contenido-${id}.json`, import.meta.url), 'utf8'));
+  const [en, ...otros] = ['en', 'de', 'fr', 'it'].map(leer);
+  const claves = Object.keys(en).sort();
+  assert.ok(claves.length > 2600, `solo ${claves.length} textos`);
+  for (const m of otros) assert.deepEqual(Object.keys(m).sort(), claves);
+  for (const m of [en, ...otros]) for (const v of Object.values(m)) assert.ok(v.trim());
 });

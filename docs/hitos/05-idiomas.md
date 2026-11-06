@@ -27,6 +27,8 @@ Fecha: 2026-11-05. Base: commit `cacca0b`. Encargo de Carlos: «que en configura
 
 ## 2. Lo que sigue en español
 
+> **Actualización (2026-11-05, mismo día):** Carlos pidió traducir también el contenido. Ya está traducido a los cuatro idiomas (sin revisar); lo de este apartado y del 6 describe el estado al cerrar este hito. Ver `06-traduccion-contenido.md`.
+
 - **Las descripciones de las fichas** (descripción, campos, etimología, puntos clave, fuentes). En otro idioma van plegadas bajo «Descripción (solo en español)», marcadas como español (`lang="es"`).
 - **El módulo de estudio** (lección, preguntas, explicaciones), con un aviso en el idioma elegido. Está en revisión por un especialista: traducirlo antes multiplicaría la revisión.
 - Traducir ese contenido es la siguiente decisión de Carlos (ver el apartado 6).

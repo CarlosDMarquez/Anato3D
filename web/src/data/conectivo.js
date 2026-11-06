@@ -138,7 +138,7 @@ export function resolveConnective(name, x) {
     latin: x.name_la || null,
     tissue: null,
     chips: [tissue.tipo, side && (side === 'L' ? 'Lado izquierdo' : 'Lado derecho')].filter(Boolean),
-    fields: [group && { label: 'Región', value: group.nombre }].filter(Boolean),
+    fields: [group && { label: 'Región', value: group.nombreEs ?? group.nombre }].filter(Boolean),
     entry: {
       descripcion: own?.descripcion ?? tissue.descripcion,
       etimologia: latinEtymology(x.name_la),

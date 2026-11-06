@@ -121,7 +121,7 @@ export function resolveNervous(name, x) {
     chips: [own?.par ? `Par craneal ${own.par}` : tejido.tipo, side && (side === 'L' ? 'Lado izquierdo' : 'Lado derecho')].filter(Boolean),
     fields: [
       { label: 'Parte', value: SUBSISTEMA[x.subsystem] ?? 'Sistema nervioso' },
-      group && { label: 'Región', value: group.nombre },
+      group && { label: 'Región', value: group.nombreEs ?? group.nombre },
       own?.tipo && { label: 'Tipo', value: own.tipo },
       own?.funcion && { label: 'Función', value: own.funcion },
     ].filter(Boolean),

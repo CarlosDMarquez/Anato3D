@@ -180,7 +180,7 @@ export function resolveVisceral(name, x) {
     latin: x.name_la || null,
     tissue: null,
     chips: [tejido.tipo, side && (side === 'L' ? 'Lado izquierdo' : 'Lado derecho')].filter(Boolean),
-    fields: [group && { label: 'Región', value: group.nombre }].filter(Boolean),
+    fields: [group && { label: 'Región', value: group.nombreEs ?? group.nombre }].filter(Boolean),
     entry: {
       descripcion: own?.descripcion ?? tejido.descripcion,
       etimologia: latinEtymology(x.name_la),

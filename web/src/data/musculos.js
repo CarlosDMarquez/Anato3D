@@ -46,7 +46,7 @@ export function resolveMuscle(name, x) {
   const latin = LATIN_SEXO[key]?.[x.sex]?.[0] ?? x.name_la ?? null;
   const group = [...region].reverse().map((g) => GRUPOS[g]).find(Boolean);
   const fields = [
-    group && { label: 'Región', value: group.nombre },
+    group && { label: 'Región', value: group.nombreEs ?? group.nombre },
     (entry?.accion ?? x.function_es) && { label: 'Acción', value: entry?.accion ?? x.function_es },
     (entry?.inervacion ?? nerves.length) && { label: 'Inervación', value: entry?.inervacion ?? nerves.join(', ') },
     entry?.origen && { label: 'Origen', value: entry.origen },

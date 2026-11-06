@@ -36,7 +36,7 @@ Modelos: `zsh tools/build_all.sh` (masculino) y `A3D_MODEL=female zsh tools/buil
 | `web/scripts/check-cards.mjs` | Revisa las fichas de todas las piezas: `node scripts/check-cards.mjs` (desde `web/`). |
 | `web/src/data/grupos.js` | Regiones de la ruta jerárquica (los grupos musculares llegan en `male-muscular.json`). |
 | `web/src/viewer.js` | Escena three.js: carga Draco, materiales, brillo de selección, cámara. |
-| `web/src/i18n/`, `web/public/i18n/` | Idiomas: textos de la interfaz en español, inglés, alemán, francés e italiano (`textos.js`), idioma elegido (`idioma.js`), nombres de estructuras y grupos (`nombres.js`, con las tablas `nombres-fr.json` y `nombres-it.json`). |
+| `web/src/i18n/`, `web/public/i18n/` | Idiomas: textos de la interfaz en español, inglés, alemán, francés e italiano (`textos.js`), idioma elegido (`idioma.js`), nombres de estructuras y grupos (`nombres.js`, con las tablas `nombres-fr.json` y `nombres-it.json`) y contenido traducido (`contenido.js`, con las memorias `contenido-{en,de,fr,it}.json`). |
 | `web/src/ui/start.js`, `web/public/neurofuture.png` | Pantalla de inicio (nombre, menú, crédito) y el logo de NeuroFuture para fondo negro. |
 | `web/src/study/`, `web/src/ui/study.js` | Progreso (local, con versión), preguntas y panel «Estudiar» (lección, evaluación, repaso). |
 | `web/src/content/` | Contenido de estudio: esquema (`schema.js`), fuentes (`fuentes.js`), módulos (`brazo.js`) e índice por pieza (`index.js`). |
@@ -54,10 +54,14 @@ La interfaz está en **inglés (por defecto), español, alemán, francés e ital
   - italiano: la lista TA2 (97 %);
   - alemán: el latín, como en los atlas alemanes (no hay una tabla alemana entre las fuentes);
   - si falta un nombre, se muestra el latino.
-- **Solo en español, por ahora:** las descripciones de las fichas (en otro idioma van plegadas bajo «Descripción (solo en español)») y el módulo de estudio (con un aviso).
+- **Contenido** (descripciones, campos, puntos clave, etimologías y fuentes de las fichas; módulo del brazo): traducido con IA (Claude) al inglés, alemán, francés e italiano el 2026-11-05, **sin revisar** por especialistas ni por hablantes nativos. Cada ficha y el panel Estudiar lo avisan en el idioma elegido.
+  - Memorias de traducción: `web/public/i18n/contenido-{en,de,fr,it}.json`, una por idioma, con la huella del texto español como clave (unos 90 KB comprimidos cada una; se descargan solo al elegir ese idioma). Un texto español nuevo o cambiado se muestra en español hasta traducirlo.
+  - Etimologías: las generadas con el glosario latino se rehacen con el glosario traducido; las escritas a mano se traducen enteras, adaptadas a cada idioma.
+  - Citas de fuentes: con las comillas y abreviaturas de cada idioma (`trCita`).
+  - Herramienta: `node web/scripts/contenido-i18n.mjs` (estado), `--lote N --donde` (lo que falta, con la pieza en que sale), `--unir F` (añadir un lote traducido), `--comprobar`.
 - **Tablas de nombres:** `python3 tools/nombres_idiomas.py` → `web/public/i18n/nombres-{fr,it}.json` (necesita `sources/z-anatomy/`).
-- **Comprobaciones:** `npm --prefix web test` (que cada texto esté en los cinco idiomas, que existan las claves del HTML, plurales, nombres) y `check-cards` (que cada etiqueta corta tenga traducción).
-- **Detalle:** `docs/hitos/05-idiomas.md`.
+- **Comprobaciones:** `npm --prefix web test` (que cada texto esté en los cinco idiomas, que existan las claves del HTML, plurales, nombres, memorias de contenido y citas) y `npm --prefix web run check` (`check-cards`, que cada etiqueta corta tenga traducción, y que no falte ninguna traducción del contenido).
+- **Detalle:** `docs/hitos/05-idiomas.md` (interfaz) y `docs/hitos/06-traduccion-contenido.md` (contenido).
 
 ## Pantalla de inicio (2026-11-05)
 

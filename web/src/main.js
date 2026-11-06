@@ -15,6 +15,7 @@ import { createStudy } from './ui/study.js';
 import { createStart } from './ui/start.js';
 import { t, tn, etiqueta, idioma, leerIdioma, fijarIdioma, alCambiar, traducirDom } from './i18n/idioma.js';
 import { cargarNombres, nombrePieza, nombreGrupo } from './i18n/nombres.js';
+import { cargarContenido } from './i18n/contenido.js';
 
 const MODELS = {
   male: {
@@ -59,8 +60,9 @@ document.documentElement.lang = idioma();
 document.title = t('doc.titulo');
 traducirDom(document);
 document.documentElement.classList.remove('sin-traducir');
-// Tabla de nombres del idioma (francés e italiano); si no llega, esos idiomas muestran el latín.
-let nombresListos = cargarNombres(idioma()).catch((err) => console.error(err));
+// Tabla de nombres (francés e italiano) y traducción del contenido del idioma; si no llegan, el latín y el español.
+const cargarIdioma = (id) => Promise.all([cargarNombres(id), cargarContenido(id)]).catch((err) => console.error(err));
+let nombresListos = cargarIdioma(idioma());
 
 let viewer;
 try {
@@ -969,7 +971,7 @@ function localizarTodo() {
   for (const part of unloaded.parts) localizarPieza(part.info, part.info.en);
 }
 alCambiar(async (id) => {
-  nombresListos = cargarNombres(id).catch((err) => console.error(err));
+  nombresListos = cargarIdioma(id);
   await nombresListos;
   if (id !== idioma()) return;                           // se eligió otro mientras llegaba la tabla de nombres
   document.documentElement.lang = id;
@@ -983,6 +985,7 @@ alCambiar(async (id) => {
   renderDock();
   renderStatus();
   renderSelection();
+  study.refrescar();
   if ($('#panel-search').classList.contains('open')) renderSearch($('#search-input').value);
 });
 // La tabla del idioma inicial puede llegar después de nombrar los grupos (con el latín mientras tanto).

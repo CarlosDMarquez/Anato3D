@@ -104,7 +104,7 @@ export function resolveVessel(name, x) {
     chips: [tipo.tipo, x.major && x.tissue !== 'heart' && x.tissue !== 'valve' && 'Vaso principal', side && (side === 'L' ? 'Lado izquierdo' : 'Lado derecho')].filter(Boolean),
     fields: [
       // Región real del cuerpo (tools/vessel_regions.py); las colecciones de Z-Anatomy («Aorta»…) solo como reserva.
-      (REGIONES_VASOS[key] ?? group) && { label: 'Región', value: REGIONES_VASOS[key] ?? group.nombre },
+      (REGIONES_VASOS[key] ?? group) && { label: 'Región', value: REGIONES_VASOS[key] ?? group.nombreEs ?? group.nombre },
       tipo.sangre && { label: 'Sangre', value: tipo.sangre },
     ].filter(Boolean),
     entry: {
