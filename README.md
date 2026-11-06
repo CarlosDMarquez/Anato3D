@@ -70,6 +70,11 @@ Lo primero que se ve al abrir la app.
 - **Abajo a la izquierda**, el logo de **NeuroFuture** (Conciencia Cerebral Mexicali) como crédito del proyecto.
 - **A la derecha**, el esqueleto 3D del tórax hacia arriba, de tres cuartos y mirando hacia el menú, con un vaivén lento (quieto si el sistema pide menos movimiento). El corte inferior se funde con el negro.
 - **Iniciar** funde la pantalla a negro y entra en la app como antes (cuerpo entero, barras y sistemas).
+- **Volver desde la app** (2026-11-06): botón «Volver a la pantalla de inicio» al final de Ajustes y, en el ordenador, el nombre «Anato3D» de la barra superior.
+  - La app se funde a negro y la pantalla vuelve con el esqueleto, como al abrirla; la primera opción pasa a ser **Continuar**.
+  - **Continuar** devuelve la exploración tal cual: sistemas y capas, piezas ocultas, atenuadas o aisladas y la cámara.
+  - Si mientras tanto termina de cargar otro modelo pedido antes, se sigue en ese modelo con los mismos sistemas y la vista inicial.
+  - El botón de la casa de la barra de herramientas se llama ahora «Vista inicial» (antes «Inicio»), como en los demás idiomas.
 - **Configuración** usa los mismos ajustes que el panel «Ajustes»; **Créditos**, los del panel «Ayuda», que ahora empiezan por NeuroFuture.
 - **Teclado:** flechas arriba y abajo para elegir, Intro para entrar, Escape para volver. Mientras está abierta, los atajos de la app no actúan.
 - **Móvil:** el esqueleto arriba y el nombre, el menú y el crédito debajo; Configuración y Créditos ocupan toda la pantalla.
@@ -343,6 +348,7 @@ Los tres salen de `build_visceral.py` (`classify_new`) con el mismo ajuste:
   - se calcula en una textura y cada material la aplica a su luz indirecta (y en parte a la directa);
   - no incluye el suelo ni las piezas translúcidas;
   - se desactiva con «Alta calidad» en los ajustes, y en pantallas táctiles empieza desactivada.
+- **Calidad baja** (casilla «Alta calidad (resolución, sombras y fondo degradado)» desactivada, 2026-11-06): resolución 1:1, sin oclusión ambiental ni sombra bajo los pies, y fondo negro liso en lugar del degradado.
 
 **Rendimiento** (Mac, 1280 × 860, DPR 2, todos los sistemas, 3,3 M triángulos):
 

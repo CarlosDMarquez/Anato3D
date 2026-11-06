@@ -39,6 +39,11 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .brandbar { position: absolute; top: 14px; left: 16px; display: flex; align-items: center; gap: 14px; z-index: 5; }
 .brand { margin: 0; font-size: 17px; font-weight: 400; letter-spacing: 0.04em; color: var(--text-2); }
 .brand b { font-weight: 600; color: var(--text); }
+/* El nombre de la barra vuelve a la pantalla de inicio; su ayuda va debajo, como la de la barra de herramientas. */
+#btn-brand { position: relative; padding: 4px 2px; border-radius: 6px; transition: color 0.15s; }
+#btn-brand:hover { color: var(--text); }
+#btn-brand::after { content: attr(data-tip); position: absolute; left: 0; top: calc(100% + 8px); padding: 4px 9px; border-radius: 6px; background: var(--surface-solid); border: 1px solid var(--line); font-size: 12px; font-weight: 400; letter-spacing: 0; color: var(--text); white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.12s; }
+#btn-brand:hover::after { opacity: 1; }
 .segmented { display: flex; padding: 3px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); backdrop-filter: blur(18px); }
 .segmented button { display: flex; align-items: center; gap: 6px; padding: 5px 11px 5px 7px; border-radius: 7px; font-size: 13px; color: var(--muted); }
 .segmented button .sys-icon { width: 20px; height: 20px; }
@@ -91,6 +96,9 @@ kbd { display: inline-block; min-width: 22px; padding: 2px 6px; border-radius: 5
 .switch { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; font-size: 14px; color: var(--text-2); cursor: pointer; border-bottom: 1px solid var(--line); }
 .switch input { width: 17px; height: 17px; accent-color: var(--accent); }
 .setting-note { margin: 8px 0 0; font-size: 12px; line-height: 1.45; color: var(--muted); }
+.panel-action { width: 100%; display: flex; align-items: center; gap: 6px; margin-top: 14px; padding: 9px 10px; border-radius: var(--r); background: var(--raise); border: 1px solid var(--line); font-size: 13px; color: var(--text-2); text-align: left; }
+.panel-action:hover { background: var(--raise-2); color: var(--text); }
+.panel-action .ui-icon { width: 15px; height: 15px; transform: rotate(180deg); }
 .small { font-size: 12.5px; line-height: 1.6; color: var(--text-2); }
 .muted { color: var(--muted); }
 
@@ -332,9 +340,12 @@ body.inicio :is(.brandbar, .toolbar, .panel, .info, .pin, .status-pill, .dock-wr
 body.inicio #stage { left: var(--start-w); overflow: hidden; pointer-events: none; }
 #stage { transition: opacity 0.35s; }
 body.saliendo #stage { opacity: 0; transition-duration: 0.25s; }
-/* Al entrar en la app, sus barras aparecen poco a poco (la animación arranca al dejar de estar ocultas). */
+/* Al entrar en la app, sus barras aparecen poco a poco (la animación arranca al dejar de estar ocultas); al volver a la
+   pantalla de inicio se funden a negro con el visor. */
 .brandbar, .toolbar, .dock-wrap { animation: aparecer 0.5s ease both; }
+body.saliendo:not(.inicio) :is(.brandbar, .toolbar, .dock-wrap, .info, .status-pill) { animation: desaparecer 0.25s ease both; }
 @keyframes aparecer { from { opacity: 0; } }
+@keyframes desaparecer { to { opacity: 0; } }
 /* La primera carga, en la parte del visor y sin repetir el nombre. */
 body.inicio .loader { left: var(--start-w); background: #000; }
 body.inicio .loader .brand { display: none; }

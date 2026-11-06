@@ -928,7 +928,7 @@ async function loadModel(id) {
   useGroupsOf(id);
   current = null;
   computeAvailability();
-  const previous = state.stages;
+  const previous = pausa?.estado.stages ?? state.stages;  // de vuelta en la pantalla de inicio: los de la exploración
   state.stages = {};
   for (const sys of SYSTEMS) {
     const want = Object.keys(previous).length ? previous[sys.id] : DEFAULT_STAGES[sys.id];
@@ -946,6 +946,12 @@ async function loadModel(id) {
   if ($('#panel-search').classList.contains('open')) {
     renderSearch($('#search-input').value);
     loadPendingIndex();
+  }
+  // Un cambio de modelo pedido antes de volver a la pantalla de inicio: «Continuar» sigue con el modelo nuevo, y mientras
+  // tanto la pantalla muestra su esqueleto.
+  if (pausa) {
+    pausa = { generation: viewer.generation, estado: snapshot(), camara: null };
+    state.stages = vitrina();
   }
   apply();
   if (portada.abierta) viewer.setShowcase(true);         // encuadra el esqueleto del tórax hacia arriba
@@ -992,6 +998,46 @@ alCambiar(async (id) => {
 nombresListos.then(() => localizarGrupos());
 $('#study-aviso').hidden = idioma() === 'es';
 
+// ── Volver a la pantalla de inicio ──────────────────────────────
+// Desde Ajustes o desde el nombre de la barra. La pantalla muestra el esqueleto, como al abrir la app; la exploración
+// (sistemas, piezas ocultas, atenuadas o aisladas y la cámara) queda en `pausa` y vuelve tal cual con «Continuar».
+let pausa = null;
+
+// Lo que se ve en la pantalla de inicio: los sistemas con los que empieza la app (el esqueleto y los cartílagos).
+function vitrina() {
+  return Object.fromEntries(SYSTEMS.map(({ id }) => [id, available[id]?.has(DEFAULT_STAGES[id]) ? DEFAULT_STAGES[id] : null]));
+}
+
+function volverAlInicio() {
+  if (portada.abierta || !sessions.current) return;
+  closePopover();
+  closePanels();
+  selectPart(null);
+  pausa = { generation: viewer.generation, estado: snapshot(), camara: viewer.camara() };
+  portada.abrir(() => {
+    Object.assign(state, { stages: vitrina(), hidden: new Set(), faded: new Set(), isolated: null });
+    apply();
+    viewer.setShowcase(true);
+    for (const sys of Object.keys(MODELS[state.model].systems ?? {})) {
+      if (state.stages[sys]) ensureSystem(sys, { quiet: true }).then((ok) => ok && portada.abierta && apply());
+    }
+  });
+}
+
+// «Continuar»: la exploración como quedó (o, si mientras tanto llegó otro modelo, sus sistemas en la vista inicial).
+function reanudar() {
+  const { generation, estado, camara } = pausa;
+  pausa = null;
+  Object.assign(state, estado);
+  apply();
+  for (const sys of Object.keys(MODELS[state.model].systems ?? {})) {
+    if (state.stages[sys]) ensureSystem(sys).then((ok) => ok && apply());   // solo avisa si tiene que descargarlo
+  }
+  for (const sys of SYSTEMS) if (state.stages[sys.id]) loadContext(sys.id);
+  if (camara && generation === viewer.generation) viewer.irA(camara);
+  else viewer.home();
+}
+
 buildChrome();
 buildDock();
 const portada = createStart({
@@ -1001,9 +1047,12 @@ const portada = createStart({
   onIniciar() {
     viewer.setShowcase(false);
     updateInsets();
-    if (sessions.current) viewer.home();                 // si el modelo aún se descarga, lo encuadra loadModel
+    if (pausa) reanudar();
+    else if (sessions.current) viewer.home();            // si el modelo aún se descarga, lo encuadra loadModel
   },
 });
+$('#btn-inicio').addEventListener('click', volverAlInicio);
+$('#btn-brand').addEventListener('click', volverAlInicio);
 if (portada.abierta) viewer.setShowcase(true);
 loadModel('male');
 if (import.meta.env.DEV) window.anato3d = { viewer, state };

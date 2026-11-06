@@ -11,6 +11,8 @@ export const TEXTOS = {
   'inicio.aria': { es: 'Inicio', en: 'Start', de: 'Start', fr: 'Accueil', it: 'Inizio' },
   'inicio.menu': { es: 'Menú de inicio', en: 'Start menu', de: 'Startmenü', fr: 'Menu d’accueil', it: 'Menu iniziale' },
   'inicio.iniciar': { es: 'Iniciar', en: 'Start', de: 'Starten', fr: 'Commencer', it: 'Inizia' },
+  // En lugar de «Iniciar» al volver desde la app: la exploración sigue como quedó.
+  'inicio.continuar': { es: 'Continuar', en: 'Continue', de: 'Fortsetzen', fr: 'Continuer', it: 'Continua' },
   'inicio.configuracion': { es: 'Configuración', en: 'Settings', de: 'Einstellungen', fr: 'Paramètres', it: 'Impostazioni' },
   'inicio.creditos': { es: 'Créditos', en: 'Credits', de: 'Credits', fr: 'Crédits', it: 'Crediti' },
 
@@ -47,7 +49,7 @@ export const TEXTOS = {
 
   // ── Barra de herramientas y paneles ──
   'barra.aria': { es: 'Herramientas', en: 'Toolbar', de: 'Werkzeugleiste', fr: 'Barre d’outils', it: 'Barra degli strumenti' },
-  'barra.inicio': { es: 'Inicio', en: 'Home view', de: 'Ausgangsansicht', fr: 'Vue initiale', it: 'Vista iniziale' },
+  'barra.inicio': { es: 'Vista inicial', en: 'Home view', de: 'Ausgangsansicht', fr: 'Vue initiale', it: 'Vista iniziale' },
   'barra.deshacer': { es: 'Deshacer', en: 'Undo', de: 'Rückgängig', fr: 'Annuler', it: 'Annulla' },
   'panel.estudiar': { es: 'Estudiar', en: 'Study', de: 'Lernen', fr: 'Étudier', it: 'Studia' },
   'panel.buscar': { es: 'Buscar', en: 'Search', de: 'Suchen', fr: 'Rechercher', it: 'Cerca' },
@@ -96,8 +98,9 @@ export const TEXTOS = {
   // ── Ajustes ──
   'ajustes.idioma': { es: 'Idioma', en: 'Language', de: 'Sprache', fr: 'Langue', it: 'Lingua' },
   'ajustes.calidad': {
-    es: 'Alta calidad (resolución y sombras de contacto)', en: 'High quality (resolution and contact shadows)',
-    de: 'Hohe Qualität (Auflösung und Kontaktschatten)', fr: 'Haute qualité (résolution et ombres de contact)', it: 'Alta qualità (risoluzione e ombre di contatto)',
+    es: 'Alta calidad (resolución, sombras y fondo degradado)', en: 'High quality (resolution, shadows and gradient background)',
+    de: 'Hohe Qualität (Auflösung, Schatten und Hintergrundverlauf)', fr: 'Haute qualité (résolution, ombres et fond dégradé)',
+    it: 'Alta qualità (risoluzione, ombre e sfondo sfumato)',
   },
   'ajustes.resaltar': { es: 'Resaltar al pasar el cursor', en: 'Highlight on hover', de: 'Beim Darüberfahren hervorheben', fr: 'Surligner au survol', it: 'Evidenzia al passaggio del cursore' },
   'ajustes.genitales': { es: 'Mostrar genitales externos', en: 'Show external genitalia', de: 'Äußere Genitalien anzeigen', fr: 'Afficher les organes génitaux externes', it: 'Mostra i genitali esterni' },
@@ -107,6 +110,10 @@ export const TEXTOS = {
     de: 'Schalte es aus, um die App mit allgemeinem Publikum zu nutzen: Die Genitalhaut und die äußeren Genitalien werden ausgeblendet (Penis und Hodensack mit Inhalt; Vulva und Klitoris). Innere Organe (Prostata, Gebärmutter, Harnblase …) bleiben sichtbar.',
     fr: 'Désactivez-le pour utiliser l’application avec le grand public : la peau génitale et les organes génitaux externes sont masqués (pénis et scrotum avec leur contenu ; vulve et clitoris). Les organes internes (prostate, utérus, vessie…) restent visibles.',
     it: 'Disattivalo per usare l’app con un pubblico generale: vengono nascosti la cute genitale e i genitali esterni (pene e scroto con il loro contenuto; vulva e clitoride). Gli organi interni (prostata, utero, vescica…) restano visibili.',
+  },
+  'ajustes.volverInicio': {
+    es: 'Volver a la pantalla de inicio', en: 'Back to the start screen', de: 'Zurück zum Startbildschirm',
+    fr: 'Retour à l’écran d’accueil', it: 'Torna alla schermata iniziale',
   },
 
   // ── Avisos ──

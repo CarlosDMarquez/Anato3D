@@ -22,7 +22,8 @@
       <div id="stage"></div>
 
       <header class="brandbar">
-        <p class="brand">Anato<b>3D</b></p>
+        <button id="btn-brand" class="brand" type="button" data-tip="Volver a la pantalla de inicio" aria-label="Volver a la pantalla de inicio"
+          data-t-tip="ajustes.volverInicio" data-t-aria="ajustes.volverInicio">Anato<b>3D</b></button>
         <div id="model-switch" class="segmented" role="group" aria-label="Modelo" data-t-aria="modelo.aria">
           <button data-model="male" data-sysicon="male" aria-label="Modelo masculino" data-t-aria="modelo.male.aria"><span data-t="modelo.male">Masculino</span></button>
           <button data-model="female" data-sysicon="female" aria-label="Modelo femenino" data-t-aria="modelo.female.aria"><span data-t="modelo.female">Femenino</span></button>
@@ -31,7 +32,7 @@
       </header>
 
       <nav class="toolbar" aria-label="Herramientas" data-t-aria="barra.aria">
-        <button id="btn-home" data-icon="home" data-tip="Inicio" aria-label="Inicio" data-t-tip="barra.inicio" data-t-aria="barra.inicio"></button>
+        <button id="btn-home" data-icon="home" data-tip="Vista inicial" aria-label="Vista inicial" data-t-tip="barra.inicio" data-t-aria="barra.inicio"></button>
         <button id="btn-undo" data-icon="undo" data-tip="Deshacer" aria-label="Deshacer" data-t-tip="barra.deshacer" data-t-aria="barra.deshacer"></button>
         <hr />
         <button data-panel="study" data-icon="study" data-tip="Estudiar" aria-label="Estudiar" data-t-tip="panel.estudiar" data-t-aria="panel.estudiar"></button>
@@ -90,10 +91,11 @@
             <option value="fr" lang="fr">Français</option>
             <option value="it" lang="it">Italiano</option>
           </select></label>
-        <label class="switch"><span data-t="ajustes.calidad">Alta calidad (resolución y sombras de contacto)</span><input id="set-quality" type="checkbox" checked /></label>
+        <label class="switch"><span data-t="ajustes.calidad">Alta calidad (resolución, sombras y fondo degradado)</span><input id="set-quality" type="checkbox" checked /></label>
         <label class="switch"><span data-t="ajustes.resaltar">Resaltar al pasar el cursor</span><input id="set-hover" type="checkbox" checked /></label>
         <label class="switch"><span data-t="ajustes.genitales">Mostrar genitales externos</span><input id="set-genitals" type="checkbox" checked /></label>
         <p class="setting-note" data-t="ajustes.nota">Desactívalo para usar la app con público general: se ocultan la piel genital y los genitales externos (pene y escroto con su contenido; vulva y clítoris). Los órganos internos (próstata, útero, vejiga…) siguen visibles.</p>
+        <button id="btn-inicio" class="panel-action" type="button" data-icon="chevron"><span data-t="ajustes.volverInicio">Volver a la pantalla de inicio</span></button>
       </section>
 
       <section class="panel" id="panel-help" aria-label="Ayuda" data-t-aria="panel.ayuda">

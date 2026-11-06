@@ -283,6 +283,7 @@ export class Viewer extends EventTarget {
     // Oclusión ambiental (GTAO): se calcula en una textura antes de cada fotograma y cada material la aplica a la luz
     // indirecta (y en parte a la directa), no como una capa oscura encima de la imagen.
     this.aoEnabled = true;
+    this.quality = true;         // setQuality: en calidad baja, sin sombras y con el fondo negro
     this.ao = new GTAOPass(this.scene, this.camera, 2, 2);
     this.ao.output = GTAOPass.OUTPUT.Off;
     this.ao.updateGtaoMaterial({ radius: 0.045, distanceExponent: 1.2, thickness: 0.6, distanceFallOff: 1, scale: 1.15, samples: 16 });
@@ -327,11 +328,21 @@ export class Viewer extends EventTarget {
     this.needsRender = true;
   }
 
-  // Calidad baja: resolución 1:1 y sin oclusión ambiental (es el paso más caro: dibuja la escena una vez más).
+  // Calidad baja: resolución 1:1 y sin sombras, ni la oclusión ambiental (es el paso más caro: dibuja la escena una vez
+  // más) ni la sombra bajo los pies, y el fondo negro liso en lugar del degradado.
   setQuality(high) {
+    this.quality = high;
     this.renderer.setPixelRatio(high ? Math.min(window.devicePixelRatio, 2) : 1);
     this.aoEnabled = high;
+    this.ground.visible = high && this.parts.some((p) => p.visible);
+    this.#updateBackground();
     this.resize();
+  }
+
+  // Negro en la pantalla de inicio y en calidad baja; si no, el degradado.
+  #updateBackground() {
+    this.scene.background = this.showcase || !this.quality ? BLACK : this.backdrop;
+    this.needsRender = true;
   }
 
   setAO(on) {
@@ -675,7 +686,7 @@ export class Viewer extends EventTarget {
       this.#applyMaterials(part);
       if (part.visible && !part.ghost) this.pickMeshes.push(...part.meshes);
     }
-    this.ground.visible = this.parts.some((p) => p.visible);
+    this.ground.visible = this.quality && this.parts.some((p) => p.visible);
     if (!this.selection.size) this.anchor = null;
     this.needsRender = true;
   }
@@ -757,11 +768,20 @@ export class Viewer extends EventTarget {
     this.#animateTo(v.target, v.position);
   }
 
+  // Dónde está la cámara, para volver a ella con `irA` (al continuar desde la pantalla de inicio).
+  camara() {
+    return { target: this.controls.target.clone(), position: this.camera.position.clone() };
+  }
+
+  irA({ target, position }) {
+    this.#animateTo(target, position);
+  }
+
   // Pantalla de inicio: fondo negro, sin controles y la cámara en el tórax y la cabeza de lo visible, girando despacio
   // de un lado a otro (quieta si el sistema pide menos movimiento). Al salir, `home()` lleva la cámara a la vista inicial.
   setShowcase(on) {
     this.showcase = on ? { t0: performance.now(), frame: null } : null;
-    this.scene.background = on ? BLACK : this.backdrop;
+    this.#updateBackground();
     this.controls.enabled = !on;
     if (on) {
       this.tween = null;
