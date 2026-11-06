@@ -62,7 +62,7 @@ function studyBody(hit, info, entry, latines) {
       <li>${esc(tr(r.texto))}${r.con ? ` <button class="rel-link" data-ficha="${esc(r.con)}">${esc(t('ficha.ver'))}</button>` : ''}</li>`).join('')}</ul></section>` : ''}
     ${ficha.simplificaciones.length ? `<section><h3>${esc(t('ficha.simplificaciones'))}</h3><ul class="facts">${ficha.simplificaciones.map((x) => `<li>${esc(tr(x))}</li>`).join('')}</ul></section>` : ''}
     ${entry?.etimologia ? `<section class="etym"><h3>${esc(t('ficha.etimologia'))}</h3><p>${esc(trEtimologia(entry.etimologia, latines))}</p></section>` : ''}
-    ${info.source ? `<p class="info-source">${esc(t('ficha.modelo3d'))} ${esc(info.source)}</p>` : ''}
+    ${info.source ? `<p class="info-source">${esc(t('ficha.modelo3d'))} ${esc(tr(info.source))}</p>` : ''}
     <details class="info-refs"><summary>${esc(t('ficha.fuentes'))}</summary>
       <p class="refs-group">${esc(t('ficha.terminologia'))}</p>
       <ul>${term.map((f) => `<li>${link(f)}</li>`).join('')}</ul>
@@ -135,7 +135,7 @@ export function renderInfo(el, sel, { system, faded, collapsed, modelo, onAction
             </ul>
             <p>${esc(tr(info.fuentes.nota))}</p>
           </details>` : ''}
-        ${info.source ? `<p class="info-source">${esc(t('ficha.modelo3d'))} ${esc(info.source)}</p>` : ''}
+        ${info.source ? `<p class="info-source">${esc(t('ficha.modelo3d'))} ${esc(tr(info.source))}</p>` : ''}
         ${entry ? notaTraduccion() : ''}`}
     </div>`;
   el.querySelectorAll('[data-act]').forEach((b) => b.addEventListener('click', () => onAction(b.dataset.act)));

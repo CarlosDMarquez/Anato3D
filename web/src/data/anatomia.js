@@ -627,7 +627,7 @@ export const ANATOMIA = {
   Skin_Lips: {
     nombre: 'Labios', latin: 'Labia oris', tipo: 'Zona de la piel',
     descripcion: 'Pliegues que rodean la boca, con el músculo orbicular de la boca dentro. En su zona roja (bermellón), la piel tiene solo de tres a cinco capas de células, frente a las hasta dieciséis de la cara: por eso se transparentan los vasos y se ve roja.',
-    datos: ['La piel del labio no tiene pelo ni glándulas sudoríparas.', 'El borde del labio superior forma el «arco de Cupido».'],
+    datos: ['La parte roja del labio (bermellón) no tiene pelo ni glándulas sudoríparas.', 'El borde del labio superior forma el «arco de Cupido».'],
   },
   Skin_Ear: {
     nombre: 'Oreja', latin: 'Auricula', tipo: 'Zona de la piel',
@@ -647,7 +647,7 @@ export const ANATOMIA = {
   Skin_Breast: {
     nombre: 'Mama', latin: 'Mamma', tipo: 'Zona de la piel',
     descripcion: 'Relieve del pecho formado por la glándula mamaria, grasa y tejido conjuntivo, cubiertos de piel. En el centro están el pezón y la areola.',
-    datos: ['Los ligamentos suspensorios (de Cooper) van de la fascia a la piel y sostienen la mama.', 'La areola tiene glándulas sudoríparas modificadas, las glándulas de Montgomery.', 'Una piel con aspecto de «piel de naranja» puede ser signo de un cáncer de mama inflamatorio y obliga a consultar.'],
+    datos: ['Los ligamentos suspensorios (de Cooper) van de la fascia a la piel y sostienen la mama.', 'La areola tiene glándulas sebáceas, las glándulas de Montgomery, que lubrican el pezón y la areola.', 'Una piel con aspecto de «piel de naranja» puede ser signo de un cáncer de mama inflamatorio y obliga a consultar.'],
   },
   Skin_Abdomen: {
     nombre: 'Piel del abdomen', latin: 'Abdomen', tipo: 'Zona de la piel',

@@ -58,7 +58,7 @@ La interfaz está en **inglés (por defecto), español, alemán, francés e ital
   - Memorias de traducción: `web/public/i18n/contenido-{en,de,fr,it}.json`, una por idioma, con la huella del texto español como clave (unos 90 KB comprimidos cada una; se descargan solo al elegir ese idioma). Un texto español nuevo o cambiado se muestra en español hasta traducirlo.
   - Etimologías: las generadas con el glosario latino se rehacen con el glosario traducido; las escritas a mano se traducen enteras, adaptadas a cada idioma.
   - Citas de fuentes: con las comillas y abreviaturas de cada idioma (`trCita`).
-  - Herramienta: `node web/scripts/contenido-i18n.mjs` (estado), `--lote N --donde` (lo que falta, con la pieza en que sale), `--unir F` (añadir un lote traducido), `--comprobar`.
+  - Herramienta: `node web/scripts/contenido-i18n.mjs` (estado), `--lote N --donde` (lo que falta, con la pieza en que sale), `--unir F` (añadir un lote traducido; quita también las traducciones de textos que ya no existen), `--limpiar` (solo eso), `--comprobar`.
 - **Tablas de nombres:** `python3 tools/nombres_idiomas.py` → `web/public/i18n/nombres-{fr,it}.json` (necesita `sources/z-anatomy/`).
 - **Comprobaciones:** `npm --prefix web test` (que cada texto esté en los cinco idiomas, que existan las claves del HTML, plurales, nombres, memorias de contenido y citas) y `npm --prefix web run check` (`check-cards`, que cada etiqueta corta tenga traducción, y que no falte ninguna traducción del contenido).
 - **Detalle:** `docs/hitos/05-idiomas.md` (interfaz) y `docs/hitos/06-traduccion-contenido.md` (contenido).

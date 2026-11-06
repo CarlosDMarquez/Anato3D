@@ -4,6 +4,7 @@
 //   node scripts/contenido-i18n.mjs --lote N     los N siguientes textos sin traducir, en JSON { huella: español }
 //                                     (con --donde, cada texto lleva detrás las piezas en las que sale)
 //   node scripts/contenido-i18n.mjs --unir F     añade un lote traducido (F: { huella: [en, de, fr, it] })
+//   node scripts/contenido-i18n.mjs --limpiar    quita las traducciones de textos que ya no existen (también al unir)
 //   node scripts/contenido-i18n.mjs --comprobar  termina con código 1 si falta alguna traducción
 //
 // Los textos son los que muestra la app en español: los de las fichas de todas las piezas de los dos modelos (como las
@@ -85,7 +86,7 @@ export function textosDelContenido() {
   // 3. Descripciones de los grupos.
   for (const g of Object.values(GRUPOS)) add('grupo', g.descripcion);
   // 4. Fichas de las piezas de todos los modelos.
-  const porTipo = { descripcion: [], datos: [], campos: [], etimologia: [], fuentes: [] };
+  const porTipo = { descripcion: [], datos: [], campos: [], etimologia: [], fuentes: [], modelo: [] };
   for (const file of fs.readdirSync(MODELS).filter((f) => f.endsWith('.glb')).sort()) {
     for (const n of nodes(file)) {
       const x = n.extras ?? {};
@@ -98,6 +99,8 @@ export function textosDelContenido() {
       const e = info.entry?.etimologia;
       if (e && ![info.latin, x.name_la].some((l) => l && latinEtymology(l) === e)) porTipo.etimologia.push([e, t]);
       porTipo.fuentes.push([info.fuentes?.nota, t], ...(info.fuentes?.lista ?? []).flatMap((l) => [[l.papel, t], ...(esCitaConFormato(l.texto) ? [] : [[l.texto, t]])]));
+      // Línea «Modelo 3D»: se traducen las de las piezas hechas para Anato3D; las de Z-Anatomy son atribuciones literales.
+      if (/^Anato3D\b/.test(info.source ?? '')) porTipo.modelo.push([info.source, t]);
     }
   }
   for (const [tipo, lista] of Object.entries(porTipo)) lista.forEach(([s, donde]) => add(tipo, s, donde));
@@ -139,7 +142,16 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // Los nombres de grupo se rehacen siempre desde las tablas oficiales.
   const grupos = nombresDeGrupos();
   for (const id of DESTINOS) Object.assign(memorias[id], grupos[id]);
-  if (arg('--unir') || !fs.existsSync(archivo('en'))) for (const id of DESTINOS) escribir(id, memorias[id]);
+  // Traducciones sin uso: su texto español cambió o ya no existe. Se quitan al escribir.
+  const vigentes = new Set([...textos.keys(), ...DESTINOS.flatMap((id) => Object.keys(grupos[id]))]);
+  const sobran = [...new Set(DESTINOS.flatMap((id) => Object.keys(memorias[id])))].filter((h) => !vigentes.has(h));
+  if (arg('--unir') || process.argv.includes('--limpiar') || !fs.existsSync(archivo('en'))) {
+    for (const id of DESTINOS) {
+      for (const h of sobran) delete memorias[id][h];
+      escribir(id, memorias[id]);
+    }
+    if (sobran.length) console.log(`traducciones sin uso quitadas: ${sobran.length}`);
+  } else if (sobran.length) console.log(`traducciones sin uso: ${sobran.length} (se quitan con --limpiar o al unir un lote)`);
 
   const falta = [...textos.entries()].filter(([h]) => DESTINOS.some((id) => !memorias[id][h]));
   if (arg('--lote')) {

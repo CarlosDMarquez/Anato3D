@@ -1,20 +1,22 @@
 {
- "release": "20261102T183421-1a81de4",
- "generated": "2026-11-02T18:34:21+00:00",
+ "release": "20261106T201415-d91e0ec",
+ "generated": "2026-11-06T20:14:15+00:00",
  "note": "Versión de los modelos de la web: un archivo solo es de esta versión si su SHA-256 coincide.",
  "builds": {
   "male": {
-   "date": "2026-11-02T18:31:09+00:00",
+   "date": "2026-11-06T20:10:46+00:00",
    "systems": [
-    "vascular",
-    "nervous"
+    "muscular"
    ],
    "git": {
-    "commit": "1a81de4",
+    "commit": "d91e0ec",
     "uncommitted_changes": [
      "M tools/anato3d_fit.py",
-     " M tools/build_lib.sh",
-     " M web/scripts/check-cards.mjs"
+     " M web/scripts/check-cards.mjs",
+     " M web/scripts/contenido-i18n.mjs",
+     " M web/src/data/anatomia.js",
+     " M web/src/data/fuentes.js",
+     " M web/src/data/musculos-fichas.js"
     ]
    },
    "tools": {
@@ -48,7 +50,7 @@
      "sha256": "f50459187fac1ef0154d57193e482b1758cb80d6a3823e55cfa42790caa5e9ba"
     }
    },
-   "checks": "validate_models: 7 archivos correctos; check-cards: todo correcto",
+   "checks": "validate_models: 3 archivos correctos; check-cards: todo correcto",
    "audit": {
     "file": "build/audit.json",
     "sha256": "fa11c6c0e5b360ff45aca8280b20104d2486f26d895d3dc009869e02fe539b10",
@@ -57,17 +59,19 @@
    }
   },
   "female": {
-   "date": "2026-11-02T18:34:21+00:00",
+   "date": "2026-11-06T20:14:15+00:00",
    "systems": [
-    "vascular",
-    "nervous"
+    "muscular"
    ],
    "git": {
-    "commit": "1a81de4",
+    "commit": "d91e0ec",
     "uncommitted_changes": [
      "M tools/anato3d_fit.py",
-     " M tools/build_lib.sh",
-     " M web/scripts/check-cards.mjs"
+     " M web/scripts/check-cards.mjs",
+     " M web/scripts/contenido-i18n.mjs",
+     " M web/src/data/anatomia.js",
+     " M web/src/data/fuentes.js",
+     " M web/src/data/musculos-fichas.js"
     ]
    },
    "tools": {
@@ -101,7 +105,7 @@
      "sha256": "2378ec6aa1668360ff67f06f5bdcb5a6327adbb3227aa33a0f80bd4c9265b88a"
     }
    },
-   "checks": "validate_models: 7 archivos correctos; check-cards: todo correcto",
+   "checks": "validate_models: 3 archivos correctos; check-cards: todo correcto",
    "audit": {
     "file": "build/audit.json",
     "sha256": "fa11c6c0e5b360ff45aca8280b20104d2486f26d895d3dc009869e02fe539b10",
@@ -144,8 +148,8 @@
    "sha256": "5e996ee9d1f158d2b25841746494d45d751a988fa73e35b922258df560c3d1c8"
   },
   "female-index.json": {
-   "bytes": 527694,
-   "sha256": "df0d7af9a99ac693d0b86c6603da1ed32fd3cc6b46cfcc98a0bbcc8261818ec2"
+   "bytes": 527698,
+   "sha256": "efb7f3af59bbcdc575ff4b4f9dcc7a602b55043560bb36391c7387f95d4e05eb"
   },
   "female-integumentary.glb": {
    "bytes": 184372,
@@ -164,8 +168,8 @@
    "sha256": "bcf82a8254e81b4fdab3709d9e83a4771f7ac885e9d82577786a5c8ec107c966"
   },
   "female-muscular.glb": {
-   "bytes": 3035084,
-   "sha256": "f458cc231a021d796c7ed11fd80663d644cc623a3c6ab69d8b9faf1065960ae3"
+   "bytes": 3035048,
+   "sha256": "70aecdf3d26d1d7e935d789f4128accaed5966bfbd9dfb5914d8e017513f093d"
   },
   "female-muscular.json": {
    "bytes": 5651,
@@ -244,8 +248,8 @@
    "sha256": "c255985a200bab12c042c55e628bf2e87e8404f0dc0e549dc9a3d2594d05c927"
   },
   "male-index.json": {
-   "bytes": 526141,
-   "sha256": "efa7d3573d31e186e2e507be636020e468cb4e3333e3de0fd68ffe0b3a8a9546"
+   "bytes": 526145,
+   "sha256": "ba2aa4c00a30b294aed9db9b5ca3181541b1e5b02b7bf6f4694944ff8042fbc8"
   },
   "male-integumentary.glb": {
    "bytes": 173668,
@@ -264,8 +268,8 @@
    "sha256": "bcf82a8254e81b4fdab3709d9e83a4771f7ac885e9d82577786a5c8ec107c966"
   },
   "male-muscular.glb": {
-   "bytes": 3016280,
-   "sha256": "4c07ae7d45cd1615e12bd16b02b2a355d94ee757f000a87dcbb60799ccb94b90"
+   "bytes": 3016244,
+   "sha256": "f481f4df8fa7d104c0b1e5842a3b8cc2c48dd440abd8c4fdf44bfb8de76825ff"
   },
   "male-muscular.json": {
    "bytes": 5651,

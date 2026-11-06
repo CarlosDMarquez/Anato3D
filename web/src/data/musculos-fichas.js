@@ -660,7 +660,7 @@ export const MUSCULOS = {
     inervacion: 'Es tejido fibroso: no tiene inervación motora.',
     descripcion: 'Nudo fibromuscular entre la vagina y el ano, donde se unen los músculos del periné: bulboesponjoso, transversos, esfínter externo del ano y fibras del elevador del ano.',
     accion: 'Sostiene el suelo de la pelvis.',
-    datos: ['En el parto puede desgarrarse; la episiotomía es un corte quirúrgico que evita un desgarro mayor.'],
+    datos: ['En el parto puede desgarrarse. La episiotomía es un corte quirúrgico en esta zona; la OMS desaconseja hacerla de rutina en los partos vaginales espontáneos.'],
   },
   // ── Periné (modelo masculino: envuelven los órganos de Z-Anatomy, tools/male_perineum.py) ──
   'Ischiocavernosus_muscle@male': {

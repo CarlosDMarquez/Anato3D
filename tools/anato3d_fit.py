@@ -61,7 +61,9 @@ ES_FIXES = [(r'^Musculo\b', 'Músculo'), (r'\bulmonar', 'pulmonar'), (r'\bcorazo
             (r'\bfibula\b', 'fíbula'), (r'\bhumero\b', 'húmero'), (r'\b([Mm])usculo(s?)\b', r'\1úsculo\2'), (r'\boftalmic', 'oftálmic'),
             (r'faring(e[oa]s?)\b', r'faríng\1'), (r'^Linea\b', 'Línea'), (r'\b([Ll])ingula\b', r'\1íngula'), (r'^Fornix\b', 'Fórnix'),
             (r'multifido', 'multífido'), (r'interfalangeas', 'interfalángicas'), (r'metatarsofalangeas', 'metatarsofalángicas'),
-            (r'calcáneocuboideo', 'calcaneocuboideo'), (r'masétero', 'masetero'), (r'intertransvarios', 'intertransversarios')]
+            (r'calcáneocuboideo', 'calcaneocuboideo'), (r'masétero', 'masetero'), (r'intertransvarios', 'intertransversarios'),
+            # Letras que faltan en la traducción (revisión del 2026-11-06): «múculo» y «longísmo».
+            (r'\bmúculo\b', 'músculo'), (r'\blongísmo\b', 'longísimo')]
 # Traducciones oficiales equivocadas (clave: término inglés de Z-Anatomy).
 ES_OVERRIDES = {
     'Posterior septal branches of sphenopalatine artery': 'Ramas septales posteriores de la arteria esfenopalatina',

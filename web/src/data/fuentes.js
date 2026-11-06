@@ -379,6 +379,18 @@ function fuenteLatin(fuente) {
   return { texto: 'Nombre latino de Z-Anatomy (sin término propio en la Terminologia Anatomica).', url: 'https://www.z-anatomy.com/' };
 }
 
+// Fuente propia de un punto clave que no cubren las de la ficha (clave de la ficha), con su nota de consulta.
+const DATOS = {
+  Perineal_body: {
+    fuente: {
+      papel: 'Punto clave',
+      texto: 'World Health Organization: «WHO recommendations: intrapartum care for a positive childbirth experience» (2018)',
+      url: 'https://bigg-rec.bvsalud.org/en/recommendations/5da57cafad4450c07dff1cce955a77b37979740f',   // la recomendación, en la base BIGG de la OPS
+    },
+    nota: 'Consultadas el 1 de noviembre de 2026; la de la OMS, el 6 de noviembre de 2026.',
+  },
+};
+
 // Fuentes de la ficha de un músculo (clave de su ficha) y del latín de la pieza.
 export function fuentesMusculo(cardKey, nameKey, sex) {
   const out = [];
@@ -388,7 +400,9 @@ export function fuentesMusculo(cardKey, nameKey, sex) {
   if (termino) out.push({ papel: 'Nombre', ...TA2, texto: `${TA2.texto}, término n.º ${termino}` });
   if (wiki) out.push({ papel: 'Ficha', ...WIKI(wiki) });
   if (tma) out.push({ papel: 'Ficha', texto: `TeachMeAnatomy: «${TMA[tma][0]}»`, url: `https://teachmeanatomy.info/${TMA[tma][1]}` });
-  return out.length ? { lista: out, nota: CONSULTA } : null;
+  const dato = DATOS[cardKey];
+  if (dato) out.push(dato.fuente);
+  return out.length ? { lista: out, nota: dato?.nota ?? CONSULTA } : null;
 }
 
 export function fuentesLatin(nameKey) {

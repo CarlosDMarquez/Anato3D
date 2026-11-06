@@ -31,7 +31,8 @@ function nodes(file) {
 const RARO = /\s{2,}|\bdel el\b|\bde el\b|\ba el\b| ,|\(\s|\s\)|undefined|null|NaN/;
 // Erratas conocidas del pipeline: tilde en el primer elemento de un compuesto («músculocutáneo», «músculofrénica»; en
 // español van sin ella: musculocutáneo, musculofrénica). La introdujo una regla de ES_FIXES (tools/anato3d_fit.py).
-const ERRATA = /\b[Mm]úsculo(?!s?\b)[a-záéíóúñ]/;
+// También las letras que faltan en la traducción de Z-Anatomy («múculo», «longísmo»), corregidas en ES_FIXES.
+const ERRATA = /\b[Mm]úsculo(?!s?\b)[a-záéíóúñ]|\b[Mm]úculo\b|\blongísmo\b/;
 let fallos = 0;
 // Una etiqueta se traduce si está en ETIQUETAS, si sigue un patrón («Par craneal XI») o si sus partes « · » lo hacen.
 const traducible = (e) => !!ETIQUETAS[e] || ETIQUETAS_PATRON.some(([re]) => re.test(e))
@@ -63,7 +64,7 @@ for (const model of only > 0 ? [process.argv[only + 1]] : ['male', 'female']) {
       if (!info.title || /_/.test(info.title)) malos.titulo.push(name);
       if (!info.latin) malos.latin.push(name);
       if (RARO.test(`${info.title} ${info.latin ?? ''} ${info.entry?.descripcion ?? ''}`)) malos.raro.push(name);
-      if (ERRATA.test(`${info.title} ${info.entry?.descripcion ?? ''}`)) malos.errata.push(name);
+      if (ERRATA.test(`${info.title} ${info.entry?.descripcion ?? ''} ${(info.fields ?? []).map((f) => f.value).join(' ')}`)) malos.errata.push(name);
       for (const e of [...(info.chips ?? []), info.tissue].filter(Boolean)) if (!traducible(e)) malos.traduccion.push(`${name} («${e}»)`);
       if (x.system !== 'muscular') continue;
       c.musculos++;
