@@ -231,6 +231,7 @@ export class Viewer extends EventTarget {
     this.modesty = false;        // true = genitales externos ocultos
     this.genitalRegion = null;
     this.variantCache = new Map();
+    this.created = new Map();    // material creado aquí (variante, versión física) → generación del modelo para el que se creó
     this.cache = new Map();
     this.adding = new Map();     // `${generación} ${url}` → carga de sistema en curso
     // Número de la carga de modelo en curso: una descarga que termina después de cambiar de modelo no se añade (las piezas
@@ -255,9 +256,19 @@ export class Viewer extends EventTarget {
     this.scene = new THREE.Scene();
     this.backdrop = radialTexture(1024, [[0, '#1d2733'], [0.55, '#121820'], [1, '#07090c']]);
     this.scene.background = this.backdrop;
-    const pmrem = new THREE.PMREMGenerator(renderer);
-    this.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    const environment = () => new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
+    this.scene.environment = environment();
     this.scene.environmentIntensity = 0.5;
+    // Contexto WebGL perdido: el sistema quita la GPU a la página (poca memoria en un teléfono, la app en segundo plano,
+    // un reinicio del controlador). three deja de dibujar y lo recupera si el navegador lo devuelve; la interfaz lo avisa
+    // (antes el lienzo se quedaba en blanco sin explicación). Al volver se rehace el entorno de luz, que se dibuja en la
+    // GPU y no se puede volver a subir como las mallas y las texturas.
+    renderer.domElement.addEventListener('webglcontextlost', () => this.dispatchEvent(new Event('contextlost')));
+    renderer.domElement.addEventListener('webglcontextrestored', () => {
+      this.scene.environment = environment();
+      this.needsRender = true;
+      this.dispatchEvent(new Event('contextrestored'));
+    });
 
     const key = new THREE.DirectionalLight(0xfff4e8, 1.55);
     key.position.set(1.6, 3, 2.6);
@@ -372,6 +383,7 @@ export class Viewer extends EventTarget {
     if (prof && !base.isMeshPhysicalMaterial) {
       if (!this.physCache.has(base)) {
         const phys = toPhysical(base);
+        this.created.set(phys, this.generation);
         for (const p of PATCHES.get(base) ?? []) addPatch(phys, p.key, p.fn);
         this.physCache.set(base, phys);
       }
@@ -400,7 +412,9 @@ export class Viewer extends EventTarget {
     this.generation++;
     for (const r of this.roots ?? []) this.scene.remove(r);
     this.select([]);
+    this.hovered = null;                                            // (si no, su resalte recrearía variantes ya liberadas)
     this.partByMesh.clear();
+    this.#release((this.roots ?? []).filter((r) => r !== gltf.scene));
     this.root = gltf.scene;
     this.roots = [this.root];
     this.scene.add(this.root);
@@ -431,7 +445,10 @@ export class Viewer extends EventTarget {
 
   async #addSystem(url, generation, { signal, onProgress }) {
     const gltf = await this.#gltf(url, { signal, onProgress });
-    if (generation !== this.generation) return null;               // el modelo cambió durante la descarga
+    if (generation !== this.generation) {                          // el modelo cambió durante la descarga
+      this.#release([gltf.scene]);
+      return null;
+    }
     if (this.roots.includes(gltf.scene)) return [];
     const parts = this.#collectParts(gltf.scene);
     // Los programas nuevos (perfiles de tejido, fibras) se compilan antes de añadir el sistema a la escena: mientras se
@@ -442,6 +459,7 @@ export class Viewer extends EventTarget {
     // mientras tanto, la limpieza hacía splice(indexOf(...) = −1) y quitaba la última raíz del modelo nuevo.
     if (generation !== this.generation) {
       for (const p of parts) for (const m of p.meshes) if (this.partByMesh.get(m) === p) this.partByMesh.delete(m);
+      this.#release([gltf.scene]);
       return null;
     }
     this.roots.push(gltf.scene);
@@ -569,6 +587,26 @@ export class Viewer extends EventTarget {
     return empty;
   }
 
+  // Memoria de lo que deja de verse: el modelo anterior al cambiar de hombre a mujer (o al revés) y los sistemas que llegan
+  // cuando ya se muestra otro modelo. Se liberan en la GPU sus mallas, sus materiales (con las variantes y versiones
+  // físicas creadas para un modelo anterior, que el que se ve ya no usa) y sus texturas, y se quitan de la caché de
+  // descargas. Antes se quedaban los dos modelos: en un teléfono, solo las texturas del esqueleto de los dos sumaban unos
+  // 610 MB (revisión de rendimiento del 2026-11-07). Volver a un modelo lo pide otra vez (suele servirlo la caché del
+  // navegador).
+  #release(roots) {
+    const geometries = new Set(), materials = new Set(), textures = new Set();
+    for (const r of roots) r.traverse((o) => {
+      if (!o.isMesh) return;
+      geometries.add(o.geometry);
+      for (const m of [o.material, o.userData.baseMaterial].flat()) if (m) materials.add(m);
+    });
+    for (const [mat, gen] of this.created) if (gen < this.generation) { materials.add(mat); this.created.delete(mat); }
+    for (const cache of [this.variantCache, this.physCache]) for (const [k, mat] of cache) if (materials.has(mat)) cache.delete(k);
+    for (const m of materials) for (const v of Object.values(m)) if (v?.isTexture) textures.add(v);
+    for (const x of [...geometries, ...materials, ...textures]) x.dispose();
+    for (const [url, gltf] of this.cache) if (roots.includes(gltf.scene)) this.cache.delete(url);
+  }
+
   #collectParts(root) {
     const parts = [];
     root.traverse((node) => {
@@ -649,6 +687,7 @@ export class Viewer extends EventTarget {
     const key = `${base.uuid}|${name}`;
     if (!this.variantCache.has(key)) {
       const mat = base.clone();
+      this.created.set(mat, this.generation);
       for (const p of PATCHES.get(base) ?? []) addPatch(mat, p.key, p.fn);
       edit(mat);
       this.variantCache.set(key, mat);
@@ -839,13 +878,19 @@ export class Viewer extends EventTarget {
 
   #frame() {
     const show = this.showcase?.frame;
-    if (show) {
-      // De tres cuartos, mirando hacia el menú de la izquierda, con un vaivén de ±11° cada 18 s.
-      const t = (performance.now() - this.showcase.t0) / 1000;
+    // De tres cuartos, mirando hacia el menú de la izquierda, con un vaivén de ±11° cada 18 s. En calidad baja (teléfonos),
+    // a 30 fotogramas por segundo: el giro es lento y así se dibuja la mitad de veces o menos (antes, a la frecuencia de
+    // la pantalla mientras se estaba en el menú; revisión de rendimiento del 2026-11-07).
+    const now = performance.now();
+    if (show && (this.quality || this.lessMotion.matches || now - (this.showcase.last ?? 0) >= 1000 / 30 - 2)) {
+      const t = (now - this.showcase.t0) / 1000;
       const az = 0.38 + (this.lessMotion.matches ? 0 : 0.2 * Math.sin((2 * Math.PI * t) / 18));
       this.controls.target.copy(show.target);
       this.camera.position.set(show.target.x + Math.sin(az) * show.dist, show.target.y + show.dist * 0.04, show.target.z + Math.cos(az) * show.dist);
-      if (!this.lessMotion.matches) this.needsRender = true;
+      if (!this.lessMotion.matches) {
+        this.needsRender = true;
+        this.showcase.last = now;
+      }
     }
     if (this.tween) {
       const tw = this.tween;

@@ -22,7 +22,8 @@ encaja con la anatomía tras revisar la lista se corrige en OVERRIDES.
 
 Uso (desde la raíz del proyecto; necesita build/<modelo>_{arterial,venous,nervous,muscular}.blend):
   /Applications/Blender.app/Contents/MacOS/Blender -b --factory-startup --python tools/vessel_regions.py -- male
-Escribe build/vessel_regions_<modelo>.json; con «male», además web/src/data/regiones-vasos.js (la tabla de la app).
+Escribe build/vessel_regions_<modelo>.json y web/src/data/regiones-vasos.js (la tabla de la app: la del hombre más los vasos
+que solo tiene la mujer).
 """
 import bpy, os, re, sys, json, collections, math
 import numpy as np
@@ -77,6 +78,10 @@ OVERRIDES = {
     'Deep_artery_of_penis': ['genitales'], 'Dorsal_artery_of_penis': ['genitales'], 'Deep_dorsal_vein_of_penis': ['genitales'],
     'Superficial_dorsal_veins_of_penis': ['genitales'], 'External_pudendal_veins': ['muslo', 'genitales'],
     'Superficial_external_pudendal_artery': ['muslo', 'genitales'], 'Deep_external_pudendal_artery': ['muslo', 'genitales'],
+    # Ovario y útero (solo en la mujer, tools/female_vessels.py): las ováricas bajan del abdomen a la pelvis; el resto, pelvis.
+    'Ovarian_artery': ['abdomen', 'pelvis'], 'Left_ovarian_vein': ['abdomen', 'pelvis'], 'Right_ovarian_vein': ['abdomen', 'pelvis'],
+    'Uterine_artery': ['pelvis'], 'Vaginal_branches_of_uterine_artery': ['pelvis'], 'Tubal_branch_of_uterine_artery': ['pelvis'],
+    'Ovarian_branch_of_uterine_artery': ['pelvis'], 'Uterine_veins': ['pelvis'], 'Uterine_venous_plexus': ['pelvis'],
 }
 # Senos venosos de la duramadre y plexo basilar: están en la cavidad craneal, no en el encéfalo.
 SINUS = re.compile(r'(?<!Coronary)_sinus$|Basilar_venous_plexus')
@@ -236,11 +241,18 @@ for k in out:
 for k, v in OVERRIDES.items():
     if k in out: out[k] = v
 json.dump({'regiones': out, 'detalle': {k: dict(c) for k, c in res.items()}}, open(os.path.join(ROOT, f'build/vessel_regions_{MODEL}.json'), 'w'), ensure_ascii=False, indent=0)
-if MODEL == 'male':
+# Tabla de la app: la del modelo masculino y, del femenino, los vasos que el masculino no tiene (ováricos y uterinos, desde el
+# 2026-11-07). Se escribe con cualquiera de los dos modelos, con lo que haya en build/.
+table = {}
+for m in ('male', 'female'):
+    f = os.path.join(ROOT, f'build/vessel_regions_{m}.json')
+    if os.path.exists(f):
+        for k, v in json.load(open(f))['regiones'].items(): table.setdefault(k, v)
+if table:
     lines = ['// Región del cuerpo de cada vaso (por su nombre inglés en Z-Anatomy). Generado por tools/vessel_regions.py:',
              '// las colecciones de Z-Anatomy («Aorta», «Miembro superior»…) no dicen dónde está cada vaso. No editar a mano.',
              'export const REGIONES_VASOS = {']
-    lines += [f"  {k}: '{label(v)}'," for k, v in out.items()]
+    lines += [f"  {k}: '{label(v)}'," for k, v in sorted(table.items())]
     lines.append('};')
     open(os.path.join(ROOT, 'web/src/data/regiones-vasos.js'), 'w').write('\n'.join(lines) + '\n')
 print('[regiones]', len(out), 'vasos;', collections.Counter(label(v) for v in out.values()).most_common(15))

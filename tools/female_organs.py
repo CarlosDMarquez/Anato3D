@@ -132,8 +132,11 @@ def curve(points, n=24):
 
 # ── Órganos ───────────────────────────────────────────────────────────────
 def pelvic_organs(objs, bladder_world, skin_world=None):
-    """Lista de (nombre, tejido, vértices, caras, externo) de los órganos pélvicos femeninos.
-    `skin_world`: vértices de la piel; los orificios del vestíbulo y el glande del clítoris se colocan sobre ella."""
+    """Lista de (nombre, tejido, vértices, caras, externo) de los órganos pélvicos femeninos, y las referencias.
+    `skin_world`: vértices de la piel; los orificios del vestíbulo y el glande del clítoris se colocan sobre ella.
+    Las referencias incluyen los ejes de la vagina, del útero, de las trompas y de los ligamentos propios del ovario, con
+    sus radios, el centro de cada ovario y el cuerno del útero: build_visceral.py las guarda y los vasos ováricos y
+    uterinos (female_vessels.py) se trazan sobre ellas."""
     from female_perineum import frame, deep_genitals                        # (importa este módulo)
     L = landmarks(objs)
     out = []
@@ -153,6 +156,7 @@ def pelvic_organs(objs, bladder_world, skin_world=None):
     rb = np.interp(s, [0, 0.12, 0.3, 1], [0.0042, 0.0055, 0.006, 0.008])                # de delante atrás
     V, F = tube(vagina_path, va, rb, caps=(False, True))                 # abierta en el orificio (con casquete, asomaba)
     out.append(('Vagina', 'vagina', V, F, False))
+    L['vagina_path'], L['vagina_va'], L['vagina_rb'] = vagina_path, va, rb
     # Útero: el orificio externo del cuello, dentro de la bóveda de la vagina; cuello en anteversión, cuerpo en anteflexión.
     # Con la anteversión y la anteflexión habituales (90° y 20°) el fondo llega por delante del pubis en esta pelvis (corta
     # de delante atrás: conjugada obstétrica de 10,1 cm): se usa la más inclinada con el fondo a 1,2 cm por detrás. Con la
@@ -175,6 +179,7 @@ def pelvic_organs(objs, bladder_world, skin_world=None):
         upath = upath + np.array([0, 0, lift]) * s[:, None] ** 2
     V, F = tube(upath, ra, rb, ref=(1.0, 0.0, 0.0))
     out.append(('Uterus', 'uterus', V, F, False))
+    L['uterus_path'], L['uterus_ra'], L['uterus_rb'] = upath, ra, rb
     fundus = upath[-1]; fundus_dir = _unit(upath[-1] - upath[-4])
     for side, sx in (('L', 1), ('R', -1)):
         cornu = upath[-5] + np.array([sx * 0.022, 0, 0]) + fundus_dir * 0.004
@@ -185,6 +190,7 @@ def pelvic_organs(objs, bladder_world, skin_world=None):
         V, F = ellipsoid(ovary_c, [[0.007 * sx, 0, 0], [0, 0.010, 0], [0, 0, 0.0175]],
                          bumps=lambda d: 1 + 0.06 * np.sin(5 * d[:, 0] + 3 * d[:, 2]) * np.cos(4 * d[:, 1]))
         out.append((f'Ovary_{side}', 'ovary', V, F, False))
+        L[f'cornu_{side}'], L[f'ovary_{side}'] = cornu, ovary_c
         # Trompa: del ángulo del útero hacia fuera, sobre el polo superior del ovario, y hacia atrás y abajo.
         # (Sin pasar del ovario hacia fuera: más allá está el ilion.)
         tpath = curve([cornu, cornu + np.array([sx * 0.025, 0.0, 0.006]), ovary_c + np.array([sx * 0.001, -0.012, 0.03]),
@@ -193,6 +199,7 @@ def pelvic_organs(objs, bladder_world, skin_world=None):
         r = np.interp(s, [0, 0.35, 0.8, 1.0], [0.002, 0.0025, 0.005, 0.008])
         V, F = tube(tpath, r, r, seg=16, ref=(0.0, 0.0, 1.0))
         out.append((f'Uterine_tube_{side}', 'tube', V, F, False))
+        L[f'tube_{side}'], L[f'tube_r_{side}'] = tpath, r
         end, tdir = tpath[-1], _unit(tpath[-1] - tpath[-3])
         for k in range(7):                                          # fimbrias
             a = 2 * np.pi * k / 7
@@ -203,9 +210,11 @@ def pelvic_organs(objs, bladder_world, skin_world=None):
                         np.linspace(0.0016, 0.0008, 5), seg=8)
             out.append((f'Fimbriae_of_uterine_tube_{side}', 'tube', V, F, False))
         # Ligamento propio del ovario: del polo inferior del ovario al ángulo del útero, bajo la trompa.
-        V, F = tube(curve([ovary_c + np.array([-sx * 0.004, 0, -0.012]), (ovary_c + cornu) / 2 + np.array([0, 0.004, -0.012]),
-                           cornu + np.array([0, 0.004, -0.008])], 12), 0.0025, 0.0022, seg=12)
+        lpath = curve([ovary_c + np.array([-sx * 0.004, 0, -0.012]), (ovary_c + cornu) / 2 + np.array([0, 0.004, -0.012]),
+                       cornu + np.array([0, 0.004, -0.008])], 12)
+        V, F = tube(lpath, 0.0025, 0.0022, seg=12)
         out.append((f'Ligament_of_ovary_{side}', 'ligament', V, F, False))
+        L[f'ovary_ligament_{side}'] = lpath
         # Ligamento redondo: del ángulo del útero al anillo inguinal profundo, por el conducto inguinal al labio mayor.
         asis = L[f'asis_{side}']; tubercle = np.array([sx * 0.022, ps_t[1] - 0.004, ps_t[2] + 0.004])
         deep_ring = (asis + tubercle) / 2 + np.array([-sx * 0.008, 0.012, 0.012])

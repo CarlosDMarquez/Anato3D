@@ -1,25 +1,27 @@
 {
- "release": "20261107T015054-6f2c142",
- "generated": "2026-11-07T01:50:54+00:00",
+ "release": "20261107T170835-c754096",
+ "generated": "2026-11-07T17:08:35+00:00",
  "note": "Versión de los modelos de la web: un archivo solo es de esta versión si su SHA-256 coincide.",
  "builds": {
   "male": {
-   "date": "2026-11-07T01:20:20+00:00",
+   "date": "2026-11-07T17:08:35+00:00",
    "systems": [
-    "base"
+    "ligera"
    ],
    "git": {
-    "commit": "6f2c142",
+    "commit": "c754096",
     "uncommitted_changes": [
-     "M tools/audit_models.py",
-     " M tools/build_female_skin.py",
+     "M tools/build_all.sh",
+     " M tools/build_vascular.py",
      " M tools/build_visceral.py",
      " M tools/female_organs.py",
-     " M tools/female_pelvis.py",
-     " M tools/female_perineum.py",
-     " M tools/fix_neck.py",
      " M tools/nombres_idiomas.py",
-     " M web/src/data/visceras.js"
+     " M tools/vessel_regions.py",
+     " M web/src/data/latin.js",
+     " M web/src/data/regiones-vasos.js",
+     " M web/src/data/vasos.js",
+     "?? tools/base_ligera.py",
+     "?? tools/female_vessels.py"
     ]
    },
    "tools": {
@@ -45,8 +47,8 @@
      "sha256": "6ae4927d488b410e6d7e785eaa32e06678f8845a01cb996a1f5af630ca45b7e0"
     },
     "Anato3D_Male_30_Fase2.blend": {
-     "bytes": 68671377,
-     "sha256": "2f1ed4f07f9aee2dafb5c5db946da8b64b11b5a18cb549384f09808f520806ff"
+     "bytes": 68672320,
+     "sha256": "e78496ca6f340026d34c3da410b4b2cc834d975fd550b602439094ad95aedece"
     },
     "Anato3D_Male_30_Fase2_musculature.npz": {
      "bytes": 1128121,
@@ -62,23 +64,23 @@
    }
   },
   "female": {
-   "date": "2026-11-07T01:50:54+00:00",
+   "date": "2026-11-07T08:30:40+00:00",
    "systems": [
-    "visceral"
+    "visceral",
+    "vascular"
    ],
    "git": {
-    "commit": "6f2c142",
+    "commit": "c754096",
     "uncommitted_changes": [
-     "M tools/audit_models.py",
-     " M tools/build_female_skin.py",
-     " M tools/build_muscular.py",
+     "M tools/build_all.sh",
+     " M tools/build_vascular.py",
      " M tools/build_visceral.py",
      " M tools/female_organs.py",
-     " M tools/female_pelvis.py",
-     " M tools/female_perineum.py",
-     " M tools/fix_neck.py",
      " M tools/nombres_idiomas.py",
-     " M web/src/data/visceras.js"
+     " M tools/vessel_regions.py",
+     " M web/src/data/latin.js",
+     " M web/src/data/vasos.js",
+     "?? tools/female_vessels.py"
     ]
    },
    "tools": {
@@ -112,7 +114,7 @@
      "sha256": "0964ef45cf3ae08e5c163805b783766d9021aee7d687824aee115deeab6d181f"
     }
    },
-   "checks": "validate_models: 13 archivos correctos; check-cards: todo correcto",
+   "checks": "validate_models: 17 archivos correctos; check-cards: todo correcto",
    "audit": {
     "file": "build/audit.json",
     "sha256": "aede1fd3250bf774281d0440aa124275bdf4b6998fda1ebfec33e9f4d0331f77",
@@ -123,8 +125,8 @@
  },
  "files": {
   "female-arterial.glb": {
-   "bytes": 2776488,
-   "sha256": "1957d15bb4c49b4cb479a3ae59b6bd9477fe8d9264e027dd6726c6dca7a4439b"
+   "bytes": 2820896,
+   "sha256": "67b5ef74b91df45d6fad67966edec7e982d72f5f1f67525ab939fc55aa6bc248"
   },
   "female-arterial.json": {
    "bytes": 1481,
@@ -155,8 +157,8 @@
    "sha256": "5e996ee9d1f158d2b25841746494d45d751a988fa73e35b922258df560c3d1c8"
   },
   "female-index.json": {
-   "bytes": 528550,
-   "sha256": "b37017ec475b672926fc6f9ae5f21eb52a39b1bdc8abaf17ec76fc240cb857c3"
+   "bytes": 531356,
+   "sha256": "37cd68f20ab83a526f134b3690b0bef519ce2ea0b9d0f4e3b55dfb6ef5f554fe"
   },
   "female-integumentary.glb": {
    "bytes": 182456,
@@ -207,8 +209,8 @@
    "sha256": "6c4ec98bd278f32f3d3b507f8ce6fa74ebc7ec7ba850b01f8286d4d86b86f71a"
   },
   "female-venous.glb": {
-   "bytes": 1338620,
-   "sha256": "ac5a7dee2f527edc18bec77f915b6b1526df7caad36876146f56e5217d4bfc7e"
+   "bytes": 1398384,
+   "sha256": "cf9bf30de0d5981400a1f0d705bb9cd2800ee7285affc8ecbc5e08ed466cbc2d"
   },
   "female-venous.json": {
    "bytes": 1378,
@@ -217,6 +219,10 @@
   "female.glb": {
    "bytes": 11432608,
    "sha256": "a980dadbb5ff7c890c360aacb7cae7480d34925052e3116fc96284941fddcda0"
+  },
+  "female.ligero.glb": {
+   "bytes": 7515980,
+   "sha256": "f4fd2e163c5a01e32f23e09e1a35569c686f267d7029f11518f24ecfe5685173"
   },
   "male-arterial.glb": {
    "bytes": 2797720,
@@ -317,6 +323,10 @@
   "male.glb": {
    "bytes": 11405932,
    "sha256": "db4ce1950c5570f1bf7f078eaf67e5375f31814dad0649b56cee70c70f0ab8cc"
+  },
+  "male.ligero.glb": {
+   "bytes": 7489304,
+   "sha256": "b40ef0c9c51004031da9f0ab3d6e2513a5cc9b13f1001c5578709ae13997f217"
   }
  }
 }

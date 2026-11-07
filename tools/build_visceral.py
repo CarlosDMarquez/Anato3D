@@ -16,7 +16,7 @@ Salida: build/male_<sistema>.blend y .json, y web/public/models/male-<sistema>.j
 import bpy, bmesh, os, re, sys, json, collections
 sys.path.insert(0, os.path.dirname(__file__))
 from anato3d_fit import (Fitter, Extractor, Groups, bonus_paths, es, la, sanitize, source_name, principled, save,
-                         log, parse_args, male_only, MODEL, skull_bone)
+                         log, parse_args, male_only, MODEL, skull_bone, OUT_DIR)
 from mathutils import Matrix, Vector, bvhtree
 import numpy as np
 
@@ -405,6 +405,10 @@ if MODEL == 'female' and 'urogenital' in wanted:
                                     'verts': len(me.vertices), 'name_es': es_name})
     log(f'órganos femeninos: {len(merged)} piezas; vestíbulo a {LM["ps_bottom"][2]:.3f} m (borde inferior de la sínfisis); '
         f'útero en anteversión {LM["uterus_pose"][0]}° y anteflexión {LM["uterus_pose"][1]}°')
+    # Ejes y radios de los órganos (útero, vagina, trompas, ovarios, ligamentos): los vasos ováricos y uterinos se trazan
+    # sobre ellos (build_vascular.py, que por eso se construye después).
+    os.makedirs(OUT_DIR, exist_ok=True)
+    np.savez(os.path.join(OUT_DIR, 'female_pelvic_organs.npz'), **{k: np.asarray(v, float) for k, v in LM.items()})
 
 # ── Solapes entre órganos ───────────────────────────────────────────────────
 # El ajuste mezcla las transformaciones de huesos vecinos y algunos órganos acababan unos dentro de otros. La auditoría

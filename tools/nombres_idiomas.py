@@ -93,6 +93,7 @@ def main():
         fr = zfr.get(k) or ta_fr_en.get(k) or (ta_fr_la.get(kl) if kl else None) or PROPIOS.get(nombre, {}).get('fr')
         it = ta_it_en.get(k) or (ta_it_la.get(kl) if kl else None) or PROPIOS.get(nombre, {}).get('it')
         if fr:
+            fr = re.sub(r"\b([dl]) '", r"\1'", fr)                     # errata de la TA2: «de l 'artère utérine»
             fr = re.sub(r'([Nn])oeud', r'\1œud', fr)
             fr = re.sub(r'\b([Cc])oeur', r'\1œur', re.sub(r'\bOe(il|soph)', r'Œ\1', re.sub(r'\boe(il|soph)', r'œ\1', fr)))
             tablas['fr'][nombre] = fr[0].upper() + fr[1:]

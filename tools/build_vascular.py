@@ -9,6 +9,8 @@ Uso (desde la raíz del proyecto):
 Los vasos de Z-Anatomy son curvas con grosor (radio por punto): su detalle se ajusta con la resolución de la
 curva según el calibre. El corazón (cavidades, válvulas, músculos papilares) va con el sistema arterial.
 Colores según la oxigenación, como en los atlas: arterias pulmonares en azul y venas pulmonares en rojo.
+En la mujer se añaden los vasos ováricos y uterinos, que Z-Anatomy no tiene (tools/female_vessels.py): necesitan el sistema
+visceral femenino ya construido en build/.
 
 Salida: build/male_arterial.* y build/male_venous.*, y sus .json en web/public/models/.
 """
@@ -159,5 +161,56 @@ for n, it in enumerate(items):
     if n % 100 == 0: log(f'  {n}/{len(items)} {name}: {len(obj.data.polygons)} caras, {moved}/{len(obj.data.vertices)} vértices corregidos por la piel')
 
 log('vasos sacados del hueso:', dict(bone_fixed))
+
+# ── Vasos ováricos y uterinos (solo en la mujer) ────────────────────────────
+# Z-Anatomy es un cuerpo masculino: la mujer no tenía arterias ni venas para los ovarios y el útero (tools/female_vessels.py).
+# Se trazan sobre los órganos femeninos que hace build_visceral.py (sus ejes, en build/female_pelvic_organs.npz, y sus
+# mallas, para no atravesarlos): por eso build_all.sh construye el visceral antes que el vascular.
+PELVIC = re.compile(r'iliac|pudendal|obturator|gluteal|sacral|anorectal|rectal|vesical|umbilical|iliolumbar|^Abdominal aorta$|'
+                    r'^Inferior vena cava \(abdominal|^Left renal vein$|Inferior mesenteric|testicular (artery|vein)', re.I)
+if MODEL == 'female' and not opt['only']:
+    import numpy as np
+    from female_vessels import pelvic_vessels
+    from anato3d_fit import OUT_DIR
+    need = {'female_pelvic_organs.npz': None,
+            'female_urogenital.blend': ('Uterus', 'Ovary_', 'Uterine_tube_', 'Fimbriae_of_uterine_tube_', 'Ligament_of_ovary_',
+                                        'Round_ligament_of_uterus_', 'Ureter_', 'Urinary_bladder', 'Vagina', 'Urethra'),
+            'female_digestive.blend': ('Sigmoid_colon', 'Rectum', 'Caecum', 'Vermiform_appendix')}
+    for f in need:
+        if not os.path.exists(os.path.join(OUT_DIR, f)):
+            raise FileNotFoundError(f'build/{f}: falta; los vasos ováricos y uterinos necesitan el sistema visceral construido')
+    organs = {}
+    for f, keep in need.items():
+        if keep is None: continue
+        with bpy.data.libraries.load(os.path.join(OUT_DIR, f)) as (src, dst):
+            dst.objects = [n for n in src.objects if n.startswith(keep)]
+        for o in dst.objects:
+            if o is None or o.type != 'MESH': continue
+            m = np.array(o.matrix_basis)                         # (fuera de la escena: matrix_world sin calcular)
+            V = np.array([v.co[:] for v in o.data.vertices]) @ m[:3, :3].T + m[:3, 3]
+            organs[re.sub(r'\.\d{3}$', '', o.name)] = (V, [tuple(p.vertices) for p in o.data.polygons])
+            me = o.data; bpy.data.objects.remove(o); bpy.data.meshes.remove(me)
+    zv = {o.name: o for o in bpy.data.objects if o.type == 'CURVE' and PELVIC.search(o.name) and not o.name.startswith(('(', '?'))
+          and '//' not in o.name and not o.name.endswith(('.j', '.g', '.t'))}
+    pieces = pelvic_vessels(fitter, dict(np.load(os.path.join(OUT_DIR, 'female_pelvic_organs.npz'))), organs, zv,
+                            bone_skip=skull_bone, log=log)
+    for pc in pieces:
+        V = pc['V']; center = (V.min(0) + V.max(0)) / 2
+        me = bpy.data.meshes.new(pc['name']); me.from_pydata((V - center).tolist(), [], pc['F']); me.update()
+        for f in me.polygons: f.use_smooth = True
+        obj = bpy.data.objects.new(pc['name'], me); obj.location = center
+        obj.data.materials.append(MATS[pc['tissue']])
+        rp = region_path(pc['like'], pc['system'])
+        obj['anato3d_id'] = f"{pc['system']}_{pc['name'].lower()}"
+        obj['system'] = pc['system']
+        obj['tissue'] = pc['tissue']
+        obj['major'] = False
+        obj['name_en'], obj['name_la'], obj['name_es'] = pc['name_en'], pc['name_la'], pc['name_es']
+        obj['region'] = json.dumps([sanitize(g) for g in rp])
+        obj['source'] = pc['source']
+        roots[pc['system']].collection(rp).objects.link(obj)
+        stats[pc['system']].append({'name': pc['name'], 'tissue': pc['tissue'], 'major': False, 'faces': len(me.polygons),
+                                    'moved_out_of_skin': 0, 'verts': len(me.vertices), 'worst_mm': 0.0, 'name_es': pc['name_es']})
+    log(f'vasos ováricos y uterinos: {len(pieces)} piezas, {sum(len(pc["F"]) for pc in pieces)} caras')
 for system, groups in roots.items():
     save(f'male_{system}', groups, stats[system], {'major': sum(s['major'] for s in stats[system])})

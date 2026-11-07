@@ -2,9 +2,12 @@
 # Regenera los sistemas a partir de Z-Anatomy y de la Fase 2 actual y, si todo pasa las comprobaciones, los publica en
 # web/public/models.
 # Uso (desde la raíz del proyecto): zsh tools/build_all.sh [sistemas...]   (por defecto: muscular connective vascular
-#   nervous visceral; visceral incluye la piel genital)
+#   nervous visceral; visceral incluye la piel genital). Se construyen en este orden: muscular, conectivo, visceral,
+#   vascular, nervioso (el vascular femenino necesita el visceral).
 #   genital: solo la piel genital (necesita urogenital, vascular y nervioso ya construidos en build/).
 #   base: tools/fix_neck.py (male.glb y female.glb). No va por defecto: reescribe también las Fase 2 y los campos .npz.
+#   ligera: los modelos base ligeros de las pantallas táctiles (male.ligero.glb y female.ligero.glb, tools/base_ligera.py),
+#   de los publicados. Con «base» se hacen también, de los nuevos.
 # Modelo femenino: A3D_MODEL=female zsh tools/build_all.sh. Otro Blender: A3D_BLENDER=/ruta/al/Blender.
 #
 # Garantías (2026-11-02; antes, un error de Blender podía pasar por éxito: `set -e` sin pipefail, salida filtrada con
@@ -22,7 +25,7 @@ cd "$(dirname "$0")/.."
 M=${A3D_MODEL:-male}
 export A3D_MODEL=$M
 ALL="${*:-muscular connective vascular nervous visceral}"
-KNOWN=" muscular connective vascular nervous visceral genital base "
+KNOWN=" muscular connective vascular nervous visceral genital base ligera "
 source tools/build_lib.sh
 
 for s in ${=ALL}; do [[ $KNOWN == *" $s "* ]] || { print -u2 "✗ sistema desconocido: $s (válidos:$KNOWN)"; exit 2; }; done
@@ -66,6 +69,17 @@ if want base; then
   run_blender base --python tools/fix_neck.py
   require_outputs base $OUT/male.glb $OUT/female.glb
 fi
+# Modelos base ligeros para pantallas táctiles: las mismas mallas con las texturas a la mitad (en la GPU, unos 77 MB en
+# lugar de 305; revisión de rendimiento del 2026-11-07). De los base recién hechos o, si no, de los publicados.
+if want base || want ligera; then
+  print "· ligera…"
+  for m in male female; do
+    src=${A3D_PUBLISHED:-web/public/models}/$m.glb
+    [[ -f $OUT/$m.glb ]] && src=$OUT/$m.glb
+    python3 tools/base_ligera.py $src $OUT/$m.ligero.glb
+  done
+  require_outputs ligera $OUT/{male,female}.ligero.glb
+fi
 if want muscular; then
   build muscular $Z tools/build_muscular.py
   require_outputs muscular build/${M}_muscular.blend $OUT/${M}-muscular.json
@@ -76,6 +90,15 @@ if want connective; then
   require_outputs connective build/${M}_connective.blend $OUT/${M}-connective.json
   export_glb connective Connective_System
 fi
+if want visceral; then
+  build visceral $Z tools/build_visceral.py
+  require_outputs visceral build/${M}_{respiratory,digestive,urogenital,endocrine,lymphatic}.blend \
+    $OUT/${M}-{respiratory,digestive,urogenital,endocrine,lymphatic}.json
+  export_glb respiratory Respiratory_System; export_glb digestive Digestive_System
+  export_glb urogenital Urogenital_System; export_glb endocrine Endocrine_System; export_glb lymphatic Lymphatic_System
+fi
+# Después del visceral: en la mujer, los vasos ováricos y uterinos se trazan sobre los órganos que construye
+# (build/female_pelvic_organs.npz y build/female_urogenital.blend; tools/female_vessels.py).
 if want vascular; then
   build vascular $Z tools/build_vascular.py
   require_outputs vascular build/${M}_{arterial,venous}.blend $OUT/${M}-{arterial,venous}.json
@@ -85,13 +108,6 @@ if want nervous; then
   build nervous $Z tools/build_nervous.py
   require_outputs nervous build/${M}_nervous.blend $OUT/${M}-nervous.json
   export_glb nervous Nervous_System
-fi
-if want visceral; then
-  build visceral $Z tools/build_visceral.py
-  require_outputs visceral build/${M}_{respiratory,digestive,urogenital,endocrine,lymphatic}.blend \
-    $OUT/${M}-{respiratory,digestive,urogenital,endocrine,lymphatic}.json
-  export_glb respiratory Respiratory_System; export_glb digestive Digestive_System
-  export_glb urogenital Urogenital_System; export_glb endocrine Endocrine_System; export_glb lymphatic Lymphatic_System
 fi
 # Piel de los genitales externos (y, en la mujer, las mamas): necesita urogenital, vascular y nervioso.
 if want visceral || want genital; then

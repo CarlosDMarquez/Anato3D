@@ -109,4 +109,9 @@ export const LATIN = {
   omentum: 'membrana grasa, entraña', majus: 'mayor', minus: 'menor', taenia: 'cinta, banda', libera: 'libre', segmentum: 'segmento, porción cortada',
   pleura: 'del griego pleura, «costado»', mucosa: 'mucosa, productora de moco',
   genus: 'de la rodilla', cubiti: 'del codo', humeri: 'del húmero', coxae: 'de la cadera', talocruralis: 'del talus y la pierna (tobillo)',
+  // Vasos ováricos y uterinos y órganos genitales femeninos (2026-11-07)
+  ovarica: 'del ovario (ovarium, de ovum, «huevo»)', ovaricus: 'del ovario (ovarium, de ovum, «huevo»)',
+  uterina: 'del útero (uterus, «vientre, matriz»)', uterinae: 'del útero (uterus, «vientre, matriz»)', uterinus: 'del útero (uterus, «vientre, matriz»)',
+  tuba: 'trompeta, por la forma de la trompa', tubae: 'de la trompa (tuba, «trompeta»)', tubarius: 'de la trompa (tuba, «trompeta»)',
+  vaginales: 'de la vagina (vagina, «vaina»)',
 };

@@ -19,6 +19,7 @@ export const TEXTOS = {
   // ── Comunes ──
   'comun.cerrar': { es: 'Cerrar', en: 'Close', de: 'Schließen', fr: 'Fermer', it: 'Chiudi' },
   'comun.reintentar': { es: 'Reintentar', en: 'Retry', de: 'Erneut versuchen', fr: 'Réessayer', it: 'Riprova' },
+  'comun.recargar': { es: 'Recargar', en: 'Reload', de: 'Neu laden', fr: 'Recharger', it: 'Ricarica' },
   'comun.volver': { es: 'Volver', en: 'Back', de: 'Zurück', fr: 'Retour', it: 'Indietro' },
 
   // ── Modelo ──
@@ -214,6 +215,15 @@ export const TEXTOS = {
     es: 'No se pudo cargar el {que}: {causa}.', en: 'Could not load the {que}: {causa}.', de: '{Que} konnte nicht geladen werden: {causa}.',
     fr: 'Impossible de charger le {que} : {causa}.', it: 'Impossibile caricare il {que}: {causa}.',
   },
+  // El sistema quitó la GPU a la página (viewer.js, «contextlost»).
+  'carga.contextoPerdido': {
+    es: 'Se interrumpió la imagen 3D: el dispositivo liberó la memoria gráfica. Si no vuelve sola, recarga la página.',
+    en: 'The 3D view was interrupted: the device freed its graphics memory. If it does not come back by itself, reload the page.',
+    de: 'Die 3D-Ansicht wurde unterbrochen: Das Gerät hat den Grafikspeicher freigegeben. Wenn sie nicht von selbst zurückkommt, lade die Seite neu.',
+    fr: 'L’affichage 3D a été interrompu : l’appareil a libéré sa mémoire graphique. S’il ne revient pas tout seul, rechargez la page.',
+    it: 'La vista 3D si è interrotta: il dispositivo ha liberato la memoria grafica. Se non torna da sola, ricarica la pagina.',
+  },
+  'carga.contextoRecuperado': { es: 'Imagen 3D recuperada', en: '3D view restored', de: '3D-Ansicht wiederhergestellt', fr: 'Affichage 3D rétabli', it: 'Vista 3D ripristinata' },
   'carga.sigues': { es: 'Sigues viendo el modelo actual.', en: 'You are still viewing the current model.', de: 'Das aktuelle Modell bleibt sichtbar.', fr: 'Le modèle actuel reste affiché.', it: 'Continui a vedere il modello attuale.' },
   'carga.webgl': {
     es: 'Este navegador no puede mostrar gráficos 3D (WebGL). Prueba con otro navegador o activa la aceleración por hardware en sus ajustes.',

@@ -20,6 +20,8 @@ import { cargarContenido } from './i18n/contenido.js';
 const MODELS = {
   male: {
     url: '/models/male.glb', label: 'Masculino', detail: 'Hombre adulto · 12 sistemas', icon: 'male',
+    // En pantallas táctiles: las mismas mallas con las texturas a la mitad (tools/base_ligera.py).
+    ligero: '/models/male.ligero.glb',
     // Nombres de las piezas de los sistemas que se descargan aparte, para buscarlas antes (tools/search_index.py).
     index: '/models/male-index.json',
     // Región externa de los genitales, para la opción «Mostrar genitales externos» (build_genital_skin.py).
@@ -42,6 +44,7 @@ const MODELS = {
   },
   female: {
     url: '/models/female.glb', label: 'Femenino', detail: 'Mujer adulta · 12 sistemas', icon: 'female',
+    ligero: '/models/female.ligero.glb',
     index: '/models/female-index.json',
     // Los mismos sistemas que el masculino (A3D_MODEL=female zsh tools/build_all.sh); los órganos femeninos que
     // Z-Anatomy no tiene son formas paramétricas (tools/female_organs.py).
@@ -49,6 +52,10 @@ const MODELS = {
       'urogenital', 'endocrine', 'lymphatic', 'integumentary'].map((s) => [s, { url: `/models/female-${s}.glb`, meta: `/models/female-${s}.json` }])),
   },
 };
+// Pantallas táctiles (móviles, tabletas): modelo base ligero, con las texturas del esqueleto a la mitad (en la GPU, unos
+// 77 MB en lugar de 305: revisión de rendimiento del 2026-11-07), y calidad baja de partida.
+const TACTIL = matchMedia('(pointer: coarse)').matches;
+const urlBase = (id) => (TACTIL && MODELS[id].ligero) || MODELS[id].url;
 
 const $ = (sel) => document.querySelector(sel);
 const isMobile = () => window.innerWidth < 760;
@@ -75,6 +82,9 @@ try {
   $('.loader-track').hidden = true;
   throw err;
 }
+// La GPU se perdió (viewer.js): se avisa, con la opción de recargar; si el navegador la devuelve, el visor sigue solo.
+viewer.addEventListener('contextlost', () => toast(t('carga.contextoPerdido'), 0, { label: t('comun.recargar'), run: () => location.reload() }));
+viewer.addEventListener('contextrestored', () => toast(t('carga.contextoRecuperado')));
 const state = { model: 'male', stages: {}, hidden: new Set(), isolated: null, faded: new Set() };
 const history = [];
 let available = {};
@@ -827,7 +837,7 @@ function buildChrome() {
   selIdioma.value = idioma();
   selIdioma.addEventListener('change', () => fijarIdioma(selIdioma.value, almacen));
   // En pantallas táctiles (móviles, tabletas) se empieza en calidad baja: la oclusión ambiental dibuja la escena dos veces.
-  if (matchMedia('(pointer: coarse)').matches) {
+  if (TACTIL) {
     $('#set-quality').checked = false;
     viewer.setQuality(false);
   }
@@ -907,7 +917,7 @@ async function loadModel(id) {
     // La tabla de nombres del idioma (francés, italiano) llega antes de instalar el modelo; nunca falla (sin ella, latín).
     [region] = await Promise.all([MODELS[id].genitalRegion ? regionOf(MODELS[id].genitalRegion) : null, nombresListos]);
     if (!wanted()) return;
-    if (!(await viewer.loadModel(MODELS[id].url, { signal: abort.signal, onProgress: progress, wanted }))) return;
+    if (!(await viewer.loadModel(urlBase(id), { signal: abort.signal, onProgress: progress, wanted }))) return;
   } catch (err) {
     if (!wanted() || err?.name === 'AbortError') return;  // se pidió otro modelo mientras tanto
     requested = null;

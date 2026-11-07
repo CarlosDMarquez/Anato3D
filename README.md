@@ -924,12 +924,21 @@ A3D_MODEL=female zsh tools/build_all.sh
 - Clítoris (glande, cuerpo y raíces), bulbos del vestíbulo y glándulas vestibulares mayores. El vestíbulo queda a la altura de la piel del periné.
 - Glándulas mamarias: una lente bajo el relieve de la mama de la piel (8 mm bajo ella, 3 mm tras el pezón), sobre el pectoral, del borde del esternón a la línea axilar media y de la 2.ª a la 6.ª costilla, con prolongación axilar y 15 lóbulos. Además, 14 conductos galactóforos por lado.
 
+**Vasos ováricos y uterinos** (`tools/female_vessels.py`, desde `build_vascular.py`; 2026-11-07). Z-Anatomy tiene arterias y venas testiculares, que la mujer no lleva, y ninguna ovárica, uterina ni vaginal: hasta ahora el ovario y el útero no tenían vasos. Son 16 piezas (10 arterias y 6 venas), con los nombres de la TA2:
+- **Arteria ovárica**: el tramo abdominal es el de la arteria testicular de Z-Anatomy (de la aorta, bajo las renales, sobre el psoas y por delante del uréter). En la pelvis, trayecto propio: cruza por delante de los vasos ilíacos externos junto a su origen, baja por dentro y por detrás de la vena ilíaca externa (el ligamento suspensorio) y entra en el ovario por el hilio, bajo la trompa.
+- **Arteria uterina**: de la división anterior de la ilíaca interna, por encima del uréter, al istmo; sube tortuosa por el borde del útero. Ramas **vaginales** (por el cuello supravaginal y la pared de la vagina), **tubárica** (bajo la trompa) y **ovárica** (sobre el ligamento propio del ovario, hasta el hilio, donde se une a la arteria ovárica).
+- **Venas ováricas** izquierda (a la renal izquierda) y derecha (a la cava inferior), con tres venas finas en el hilio; **plexo venoso uterino** (dos cordones a cada lado del útero y de la vagina, unidos por venas oblicuas, y una comunicación con las venas del ovario) y **venas uterinas** (dos por lado, a la ilíaca interna).
+- Calibres: ovárica 1,5 mm de diámetro; uterina 2,2 mm en su origen; vena ovárica 2,6 mm al desembocar; venas uterinas 2,4 mm.
+- Cada vaso se aparta de los órganos (paridad de rayos: el uréter de Z-Anatomy tiene las caras hacia dentro), de los vasos de Z-Anatomy, de los huesos y de los vasos ya trazados. Quedan roces de 0,2–1,6 mm entre venas del plexo y con la pared de algún órgano; el registro de la construcción los lista.
+- Las formas de los órganos las guarda `build_visceral.py` en `build/female_pelvic_organs.npz`: el visceral se construye antes que el vascular.
+- **Simplificación:** el ovario de este modelo queda justo detrás de la arteria ilíaca externa, no por debajo de ella como en los atlas; los vasos ováricos rodean la vena por dentro para llegar al hilio. Faltan la arteria vaginal, las ramas helicinas y el plexo venoso vaginal propiamente dicho.
+
 **Piel de la vulva** (`tools/build_female_skin.py`). La piel de MakeHuman tiene el pubis liso. Es una copia subdividida de la piel del cuerpo alrededor de la línea de la vulva, con relieve a lo largo de la normal. Asoma solo donde hay relieve y en el borde se hunde bajo la piel. Una función de distancia, como la de la piel genital masculina, sacaba los labios por los muslos.
 - Labios mayores y menores a lo largo de la línea de la vulva, sobre la piel, y capuchón del clítoris.
 - Color propio («Tono»).
 - Con «Mostrar genitales externos» desactivado se ocultan enteros, como en el hombre, la piel de la vulva y los genitales externos profundos.
 
-**Web:** el selector Masculino/Femenino carga `female-*.glb` y el índice de búsqueda `female-index.json`; fichas en español de los órganos femeninos (`visceras.js`).
+**Web:** el selector Masculino/Femenino carga `female-*.glb` y el índice de búsqueda `female-index.json`; fichas en español de los órganos femeninos (`visceras.js`) y de los vasos ováricos y uterinos (`vasos.js`).
 
 **Verificado:**
 - **Web:** carga los 12 sistemas sin errores de consola. El buscador incluye útero, ovarios, mamas y vulva, sin piezas masculinas. Con «Mostrar genitales externos» desactivado, la piel queda lisa.
