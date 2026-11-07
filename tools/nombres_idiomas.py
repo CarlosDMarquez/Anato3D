@@ -26,6 +26,12 @@ OUT = ROOT / 'web/public/i18n'
 LADO = re.compile(r'\s*\((left|right)\)$', re.I)
 
 
+# Piezas hechas para Anato3D cuyo nombre no está en ninguna de las dos fuentes (traducción de Anato3D, 2026-11-06).
+PROPIOS = {
+    'Fat of breast': {'fr': 'Tissu adipeux du sein', 'it': 'Tessuto adiposo della mammella'},
+}
+
+
 def clave(s):
     """Forma de comparar nombres: sin lado, sin guiones bajos, en minúsculas y con un solo espacio."""
     s = LADO.sub('', str(s or '')).replace('_', ' ')
@@ -84,8 +90,8 @@ def main():
     tablas = {'fr': {}, 'it': {}}
     for nombre, latin in nombres.items():
         k, kl = clave(nombre), clave(latin)
-        fr = zfr.get(k) or ta_fr_en.get(k) or (ta_fr_la.get(kl) if kl else None)
-        it = ta_it_en.get(k) or (ta_it_la.get(kl) if kl else None)
+        fr = zfr.get(k) or ta_fr_en.get(k) or (ta_fr_la.get(kl) if kl else None) or PROPIOS.get(nombre, {}).get('fr')
+        it = ta_it_en.get(k) or (ta_it_la.get(kl) if kl else None) or PROPIOS.get(nombre, {}).get('it')
         if fr:
             fr = re.sub(r'([Nn])oeud', r'\1œud', fr)
             fr = re.sub(r'\b([Cc])oeur', r'\1œur', re.sub(r'\bOe(il|soph)', r'Œ\1', re.sub(r'\boe(il|soph)', r'œ\1', fr)))

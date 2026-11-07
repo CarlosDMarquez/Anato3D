@@ -870,15 +870,22 @@ La pelvis del modelo femenino era la masculina con las proporciones de la piel d
   - El útero queda en anteversión 70° y anteflexión 15° (antes, 65° y 10°): es la más próxima a la habitual (90° y 20°) con el fondo detrás del pubis.
   - Ovarios 6 mm más afuera; raíces del clítoris abiertas con el arco del pubis; vestíbulo 5–7 mm más adelante.
 
-| Medida (`pelvimetry`) | Antes | Después |
-|---|---|---|
-| Arco del pubis | 54° | 88° |
-| Entre espinas ciáticas | 8,0 cm | 10,1 cm |
-| Estrecho superior, ancho | 12,7 cm | 13,6 cm |
-| Conjugada obstétrica | 9,8 cm | 10,1 cm |
-| Sínfisis–cóccix | 8,1 cm | 9,3 cm |
-| Sacro (ancho × largo) | 11,0 × 10,1 cm | 11,9 × 9,6 cm |
-| Altura del coxal | 20,4 cm | 19,2 cm |
+| Medida (`pelvimetry`) | Antes | 2026-10-30 | 2026-11-06 (pubis más largo) |
+|---|---|---|---|
+| Arco del pubis | 54° | 88° | 87° |
+| Entre espinas ciáticas | 8,0 cm | 10,1 cm | 10,2 cm |
+| Entre tuberosidades isquiáticas | 6,2 cm | 8,6 cm | 9,1 cm |
+| Estrecho superior, ancho | 12,7 cm | 13,6 cm | 13,6 cm |
+| Conjugada obstétrica | 9,8 cm | 10,1 cm | 10,9 cm |
+| Sínfisis–cóccix | 8,1 cm | 9,3 cm | 9,8 cm |
+| Sacro (ancho × largo) | 11,0 × 10,1 cm | 11,9 × 9,6 cm | 11,9 × 9,5 cm |
+| Altura del coxal | 20,4 cm | 19,2 cm | 19,2 cm |
+
+**Pubis más largo (2026-11-06).** En esta pelvis el borde superior de la sínfisis está 8,7 cm por debajo del promontorio y solo 4,5 cm por delante: adelantarla alarga poco la conjugada, y la deformación arrastraba el promontorio 4 mm hacia delante.
+- Ahora el promontorio queda fijo (sobre él va L5) y la sínfisis va 10 mm hacia delante y 6–7 mm hacia abajo, con el tubérculo y el pecten; las ramas, más abiertas junto a la sínfisis para no cerrar el arco.
+- En la mujer el pubis es más largo que en el hombre (índice isquiopubiano).
+- Delante de la sínfisis quedan 2,1 cm de partes blandas (antes 2,7).
+- **Referencia:** valores habituales de 9,5–11,5 cm para la conjugada obstétrica y la distancia entre espinas, 10–12 cm entre tuberosidades y un arco de 85–90° o más en la pelvis ginecoide (tabla de Wikipedia «Pelvimetry», consultada por búsqueda web el 2026-11-06; las cifras varían entre fuentes). La distancia entre tuberosidades queda algo corta.
 
 **Verificado:**
 - **Modelo masculino:** sale idéntico (mismos GLB).
@@ -890,7 +897,7 @@ La pelvis del modelo femenino era la masculina con las proporciones de la piel d
 
 **Fallo corregido:** al cargar la Fase 2 junto a Z-Anatomy, el sacro se llama `Sacrum.001` y el ajuste no encontraba su versión sin deformar. Quedaba fuera de la guía del ajuste (5,7 mm de error afín). Ahora se busca sin el sufijo.
 
-**Pendiente:** la conjugada obstétrica sigue corta (10,1 cm; en la mujer, ~11–12). Alargarla movería la sínfisis hacia la piel del pubis (le quedan 2,7 cm) o la base del sacro, sobre la que va L5.
+**[Histórico] Pendiente del 2026-10-30:** la conjugada obstétrica seguía corta (10,1 cm). Resuelto el 2026-11-06 (pubis más largo, arriba).
 
 ## Modelo femenino (2026-10-30)
 
@@ -934,9 +941,9 @@ A3D_MODEL=female zsh tools/build_all.sh
 **Pendiente (para perfeccionar):**
 - ~~**Pelvis:** tiene las proporciones de la piel femenina, no la forma de una pelvis femenina.~~ Hecho (ver «Pelvis femenina»). Sigue algo corta de delante atrás, así que el útero queda más vertical de lo habitual.
 - ~~**Vulva:** primera versión, con relieves bajos; el borde del parche se notaba; genitales profundos simples.~~ Rehecha el 2026-10-31 (ver «Vulva, genitales externos profundos y músculos del periné»).
-- **Mamas:** las forma la piel de MakeHuman. La glándula es una lente bajo ella, sin la grasa ni los ligamentos de Cooper.
+- ~~**Mamas:** las forma la piel de MakeHuman. La glándula es una lente bajo ella, sin la grasa ni los ligamentos de Cooper.~~ Hecho el 2026-11-06 (ver «Modelo femenino perfeccionado»).
 - **Cabeza:**
-  - Los labios de la piel femenina quedan entreabiertos: se ven los dientes.
+  - ~~Los labios de la piel femenina quedan entreabiertos: se ven los dientes.~~ Cerrados el 2026-11-06 (ver «Modelo femenino perfeccionado»).
   - La auditoría marca algunos músculos del ojo y nodos retrofaríngeos junto a las cavidades.
 - ~~**Músculos:** los del periné son los de Z-Anatomy (masculinos), ajustados a la pelvis femenina.~~ Era impreciso: Z-Anatomy no tiene los del triángulo urogenital. Hecho el 2026-10-31 (ver «Vulva, genitales externos profundos y músculos del periné»).
 
@@ -944,6 +951,24 @@ A3D_MODEL=female zsh tools/build_all.sh
 - **Tramos de la tibia** (`anato3d_fit._segments`): al unir un primer tramo pequeño con el siguiente, se duplicaba el segundo y se perdía el último (el distal, junto al tobillo). Le pasaba a las dos tibias masculinas. Con dos tramos fallaba (así apareció en la mujer).
   - Se reconstruyeron los sistemas masculinos. Cambian solo estructuras de la pierna y el pie: tendones y músculos hasta 6,8 mm, arterias tibial posterior y tarsiana lateral hasta 8,6 mm. La auditoría masculina sigue con los mismos 36 choques.
 - **Auditoría:** `A3D_MODEL=female` audita el modelo femenino (`build/female_audit.json`).
+
+## Modelo femenino perfeccionado (2026-11-06)
+
+Encargo de Carlos: la forma de la pelvis, la vulva y los genitales externos profundos, la mama (grasa y ligamentos), los labios entreabiertos y los músculos del periné. Detalle en `docs/hitos/07-solapes-y-modelo-femenino.md`.
+
+- **Pelvis:** pubis más largo (ver «Pelvis femenina»): conjugada obstétrica de 10,1 a 10,9 cm.
+- **Boca** (`fix_neck.py`, `close_mouth`, solo en la piel femenina):
+  - la rendija entre los labios (hasta 2,6 mm, 1,8 de media) se mide con rayos desde delante y los labios se juntan con 0,15 mm de solape;
+  - bajo el labio inferior había un corte horizontal que no está en la piel original de MakeHuman: lo dejaba el paso que infla la piel sobre la mandíbula. Se alisa;
+  - los dientes y la mandíbula no quedan más cerca de la piel que antes.
+- **Mama** (`female_organs.py`, `breast_fat_and_ligaments`):
+  - «Tejido adiposo de la mama»: de la dermis (2 mm bajo la piel) a la glándula, del borde de la areola (sin grasa bajo ella) al contorno de la base; rellena los surcos entre los lóbulos;
+  - «Ligamentos suspensorios de la mama» (de Cooper): 15 tabiques de 0,5 mm, uno en la cresta de cada lóbulo, de la glándula a la dermis;
+  - la glándula queda a 9 mm bajo la piel en las crestas y a 14 mm entre ellas (antes, 8 mm con surcos de 3);
+  - la grasa no tiene término propio en la TA2: su latín («Textus adiposus mammae») es descriptivo, y la ficha lo dice. Francés e italiano, de Anato3D (`PROPIOS` en `tools/nombres_idiomas.py`).
+- **Vulva** (`build_female_skin.py`): labios mayores de 6,5 mm (antes 5) y labios menores más gruesos (1,8 mm en la base, antes 1,2).
+- **Genitales profundos** (`female_perineum.py`): raíces del clítoris aplanadas contra las ramas isquiopubianas; parecían salchichas sueltas.
+- **Músculos del periné:** el esfínter anal externo de Z-Anatomy quedaba 2,2 cm por encima de la piel. En la mujer se estira hacia abajo hasta 4 mm bajo la piel, sin mover su parte profunda, que abraza al puborrectal (`build_muscular.py`). Los músculos generados se recolocan solos con la pelvis nueva.
 
 ## Revisión en cinco pasadas (2026-10-29)
 
@@ -1004,6 +1029,12 @@ Escribe `build/audit.json`.
   - Para «visible desde fuera», el rayo tiene que escapar también de ella.
 - **Más de 6 mm dentro de un hueso cerrado:** se confirma por paridad en ese hueso. La normal de la cara más cercana de un hueso fino (una costilla, el ala ilíaca) puede apuntar al revés lejos de él. Salían venas y fascias «a 32–44 mm» dentro del hueso sin estarlo.
 - **Fase 6 frente a antes:** la proporción dentro de hueso por sistema no cambió al bajar la rodilla y el codo (músculo 1,35 → 1,34 %; ligamentos y fascias 4,96 → 5,17 %, con menos piezas por encima del 3 %).
+- **Choques entre órganos (2026-11-06):** se miden en los dos sentidos de cada par y con su profundidad, y se separan en cuatro grupos:
+  - choques: 1 mm o más;
+  - roces: menos de 1 mm, dos superficies que se tocan;
+  - uniones y contenidos reales (`NATURAL`, con su motivo): el conducto pancreático en el páncreas, los mesos y el colon, las paratiroides en la tiroides…;
+  - heredados de Z-Anatomy y aceptados (`ACCEPTED`): las glándulas salivales en la «encía» de Z-Anatomy, que llega al suelo de la boca.
+- **Revisión a mano (2026-11-06):** ver `docs/hitos/07-solapes-y-modelo-femenino.md`. Los choques reales (riñón izquierdo, suprarrenal y bazo; riñón derecho y su suprarrenal; vejiga y sigma) se corrigen en `build_visceral.py` (`CEDE`).
 
 ## Problemas conocidos del modelo masculino Fase 2
 

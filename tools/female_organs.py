@@ -224,6 +224,93 @@ def pelvic_organs(objs, bladder_world, skin_world=None):
     return out, L
 
 
+def breast_fat_and_ligaments(side, S, N, front, depth, R, th, u, K, M, areola=0.017, dermis=0.002, gap=0.0003):
+    """Grasa de la mama y ligamentos suspensorios (de Cooper), sobre la rejilla polar de la glándula (2026-11-06).
+
+    - Grasa: de la dermis (2 mm bajo la piel) a la cara anterior de la glándula (0,3 mm por delante), desde el borde
+      de la areola (1,7 cm del pezón: bajo la areola y el pezón no hay grasa) hasta el contorno de la base. Una lente
+      con un agujero en el centro, cerrada con dos paredes finas en sus bordes. Rellena los surcos entre los lóbulos.
+    - Ligamentos: 15 tabiques de 0,5 mm, uno en la cresta de cada lóbulo, de la glándula a la dermis, a lo largo del
+      radio desde la areola hasta el 92 % del contorno. Atraviesan la grasa, como en el cuerpo.
+    `S`, `N`: puntos y normales de la piel en la rejilla (el pezón y luego K anillos de M radios); `front`, `depth`: cara
+    anterior de la glándula y su profundidad bajo la piel; `R`: distancia del pezón al contorno en cada radio."""
+    def along(arr, j, d):
+        """Valor de `arr` en el radio j a la distancia d del pezón (interpolado entre anillos)."""
+        ds = np.r_[0.0, u * R[j]]
+        vals = np.vstack([arr[0], arr[1 + np.arange(K) * M + j]])
+        return np.array([np.interp(d, ds, vals[:, c]) for c in range(vals.shape[1])])
+    def at_angle(arr, a, d):
+        """Entre los dos radios vecinos del ángulo a."""
+        step = 2 * np.pi / M
+        j0 = int(np.floor(a / step)) % M; f = a / step - np.floor(a / step)
+        return (1 - f) * along(arr, j0, d) + f * along(arr, (j0 + 1) % M, d)
+    out = []
+    # Hasta dónde llega de verdad cada radio: en la prolongación axilar los rayos sobre la piel no alcanzan el contorno y
+    # los últimos anillos repiten el mismo punto (la grasa, a 2 mm fijos de la piel, tenía ahí caras de área nula).
+    R_eff = R.copy()
+    for j in range(M):
+        ring = S[1 + np.arange(K) * M + j]
+        same = np.nonzero(np.linalg.norm(np.diff(ring, axis=0), axis=1) < 1e-6)[0]
+        if len(same): R_eff[j] = u[same[0]] * R[j]
+    # Grasa: rejilla propia (anillos de la areola al contorno) en los mismos radios.
+    K2 = 18
+    cols = []
+    for j in range(M):
+        ds = np.linspace(areola, R_eff[j], K2)
+        Sd = np.array([along(S, j, d) for d in ds]); Nd = np.array([along(N, j, d) for d in ds])
+        Nd /= np.linalg.norm(Nd, axis=1)[:, None]
+        dd = np.array([along(depth[:, None], j, d)[0] for d in ds])
+        cols.append((Sd - Nd * dermis, Sd - Nd * np.maximum(dd - gap, dermis + 0.0004)[:, None]))
+    fr = np.array([c[0] for c in cols]).transpose(1, 0, 2).reshape(-1, 3)        # [anillo, radio]
+    bk = np.array([c[1] for c in cols]).transpose(1, 0, 2).reshape(-1, 3)
+    n = K2 * M
+    V = np.vstack([fr, bk])
+    idx = lambda k, j, b=0: b * n + k * M + j % M
+    F = []
+    for k in range(K2 - 1):
+        for j in range(M):
+            F.append((idx(k, j), idx(k, j + 1), idx(k + 1, j + 1), idx(k + 1, j)))            # delante
+            F.append((idx(k, j, 1), idx(k + 1, j, 1), idx(k + 1, j + 1, 1), idx(k, j + 1, 1)))  # detrás
+    for j in range(M):                                                # paredes: borde de la areola y contorno
+        F.append((idx(0, j), idx(0, j, 1), idx(0, j + 1, 1), idx(0, j + 1)))
+        F.append((idx(K2 - 1, j), idx(K2 - 1, j + 1), idx(K2 - 1, j + 1, 1), idx(K2 - 1, j, 1)))
+    out.append((f'Fat_of_breast_{side}', 'fat', V, _outward(V, F), False))
+    # Ligamentos: en las crestas (lobes = 0 en th = 2πk/15).
+    LV, LF = [], []
+    for k in range(15):
+        a = 2 * np.pi * k / 15
+        jR = R_eff[int(round(a / (2 * np.pi / M))) % M]
+        ds = np.linspace(areola + 0.002, 0.92 * jR, 14)
+        Sd = np.array([at_angle(S, a, d) for d in ds]); Nd = np.array([at_angle(N, a, d) for d in ds])
+        Nd /= np.linalg.norm(Nd, axis=1)[:, None]
+        Gd = np.array([at_angle(front, a, d) for d in ds])
+        bot = Gd + Nd * gap; top = Sd - Nd * (dermis - 0.0001)
+        radial = np.gradient(Sd, axis=0); radial /= np.linalg.norm(radial, axis=1)[:, None]
+        tv = np.cross(Nd, radial); tv /= np.linalg.norm(tv, axis=1)[:, None]
+        h = 0.00025
+        P = np.stack([bot - tv * h, bot + tv * h, top + tv * h, top - tv * h], 1)    # [paso, 4]
+        base = sum(len(v) for v in LV)
+        LV.append(P.reshape(-1, 3))
+        q = lambda i, c: base + i * 4 + c
+        for i in range(len(ds) - 1):
+            for c in range(4):
+                LF.append((q(i, c), q(i, (c + 1) % 4), q(i + 1, (c + 1) % 4), q(i + 1, c)))
+        LF.append((q(0, 3), q(0, 2), q(0, 1), q(0, 0)))
+        LF.append(tuple(q(len(ds) - 1, c) for c in range(4)))
+    LV = np.vstack(LV)
+    out.append((f'Suspensory_ligaments_of_breast_{side}', 'ligament', LV, _outward(LV, LF), False))
+    return out
+
+
+def _outward(V, F):
+    """Caras con las normales hacia fuera (volumen con signo positivo)."""
+    vol = 0.0
+    for f in F:
+        for i in range(1, len(f) - 1):
+            vol += np.dot(V[f[0]], np.cross(V[f[i]], V[f[i + 1]]))
+    return F if vol >= 0 else [tuple(reversed(f)) for f in F]
+
+
 def mammary_glands(skin_world, skin_normals, ribs_bvh, skin_bvh):
     """Glándula mamaria y conductos galactóforos de cada lado. `ribs_bvh`: costillas y esternón (mundo).
 
@@ -280,7 +367,12 @@ def mammary_glands(skin_world, skin_normals, ribs_bvh, skin_bvh):
         d_ax = uu * np.r_[0, np.tile(R, K)]
         lobes = 0.5 - 0.5 * np.cos(15 * tt)                         # 15 lóbulos alrededor del pezón
         q = np.clip((d_ax - 0.012) / 0.02, 0, 1); q = q * q * (3 - 2 * q)
-        front = S - N * (0.003 + 0.005 * q + 0.003 * lobes * q * s)[:, None]   # 3 mm tras el pezón, 8 mm fuera
+        # Profundidad de la cara anterior bajo la piel (2026-11-06, con la grasa): 3 mm tras el pezón; fuera, 9 mm en las
+        # crestas de los lóbulos (donde se insertan los ligamentos suspensorios) y 14 mm entre ellos; hacia el contorno
+        # vuelve a 3 mm, donde la mama se funde con la pared del tórax. Antes, 8 mm con surcos de 3.
+        edge = 1 - np.clip((uu - 0.7) / 0.3, 0, 1) ** 2 * (3 - 2 * np.clip((uu - 0.7) / 0.3, 0, 1))
+        depth = 0.003 + (0.006 * q + 0.005 * lobes * q * s) * edge
+        front = S - N * depth[:, None]
         # Espacio hasta el pectoral (18 mm delante de las costillas), hacia el centro de la rejilla.
         inward = C - front; inward /= np.linalg.norm(inward, axis=1)[:, None]
         room = np.empty(len(S))
@@ -301,6 +393,7 @@ def mammary_glands(skin_world, skin_normals, ribs_bvh, skin_bvh):
         V = np.vstack([front, back[~boundary]])
         F = F + [tuple(int(idx_back[k]) for k in reversed(f)) for f in F]
         out.append((f'Mammary_gland_{side}', 'mammary', V, F, False))
+        out += breast_fat_and_ligaments(side, S, N, front, depth, R, th, u, K, M)
         # Conductos galactóforos: del pezón al interior de la glándula, con su seno junto a la areola.
         base = nipple - n * 0.002
         mid = (front + back) / 2

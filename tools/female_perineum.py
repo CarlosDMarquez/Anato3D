@@ -233,8 +233,9 @@ def _crus_path(F, s):
     along = E[sel] + m * (h[:, None] + 0.0004)
     K = F['knee'] + np.array([sx * 0.0035, 0.0, 0.0])
     path = curve([K, K + np.array([sx * 0.008, 0.004, -0.002]), along[1], along[len(along) // 2], along[-1]], 20)
-    a = np.interp(np.linspace(0, 1, 20), [0, 0.2, 1], [0.0034, 0.0042, 0.0016])
-    b = np.interp(np.linspace(0, 1, 20), [0, 0.2, 1], [0.0030, 0.0034, 0.0013])
+    # Aplanadas contra la rama (2026-11-06): con la sección casi redonda parecían salchichas sueltas bajo el hueso.
+    a = np.interp(np.linspace(0, 1, 20), [0, 0.2, 1], [0.0036, 0.0048, 0.0018])     # contra el hueso
+    b = np.interp(np.linspace(0, 1, 20), [0, 0.2, 1], [0.0027, 0.0026, 0.0010])     # hacia el periné
     return path, a, b, m
 
 

@@ -10,7 +10,8 @@ Qué mide, por objeto:
   - hueso: en las vísceras, proporción de vértices dentro de algún hueso;
   - malla: caras de área nula, mallas vacías y mallas cerradas con las caras invertidas (volumen negativo);
   - nombres: sin nombre en español o con restos de latín;
-  - choques entre órganos: vértices de un órgano dentro de otro (solo mallas cerradas de vísceras).
+  - choques entre órganos: vértices de un órgano dentro de otro (solo mallas cerradas de vísceras), con su profundidad;
+    separa los choques (1 mm o más) de los roces y de las uniones y contenidos reales (NATURAL).
 Además compara la posición de algunos órganos con las vértebras (niveles de referencia de los atlas).
 
 Salida: build/audit.json (build/female_audit.json) y un resumen en la consola.
@@ -160,18 +161,70 @@ for i, o in enumerate(objs):
     if i % 200 == 0: log(f'{i}/{len(objs)} {o.name}')
 
 # ── Choques entre órganos cerrados ──────────────────────────────────────────
+# En los dos sentidos (antes solo «a en b» con a antes que b en la lista) y con la profundidad: el más hondo de los
+# vértices de a que están dentro de b, hasta la superficie de b.
+# Revisión a mano del 2026-11-06 (docs/hitos/07-solapes-y-modelo-femenino.md): casi todos los choques eran roces de
+# menos de 1 mm (dos piezas que se tocan) o uniones y contenidos reales. Estos últimos no son errores:
+NATURAL = {
+    ('Accessory_pancreatic_duct', 'Pancreas'): 'el conducto va dentro del páncreas',
+    ('Intraglandular_parotid_nodes_L', 'Parotid_gland_L'): 'nodos dentro de la glándula, por definición',
+    ('Intraglandular_parotid_nodes_R', 'Parotid_gland_R'): 'nodos dentro de la glándula, por definición',
+    ('Appendicular_nodes', 'Meso_appendix'): 'los nodos del apéndice están en su meso',
+    ('Meso_appendix', 'Vermiform_appendix'): 'el meso se une al apéndice',
+    ('Mesocolon', 'Transverse_colon'): 'el mesocolon se une al colon',
+    ('Mesocolic_taenia', 'Transverse_colon'): 'la tenia es parte de la pared del colon',
+    ('Left_lobe_of_thymus', 'Right_lobe_of_thymus'): 'los dos lóbulos están unidos en la línea media',
+    ('Prostate', 'Urinary_bladder'): 'el cuello de la vejiga descansa en la base de la próstata',
+    ('Seminal_gland_L', 'Urinary_bladder'): 'apoyada en la cara posterior de la vejiga',
+    ('Seminal_gland_R', 'Urinary_bladder'): 'apoyada en la cara posterior de la vejiga',
+    ('Oropharynx', 'Soft_palate'): 'mucosa continua',
+    ('Major_alar_cartilage_R', 'Nasal_septal_cartilage'): 'la rama medial se apoya en el tabique',
+    ('Major_alar_cartilage_L', 'Nasal_septal_cartilage'): 'la rama medial se apoya en el tabique',
+    ('Pancreatic_duct', 'Pancreas'): 'el conducto va dentro del páncreas',
+    ('Seminal_gland_L', 'Prostate'): 'su extremo y su conducto entran en la base de la próstata',
+    ('Seminal_gland_R', 'Prostate'): 'su extremo y su conducto entran en la base de la próstata',
+    ('Testis_L', 'Epididymis_L'): 'el epidídimo va pegado al borde posterior del testículo',
+    ('Testis_R', 'Epididymis_R'): 'el epidídimo va pegado al borde posterior del testículo',
+    ('Uvula_of_palate', 'Soft_palate'): 'la úvula cuelga del paladar blando',
+    ('Corpus_spongiosum_of_penis', 'Corpus_cavernosum_of_penis'): 'el cuerpo esponjoso va en el surco de los cavernosos',
+    ('Suspensory_ligaments_of_breast_L', 'Fat_of_breast_L'): 'los ligamentos atraviesan la grasa de la piel a la glándula',
+    ('Suspensory_ligaments_of_breast_R', 'Fat_of_breast_R'): 'los ligamentos atraviesan la grasa de la piel a la glándula',
+}
+# Heredados de Z-Anatomy y aceptados (mismo solape en la fuente; dentro de la boca, no se ve desde fuera). Separarlos
+# deformaba la boca: la úvula salía del paladar blando y las glándulas salivales de la encía (revisión del 2026-11-01).
+ACCEPTED = {
+    ('Sublingual_gland_L', 'Gingiva'): 'la «encía» de Z-Anatomy llega al suelo de la boca, bajo cuya mucosa está la glándula',
+    ('Sublingual_gland_R', 'Gingiva'): 'la «encía» de Z-Anatomy llega al suelo de la boca, bajo cuya mucosa está la glándula',
+    ('Submandibular_gland_L', 'Gingiva'): 'su parte profunda llega al suelo de la boca, que la «encía» de Z-Anatomy incluye',
+    ('Submandibular_gland_R', 'Gingiva'): 'su parte profunda llega al suelo de la boca, que la «encía» de Z-Anatomy incluye',
+    ('Oropharynx', 'Gingiva'): 'mucosa continua al fondo de la boca',
+}
+CONTACT_MM = 1.0                     # menos que esto: dos superficies que se tocan (no se ve)
+def natural(a, b):
+    return NATURAL.get((a, b)) or NATURAL.get((b, a)) or (
+        'segmentos vecinos del hígado' if 'segment_of_liver' in a and 'segment_of_liver' in b else None) or (
+        'glándula en la superficie de la tiroides' if 'parathyroid' in a.lower() and b == 'Thyroid_gland' else None) or (
+        'el omento menor se inserta en el hígado' if 'Lesser_omentum' in (a, b) and ('liver' in a + b) else None)
+def accepted(a, b):
+    return ACCEPTED.get((a, b)) or ACCEPTED.get((b, a))
 names = list(closed)
-for a in range(len(names)):
-    ta, amin, amax, VA = closed[names[a]]
-    for b in range(a + 1, len(names)):
-        tb, bmin, bmax, VB = closed[names[b]]
+def clash(a, b):
+    ta, amin, amax, VA = closed[a]; tb, bmin, bmax, VB = closed[b]
+    step = max(1, len(VA) // 300)
+    S = [v for v in VA[::step] if (v >= bmin).all() and (v <= bmax).all()]
+    inn = [v for v in S if parity_inside(tb, Vector(v), need=5)]
+    frac = len(inn) / len(VA[::step])
+    if frac <= 0.02: return
+    depth = max(tb.find_nearest(Vector(v))[3] for v in inn) * 1000
+    why = natural(a, b) or accepted(a, b)
+    kind = 'natural' if natural(a, b) else 'aceptado' if accepted(a, b) else 'contacto' if depth < CONTACT_MM else 'choque'
+    report['clashes'].append({'a': a, 'b': b, 'frac_a_in_b': round(frac, 3), 'depth_mm': round(depth, 1), 'kind': kind,
+                              **({'why': why} if why else {})})
+for i in range(len(names)):
+    for j in range(i + 1, len(names)):
+        _, amin, amax, _ = closed[names[i]]; _, bmin, bmax, _ = closed[names[j]]
         if (amin > bmax).any() or (bmin > amax).any(): continue
-        step = max(1, len(VA) // 300)
-        S = [v for v in VA[::step] if (v >= bmin).all() and (v <= bmax).all()]
-        if not S: continue
-        k = sum(parity_inside(tb, Vector(v), need=5) for v in S)
-        frac = k / len(VA[::step])
-        if frac > 0.02: report['clashes'].append({'a': names[a], 'b': names[b], 'frac_a_in_b': round(frac, 3)})
+        clash(names[i], names[j]); clash(names[j], names[i])
 
 # ── Representaciones duplicadas: una pieza casi entera dentro de otra del mismo sistema ─────────────────
 # (p. ej. el hígado entero y sus segmentos de Couinaud, que no deben verse a la vez). Solo pares cuya caja está
@@ -236,9 +289,13 @@ for s in wanted:
     if rs: log(f"  {s:12} media {np.mean([r['in_bone'] for r in rs]) * 100:.2f} %, {sum(r['in_bone'] > 0.03 for r in rs)} piezas > 3 %")
 for r in top('in_bone', 50, lambda r: r.get('in_bone', 0) if r.get('in_bone', 0) > 0.03 else 0):
     log(f"  {r['system']:12} {r['name']:45} {r['in_bone'] * 100:.0f} % (hasta {r['in_bone_mm']} mm)")
-log('== Choques entre órganos (> 2 %)')
-for c in sorted(report['clashes'], key=lambda c: -c['frac_a_in_b'])[:40]:
-    log(f"  {c['a']} dentro de {c['b']}: {c['frac_a_in_b'] * 100:.0f} %")
+for kind, title in (('choque', f'Choques entre órganos (> 2 % de los vértices, {CONTACT_MM:g} mm o más)'),
+                    ('contacto', f'Roces (> 2 %, menos de {CONTACT_MM:g} mm)'), ('natural', 'Uniones y contenidos reales'),
+                    ('aceptado', 'Heredados de Z-Anatomy y aceptados')):
+    cs = sorted([c for c in report['clashes'] if c['kind'] == kind], key=lambda c: -c['depth_mm'])
+    log(f'== {title}: {len(cs)}')
+    for c in cs[:40]:
+        log(f"  {c['a']} dentro de {c['b']}: {c['frac_a_in_b'] * 100:.0f} %, hasta {c['depth_mm']} mm" + (f" ({c['why']})" if c.get('why') else ''))
 log('== Malla: invertidas', [r['name'] for r in O if r.get('inverted')][:40])
 log('== Malla: vacías', [r['name'] for r in O if r.get('empty')])
 log('== Malla: caras de área nula', [(r['name'], r['zero_area']) for r in O if r.get('zero_area')][:30])

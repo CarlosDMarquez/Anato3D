@@ -11,7 +11,7 @@ Cómo:
     la piel (en el borde, nada: coincide con sus aristas); normal y tono del cuerpo, interpolados sobre ellas.
   - Relieve a lo largo de la normal, en función de la posición a lo largo de la línea (s) y de la distancia a la línea
     media (u), con medidas de adulta (Lloyd 2005):
-      - labios mayores: dos almohadillas de 5 mm y contorno elíptico (2,3 cm de ancho entre los dos), del monte del pubis
+      - labios mayores: dos almohadillas de 6,5 mm y contorno elíptico (2,3 cm de ancho entre los dos), del monte del pubis
         (comisura anterior) a la horquilla (comisura posterior), con la hendidura vulvar entre ellas;
       - dentro: hendidura de 2,5 mm, labios menores (pliegues finos a 2 mm de la línea media que asoman entre los
         mayores), capuchón y glande del clítoris;
@@ -156,7 +156,8 @@ t = np.clip((s - s_A) / (s_E - s_A), 0, 1) ** 0.85                  # más lleno
 # Anchura disponible: la de la envolvente, menos 4 mm (los labios no llegan a la esquina del techo con los muslos).
 W_avail = W_env(s) - 0.004
 W_out = np.minimum(12.0 * mm * np.sin(np.pi * t) ** 0.6, np.maximum(W_avail, 4 * mm))   # los dos labios juntos, /2
-a_maj = 5.0 * mm * np.sin(np.pi * t) ** 1.5                           # comisuras redondeadas, no en punta
+# 6,5 mm (antes 5): los labios mayores salían planos (2026-11-06).
+a_maj = 6.5 * mm * np.sin(np.pi * t) ** 1.5                           # comisuras redondeadas, no en punta
 r = au / np.maximum(W_out, 1e-6)
 inner_slope = 0.10 + 0.90 * sm(r / 0.42)                              # de la hendidura (0) a la cresta (r = 0,42)
 outer_slope = 0.5 + 0.5 * np.cos(np.pi * np.clip((r - 0.42) / 0.58, 0, 1))
@@ -166,8 +167,9 @@ span = sm((s - s_G + 0.006) / 0.004) * (1 - sm((s - s_P + 0.003) / 0.004))
 h_cleft = -2.5 * mm * span * (1 - sm((au - 2.0 * mm) / (1.8 * mm)))
 # Labios menores: pliegues finos que suben desde el fondo de la hendidura y asoman entre los mayores.
 mspan = sm((s - s_G + 0.003) / 0.004) * (1 - sm((s - s_P + 0.004) / 0.005))
-H_min = 3.4 * mm * np.sin(np.pi * np.clip((s - s_G + 0.003) / (s_P - s_G - 0.001), 0, 1)) ** 0.45 * mspan
-h_min = H_min * np.exp(-((au - 2.1 * mm) / (0.62 * mm)) ** 2)
+# Más gruesos (1,8 mm en la base, antes 1,2) y algo más altos y separados: eran aletas finas (2026-11-06).
+H_min = 3.8 * mm * np.sin(np.pi * np.clip((s - s_G + 0.003) / (s_P - s_G - 0.001), 0, 1)) ** 0.45 * mspan
+h_min = H_min * np.exp(-((au - 2.3 * mm) / (0.9 * mm)) ** 2)
 # Capuchón (prepucio) y glande del clítoris; frenillo (el capuchón se une a los labios menores).
 h_hood = 1.9 * mm * np.exp(-((s - s_G + 0.0025) / 0.0045) ** 2 - (u / (3.0 * mm)) ** 2)
 h_glans = 1.1 * mm * np.exp(-((s - s_G - 0.0015) / 0.0022) ** 2 - (u / (2.0 * mm)) ** 2)

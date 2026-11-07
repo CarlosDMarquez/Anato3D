@@ -244,6 +244,7 @@ MATS = {
     'urethra': principled('MAT_Urethra', srgb(0.88, 0.64, 0.58), 0.45, coat=0.35),
     'gland_f': principled('MAT_Vestibular_Gland', srgb(0.90, 0.74, 0.62), 0.5, coat=0.3),
     'mammary': principled('MAT_Mammary_Gland', srgb(0.96, 0.82, 0.60), 0.5, coat=0.25),
+    'fat': principled('MAT_Breast_Fat', srgb(0.97, 0.86, 0.47), 0.55, coat=0.2),
     'duct_f': principled('MAT_Lactiferous_Duct', srgb(0.95, 0.88, 0.74), 0.45, coat=0.3),
     # Endocrino
     'thyroid': principled('MAT_Thyroid', srgb(0.66, 0.26, 0.27), 0.4, coat=0.4),
@@ -341,6 +342,9 @@ FEMALE_PARTS = {   # nombre: (español, latín, ruta)
     'Duct_of_greater_vestibular_gland': ('Conducto de la glándula vestibular mayor', 'Ductus glandulae vestibularis majoris', 'external'),
     'Mammary_gland': ('Glándula mamaria', 'Glandula mammaria', 'breast'),
     'Lactiferous_ducts': ('Conductos galactóforos', 'Ductus lactiferi', 'breast'),
+    # Sin término propio en la TA2: latín descriptivo, con su vocabulario («textus adiposus», «mammae»).
+    'Fat_of_breast': ('Tejido adiposo de la mama', 'Textus adiposus mammae', 'breast'),
+    'Suspensory_ligaments_of_breast': ('Ligamentos suspensorios de la mama', 'Ligamenta suspensoria mammaria', 'breast'),
 }
 FEMALE_PATHS = {'internal': (UROGENITAL, 'Female genital system', 'Female internal genitalia'),
                 'external': (UROGENITAL, 'Female genital system', 'Female external genitalia'),
@@ -522,34 +526,131 @@ for it in items:
     bm.to_mesh(obj.data); bm.free(); obj.data.update()
 log(f'nodos sacados de los órganos: {nodes_moved}')
 
-# Órganos: cede el más pequeño.
+# Órganos: cede el más pequeño, salvo en los pares de CEDE.
+# Revisión a mano de los choques de la auditoría (2026-11-06, docs/hitos/07-solapes-y-modelo-femenino.md): casi todos eran
+# roces de menos de 1 mm o uniones reales. Solo se metían de verdad unos en otros, ya en Z-Anatomy, el riñón izquierdo, la
+# suprarrenal izquierda y el bazo (hasta 5 mm), y algo el riñón derecho en su suprarrenal. Con «cede el más pequeño» la
+# suprarrenal se deformaba sobre el riñón y el polo de este seguía dentro de ella. Ahora la suprarrenal conserva su forma
+# de media luna y ceden el riñón y el bazo, que en el cuerpo tienen esas impresiones; entre riñón y bazo cede el bazo.
+# (cede, se queda), en este orden y dos vueltas: al apartarse de la suprarrenal, el bazo y el riñón volvían a tocarse.
+# El sigma, que cedía ante la vejiga, la dejaba 1,1 mm dentro de él (en Z-Anatomy, 0,2 mm): ahora cede del todo, y
+# después las vesículas seminales ceden ante él (al apartarse de la vejiga entraba 2 mm en la izquierda).
+CEDE = [('Spleen', 'Suprarenal_gland_L'), ('Kidney_L', 'Suprarenal_gland_L'), ('Kidney_R', 'Suprarenal_gland_R'),
+        ('Spleen', 'Kidney_L'), ('Sigmoid_colon', 'Urinary_bladder'), ('Seminal_gland_L', 'Sigmoid_colon'),
+        ('Seminal_gland_R', 'Sigmoid_colon')]
+
+def smooth_shift(y, D, fixed, rounds=6):
+    """Extiende a los vecinos el desplazamiento de los vértices fijados, saca del hueso y guarda la malla de `y`."""
+    obj = y['it']['out']; me = obj.data
+    E = np.empty(len(me.edges) * 2, dtype=np.int64); me.edges.foreach_get('vertices', E); E = E.reshape(-1, 2)
+    deg = np.maximum(np.bincount(E.ravel(), minlength=len(D)), 1)[:, None]
+    D0 = D.copy()
+    for _ in range(rounds):
+        acc = np.zeros_like(D); np.add.at(acc, E[:, 0], D[E[:, 1]]); np.add.at(acc, E[:, 1], D[E[:, 0]])
+        D = np.where(fixed[:, None], D0, 0.5 * D + 0.5 * acc / deg)
+    V = y['V'] + D
+    fitter.push_out_of_bone(V)
+    me.vertices.foreach_set('co', (V - np.array(obj.location)).ravel()); me.update()
+    y.update(solid(y['it']))
+
+def push_out(y, k):
+    """Los vértices de `y` dentro de `k` pasan a su superficie (+0,5 mm). Devuelve cuántos."""
+    A = y['V']; sel = np.where(((A >= k['lo']) & (A <= k['hi'])).all(1))[0]
+    inn = [j for j in sel if inside(k['T'], Vector(A[j]))]
+    if not inn: return 0
+    D = np.zeros_like(A); fixed = np.zeros(len(A), bool)
+    for j in inn:
+        hit, nrm, _, _ = k['T'].find_nearest(Vector(A[j]))
+        D[j] = np.array(hit + nrm * k['sign'] * 0.0005) - A[j]; fixed[j] = True
+    smooth_shift(y, D, fixed)
+    return len(inn)
+
+def refine_near(y, k, dist=0.008, levels=1):
+    """Subdivide las caras de `y` a menos de `dist` de `k`: la malla reducida del riñón (vértices cada 3–4 mm) no podía
+    seguir la forma de la suprarrenal y sus puntas quedaban dentro entre vértice y vértice."""
+    obj = y['it']['out']; me = obj.data; loc = Vector(obj.location)
+    for _ in range(levels):
+        bm = bmesh.new(); bm.from_mesh(me)
+        near = {v for v in bm.verts if k['T'].find_nearest(v.co + loc, dist)[0] is not None}
+        edges = [e for e in bm.edges if e.verts[0] in near or e.verts[1] in near]
+        if edges:
+            bmesh.ops.subdivide_edges(bm, edges=edges, cuts=1, use_grid_fill=True)
+            bmesh.ops.triangulate(bm, faces=[f for f in bm.faces if len(f.verts) > 3])
+        bm.to_mesh(me); bm.free(); me.update()
+        if not edges: break
+    y.update(solid(y['it']))
+    for st in stats[y['it']['system']]:
+        if st['name'] == obj.name: st.update(faces=len(me.polygons), verts=len(me.vertices))
+
+def push_along(y, k, d):
+    """Los vértices de `y` dentro de `k` salen de `k` en la dirección `d` (+0,5 mm). Con la superficie más cercana, en
+    una pieza fina metida en otra (la punta de la suprarrenal en el bazo) unos salían por un lado y otros por el otro, y
+    la pieza seguía dentro."""
+    A = y['V']; dv = Vector(d)
+    sel = np.where(((A >= k['lo']) & (A <= k['hi'])).all(1))[0]
+    D = np.zeros_like(A); fixed = np.zeros(len(A), bool)
+    for j in sel:
+        p = Vector(A[j])
+        if not inside(k['T'], p): continue
+        hit = k['T'].ray_cast(p + dv * 1e-6, dv)[0]
+        if hit is None: continue
+        D[j] = np.array(hit + dv * 0.0005) - A[j]; fixed[j] = True
+    if fixed.any(): smooth_shift(y, D, fixed)
+    return int(fixed.sum())
+
+refined = set()
+def ceder(y, k, rounds=6):
+    """`y` deja sitio a `k` sin que `k` cambie: se subdivide junto a él y sale en la dirección que va del centro de `k`
+    al de `y` (el polo del riñón baja, el bazo se aparta hacia fuera). Las puntas de `k` que siguen dentro de `y` empujan
+    en esa dirección la cara de `y` que atraviesan."""
+    if (y['name'], k['name']) not in refined:                # una sola vez por par (la segunda vuelta no vuelve a subdividir)
+        refine_near(y, k); refined.add((y['name'], k['name']))
+    d = y['V'].mean(0) - k['V'].mean(0); d /= np.linalg.norm(d); dv = Vector(d)
+    moved = 0
+    for _ in range(rounds):
+        m = push_along(y, k, d)
+        A = y['V']; D = np.zeros_like(A); fixed = np.zeros(len(A), bool)
+        polys = y['it']['out'].data.polygons
+        V = k['V'][((k['V'] >= y['lo']) & (k['V'] <= y['hi'])).all(1)]
+        for p in V:
+            if not inside(y['T'], Vector(p)): continue
+            hit, _, fi, t = y['T'].ray_cast(Vector(p), -dv)
+            if hit is None: continue
+            for vi in polys[fi].vertices:
+                if t + 0.0005 > np.linalg.norm(D[vi]): D[vi] = d * (t + 0.0005); fixed[vi] = True
+        if fixed.any(): smooth_shift(y, D, fixed)
+        moved += m + int(fixed.sum())
+        if not m and not fixed.any(): break
+    return moved
+
+def inside_count(p, q, sample=1):
+    """Vértices de `p` dentro de `q`."""
+    V = p['V'][::sample]
+    return sum(inside(q['T'], Vector(v)) for v in V[((V >= q['lo']) & (V <= q['hi'])).all(1)])
+
 fixed_pairs = []
 for i, a in enumerate(organs):
     for b in organs[i + 1:]:
         ga, gb = group(a), group(b)
         if not ga or not gb or ga == gb or not overlap(a, b): continue
+        if {a['name'], b['name']} in [set(c) for c in CEDE]: continue           # después, en su orden
         y, k = (a, b) if a['volume'] < b['volume'] else (b, a)
         A = y['V']; sel = np.where(((A >= k['lo']) & (A <= k['hi'])).all(1))[0]
         inn = [j for j in sel if inside(k['T'], Vector(A[j]))]
         frac = max(len(inn) / len(A), np.mean([inside(y['T'], Vector(p)) for p in k['V'][::max(1, len(k['V']) // 400)]]))
         if frac <= 0.02 or not inn: continue
-        D = np.zeros_like(A); fixed = np.zeros(len(A), bool)
-        for j in inn:
-            hit, nrm, _, _ = k['T'].find_nearest(Vector(A[j]))
-            D[j] = np.array(hit + nrm * k['sign'] * 0.0005) - A[j]; fixed[j] = True
-        obj = y['it']['out']; me = obj.data
-        E = np.empty(len(me.edges) * 2, dtype=np.int64); me.edges.foreach_get('vertices', E); E = E.reshape(-1, 2)
-        deg = np.maximum(np.bincount(E.ravel(), minlength=len(A)), 1)[:, None]
-        D0 = D.copy()
-        for _ in range(6):
-            acc = np.zeros_like(D); np.add.at(acc, E[:, 0], D[E[:, 1]]); np.add.at(acc, E[:, 1], D[E[:, 0]])
-            D = np.where(fixed[:, None], D0, 0.5 * D + 0.5 * acc / deg)
-        V = A + D
-        fitter.push_out_of_bone(V)
-        me.vertices.foreach_set('co', (V - np.array(obj.location)).ravel()); me.update()
-        y.update(solid(y['it']))
+        push_out(y, k)
         fixed_pairs.append(f'{y["name"]} fuera de {k["name"]} ({frac * 100:.0f} %, {len(inn)} vértices)')
+by_name = {o['name']: o for o in organs}
+for vuelta in range(2):
+    for yn, kn in CEDE:
+        y, k = by_name.get(yn), by_name.get(kn)
+        if not y or not k or not overlap(y, k) or not (inside_count(y, k) or inside_count(k, y)): continue
+        fixed_pairs.append(f'{yn} cede ante {kn} ({ceder(y, k)} vértices, vuelta {vuelta + 1})')
 log('órganos separados:', fixed_pairs)
+for yn, kn in CEDE:
+    y, k = by_name.get(yn), by_name.get(kn)
+    if y and k: log(f'  {yn} / {kn}: {inside_count(y, k)} y {inside_count(k, y)} vértices dentro del otro')
 log('órganos sacados del hueso, por sistema:', dict(bone_fixed))
 
 for system, groups in roots.items():

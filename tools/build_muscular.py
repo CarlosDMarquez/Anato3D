@@ -129,6 +129,25 @@ for n, it in enumerate(items):
     stats.append({'name': name, 'faces': len(me.polygons), 'moved_out_of_skin': moved, 'verts': len(me.vertices), 'worst_mm': round(worst * 1000, 1)})
     if n % 50 == 0: log(f'  {n}/{len(items)} {name}: {len(me.polygons)} caras, {moved}/{len(me.vertices)} vértices corregidos por la piel')
 
+# Esfínter anal externo de la mujer (2026-11-06): el de Z-Anatomy quedaba 2,2 cm por encima de la piel del periné (en el
+# hombre pasa lo mismo, anotado como problema de la fuente). Su parte subcutánea va justo bajo la piel que rodea el ano:
+# se estira hacia abajo hasta 4 mm bajo la piel, sin mover su parte profunda, que abraza al pubococcígeo (puborrectal).
+if MODEL == 'female':
+    eas = [it['out'] for it in items if it.get('base') == 'External anal sphincter' and 'out' in it]
+    if eas:
+        world_v = lambda o: np.array([v.co[:] for v in o.data.vertices]) + np.array(o.location)
+        allV = np.vstack([world_v(o) for o in eas])
+        low, top = allV[np.argmin(allV[:, 2])], allV[:, 2].max()
+        hit = fitter.skin.ray_cast(Vector(low), Vector((0, 0, -1)), 0.1)[0]
+        delta = (low[2] - hit.z - 0.004) if hit is not None else 0.0
+        if delta > 0.002:
+            for o in eas:
+                V = world_v(o)
+                V[:, 2] -= delta * np.clip((top - V[:, 2]) / (top - low[2]), 0, 1)     # 1 abajo, 0 arriba
+                o.data.vertices.foreach_set('co', (V - np.array(o.location)).ravel()); o.data.update()
+            log(f'esfínter anal externo: estirado {delta * 1000:.1f} mm hacia abajo (alto {(top - low[2]) * 1000:.0f} → '
+                f'{(top - low[2] + delta) * 1000:.0f} mm), a 4 mm de la piel')
+
 # ── Periné (tools/female_perineum.py, tools/male_perineum.py) ──────────────
 # Z-Anatomy no tiene los músculos del triángulo urogenital ni la membrana ni el cuerpo perineal, en ninguno de los dos
 # sexos. En la mujer se generan sobre las mismas referencias que la vulva y los genitales profundos; en el hombre, sobre

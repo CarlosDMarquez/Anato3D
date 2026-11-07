@@ -426,6 +426,7 @@ export const ETIQUETAS = {
   'Fibrocartílago': { en: 'Fibrocartilage', de: 'Faserknorpel', fr: 'Fibrocartilage', it: 'Fibrocartilagine' },
   'Cápsula articular': { en: 'Joint capsule', de: 'Gelenkkapsel', fr: 'Capsule articulaire', it: 'Capsula articolare' },
   'Almohadilla adiposa': { en: 'Fat pad', de: 'Fettkörper', fr: 'Coussinet adipeux', it: 'Cuscinetto adiposo' },
+  'Tejido adiposo': { en: 'Adipose tissue', de: 'Fettgewebe', fr: 'Tissu adipeux', it: 'Tessuto adiposo' },
   'Fascia': { en: 'Fascia', de: 'Faszie', fr: 'Fascia', it: 'Fascia' },
   'Bolsa sinovial (bursa)': { en: 'Synovial bursa', de: 'Schleimbeutel (Bursa)', fr: 'Bourse synoviale', it: 'Borsa sinoviale' },
   'Vaina tendinosa': { en: 'Tendon sheath', de: 'Sehnenscheide', fr: 'Gaine tendineuse', it: 'Guaina tendinea' },

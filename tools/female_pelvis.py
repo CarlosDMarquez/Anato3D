@@ -24,10 +24,11 @@ Cómo:
     huesos, que se hace con los huesos antes de deformar (guardados con el campo): el coxal deformado ya no es una
     transformación afín del de Z-Anatomy.
 
-Resultado (pelvimetría de `pelvimetry`, antes → después): arco del pubis 54° → 88°; diámetro entre las espinas
-ciáticas 8,0 → 10,1 cm; estrecho superior 12,7 → 13,6 cm de ancho y conjugada obstétrica 9,8 → 10,1 cm; sínfisis–cóccix
-8,1 → 9,3 cm; sacro 11,0 × 10,1 → 11,9 × 9,6 cm (ancho × largo); altura del coxal 20,4 → 19,2 cm. Los huesos se mueven
-hasta 16,5 mm (coxales), 9,3 (sacro) y 12,8 (cóccix).
+Resultado (pelvimetría de `pelvimetry`, antes → después, con el pubis más largo del 2026-11-06): arco del pubis
+54° → 87°; diámetro entre las espinas ciáticas 8,0 → 10,2 cm; entre las tuberosidades 6,2 → 9,1 cm; estrecho superior
+12,7 → 13,6 cm de ancho y conjugada obstétrica 9,8 → 10,9 cm (antes de alargar el pubis, 10,1); sínfisis–cóccix
+8,1 → 9,8 cm; sacro 11,0 × 10,1 → 11,9 × 9,5 cm (ancho × largo); altura del coxal 20,4 → 19,2 cm. Los huesos se mueven
+hasta 17,4 mm (coxales), 9,2 (sacro) y 13,0 (cóccix).
 """
 import numpy as np
 from mathutils import Vector, bvhtree
@@ -35,12 +36,18 @@ from mathutils import Vector, bvhtree
 PELVIC = ('Hip_Bone_L', 'Hip_Bone_R', 'Sacrum', 'Coccyx')
 
 # Desplazamientos del lado izquierdo (x > 0), en mm: (fuera, atrás, arriba). Los de la línea media no se mueven en x.
+# Pubis más largo (2026-11-06): la conjugada obstétrica se quedaba en 10,1 cm. En esta pelvis el borde superior de la
+# sínfisis está 8,7 cm por debajo del promontorio y solo 4,5 por delante: adelantarla alarga poco la conjugada (y la
+# deformación arrastraba el promontorio 4 mm hacia delante). Ahora el promontorio queda fijo (sobre él va L5) y la
+# sínfisis va 10 mm hacia delante y 6–7 mm hacia abajo, con el tubérculo y el pecten; las ramas, más abiertas junto a la
+# sínfisis para no cerrar el arco. En la mujer el pubis es más largo que en el hombre (índice isquiopubiano).
 DESIGN = {
     'acetabulum': (0, 0, 0),
     's1': (0, 0, 0),
-    'symphysis': ((0, -6, -2), (0, -5.5, -1.5), (0, -5, -1)),              # arriba, centro, abajo
-    'pubic_tubercle': (9, -4, 0),
-    'pecten': ((10, -3, 0), (7, -1, 0)),                                     # hacia el acetábulo
+    'promontory': (0, 0, 0),
+    'symphysis': ((0, -10.5, -7), (0, -10, -6.5), (0, -9.5, -6)),           # arriba, centro, abajo
+    'pubic_tubercle': (9, -7.5, -3.5),
+    'pecten': ((10, -6.5, -2.5), (7, -2.5, -0.5)),                           # hacia el acetábulo
     'arcuate': ((7, -1, 0), (5, 0, 0), (3, 0, 0)),                          # de delante atrás
     'sacroiliac': (4, 0, 0),
     'ala': (5, 0, 0),
@@ -49,7 +56,7 @@ DESIGN = {
     'coccyx': (0, 9, 8),
     'spine': (13, 4, 0),
     'tuberosity': ((10, 0, 4), (13, 0, 4), (12, 0, 5)),                     # medial anterior, lateral, centro
-    'ramus': ((7, 0, 2.5), (12, 0, 3.5), (15, 0.5, 4.5)),                   # a 15, 30 y 45 mm de la sínfisis
+    'ramus': ((11, 0, -0.5), (14, 0, 2.5), (15.5, 0.5, 4.5)),               # a 15, 30 y 45 mm de la sínfisis
     'crest': (5, 0, -7),
     'asis': (4, -1, -5),
     'psis': (2, 0, -3),

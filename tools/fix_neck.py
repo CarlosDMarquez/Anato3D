@@ -537,6 +537,57 @@ assert len(fskin.data.vertices) == len(MALE_TONE['pliegues'][0]), 'la piel femen
 skin, objs = fskin, {o.name: o for o in bpy.data.objects}
 cover(['Mandible', 'Hyoid_Bone'] + NAPE)
 cover_close([n for n in fbones if not n.startswith(CAVITY)])
+
+# Boca femenina (2026-11-06). La piel femenina de MakeHuman tiene los labios entreabiertos: una rendija de hasta 2,6 mm
+# (1,8 de media) por la que se veían los dientes; la masculina cierra casi del todo. Y al inflar la piel sobre la
+# mandíbula (cover), bajo el labio inferior quedaba un pliegue con un corte horizontal que no está en la piel original.
+#   - Labios: la rendija se mide con rayos desde delante (alto de cada lado, cada milímetro de ancho) y los vértices de
+#     los labios a menos de 5 mm de ella se mueven en vertical hacia su línea media, con 0,15 mm de solape y caída suave;
+#     solo la piel de los labios (hasta 12 mm por detrás de su cara anterior), no la cavidad de la boca.
+#   - Pliegue: suavizado laplaciano con máscara en la piel de delante, entre el labio inferior y el mentón.
+# Los dientes y la mandíbula no quedan más cerca de la piel que antes (comprobado con el prototipo).
+def close_mouth(skin, over=0.00015, reach=0.005):
+    W = world(skin)
+    T = bvhtree.BVHTree.FromPolygons(W.tolist(), [p.vertices[:] for p in skin.data.polygons])
+    face = W[(np.abs(W[:, 0]) < 0.03) & (W[:, 2] > W[:, 2].max() - 0.25)]
+    tip = face[np.argmin(face[:, 1])]                                   # punta de la nariz
+    def front_y(x, z):
+        h = T.ray_cast(Vector((x, tip[1] - 0.06, z)), Vector((0, 1, 0)))[0]
+        return h.y if h else np.nan
+    zs = np.arange(tip[2] - 0.040, tip[2] - 0.020, 0.0001)
+    xk, zu, zl = [], [], []
+    for x in np.arange(-0.030, 0.0301, 0.001):
+        ys = np.array([front_y(x, z) for z in zs])
+        env = np.array([np.nanmin(ys[max(0, i - 15):i + 16]) for i in range(len(ys))])
+        deep = np.where((ys - env) > 0.002)[0]                          # 2 mm más hondo que lo de alrededor
+        if not len(deep): continue
+        run = max(np.split(deep, np.where(np.diff(deep) > 1)[0] + 1), key=len)
+        xk.append(x); zu.append(zs[run[-1]] + 0.00005); zl.append(zs[run[0]] - 0.00005)
+    xk, zu, zl = map(np.array, (xk, zu, zl))
+    mid, gap = (zu + zl) / 2, zu - zl
+    idx = np.where((W[:, 0] > xk.min() - 0.004) & (W[:, 0] < xk.max() + 0.004)
+                   & (np.abs(W[:, 2] - np.interp(W[:, 0], xk, mid)) < reach))[0]
+    idx = idx[np.array([W[i, 1] - front_y(W[i, 0], W[i, 2]) < 0.012 for i in idx])]
+    dz = W[idx, 2] - np.interp(W[idx, 0], xk, mid)
+    half = np.interp(W[idx, 0], xk, gap, left=0, right=0) / 2 + over
+    W[idx, 2] -= np.sign(dz) * np.minimum(np.abs(dz), half) * (1 - smooth((np.abs(dz) - half) / (reach - half)))
+    print(f'boca: rendija de {xk.min() * 100:.1f} a {xk.max() * 100:.1f} cm, hasta {gap.max() * 1000:.1f} mm '
+          f'({gap.mean() * 1000:.1f} de media); {len(idx)} vértices de los labios cerrados')
+    # Pliegue bajo el labio inferior (4,8 cm por debajo de la punta de la nariz).
+    zf = tip[2] - 0.048
+    box = np.where((np.abs(W[:, 0]) < 0.034) & (np.abs(W[:, 2] - zf) < 0.012))[0]
+    box = box[np.array([W[i, 1] - front_y(W[i, 0], W[i, 2]) < 0.007 for i in box])]
+    mask = np.zeros(len(W))
+    mask[box] = (1 - smooth((np.abs(W[box, 2] - zf) - 0.004) / 0.008)) * (1 - smooth((np.abs(W[box, 0]) - 0.024) / 0.010))
+    E = np.empty(len(skin.data.edges) * 2, dtype=np.int64); skin.data.edges.foreach_get('vertices', E); E = E.reshape(-1, 2)
+    deg = np.maximum(np.bincount(E.ravel(), minlength=len(W)), 1)[:, None]
+    W0 = W.copy()
+    for _ in range(24):
+        acc = np.zeros_like(W); np.add.at(acc, E[:, 0], W[E[:, 1]]); np.add.at(acc, E[:, 1], W[E[:, 0]])
+        W = W + 0.5 * mask[:, None] * (acc / deg - W)
+    print(f'boca: pliegue bajo el labio alisado en {(mask > 0.01).sum()} vértices (hasta {np.linalg.norm(W - W0, axis=1).max() * 1000:.1f} mm)')
+    set_world(skin, W)
+close_mouth(fskin)
 apply_layers(fskin, female_layers(fskin, MALE_TONE, world))
 # Región de la vulva (tools/female_perineum.py): se guarda en la piel (atributo de cara «vulva») para que
 # build_female_skin.py modele la vulva con el mismo borde. La piel de la Fase 2 queda entera (los sistemas la usan para
