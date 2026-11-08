@@ -129,10 +129,12 @@ for n, it in enumerate(items):
     stats.append({'name': name, 'faces': len(me.polygons), 'moved_out_of_skin': moved, 'verts': len(me.vertices), 'worst_mm': round(worst * 1000, 1)})
     if n % 50 == 0: log(f'  {n}/{len(items)} {name}: {len(me.polygons)} caras, {moved}/{len(me.vertices)} vértices corregidos por la piel')
 
-# Esfínter anal externo de la mujer (2026-11-06): el de Z-Anatomy quedaba 2,2 cm por encima de la piel del periné (en el
-# hombre pasa lo mismo, anotado como problema de la fuente). Su parte subcutánea va justo bajo la piel que rodea el ano:
-# se estira hacia abajo hasta 4 mm bajo la piel, sin mover su parte profunda, que abraza al pubococcígeo (puborrectal).
-if MODEL == 'female':
+# Esfínter anal externo (mujer desde el 2026-11-06, hombre desde el 2026-11-08): el de Z-Anatomy quedaba unos 2 cm por
+# encima de la piel del periné. Su parte subcutánea va justo bajo la piel que rodea el ano: se estira hacia abajo hasta
+# 4 mm bajo la piel, sin mover su parte profunda, que abraza al pubococcígeo (puborrectal). En el hombre no cambia el
+# periné de male_perineum.py: el cuerpo perineal toma del esfínter solo su punto más anterior, que no se mueve de delante
+# atrás.
+if MODEL in ('female', 'male'):
     eas = [it['out'] for it in items if it.get('base') == 'External anal sphincter' and 'out' in it]
     if eas:
         world_v = lambda o: np.array([v.co[:] for v in o.data.vertices]) + np.array(o.location)

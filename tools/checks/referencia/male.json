@@ -1,7 +1,7 @@
 {
  "modelo": "male",
- "fecha": "2026-11-08T13:13:07",
- "commit": "730fbae",
+ "fecha": "2026-11-08T14:21:44",
+ "commit": "898b4f1",
  "objetos": 2870,
  "por_sistema": {
   "arterial": 436,
@@ -55,19 +55,9 @@
    "hueso_mm": 1.2,
    "sistema": "arterial"
   },
-  "Anterior_lateral_segment_of_liver_VI": {
-   "hueso": 0.019,
-   "hueso_mm": 4.3,
-   "sistema": "digestive"
-  },
   "Anterior_longitudinal_ligament": {
    "piel_mm": 6.0,
    "sistema": "connective"
-  },
-  "Anterior_medial_segment_of_liver_V": {
-   "hueso": 0.014,
-   "hueso_mm": 5.2,
-   "sistema": "digestive"
   },
   "Anterior_segment_of_eyeball_L": {
    "piel_mm": 13.4,
@@ -596,14 +586,6 @@
    "piel_mm": 8.2,
    "sistema": "venous"
   },
-  "Long_plantar_ligament_L": {
-   "area_nula": 2,
-   "sistema": "connective"
-  },
-  "Long_plantar_ligament_R": {
-   "area_nula": 1,
-   "sistema": "connective"
-  },
   "Longus_capitis_muscle_L": {
    "piel_mm": 7.3,
    "sistema": "muscular"
@@ -938,6 +920,11 @@
   "Pterygospinous_ligament_R": {
    "piel_mm": 1.8,
    "sistema": "connective"
+  },
+  "Pulmonary_trunk": {
+   "hueso": 0.007,
+   "hueso_mm": 1.0,
+   "sistema": "arterial"
   },
   "Rectus_anterior_capitis_muscle_L": {
    "piel_mm": 1.6,
@@ -1723,7 +1710,7 @@
    "mediana_mm": 0.02
   },
   "connective:Costoclavicular_ligament": {
-   "max_mm": 7.4,
+   "max_mm": 7.5,
    "mediana_mm": 5.58
   },
   "connective:Iliopsoas_fascia": {
@@ -1748,7 +1735,7 @@
   },
   "connective:Posterior_sternoclavicular_ligament": {
    "max_mm": 11.8,
-   "mediana_mm": 3.29
+   "mediana_mm": 3.26
   },
   "connective:Sacrospinous_ligament": {
    "max_mm": 5.1,
@@ -1767,7 +1754,7 @@
    "mediana_mm": 1.82
   },
   "connective:Ulnocapitate_ligament": {
-   "max_mm": 14.9,
+   "max_mm": 14.8,
    "mediana_mm": 2.65
   },
   "connective:Ulnolunate_ligament": {
@@ -1787,19 +1774,15 @@
    "mediana_mm": 1.93
   },
   "lymphatic:Retropharyngeal_nodes": {
-   "max_mm": 6.8,
-   "mediana_mm": 4.19
+   "max_mm": 6.6,
+   "mediana_mm": 4.14
   },
   "lymphatic:Superior_gluteal_nodes": {
    "max_mm": 3.1,
    "mediana_mm": 0.1
   },
-  "muscular:Depressor_labii_inferioris": {
-   "max_mm": 3.3,
-   "mediana_mm": 0.03
-  },
   "muscular:Descending_part_of_trapezius_muscle": {
-   "max_mm": 3.4,
+   "max_mm": 3.1,
    "mediana_mm": 0.12
   },
   "muscular:Epicranial_aponeurosis": {
@@ -1835,7 +1818,7 @@
    "mediana_mm": 0.09
   },
   "muscular:Mylohyoid_muscle": {
-   "max_mm": 4.2,
+   "max_mm": 4.6,
    "mediana_mm": 0.05
   },
   "muscular:Occipitalis_muscle": {
@@ -1848,30 +1831,22 @@
   },
   "muscular:Posterior_crico_arytenoid_muscle": {
    "max_mm": 3.5,
-   "mediana_mm": 0.51
+   "mediana_mm": 0.54
   },
   "muscular:Rhomboid_major_muscle": {
    "max_mm": 3.6,
-   "mediana_mm": 0.16
+   "mediana_mm": 0.15
   },
   "muscular:Rotatores": {
    "max_mm": 3.5,
    "mediana_mm": 0.14
   },
-  "muscular:Scalenus_posterior_muscle": {
-   "max_mm": 3.8,
-   "mediana_mm": 0.03
-  },
   "muscular:Serratus_posterior_superior_muscle": {
    "max_mm": 3.1,
    "mediana_mm": 0.1
   },
-  "muscular:Spinalis_thoracis_muscle": {
-   "max_mm": 3.1,
-   "mediana_mm": 0.14
-  },
   "muscular:Splenius_colli_muscle": {
-   "max_mm": 3.4,
+   "max_mm": 3.5,
    "mediana_mm": 0.14
   },
   "muscular:Sternocleidomastoid_muscle": {
@@ -1908,7 +1883,7 @@
   },
   "nervous:Inferior_occipital_gyrus_and_sulcus": {
    "max_mm": 4.4,
-   "mediana_mm": 0.71
+   "mediana_mm": 0.72
   },
   "nervous:Inferior_temporal_gyrus": {
    "max_mm": 4.0,
@@ -1964,7 +1939,7 @@
   },
   "nervous:Paracentral_gyrus_and_sulcus": {
    "max_mm": 3.1,
-   "mediana_mm": 1.92
+   "mediana_mm": 1.93
   },
   "nervous:Parieto_occipital_sulcus": {
    "max_mm": 3.6,
@@ -2036,7 +2011,7 @@
   },
   "nervous:Triangular_part_of_inferior_frontal_gyrus": {
    "max_mm": 6.2,
-   "mediana_mm": 1.24
+   "mediana_mm": 1.23
   },
   "nervous:Vagus_nerve_X": {
    "max_mm": 219.0,
@@ -3403,15 +3378,6 @@
     137.1
    ]
   },
-  "White_matter_of_telencephalon_R": {
-   "n": 9,
-   "max_mm": 53.5,
-   "en_cm": [
-    -0.5,
-    0.6,
-    164.5
-   ]
-  },
   "Hippocampal_commissure": {
    "n": 66,
    "max_mm": 41.7,
@@ -3727,17 +3693,8 @@
     157.7
    ]
   },
-  "Liver": {
-   "n": 28,
-   "max_mm": 45.3,
-   "en_cm": [
-    -6.7,
-    -6.1,
-    116.5
-   ]
-  },
   "Mucosa_of_stomach": {
-   "n": 6,
+   "n": 2,
    "max_mm": 24.5,
    "en_cm": [
     4.9,
@@ -3761,42 +3718,6 @@
     4.9,
     -6.8,
     114.6
-   ]
-  },
-  "Mesocolic_taenia": {
-   "n": 11,
-   "max_mm": 28.5,
-   "en_cm": [
-    -7.7,
-    -6.2,
-    113.7
-   ]
-  },
-  "Ascending_colon": {
-   "n": 4,
-   "max_mm": 46.7,
-   "en_cm": [
-    -7.3,
-    -5.4,
-    113.7
-   ]
-  },
-  "Anterior_medial_segment_of_liver_V": {
-   "n": 14,
-   "max_mm": 37.2,
-   "en_cm": [
-    -6.1,
-    -6.6,
-    116.6
-   ]
-  },
-  "Anterior_lateral_segment_of_liver_VI": {
-   "n": 34,
-   "max_mm": 43.5,
-   "en_cm": [
-    -5.8,
-    -6.3,
-    116.6
    ]
   },
   "Renal_pelvis_R": {

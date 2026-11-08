@@ -12,6 +12,11 @@ Qué hace:
      la derecha en espejo): se hornea con Cycles («Emit»), en las UV de la izquierda, el canal R de la textura ORM leído en
      las UV de la derecha. Solo se escribe ese canal, dentro de las islas de la izquierda y su margen; las islas de las
      demás piezas (con 3 píxeles de holgura) y los canales de rugosidad y metal no cambian.
+  1b. El color (textura «albedo») de cada pieza izquierda se copia también de su pareja derecha, igual (2026-11-08,
+     incidencia A8). Las 110 izquierdas eran más oscuras que sus derechas: de media un 13,7 % en los pies, 12,6 % en las
+     manos, 10,6 % en el tórax, 9,4 % en el cráneo y 5 % en brazos, pelvis y piernas; hasta un 28 % en las falanges
+     distales. Se hornea el RGB tal cual (la imagen se lee como datos durante el horneado: sin pasar de sRGB a lineal y
+     vuelta), dentro de las mismas islas.
   2. Se les da la vuelta a las caras de todas las piezas del revés (normales hacia fuera).
   3. El vómer, que no tiene pareja, se hornea de nuevo (Cycles, «AO», con los demás huesos y sin la piel), con la distancia
      que mejor reproduce el AO de las piezas del cráneo que estaban bien (AO_DISTANCE).
@@ -36,6 +41,10 @@ def volume(o):
 
 def orm_node(mat):
     return next(n for n in mat.node_tree.nodes if n.type == 'TEX_IMAGE' and n.image and n.image.name.endswith('_orm'))
+
+
+def albedo_node(mat):
+    return next(n for n in mat.node_tree.nodes if n.type == 'TEX_IMAGE' and n.image and n.image.name.endswith('_albedo'))
 
 
 def pixels(img):
@@ -126,10 +135,10 @@ class Baker:
 
 
 def ao_from_right(baker, lefts, orm):
-    """Canal R de `orm` en las islas de `lefts`, leído en las UV de su pareja derecha (capa «AO_R» de cada izquierda)."""
+    """Canal R de `orm` en las islas de `lefts`, leído en las UV de su pareja derecha (capa «UV_R» de cada izquierda)."""
     img = baker.target(orm, 'tmp_ao_derecha')
     def emit(nodes, links):
-        uv = nodes.new('ShaderNodeUVMap'); uv.uv_map = 'AO_R'
+        uv = nodes.new('ShaderNodeUVMap'); uv.uv_map = 'UV_R'
         tex = nodes.new('ShaderNodeTexImage'); tex.image = orm; tex.interpolation = 'Linear'
         sep = nodes.new('ShaderNodeSeparateColor'); comb = nodes.new('ShaderNodeCombineColor')
         links.new(uv.outputs['UV'], tex.inputs['Vector']); links.new(tex.outputs['Color'], sep.inputs['Color'])
@@ -141,6 +150,26 @@ def ao_from_right(baker, lefts, orm):
     baker.restore()
     a = pixels(img); bpy.data.images.remove(img)
     return a[..., 0], a[..., 3] > 0
+
+
+def color_from_right(baker, lefts, albedo):
+    """RGB de `albedo` en las islas de `lefts`, leído en las UV de su pareja derecha (capa «UV_R»). Durante el horneado la
+    imagen se lee como datos («Non-Color»): los valores pasan tal cual, sin convertir de sRGB a lineal y vuelta."""
+    img = baker.target(albedo, 'tmp_color_derecha')
+    space = albedo.colorspace_settings.name
+    albedo.colorspace_settings.name = 'Non-Color'
+    def emit(nodes, links):
+        uv = nodes.new('ShaderNodeUVMap'); uv.uv_map = 'UV_R'
+        tex = nodes.new('ShaderNodeTexImage'); tex.image = albedo; tex.interpolation = 'Linear'
+        links.new(uv.outputs['UV'], tex.inputs['Vector'])
+        return tex.outputs['Color']
+    baker.assign(lefts, baker.material('tmp_color_derecha', img, emit))
+    baker.scene.cycles.samples = 1
+    baker.bake(lefts, 'EMIT', MARGIN)
+    baker.restore()
+    albedo.colorspace_settings.name = space
+    a = pixels(img); bpy.data.images.remove(img)
+    return a[..., :3], a[..., 3] > 0
 
 
 def baked_ao(baker, objs, orm, distance=AO_DISTANCE, samples=AO_SAMPLES):
@@ -167,32 +196,54 @@ def fix(objects, log=print):
              if o.name.endswith('_L') and o.name[:-2] + '_R' in bones and same_faces(o, bones[o.name[:-2] + '_R'])}
     single = [o for o in bad if o.name not in pairs]
     image = lambda o: orm_node(o.data.materials[0]).image
+    color = lambda o: albedo_node(o.data.materials[0]).image
     baker = Baker(bpy.context.scene)
-    changed = {}                                                # textura ORM → píxeles nuevos
+    changed = {}                                                # textura → píxeles nuevos
+    coverage = {}                                               # (textura, piezas que se escriben) → islas de las demás
+
+    def keep_others(img, objs, m, of):
+        others = [x for x in bones.values() if of(x) == img and x not in objs]
+        if not others: return m
+        key = (img.name, tuple(sorted(o.name for o in objs)))
+        if key not in coverage: coverage[key] = dilate(baker.coverage(others, img), GUARD)
+        return m & ~coverage[key]
 
     def write(orm, objs, ao, m, what):
-        others = [x for x in bones.values() if image(x) == orm and x not in objs]
-        if others: m = m & ~dilate(baker.coverage(others, orm), GUARD)
+        m = keep_others(orm, objs, m, image)
         A = changed.setdefault(orm.name, pixels(orm).copy())
         before = A[m, 0].mean()
         A[m, 0] = ao[m]
         log(f'  {orm.name}: {what} ({m.sum()} píxeles; AO medio {before:.3f} → {A[m, 0].mean():.3f})')
 
-    # 1. AO copiado de la pareja derecha, antes de dar la vuelta a las caras (el orden de las esquinas aún coincide).
+    def write_color(albedo, objs, rgb, m, what):
+        m = keep_others(albedo, objs, m, color)
+        A = changed.setdefault(albedo.name, pixels(albedo).copy())
+        lum = np.array([0.2126, 0.7152, 0.0722], np.float32)
+        before = (A[m, :3] @ lum).mean()
+        A[m, :3] = rgb[m]
+        log(f'  {albedo.name}: {what} ({m.sum()} píxeles; luminancia media {before:.3f} → {(A[m, :3] @ lum).mean():.3f})')
+
+    # 1. AO y color copiados de la pareja derecha, antes de dar la vuelta a las caras (el orden de las esquinas aún
+    #    coincide): cada izquierda lleva las UV de su derecha en una capa «UV_R».
     for name, r in pairs.items():
         o = bones[name]
         u = np.empty(len(r.data.loops) * 2, np.float32); r.data.uv_layers.active.data.foreach_get('uv', u)
         main = o.data.uv_layers.active
-        o.data.uv_layers.new(name='AO_R').data.foreach_set('uv', u)
+        o.data.uv_layers.new(name='UV_R').data.foreach_set('uv', u)
         o.data.uv_layers.active = main                         # el horneado escribe en las UV propias de la pieza
         main.active_render = True
     for orm in sorted({image(bones[n]) for n in pairs}, key=lambda i: i.name):
         lefts = [bones[n] for n in pairs if image(bones[n]) == orm]
         ao, m = ao_from_right(baker, lefts, orm)
         write(orm, lefts, ao, m, f'AO de {len(lefts)} piezas izquierdas copiado de las derechas')
+    # 1b. Color (A8, 2026-11-08): las izquierdas eran entre un 2 y un 28 % más oscuras que sus derechas.
+    for albedo in sorted({color(bones[n]) for n in pairs}, key=lambda i: i.name):
+        lefts = [bones[n] for n in pairs if color(bones[n]) == albedo]
+        rgb, m = color_from_right(baker, lefts, albedo)
+        write_color(albedo, lefts, rgb, m, f'color de {len(lefts)} piezas izquierdas copiado de las derechas')
     for name in pairs:
         lay = bones[name].data.uv_layers
-        lay.remove(lay['AO_R'])
+        lay.remove(lay['UV_R'])
     # 2. Caras del derecho.
     for o in bad:
         bm = bmesh.new(); bm.from_mesh(o.data)

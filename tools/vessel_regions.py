@@ -82,6 +82,12 @@ OVERRIDES = {
     'Ovarian_artery': ['abdomen', 'pelvis'], 'Left_ovarian_vein': ['abdomen', 'pelvis'], 'Right_ovarian_vein': ['abdomen', 'pelvis'],
     'Uterine_artery': ['pelvis'], 'Vaginal_branches_of_uterine_artery': ['pelvis'], 'Tubal_branch_of_uterine_artery': ['pelvis'],
     'Ovarian_branch_of_uterine_artery': ['pelvis'], 'Uterine_veins': ['pelvis'], 'Uterine_venous_plexus': ['pelvis'],
+    # Salen de la pelvis por el agujero ciático mayor a la región glútea; la pudenda interna vuelve a entrar por el menor y
+    # sigue por el periné. Las sigmoideas acompañan al colon sigmoide, que baja a la pelvis. Fijadas el 2026-11-08: con la
+    # Fase 2 corregida (push_out_of_bone por la normal) su parte glútea o pélvica quedó justo por debajo del 20 %.
+    'Inferior_gluteal_artery': ['pelvis', 'gluteo'],
+    'Internal_pudendal_artery': ['pelvis', 'gluteo', 'perine'], 'Internal_pudendal_vein': ['pelvis', 'gluteo', 'perine'],
+    'Sigmoid_arteries': ['abdomen', 'pelvis'], 'Sigmoid_veins': ['abdomen', 'pelvis'],
 }
 # Senos venosos de la duramadre y plexo basilar: están en la cavidad craneal, no en el encéfalo.
 SINUS = re.compile(r'(?<!Coronary)_sinus$|Basilar_venous_plexus')

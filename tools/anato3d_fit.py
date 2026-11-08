@@ -250,13 +250,19 @@ class Fitter:
         """Saca de los huesos de la Fase 2 los vértices que quedaron dentro (más de 0,3 mm), hasta `margin` por fuera.
         Para tejidos que nunca están dentro de un hueso (el encéfalo): la mezcla de transformaciones de huesos vecinos
         (occipital y atlas, p. ej.) podía meter el cerebelo en el occipital. `skip(nombre del hueso)`: huesos que no
-        se tocan (p. ej. el cráneo, con sus conductos y surcos)."""
+        se tocan (p. ej. el cráneo, con sus conductos y surcos).
+        Cada vértice se mueve a lo largo de la normal de la cara más cercana, lo que esté dentro más `margin` (como
+        push_tube_out_of_bone). Hasta el 2026-11-08 se llevaba al punto más cercano de la superficie: dentro de una cara
+        es lo mismo, pero cuando ese punto es una arista o un vértice de la malla del hueso (el borde de un cartílago
+        costal), todos los vértices que atravesaban esa esquina acababan en el mismo punto y dejaban un pico (el
+        estómago, junto al cartílago costal 8 izquierdo, con aristas de 47 mm; el colon transverso, junto al 9 y el 10
+        derechos)."""
         moved = 0
         for _ in range(rounds):
             for i, v in enumerate(V):
                 depth, n, loc = self.bone_depth(v, skip)
                 if depth > 0.0003:
-                    V[i] = loc + n * margin; moved += 1
+                    V[i] = v + n * (depth + margin); moved += 1
         return moved
 
     def push_tube_out_of_bone(self, V, margin=0.0005, rounds=5, skip=None):
