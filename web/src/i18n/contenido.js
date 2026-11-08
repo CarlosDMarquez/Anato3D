@@ -74,6 +74,7 @@ export function trCita(es) {
     .replace(/, término n\.º (\S+)/, (_, n) => `, ${t('ficha.termino', { n })}`)
     .replace(/, código (\S+)$/, (_, c) => `, ${t('fuente.codigo', { c })}`)
     .replace('Wikipedia (en inglés)', t('fuente.wikipediaEn'))
+    .replace('Wiktionary (en inglés)', t('fuente.wiktionaryEn'))
     .replace(/: «/g, idioma() === 'fr' ? ' : «' : ': «')
     .replace(/«([^»]+)»/g, (_, titulo) => t('fuente.titulo', { titulo }));
 }

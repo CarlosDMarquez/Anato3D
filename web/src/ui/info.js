@@ -43,6 +43,9 @@ function studyBody(hit, info, entry, latines) {
   const estado = ficha.revision.estado;
   const conjunto = ficha.nombre.toLowerCase() !== (info.tituloEs ?? info.title).toLowerCase() && ficha.piezas.length > 1;
   const term = ficha.fuentes.terminologia.map((x) => ({ ...FUENTES[x.fuente], texto: `${FUENTES[x.fuente].texto}, ${t('ficha.termino', { n: x.termino })}` }));
+  // Sinónimos: son nombres en español (cubital, humeral…), así que solo se muestran en español, con su fuente.
+  const sinonimos = idioma() === 'es' ? (ficha.sinonimos ?? []) : [];
+  for (const sn of sinonimos) if (FUENTES[sn.fuente]) term.push(FUENTES[sn.fuente]);
   const cont = ficha.fuentes.contenido.map((c) => ({ ...FUENTES[c.fuente], apoya: c.apoya }));
   // Campo que respalda una fuente, en minúscula (en alemán, con su mayúscula de sustantivo).
   const campoDe = (k) => {
@@ -56,6 +59,7 @@ function studyBody(hit, info, entry, latines) {
       <span class="review-badge ${estado}" title="${esc(tr(ficha.revision.notas ?? ''))}">${esc(etiqueta(ESTADOS[estado]))}</span>
     </section>
     ${conjunto ? `<p class="study-whole">${esc(t('ficha.conjunto'))} <b>${esc(tr(ficha.nombre))}</b></p>` : ''}
+    ${sinonimos.length ? `<p class="study-syn">${esc(t('ficha.sinonimos'))}: ${sinonimos.map((sn) => `<b>${esc(sn.nombre)}</b>`).join(', ')}</p>` : ''}
     <section><p class="lead">${esc(tr(ficha.descripcion))}</p></section>
     <section><dl class="fields">${campos.map(([l, v]) => `<dt>${esc(etiqueta(l))}</dt><dd>${esc(tr(v))}</dd>`).join('')}</dl></section>
     ${ficha.relaciones.length ? `<section><h3>${esc(t('ficha.relaciones'))}</h3><ul class="relations">${ficha.relaciones.map((r) => `

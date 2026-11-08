@@ -18,3 +18,8 @@ export function fichaDePieza(nombre, modelo = null) {
   if (!hit || (modelo && !hit.ficha.modelos.includes(modelo))) return null;
   return hit;
 }
+
+/** Sinónimos en español de la ficha de módulo de una pieza (para el buscador): [] si no tiene. */
+export function sinonimosDePieza(nombre, modelo = null) {
+  return (fichaDePieza(nombre, modelo)?.ficha.sinonimos ?? []).map((sn) => sn.nombre);
+}

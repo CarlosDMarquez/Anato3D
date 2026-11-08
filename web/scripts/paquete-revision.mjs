@@ -34,7 +34,8 @@ function tablaFicha(f) {
   const cont = (k) => f.fuentes.contenido.filter((c) => c.apoya.includes(k)).map((c) => fuente(c.fuente)).join('; ');
   const terminos = f.fuentes.terminologia.map((t) => t.termino).join(', ');
   fila('Nombre y latín', `${f.nombre} · ${f.latin} · TA2 n.º ${terminos}`, fuente('ta2'));
-  if (f.sinonimos?.length) fila('Sinónimos', f.sinonimos.join('; '), f.sinonimosFuente ? fuente(f.sinonimosFuente) : 'Sin fuente comprobada');
+  // Una sola fila con todos los sinónimos (y la fuente de cada uno), para que los códigos de las filas siguientes no cambien.
+  if (f.sinonimos?.length) fila('Sinónimos', f.sinonimos.map((sn) => sn.nombre).join('; '), f.sinonimos.map((sn) => (sn.fuente ? fuente(sn.fuente) : 'Sin fuente comprobada')).join('; '));
   fila('Descripción', f.descripcion, cont('descripcion'));
   if (f.funcion) fila('Función', f.funcion, cont('funcion'));
   for (const [k, v] of Object.entries(f.campos)) fila(CAMPOS[f.tipo][k], v, cont(k));
@@ -133,7 +134,7 @@ Los nervios y vasos del modelo femenino proceden del modelo masculino de Z-Anato
 
 ${tabla(['Código', 'Decisión', 'Propuesta actual', 'Veredicto', 'Comentario'], [
     ['D1', '¿El ancóneo entra en el módulo del brazo o en el del antebrazo?', 'Contexto del tríceps; no se evalúa. TeachMeAnatomy lo pone en el compartimento posterior del antebrazo.', V, ''],
-    ...fichas.filter((f) => f.sinonimos?.length).map((f, i) => [`D${i + 2}`, `Sinónimos de «${f.nombre}»`, `${f.sinonimos.join('; ')} (sin fuente comprobada; la app todavía no los usa: servirían para el buscador)`, V, '']),
+    ...fichas.filter((f) => f.sinonimos?.length).map((f, i) => [`D${i + 2}`, `Sinónimos de «${f.nombre}»`, `${f.sinonimos.map((sn) => sn.nombre).join('; ')} (la ficha los muestra en español y el buscador los encuentra)`, V, '']),
     [`D${2 + fichas.filter((f) => f.sinonimos?.length).length}`, '¿Incluir alguna correlación clínica?', 'Ninguna por ahora.', V, ''],
     [`D${3 + fichas.filter((f) => f.sinonimos?.length).length}`, '¿Identificar la estructura aislada o con sus vecinas?', 'Aislada con el esqueleto (más fácil que en un atlas).', V, ''],
   ])}`,

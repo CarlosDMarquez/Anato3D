@@ -423,6 +423,164 @@ const PIEL = {
   Skin_Leg: ['163', ['Tibia', 'Great_saphenous_vein']], Skin_Foot: ['166', ['Sole_(foot)', 'Pressure_ulcer']],
 };
 
+// Huesos (y el globo ocular): [término de TA2 (en las falanges, el de la mano y el del pie), artículos de Wikipedia, entradas de Wiktionary (etimología)], por la
+// clave de la ficha (anatomia.js). Cada afirmación de la ficha se comprobó el 2026-11-08 en estas páginas (texto literal,
+// revisado con su copia descargada) y se reescribió o se quitó si no lo decían; ver docs/fuentes/huesos-2026-11-08.md.
+const WIKT = (palabra) => ({ texto: `Wiktionary (en inglés): «${palabra}»`, url: `https://en.wiktionary.org/wiki/${encodeURIComponent(palabra)}` });
+const HUESOS = {
+  Frontal_Bone: ['520', ['Frontal_bone', 'Parietal_bone', 'Supraorbital_foramen'], []],
+  Parietal_Bone: ['504', ['Parietal_bone'], []],
+  Occipital_Bone: ['552', ['Occipital_bone', 'Atlas_(anatomy)'], []],
+  Temporal_Bone: ['641', ['Temporal_bone', 'Petrous_part_of_the_temporal_bone', 'Mastoid_part_of_the_temporal_bone', 'Temporomandibular_joint', 'Mandible'], []],
+  Sphenoid_Bone: ['584', ['Sphenoid_bone'], ['sphenoid']],
+  Ethmoid_Bone: ['721', ['Ethmoid_bone', 'Cribriform_plate', 'Inferior_nasal_concha'], []],
+  Nasal_Bone: ['748', ['Nasal_bone', 'Nasal_fracture'], ['nasus']],
+  Lacrimal_Bone: ['744', ['Lacrimal_bone', 'Nasolacrimal_duct'], ['lacrimal', 'lacrima']],   // lacrimal ← lacrima, «lágrima»
+  Zygomatic_Bone: ['818', ['Zygomatic_bone'], []],
+  Maxilla: ['756', ['Maxilla', 'Maxillary_sinus'], ['maxilla']],
+  Palatine_Bone: ['798', ['Palatine_bone'], []],
+  Inferior_Nasal_Concha: ['740', ['Inferior_nasal_concha'], ['concha']],
+  Vomer: ['751', ['Vomer'], []],
+  Mandible: ['835', ['Mandible'], []],
+  Hyoid_Bone: ['876', ['Hyoid_bone'], []],
+  Malleus: ['881', ['Malleus', 'Ossicles', 'Tensor_tympani_muscle'], []],
+  Incus: ['888', ['Incus'], []],
+  Stapes: ['895', ['Stapes', 'Stapedius_muscle'], []],
+  Medial_Incisor: ['906', ['Incisor', 'Maxillary_central_incisor'], []],
+  Lateral_Incisor: ['906', ['Incisor', 'Maxillary_lateral_incisor'], []],
+  Canine: ['907', ['Canine_tooth'], ['canis', 'colmillo']],
+  First_Premolar: ['909', ['Premolar', 'Maxillary_first_premolar', 'Molar_(tooth)'], ['premolar']],
+  Second_Premolar: ['909', ['Premolar', 'Mandibular_second_premolar', 'Molar_(tooth)'], ['premolar']],
+  First_Molar: ['910', ['Molar_(tooth)', 'Maxillary_first_molar', 'Mandibular_first_molar'], []],
+  Second_Molar: ['910', ['Molar_(tooth)', 'Maxillary_second_molar'], []],
+  Atlas: ['1038', ['Atlas_(anatomy)'], []],
+  Axis: ['1050', ['Axis_(anatomy)', 'Atlas_(anatomy)', 'Atlanto-axial_joint'], []],
+  Cervical_Vertebra: ['1032', ['Cervical_vertebrae'], ['vertebra', 'cervix']],
+  Thoracic_Vertebra: ['1059', ['Thoracic_vertebrae'], ['θώραξ']],
+  Lumbar_Vertebra: ['1068', ['Lumbar_vertebrae', 'Spinal_disc_herniation', 'Sacrum'], ['lumbus']],
+  Sacrum: ['1071', ['Sacrum'], []],
+  Coccyx: ['1092', ['Coccyx'], []],
+  Rib: ['1118', ['Rib', 'Intercostal_space', 'Costal_cartilage'], []],
+  Costal_Cartilage: ['1139', ['Costal_cartilage', 'Rib'], ['cartilago']],
+  Sternum_Manubrium: ['1130', ['Sternum', 'Sternal_angle'], []],
+  Sternum_Body: ['1134', ['Sternum', 'Cardiopulmonary_resuscitation'], []],
+  Sternum_Xiphoid_Process: ['1135', ['Xiphoid_process'], []],
+  Clavicle: ['1168', ['Clavicle', 'Clavicle_fracture'], []],
+  Scapula: ['1143', ['Scapula', 'Humerus'], ['omoplate']],
+  Humerus: ['1180', ['Humerus', 'Ulnar_nerve'], []],
+  Radius: ['1210', ['Radius_(bone)', 'Distal_radius_fracture'], []],
+  Ulna: ['1230', ['Ulna'], ['ulna', 'cubitus']],
+  Scaphoid: ['1250', ['Scaphoid_bone', 'Scaphoid_fracture'], []],
+  Lunate: ['1252', ['Lunate_bone', "Kienböck's_disease"], []],
+  Triquetrum: ['1253', ['Triquetral_bone'], []],
+  Pisiform: ['1254', ['Pisiform_bone'], []],
+  Trapezium: ['1255', ['Trapezium_(bone)'], []],
+  Trapezoid: ['1257', ['Trapezoid_bone'], []],
+  Capitate: ['1258', ['Capitate_bone'], []],
+  Hamate: ['1259', ['Hamate_bone', 'Ulnar_canal'], []],
+  Metacarpal: ['1265', ['Metacarpal_bones', "Boxer's_fracture"], []],
+  Proximal_Phalanx: [['1277', '1510'], ['Phalanx_bone'], []],
+  Middle_Phalanx: [['1278', '1511'], ['Phalanx_bone'], []],
+  Distal_Phalanx: [['1279', '1512'], ['Phalanx_bone'], []],
+  Hip_Bone: ['1307', ['Hip_bone', 'Pelvis'], ['coxa']],
+  Femur: ['1360', ['Femur', 'Hip_fracture'], ['femur']],
+  Patella: ['1390', ['Patella'], ['rotula']],
+  Tibia: ['1397', ['Tibia', 'Tibia_shaft_fracture'], ['tibia']],
+  Fibula: ['1427', ['Fibula', 'Common_fibular_nerve'], ['fibula']],
+  Talus: ['1448', ['Talus_bone'], ['ἀστράγαλος']],
+  Calcaneus: ['1468', ['Calcaneus', 'Calcaneal_fracture'], ['calx']],
+  Navicular: ['1484', ['Navicular_bone'], ['navicula']],
+  Cuboid: ['1489', ['Cuboid_bone'], ['cuboid', 'cube', 'κύβος']],   // cuboid = cube + -oid; cube ← κύβος, «cubo»
+  Medial_Cuneiform: ['1486', ['Cuneiform_bones'], ['cuneus']],
+  Intermediate_Cuneiform: ['1487', ['Cuneiform_bones'], ['cuneus']],
+  Lateral_Cuneiform: ['1488', ['Cuneiform_bones'], ['cuneus']],
+  Metatarsal: ['1496', ['Metatarsal_bones', 'March_fracture', 'Jones_fracture', 'Metacarpal_bones'], ['tarsus']],
+  Sesamoid_Bones_Foot: ['1514', ['Sesamoid_bone', 'Sesamoiditis'], []],
+  Eyeball: ['6735', ['Human_eye'], ['oculus']],
+};
+
+export function fuentesHueso(key) {
+  const h = HUESOS[key];
+  if (!h) return null;
+  return {
+    lista: [
+      ...[].concat(h[0]).map((n) => ({ papel: 'Nombre', ...TA2, texto: `${TA2.texto}, término n.º ${n}` })),   // falanges: mano y pie
+      ...h[1].map((w) => ({ papel: 'Ficha', ...WIKI(w) })),
+      ...h[2].map((w) => ({ papel: 'Etimología', ...WIKT(w) })),
+    ],
+    nota: 'Consultadas el 8 de noviembre de 2026: cada afirmación de la ficha está en alguna de estas páginas.',
+  };
+}
+
+// Vísceras (respiratorio, digestivo, urogenital, endocrino y linfático): artículos de Wikipedia de cada ficha propia
+// (VISCERAS, por su clave) y de cada descripción por tejido (TEJIDO), en visceras.js. Cada frase de la descripción y de
+// los puntos clave se comprobó el 2026-11-08 en estas páginas (cita literal; las que no lo decían se reescribieron o se
+// quitaron); ver docs/fuentes/visceras-2026-11-08.md. La etimología no sale de aquí: se genera del latín con el glosario.
+const VISC_TEJIDO = {
+  lung: ['Lung'], bronchus: ['Bronchus'], cartilage: ['Trachea'], mucosa: ['Mucous_membrane'], pleura: ['Pleural_cavity', 'Pneumothorax'],
+  mouth: ['Digestion', 'Mouth'], stomach: ['Stomach'], intestine: ['Small_intestine'], colon: ['Large_intestine'], taenia: ['Taenia_coli'],
+  liver: ['Liver'], gallbladder: ['Biliary_tract'], gland: ['Exocrine_gland'], peritoneum: ['Peritoneum'], kidney: ['Kidney'],
+  renal_pelvis: ['Renal_pelvis'], ureter: ['Ureter'], bladder: ['Bladder'], testis: ['Testicle'], epididymis: ['Epididymis'],
+  duct: ['Vas_deferens'], seminal: ['Seminal_vesicles'], prostate: ['Prostate'], erectile: ['Erectile_tissue'], uterus: ['Uterus'],
+  vagina: ['Vagina'], ovary: ['Ovary'], tube: ['Fallopian_tube'], ligament: ['Ovarian_ligament'], urethra: ['Urethra'],
+  gland_f: ["Bartholin's_gland"], mammary: ['Mammary_gland'], duct_f: ['Lactiferous_duct'], fat: ['Breast'],
+  thyroid: ['Thyroid', 'Endocrine_gland'], parathyroid: ['Parathyroid_gland'], adrenal: ['Adrenal_gland', 'Endocrine_gland'],
+  pituitary: ['Pituitary_gland'], pineal: ['Pineal_gland', 'Endocrine_gland'], spleen: ['Spleen'], thymus: ['Thymus'], tonsil: ['Tonsil'],
+  node: ['Lymph_node'],
+};
+const VISC = {
+  Trachea: ['Trachea', 'Tracheotomy'], Right_main_bronchus: ['Bronchus', 'Pulmonary_aspiration'], Left_main_bronchus: ['Bronchus'],
+  Superior_lobe_of_right_lung: ['Lung'], Middle_lobe_of_right_lung: ['Lung'], Inferior_lobe_of_right_lung: ['Lung'],
+  Superior_lobe_of_left_lung: ['Lung'], Inferior_lobe_of_left_lung: ['Lung'], Pleura: ['Pleural_cavity', 'Pneumothorax'],
+  Thyroid_cartilage: ['Thyroid_cartilage', "Adam's_apple"], Cricoid_cartilage: ['Cricoid_cartilage', 'Cricothyrotomy'],
+  Arytenoid_cartilage: ['Arytenoid_cartilage'], Epiglottis: ['Epiglottis', 'Epiglottitis'],
+  Mucosa_of_nasal_cavity: ['Nasal_cavity', 'Nasal_mucosa', 'Olfactory_epithelium'], Nasopharynx: ['Pharynx'],
+  Tongue: ['Tongue'], Parotid_gland: ['Parotid_gland'], Submandibular_gland: ['Submandibular_gland'], Sublingual_gland: ['Sublingual_gland'],
+  Soft_palate: ['Soft_palate'], Uvula_of_palate: ['Uvula'], Oropharynx: ['Pharynx'], Laryngopharynx: ['Pharynx'],
+  Oesophagus: ['Esophagus', 'Heartburn'], Stomach: ['Stomach'], Mucosa_of_stomach: ['Gastric_mucosa', 'Gastric_glands', 'Helicobacter_pylori'],
+  Duodenum: ['Duodenum'], Jejunum: ['Jejunum'], Ascending_colon: ['Ascending_colon'], Transverse_colon: ['Transverse_colon'],
+  Descending_colon: ['Descending_colon'], Sigmoid_colon: ['Sigmoid_colon', 'Diverticulosis'], Vermiform_appendix: ['Appendix_(anatomy)', 'Appendicitis'],
+  Liver: ['Liver', 'Liver_regeneration'], Gallbladder: ['Gallbladder', 'Gallstone'], Bile_duct: ['Common_bile_duct', 'Jaundice'],
+  Pancreas: ['Pancreas', 'Pancreatic_islets'], Pancreatic_duct: ['Pancreatic_duct'], Greater_omentum: ['Greater_omentum'], Lesser_omentum: ['Lesser_omentum'],
+  Kidney: ['Kidney', 'Nephron'], Renal_pelvis: ['Renal_pelvis'], Ureter: ['Ureter', 'Kidney_stone_disease'], Urinary_bladder: ['Bladder'],
+  Urethra: ['Urethra', 'Urinary_tract_infection'], Testis: ['Testicle', 'Cryptorchidism'], Epididymis: ['Epididymis'],
+  Ductus_deferens: ['Vas_deferens', 'Vasectomy'], Ejaculatory_duct: ['Ejaculatory_duct'], Seminal_gland: ['Seminal_vesicles', 'Semen'],
+  Prostate: ['Prostate', 'Benign_prostatic_hyperplasia', 'Rectal_examination'], Corpus_cavernosum_of_penis: ['Corpus_cavernosum_penis'],
+  Corpus_spongiosum_of_penis: ['Corpus_spongiosum', 'Bulb_of_penis'], Glans_penis: ['Glans_penis'], Uterus: ['Uterus'], Vagina: ['Vagina'],
+  Ovary: ['Ovary', 'Ovarian_follicle'], Uterine_tube: ['Fallopian_tube', 'Ectopic_pregnancy'], Fimbriae_of_uterine_tube: ['Fallopian_tube'],
+  Ligament_of_ovary: ['Ovarian_ligament'], Round_ligament_of_uterus: ['Round_ligament_of_uterus'],
+  Female_urethra: ['Urethra', 'Urinary_tract_infection', 'Vagina'], Glans_of_clitoris: ['Clitoris'], Body_of_clitoris: ['Clitoris'],
+  Crus_of_clitoris: ['Crus_of_clitoris'], Bulb_of_vestibule: ['Bulb_of_vestibule'],
+  Greater_vestibular_gland: ["Bartholin's_gland", "Bartholin's_cyst"], Duct_of_greater_vestibular_gland: ["Bartholin's_gland", "Bartholin's_cyst"],
+  Mammary_gland: ['Breast', 'Mammary_gland'], Lactiferous_ducts: ['Lactiferous_duct'], Fat_of_breast: ['Breast'],
+  Suspensory_ligaments_of_breast: ["Cooper's_ligaments"], Thyroid_gland: ['Thyroid', 'Goitre'],
+  Superior_parathyroid_gland: ['Parathyroid_gland', 'Hypoparathyroidism'], Suprarenal_gland: ['Adrenal_gland'],
+  Adenohypophysis: ['Anterior_pituitary', 'Pituitary_gland'], Neurohypophysis: ['Posterior_pituitary', 'Vasopressin'], Pineal_gland: ['Pineal_gland'],
+  Spleen: ['Spleen', 'Splenectomy'], Left_lobe_of_thymus: ['Thymus'], Palatine_tonsil: ['Palatine_tonsil', 'Tonsillitis'],
+  Supraclavicular_nodes: ['Supraclavicular_lymph_nodes'], Jugulodigastric_node: ['Jugulodigastric_lymph_node'],
+  Central_axillary_nodes: ['Axillary_lymph_nodes'], Superomedial_superficial_inguinal_nodes: ['Inguinal_lymph_nodes'],
+  Posterior_segment_of_liver_I: ['Liver', 'Lobes_of_liver'], Left_posterior_lateral_segment_of_liver_II: ['Liver', 'Hepatectomy'],
+};
+// Fichas que comparten el texto de otra (mismo objeto en visceras.js, o mismo texto salvo el número del segmento).
+const VISC_ALIAS = {
+  Inferior_parathyroid_gland: 'Superior_parathyroid_gland', Right_lobe_of_thymus: 'Left_lobe_of_thymus',
+  Superolateral_superficial_inguinal_nodes: 'Superomedial_superficial_inguinal_nodes', Inferior_superficial_inguinal_nodes: 'Superomedial_superficial_inguinal_nodes',
+  ...Object.fromEntries(['Anterior', 'Posterior', 'Lateral', 'Apical'].map((g) => [`${g}_axillary_nodes`, 'Central_axillary_nodes'])),
+  ...Object.fromEntries(['Left_anterior_lateral_segment_of_liver_III', 'Left_medial_segment_of_liver_IV', 'Anterior_medial_segment_of_liver_V',
+    'Anterior_lateral_segment_of_liver_VI', 'Posterior_lateral_segment_of_liver_VII', 'Posterior_medial_segment_of_liver_VIII']
+    .map((k) => [k, 'Left_posterior_lateral_segment_of_liver_II'])),
+};
+
+/** Fuentes de una ficha de víscera: las de su ficha propia y, si su descripción es la del tejido, también las del tejido. */
+export function fuentesViscera(key, tejido, conTejido) {
+  const paginas = [...new Set([...(VISC[VISC_ALIAS[key] ?? key] ?? []), ...(conTejido ? VISC_TEJIDO[tejido] ?? [] : [])])];
+  if (!paginas.length) return null;
+  return {
+    lista: paginas.map((w) => ({ papel: 'Ficha', ...WIKI(w) })),
+    nota: 'Consultadas el 8 de noviembre de 2026: cada frase de la descripción y de los puntos clave está en alguna de estas páginas; la etimología se genera del nombre latino.',
+  };
+}
+
 export function fuentesPiel(key) {
   const p = PIEL[key];
   if (!p) return null;

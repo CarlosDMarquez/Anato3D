@@ -10,7 +10,7 @@ import { renderInfo } from './ui/info.js';
 import { GRUPOS } from './data/grupos.js';
 import { resolvePart, sideOf } from './data/resolve.js';
 import { Sessions, Stale, createSystemLoader, fetchJSON, describeError, onceByKey } from './loading.js';
-import { FICHA_POR_ID, MODULOS } from './content/index.js';
+import { FICHA_POR_ID, MODULOS, sinonimosDePieza } from './content/index.js';
 import { createStudy } from './ui/study.js';
 import { createStart } from './ui/start.js';
 import { t, tn, etiqueta, idioma, leerIdioma, fijarIdioma, alCambiar, traducirDom } from './i18n/idioma.js';
@@ -739,6 +739,11 @@ function loadPendingIndex() {
   });
 }
 
+// Texto en el que se busca una pieza: nombre, latín, inglés y, en español, los sinónimos de su ficha de módulo
+// («cubital» encuentra el nervio ulnar; «humeral», la arteria braquial).
+const textoBuscable = (p) => norm(`${p.info.title} ${p.info.latin ?? ''} ${p.info.entry?.nombre ?? ''} ${p.info.en ?? ''}`
+  + (idioma() === 'es' ? ` ${sinonimosDePieza(p.id, state.model).join(' ')}` : ''));
+
 function renderSearch(q) {
   const list = $('#search-results');
   const term = norm(q.trim());
@@ -749,7 +754,7 @@ function renderSearch(q) {
     .map(([id, g]) => ({ group: id, label: g.nombre }))
     .sort((a, b) => a.label.localeCompare(b.label, idioma()));
   const parts = viewer.parts
-    .filter((p) => shown(p) && (!term || norm(`${p.info.title} ${p.info.latin ?? ''} ${p.info.entry?.nombre ?? ''} ${p.info.en ?? ''}`).includes(term)))
+    .filter((p) => shown(p) && (!term || textoBuscable(p).includes(term)))
     .sort((a, b) => a.info.title.localeCompare(b.info.title, idioma()))
     .filter((p) => {
       const k = `${p.info.title}|${p.side}`;
@@ -761,7 +766,7 @@ function renderSearch(q) {
   const own = unloaded.model === state.model;
   const later = !term || !own ? [] : unloaded.parts
     .filter((p) => systems[p.key] && !sessions.current?.loaded(p.key) && !(viewer.modesty && GENITAL_NAME.test(p.id)))
-    .filter((p) => norm(`${p.info.title} ${p.info.latin ?? ''} ${p.info.entry?.nombre ?? ''} ${p.info.en ?? ''}`).includes(term))
+    .filter((p) => textoBuscable(p).includes(term))
     .sort((a, b) => a.info.title.localeCompare(b.info.title, idioma()))
     .filter((p) => {
       const k = `${p.info.title}|${p.side}`;

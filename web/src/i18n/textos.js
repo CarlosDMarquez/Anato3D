@@ -254,6 +254,8 @@ export const TEXTOS = {
   'ficha.ver': { es: 'Ver', en: 'View', de: 'Zeigen', fr: 'Voir', it: 'Vedi' },
   'ficha.simplificaciones': { es: 'Simplificaciones del modelo', en: 'Model simplifications', de: 'Vereinfachungen des Modells', fr: 'Simplifications du modèle', it: 'Semplificazioni del modello' },
   'ficha.terminologia': { es: 'Terminología (nombre y latín)', en: 'Terminology (name and Latin)', de: 'Terminologie (Name und Latein)', fr: 'Terminologie (nom et latin)', it: 'Terminologia (nome e latino)' },
+  // Otros nombres en español (fichas de módulo; solo se muestran con la interfaz en español).
+  'ficha.sinonimos': { es: 'También se llama', en: 'Also called', de: 'Auch genannt', fr: 'Aussi appelé', it: 'Detto anche' },
   'ficha.contenido': { es: 'Contenido', en: 'Content', de: 'Inhalt', fr: 'Contenu', it: 'Contenuto' },
   'ficha.termino': { es: 'término n.º {n}', en: 'term no. {n}', de: 'Begriff Nr. {n}', fr: 'terme n° {n}', it: 'termine n. {n}' },
   'ficha.actualizada': { es: '(actualizada el {fecha})', en: '(updated on {fecha})', de: '(aktualisiert am {fecha})', fr: '(mise à jour le {fecha})', it: '(aggiornata il {fecha})' },
@@ -271,6 +273,7 @@ export const TEXTOS = {
   'fuente.ta2': { es: 'Terminologia Anatomica, 2.ª ed.', en: 'Terminologia Anatomica, 2nd ed.', de: 'Terminologia Anatomica, 2. Aufl.', fr: 'Terminologia Anatomica, 2e éd.', it: 'Terminologia Anatomica, 2ª ed.' },
   'fuente.codigo': { es: 'código {c}', en: 'code {c}', de: 'Code {c}', fr: 'code {c}', it: 'codice {c}' },
   'fuente.wikipediaEn': { es: 'Wikipedia (en inglés)', en: 'Wikipedia (English)', de: 'Wikipedia (englisch)', fr: 'Wikipédia (en anglais)', it: 'Wikipedia (in inglese)' },
+  'fuente.wiktionaryEn': { es: 'Wiktionary (en inglés)', en: 'Wiktionary (English)', de: 'Wiktionary (englisch)', fr: 'Wiktionnaire (en anglais)', it: 'Wikizionario (in inglese)' },
   'fuente.titulo': { es: '«{titulo}»', en: '“{titulo}”', de: '„{titulo}“', fr: '« {titulo} »', it: '«{titulo}»' },
 
   // ── Estudiar ──

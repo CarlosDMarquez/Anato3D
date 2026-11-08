@@ -29,6 +29,37 @@ export const FUENTES = {
   tma_arterias: TMA('Arterial Supply to the Upper Limb', 'upper-limb/vessels/arteries/', '2025-11-06'),
   tma_venas: TMA('Venous Drainage of the Upper Limb', 'upper-limb/vessels/veins/', '2025-11-06'),
   tma_humero: TMA('The Humerus', 'upper-limb/bones/humerus/', '2026-05-22'),
+  // Sinónimos en español (2026-11-08): cada uno, con la página que lo da por nombre de la misma estructura.
+  decs_nervio_cubital: {
+    tipo: 'terminologia',
+    texto: 'DeCS, Descriptores en Ciencias de la Salud (BIREME/OPS/OMS): «Nervio Cubital», término alternativo «Nervio Ulnar»',
+    url: 'https://decs.bvsalud.org/es/ths/resource/?id=14858',
+    consultada: '2026-11-08',
+  },
+  cun_braquial: {
+    tipo: 'terminologia',
+    texto: 'Diccionario médico de la Clínica Universidad de Navarra: «Braquial» («Músculo braquial. También llamado braquial anterior»)',
+    url: 'https://www.cun.es/diccionario-medico/terminos/braquial',
+    consultada: '2026-11-08',
+  },
+  cun_arteria_braquial: {
+    tipo: 'terminologia',
+    texto: 'Diccionario médico de la Clínica Universidad de Navarra: «Arteria braquial» («también llamada arteria humeral»)',
+    url: 'https://www.cun.es/diccionario-medico/terminos/arteria-braquial',
+    consultada: '2026-11-08',
+  },
+  ta98_profunda_brazo: {
+    tipo: 'terminologia',
+    texto: 'Terminologia Anatomica (FIPAT, IFAA): entrada TAH4134, «arteria profunda brachii»; equivalente español de la TA98: «arteria profunda del brazo»',
+    url: 'https://ifaa.unifr.ch/Public/TNAEntryPage/auto/univ/EN/TAH4134%20Universal%20EN.htm',
+    consultada: '2026-11-08',
+  },
+  kenhub_arteria_braquial: {
+    tipo: 'terminologia',
+    texto: 'Kenhub: «Arteria braquial (humeral)», sección «Arteria braquial profunda» («Sinónimos: Arteria humeral profunda»)',
+    url: 'https://www.kenhub.com/es/library/anatomia-es/arteria-braquial-humeral',
+    consultada: '2026-11-08',
+  },
   anato3d: {
     tipo: 'modelo',
     texto: 'Documentación del propio proyecto (README de Anato3D): cómo se construyó el modelo',

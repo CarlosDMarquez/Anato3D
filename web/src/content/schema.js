@@ -5,7 +5,8 @@
 //   id            identificador estable, independiente del nombre de las mallas («nervio-radial»)
 //   tipo          musculo | nervio | arteria | vena | hueso | ligamento | organo
 //   nombre        nombre en español (término de la TA2 cuando lo hay)
-//   sinonimos     otros nombres en uso; `sinonimosFuente` dice de dónde salen (null = sin comprobar)
+//   sinonimos     otros nombres en uso en español: [{ nombre, fuente }], cada uno con la fuente que lo da por nombre de la
+//                 misma estructura (la ficha los muestra en español y el buscador los encuentra)
 //   latin         término latino; `ta2`: número del término en la Terminologia Anatomica 2
 //   region        ruta de región («Miembro superior › Brazo»); `compartimento` si aplica
 //   lado          bilateral | impar
@@ -83,7 +84,11 @@ export function revisarFicha(f, { fuentes, piezasDe, ids }) {
     if (!fuentes[r.fuente]) err(`relación sin fuente válida: «${r.texto.slice(0, 40)}…»`);
     if (r.con && !ids.has(r.con)) err(`relación con una ficha que no existe: ${r.con}`);
   }
-  if (f.sinonimos?.length && !f.sinonimosFuente) aviso('sinónimos sin fuente comprobada');
+  for (const sn of f.sinonimos ?? []) {
+    if (typeof sn !== 'object' || !sn.nombre) err('sinónimo sin nombre (formato: { nombre, fuente })');
+    else if (!sn.fuente) aviso(`sinónimo «${sn.nombre}» sin fuente comprobada`);
+    else if (!fuentes[sn.fuente]) err(`sinónimo «${sn.nombre}»: fuente desconocida ${sn.fuente}`);
+  }
   // Aplicabilidad: cada pieza tiene que existir en los modelos declarados, y en los demás no.
   const lados = f.lado === 'bilateral' ? ['_L', '_R'] : [''];
   for (const modelo of ['male', 'female']) {

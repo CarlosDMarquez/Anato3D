@@ -4,7 +4,7 @@ import { resolveConnective } from './conectivo.js';
 import { resolveVessel } from './vasos.js';
 import { resolveNervous } from './nervios.js';
 import { resolveVisceral } from './visceras.js';
-import { LATIN_EXTRA, fuentesLatin, fuentesPiel } from './fuentes.js';
+import { LATIN_EXTRA, fuentesLatin, fuentesPiel, fuentesHueso } from './fuentes.js';
 import { latinEtymology } from './musculos.js';
 
 // Convierte el nombre de un objeto del modelo (p. ej. "Rib_7_L", "Tooth_Upper_Canine_R")
@@ -26,9 +26,9 @@ function splitSide(name) {
 }
 
 function ribClass(n) {
-  if (n <= 7) return { chip: 'Costilla verdadera', dato: 'Costilla verdadera: su cartílago llega directamente al esternón.' };
-  if (n <= 10) return { chip: 'Costilla falsa', dato: 'Costilla falsa: su cartílago se une al de la costilla superior, no directamente al esternón.' };
-  return { chip: 'Costilla flotante', dato: 'Costilla flotante: su extremo anterior termina libre entre los músculos de la pared abdominal.' };
+  if (n <= 7) return { chip: 'Costilla verdadera', dato: 'Costilla verdadera: su cartílago costal la une directamente al esternón.' };
+  if (n <= 10) return { chip: 'Costilla falsa', dato: 'Costilla falsa: su cartílago se une al de la costilla de arriba, no directamente al esternón.' };
+  return { chip: 'Costilla flotante', dato: 'Costilla flotante: solo se une a las vértebras; su extremo anterior termina libre.' };
 }
 
 export const sideOf = (name) => splitSide(name).side;
@@ -64,7 +64,7 @@ function resolveBySystem(name, extras) {
     const c = ribClass(n);
     chips.push(c.chip);
     extra.push(c.dato);
-    if (n === 1) extra.push('Es la más corta, ancha y curva; sobre ella pasan la arteria y la vena subclavias.');
+    if (n === 1) extra.push('Es corta, plana y en forma de C, y se une al manubrio del esternón.');
   } else if ((m = base.match(/^Costal_Cartilage_(\d+)$/))) {
     const n = +m[1];
     key = 'Costal_Cartilage';
@@ -81,9 +81,9 @@ function resolveBySystem(name, extras) {
     key = region;
     title = `Vértebra ${m[1]}${m[2]} (${label})`;
     latin = `${ANATOMIA[region].latin} ${m[1]}${ROMAN[+m[2]]}`;
-    if (base === 'Vertebra_C7') extra.push('C7 se llama vértebra prominente: su apófisis espinosa es la que se palpa con facilidad en la base del cuello.');
-    if (base === 'Vertebra_T12') extra.push('T12 es la vértebra de transición entre la columna torácica y la lumbar.');
-    if (base === 'Vertebra_L5') extra.push('L5 se articula con el sacro; entre ambos está el promontorio, una referencia de la pelvis.');
+    if (base === 'Vertebra_C7') extra.push('C7 se llama vértebra prominente: su apófisis espinosa, larga, se palpa a través de la piel.');
+    if (base === 'Vertebra_T12') extra.push('T12 se parece en parte a las vértebras lumbares: sus carillas articulares inferiores son como las de estas.');
+    if (base === 'Vertebra_L5') extra.push('L5 se articula con el promontorio del sacro.');
   } else if ((m = base.match(/^Tooth_(Upper|Lower)_(.+)$/))) {
     key = m[2];
     const upper = m[1] === 'Upper';
@@ -131,6 +131,6 @@ function resolveBySystem(name, extras) {
     entry: entry && key.startsWith('Skin_') && !entry.etimologia ? { ...entry, etimologia: latinEtymology(entry.latin) } : entry,
     datos: [...extra, ...(entry?.datos ?? [])],
     source: extras.source ?? null,
-    fuentes: fuentesPiel(key),
+    fuentes: fuentesPiel(key) ?? fuentesHueso(key),
   };
 }

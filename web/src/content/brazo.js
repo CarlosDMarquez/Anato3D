@@ -84,7 +84,7 @@ const ESTRUCTURAS = [
   },
   {
     id: 'braquial', tipo: 'musculo', nombre: 'Músculo braquial', latin: 'Musculus brachialis', ta2: '2469',
-    sinonimos: ['Músculo braquial anterior'], sinonimosFuente: null,
+    sinonimos: [{ nombre: 'Músculo braquial anterior', fuente: 'cun_braquial' }],
     region: 'Miembro superior › Brazo', compartimento: 'anterior', lado: 'bilateral', modelos: MODELOS, piezas: ['Brachialis_muscle'],
     descripcion: 'Músculo del compartimento anterior del brazo, profundo al bíceps y más distal que los demás músculos del brazo. Forma el suelo de la fosa cubital.',
     campos: {
@@ -200,7 +200,7 @@ const ESTRUCTURAS = [
   },
   {
     id: 'nervio-ulnar', tipo: 'nervio', nombre: 'Nervio ulnar', latin: 'Nervus ulnaris', ta2: '6449',
-    sinonimos: ['Nervio cubital'], sinonimosFuente: null,
+    sinonimos: [{ nombre: 'Nervio cubital', fuente: 'decs_nervio_cubital' }],
     region: 'Miembro superior › Brazo', lado: 'bilateral', modelos: MODELOS, piezas: ['Ulnar_nerve'],
     descripcion: 'Nervio que baja por la cara medial del brazo y pasa por detrás del codo, junto al epicóndilo medial; sus ramas motoras son para el antebrazo y la mano.',
     funcion: 'Motor para el flexor ulnar del carpo, parte del flexor profundo de los dedos y la mayoría de los músculos pequeños de la mano, y sensitivo para el dedo y medio mediales.',
@@ -222,7 +222,7 @@ const ESTRUCTURAS = [
   // ── Vasos ──
   {
     id: 'arteria-braquial', tipo: 'arteria', nombre: 'Arteria braquial', latin: 'Arteria brachialis', ta2: '4632',
-    sinonimos: ['Arteria humeral'], sinonimosFuente: null,
+    sinonimos: [{ nombre: 'Arteria humeral', fuente: 'cun_arteria_braquial' }],
     region: 'Miembro superior › Brazo', lado: 'bilateral', modelos: MODELOS, piezas: ['Brachial_artery'],
     descripcion: 'Arteria principal del brazo: continúa a la axilar y termina en el codo dividiéndose en las arterias radial y ulnar.',
     funcion: 'Lleva la sangre al brazo y, a través de sus ramas terminales, al antebrazo y la mano.',
@@ -246,7 +246,7 @@ const ESTRUCTURAS = [
   },
   {
     id: 'arteria-braquial-profunda', tipo: 'arteria', nombre: 'Arteria braquial profunda', latin: 'Arteria profunda brachii', ta2: '4634',
-    sinonimos: ['Arteria profunda del brazo', 'Arteria humeral profunda'], sinonimosFuente: null,
+    sinonimos: [{ nombre: 'Arteria profunda del brazo', fuente: 'ta98_profunda_brazo' }, { nombre: 'Arteria humeral profunda', fuente: 'kenhub_arteria_braquial' }],
     region: 'Miembro superior › Brazo', lado: 'bilateral', modelos: MODELOS, piezas: ['Deep_brachial_artery'],
     descripcion: 'Rama de la arteria braquial que acompaña al nervio radial por el surco del nervio radial del húmero.',
     funcion: 'Irriga la parte posterior del brazo.',
