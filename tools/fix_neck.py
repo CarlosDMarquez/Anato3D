@@ -22,6 +22,8 @@ Qué hace:
      lleva a ella (tools/female.py) y la pelvis toma la forma femenina (tools/female_pelvis.py; el campo para los demás
      tejidos queda en Anato3D_Female_30_Fase2_pelvis.npz). La región de la vulva se guarda en la piel (atributo «vulva»)
      y, al exportar, se recorta de ella y queda aparte («Skin_Vulva_Smooth»): la vulva de build_female_skin.py la sustituye.
+  3e. Las piezas del esqueleto del revés (las izquierdas y el vómer) se ponen del derecho, con su AO bien horneado
+     (tools/huesos_invertidos.py).
   5. Al exportar, la piel se divide en zonas (tools/skin_regions.py: cuero cabelludo, cara, párpados, nariz, labios,
      orejas, cuello, hombros, brazos, manos, tronco, piernas…) para que la web pueda seleccionar cada una. Las Fase 2
      guardan la piel entera.
@@ -457,6 +459,14 @@ set_world(skin, W + bulk)
 # 3d. Tono de la piel por vértice (tools/skin_tone.py): sin él, un solo color la hacía parecer un maniquí.
 MALE_TONE = male_layers(skin, objs, world)
 apply_layers(skin, MALE_TONE)
+
+# 3e. Huesos del revés (tools/huesos_invertidos.py): las piezas izquierdas (el espejo de las derechas con las mismas caras) y
+#     el vómer tenían las caras del revés y un AO horneado casi negro; el visor les daba la vuelta y les quitaba el AO. Se
+#     copia a cada izquierda el AO de su pareja derecha, el del vómer se hornea de nuevo y se les da la vuelta a las caras.
+#     El esqueleto femenino sale de esta Fase 2 y lo hereda.
+import huesos_invertidos
+print('huesos del revés: %d corregidos (%d con el AO de su pareja derecha; horneados de nuevo: %s)'
+      % huesos_invertidos.fix(list(bpy.data.objects)))
 
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT, f'{MALE}.blend'))
 # 5. Zonas de la piel (tools/skin_regions.py): solo en lo exportado; la Fase 2 guarda la piel entera, que los sistemas

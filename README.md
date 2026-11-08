@@ -21,7 +21,7 @@ Modelos: `zsh tools/build_all.sh` (masculino) y `A3D_MODEL=female zsh tools/buil
 | Ruta | Qué es |
 |---|---|
 | `*.blend`, `*.glb` (raíz) | Modelos fuente. Fase 1 = piel + ojos; Fase 2 = piel + esqueleto completo (`Anato3D_Male_30_Fase2`, `Anato3D_Female_30_Fase2`). |
-| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app), `audit_models.py` (busca errores medibles en los modelos), `vessel_regions.py` (región del cuerpo de cada vaso), `skin_regions.py` (divide la piel en zonas al exportar), `backup.sh` (copia de seguridad en este Mac), `build_lib.sh` (funciones de `build_all.sh`: Blender con código de salida, preparación, validación y publicación), `validate_models.py` (valida los archivos nuevos antes de publicarlos), `manifest.py` (manifiesto de versiones y sumas), `logo_neurofuture.py` (logo de NeuroFuture para fondo negro), `nombres_idiomas.py` (nombres de las estructuras en francés e italiano) y `tests/` (pruebas de fallos de la construcción, con un Blender falso). |
+| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app), `audit_models.py` (busca errores medibles en los modelos), `vessel_regions.py` (región del cuerpo de cada vaso), `skin_regions.py` (divide la piel en zonas al exportar), `backup.sh` (copia de seguridad en este Mac), `build_lib.sh` (funciones de `build_all.sh`: Blender con código de salida, preparación, validación y publicación), `validate_models.py` (valida los archivos nuevos antes de publicarlos), `manifest.py` (manifiesto de versiones y sumas), `logo_neurofuture.py` (logo de NeuroFuture para fondo negro), `logo_anato3d.py` (logo e iconos de Anato3D: el cráneo del modelo), `huesos_invertidos.py` (piezas del esqueleto del revés: AO de la pareja derecha), `nombres_idiomas.py` (nombres de las estructuras en francés e italiano) y `tests/` (pruebas de fallos de la construcción, con un Blender falso). |
 | `Anato3D_Male_30_Fase2_musculature.npz` | Campo de desplazamiento de la complexión musculosa (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas). |
 | `Anato3D_Female_30_Fase2_pelvis.npz` | Campo de desplazamiento de la pelvis femenina y los huesos de la pelvis antes de deformarla (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas femeninos). |
 | `sources/originals/` | Copia de los modelos tal como estaban antes de corregir el cuello. |
@@ -38,10 +38,28 @@ Modelos: `zsh tools/build_all.sh` (masculino) y `A3D_MODEL=female zsh tools/buil
 | `web/src/viewer.js` | Escena three.js: carga Draco, materiales, brillo de selección, cámara. |
 | `web/src/i18n/`, `web/public/i18n/` | Idiomas: textos de la interfaz en español, inglés, alemán, francés e italiano (`textos.js`), idioma elegido (`idioma.js`), nombres de estructuras y grupos (`nombres.js`, con las tablas `nombres-fr.json` y `nombres-it.json`) y contenido traducido (`contenido.js`, con las memorias `contenido-{en,de,fr,it}.json`). |
 | `web/src/ui/start.js`, `web/public/neurofuture.png` | Pantalla de inicio (nombre, menú, crédito) y el logo de NeuroFuture para fondo negro. |
+| `docs/marca/` | Logos: el de Anato3D (`anato3d-craneo.png`, sin fondo, y `anato3d-craneo-negro.png`) y el original de NeuroFuture. |
 | `web/src/study/`, `web/src/ui/study.js` | Progreso (local, con versión), preguntas y panel «Estudiar» (lección, evaluación, repaso). |
 | `web/src/content/` | Contenido de estudio: esquema (`schema.js`), fuentes (`fuentes.js`), módulos (`brazo.js`) e índice por pieza (`index.js`). |
 | `web/src/loading.js` | Propiedad de las peticiones de carga (una sesión por modelo instalado), descargas con estado HTTP y aborto, y errores explicables. Pruebas en `web/tests/loading.test.mjs`. |
 | `web/src/main.js` | Estado de la app (capas, ocultar/aislar/transparentar, deshacer), barra y paneles. |
+
+## Logo e iconos (2026-11-07)
+
+El logo de Anato3D es el **cráneo del modelo masculino**, de frente, sobre negro. Carlos pidió el cráneo «algo similar a esto pero sin sombras» (una captura de la app) y eligió la versión detallada, «sin fondo, que sea todo negro».
+- **Archivos:**
+  - `docs/marca/anato3d-craneo.png`: el logo, 2048 px, fondo transparente;
+  - `docs/marca/anato3d-craneo-negro.png`: cuadrado sobre negro, 2048 px;
+  - en `web/public`, sobre negro: `favicon-16.png` y `favicon-32.png` (pestaña), `icon-180.png` (iPhone), `icon-192.png` e `icon-512.png` (manifiesto; el de 512 es también la imagen al compartir) e `icon-maskable-512.png` (Android lo recorta en círculo o en otra forma: el cráneo, al 72 %, cabe en la zona segura).
+- **Cómo se hace:** `tools/logo_anato3d.py`, en dos pasos (Blender y Python con numpy, scipy y Pillow); la cabecera del archivo lo explica.
+  - Luz desde la cámara y entorno blanco: hay relieve (suturas, poros, forámenes, del mapa normal del modelo), pero ninguna sombra proyectada ni un lado oscuro como en la captura.
+  - Subdivisión de nivel 2: el contorno sale redondo, no en facetas.
+  - Color: 40 % la textura del modelo y 60 % marfil liso (la textura sola tiene manchas y un mentón sucio).
+  - Órbitas, nariz y boca oscuras según su hondura (cierre morfológico de la profundidad): son agujeros, no sombras, y sin ellos el cráneo no se lee en pequeño.
+  - Simétrico: la mitad derecha del modelo en espejo; el mentón, de la izquierda.
+  - Dos retoques de defectos del modelo: una ranura negra en la sien (pterión) y el escalón entre los parietales y el frontal en el vértice, que dejaba una muesca en el contorno.
+- `index.html` usa los favicons PNG; el manifiesto, fondo negro (`#000000`). Sustituye al icono anterior, «3D» en azul (`favicon.svg`, borrado).
+- **Licencia:** es una imagen del cráneo de Z-Anatomy, así que se comparte con su licencia, CC BY-SA 4.0 (ver Créditos).
 
 ## Idiomas (2026-11-05)
 
@@ -547,7 +565,7 @@ Encargo: «un cuerpo más ancho y musculoso como el de la referencia (hombros, b
 - **Programas de sombreado:** se compilan antes de añadir un sistema a la escena, para que no aparezca un instante blanco.
 - **Página:**
   - título y descripción;
-  - icono (`favicon.svg`, iconos de 180, 192 y 512 px);
+  - icono (`favicon.svg`, iconos de 180, 192 y 512 px; desde el 2026-11-07, el cráneo: ver «Logo e iconos»);
   - manifiesto para instalarla como app en el móvil.
 - **Cabecera:** «Hombre adulto · 12 sistemas» en lugar de «Fase 4 · 12 sistemas».
 - **Errata:** «Cabeza corta músculo del bíceps braquial» → «Cabeza corta del músculo bíceps braquial».
@@ -1047,17 +1065,28 @@ Escribe `build/audit.json`.
 
 ## Problemas conocidos del modelo masculino Fase 2
 
-- Las piezas izquierdas (`_L`), el vómer y el ojo derecho tienen las caras invertidas, porque se
-  crearon en espejo. El visor las corrige al cargarlas: detecta el volumen con signo negativo e
-  invierte esas mallas.
-- Su textura de oclusión ambiental (canal R de la ORM) se horneó con esas caras invertidas y sale
-  oscura, así que el visor la omite en esas piezas. **Arreglo definitivo:** en Blender, invertir las
-  normales de esas mallas (*Recalculate Outside*), re-hornear sus texturas y volver a exportar.
+- **[Corregido el 2026-11-07]** Las piezas izquierdas (`_L`) y el vómer tenían las caras invertidas: cada izquierda
+  es el espejo vértice a vértice de su derecha, con las mismas caras en el mismo orden. Su oclusión ambiental (canal R
+  de la ORM) se horneó así y salía casi negra (0,26 de media frente a 0,67 en las derechas). El visor les daba la
+  vuelta al cargar y omitía su AO.
+  - Ahora `tools/huesos_invertidos.py` (desde `fix_neck.py`, paso 3e) copia a cada izquierda el AO de su pareja
+    derecha, cara por cara (horneado con Cycles «Emit» en sus UV, solo en el canal R y dentro de sus islas). Hornea de
+    nuevo el del vómer (Cycles «AO», distancia de 12 mm calibrada con las piezas del cráneo que estaban bien) y les da
+    la vuelta a las caras de las 111.
+  - Resultado: AO medio de 0,667 en las izquierdas y en las derechas. El arreglo del visor (`fixInvertedWinding`,
+    `noAO`) queda como red de seguridad.
+- El ojo derecho (malla abierta y sin AO) sigue con las caras invertidas; no se nota.
+- **Color de las piezas izquierdas del cráneo (visto el 2026-11-07, al hacer el logo; sin corregir):** sus texturas de
+  color (albedo) son más oscuras que las de sus parejas derechas: cigomático 0,62 frente a 0,71 de media, hueso nasal
+  0,59 frente a 0,70, temporal 0,62 frente a 0,68, dientes superiores un 5–9 % (el parietal, al revés: 0,68 frente a
+  0,66). El AO ya es igual en las dos. De frente, la mitad izquierda de la cara se ve más gris. Arreglo posible: copiar
+  el color de la pareja derecha como se copió el AO (`huesos_invertidos.py`).
 
 ## Créditos y licencias
 
 - Proyecto: **NeuroFuture** · Conciencia Cerebral Mexicali (Mexicali, B.C.). Su logo aparece en la pantalla de inicio.
 - Nombres en otros idiomas: inglés y francés de la traducción de Z-Anatomy; francés e italiano también de la lista TA2 con traducciones descargada con Z-Anatomy; en alemán, el latín.
+- Logo de Anato3D (`docs/marca/anato3d-craneo*.png` y los iconos de la web): imagen del cráneo de Z-Anatomy, con la misma licencia CC BY-SA 4.0 y su atribución.
 - Huesos y cartílagos: [Z-Anatomy](https://github.com/Z-Anatomy/Models-of-human-anatomy)
   (CC BY-SA 4.0), derivado de [BodyParts3D](https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html)
   © DBCLS. Los modelos derivados deben mantener la licencia CC BY-SA y la atribución.

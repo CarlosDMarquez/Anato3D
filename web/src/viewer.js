@@ -185,8 +185,9 @@ const MODEST_HIDE = new Set(['Skin_Genitals', 'Corpus_cavernosum_of_penis', 'Cor
   'Duct_of_greater_vestibular_gland_R']);
 const MODEST_SYSTEMS = new Set(['urogenital', 'arterial', 'venous', 'nervous', 'lymphatic']);
 
-// Las piezas izquierdas de la Fase 2 se generaron en espejo y quedaron con las caras hacia dentro.
-// Un volumen con signo negativo delata una malla cerrada invertida: se invierten triángulos y normales.
+// Las piezas izquierdas de la Fase 2 se generaron en espejo y quedaron con las caras hacia dentro. Desde el 2026-11-07 se
+// ponen del derecho en origen, con su AO bien horneado (tools/huesos_invertidos.py, desde fix_neck.py); esto queda como red
+// de seguridad. Un volumen con signo negativo delata una malla cerrada invertida: se invierten triángulos y normales.
 function fixInvertedWinding(geometry) {
   if (geometry.userData.windingChecked) return;
   geometry.userData.windingChecked = true;
@@ -667,7 +668,7 @@ export class Viewer extends EventTarget {
           if (real.fiberMode === 'own') addFiberAttribute(m.geometry, frame());
           base = real.mat;
         }
-        // Su AO horneado salió oscuro por las caras invertidas; hasta re-hornearlo, se omite.
+        // Una pieza que llegue invertida trae el AO horneado con las normales hacia dentro (casi negro): se omite.
         if (m.geometry.userData.windingFixed) base = this.#variant(base, 'noAO', (mat) => (mat.aoMap = null));
         // Aponeurosis de los músculos anchos del abdomen: blanca; su opacidad viene por vértice (alfa del color): velo
         // delante del recto (vaina anterior), que deja verlo, y blanca a sus lados.
