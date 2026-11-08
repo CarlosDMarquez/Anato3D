@@ -1070,4 +1070,10 @@ $('#btn-inicio').addEventListener('click', volverAlInicio);
 $('#btn-brand').addEventListener('click', volverAlInicio);
 if (portada.abierta) viewer.setShowcase(true);
 loadModel('male');
-if (import.meta.env.DEV) window.anato3d = { viewer, state };
+// Solo en desarrollo: para la consola y para web/scripts/recorrido.js (recorre modelos, sistemas y capas).
+if (import.meta.env.DEV) {
+  window.anato3d = {
+    viewer, state, sessions, SYSTEMS, setStage, ensureSystem, loadModel,
+    get available() { return available; },
+  };
+}
