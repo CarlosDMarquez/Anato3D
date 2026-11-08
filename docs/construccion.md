@@ -7,7 +7,7 @@ Cómo regenerar los modelos de la web desde una copia recién clonada del reposi
 | Herramienta | Versión usada | Para qué |
 |---|---|---|
 | macOS | Darwin 25.5, Apple Silicon | Es la única plataforma probada. `build_all.sh` usa zsh y `cp -c` (clonación de APFS, con alternativa a `cp`). |
-| Blender | **5.4.0 Alpha, build hash `c31386f6fc84`** (2026-10-12) | Todos los scripts de `tools/` salvo los de Python puro. Es una versión alfa: con otra, el resultado puede cambiar. La copia de seguridad guarda el instalador (`~/Copias de seguridad/Anato3D/blender/`). Otra ruta: `A3D_BLENDER=/ruta/al/Blender`. |
+| Blender | **5.4.0 Alpha, build hash `c31386f6fc84`** (2026-10-12) | Todos los scripts de `tools/` salvo los de Python puro. Es una versión alfa: con otra, el resultado puede cambiar. La copia de seguridad guarda el instalador (`~/Copias de seguridad/Anato3D/blender/`). Otra ruta: `A3D_BLENDER=/ruta/al/Blender`. Desde el 2026-11-08, `build_all.sh` y `check_all.sh` se niegan a usar otra compilación que la de `tools/blender_esperado.txt` (`A3D_BLENDER_DISTINTO=1` para probar otra a propósito). |
 | Python 3 | 3.14.2 (del sistema; sin paquetes extra) | `search_index.py`, `validate_models.py`, `manifest.py`. |
 | Node.js | 26.12.1 | `check-cards`, pruebas de la web, Vite. |
 | npm | — | `npm --prefix web install` (three 0.186.1, Vite 8.3.5). |
@@ -45,7 +45,9 @@ tar -xf <copia>/sources.tar                          # sources/ (comprobar las s
 npm --prefix web install
 zsh tools/build_all.sh                               # modelo masculino: los 11 sistemas y la piel genital
 A3D_MODEL=female zsh tools/build_all.sh              # modelo femenino
+zsh tools/check_all.sh male && zsh tools/check_all.sh female  # nada empeora respecto a la referencia guardada
 zsh tools/tests/test_build.sh                        # pruebas de fallos de la construcción (no toca web/public/models)
+python3 tools/tests/test_comparar.py                 # pruebas de la comparación con la referencia
 npm --prefix web test && npm --prefix web run check  # pruebas de la carga y revisión de las fichas
 npm --prefix web run build                           # web de producción en web/dist
 ```
@@ -72,6 +74,10 @@ npm --prefix web run build                           # web de producción en web
    - Se escribe el manifiesto.
 3. **Publica solo lo que cambia.** Primero copia todo a temporales en la misma carpeta y después los renombra. Lo que había queda en `build/staging/…/previous`.
 4. **Deja constancia.** El registro completo de cada paso queda en `build/logs/<modelo>_<paso>.log` y el resumen filtrado, en `build/build_<paso>.log`.
+
+5. **Comprueba la versión de Blender** (desde el 2026-11-08): con otra compilación que la de `tools/blender_esperado.txt`, no construye.
+
+Después de construir, `zsh tools/check_all.sh <modelo>` dice si algo empeoró respecto a la referencia guardada (auditoría, simetría, picos y fichas; ver el README, «Comprobación de los modelos»).
 
 **Volver atrás:** `cp -p build/staging/<carpeta>/previous/* web/public/models/`, o `git checkout -- web/public/models`.
 

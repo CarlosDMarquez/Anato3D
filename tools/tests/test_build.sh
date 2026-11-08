@@ -55,8 +55,13 @@ print '{"groups":' > $V/male-endocrine.json; check male-endocrine.json; expect_f
 print '{}' > $V/male-endocrine.json; check male-endocrine.json; expect_fail $? 'rechaza metadatos sin «groups»'
 
 print '3. build_all.sh con un Blender falso, publicando en una copia'
+# El Blender falso no es la compilación esperada (tools/blender_esperado.txt): build_all se niega salvo que se pida.
+A3D_BLENDER=$PWD/tools/tests/fake_blender.zsh FAKE_BLENDER_MODE=copy A3D_PUBLISHED=$PUB zsh tools/build_all.sh vascular > $T/build_version.log 2>&1
+expect_fail $? 'con otro Blender, build_all se niega a construir'
+grep -q 'Blender distinto del esperado' $T/build_version.log && [[ $(sums $PUB) == $PUB_BEFORE ]] \
+  && ok 'dice qué Blender esperaba y no publica nada' || ko 'falta el aviso de versión o cambió la carpeta publicada'
 run_build() {
-  A3D_BLENDER=$PWD/tools/tests/fake_blender.zsh FAKE_BLENDER_MODE=$1 A3D_PUBLISHED=$PUB zsh tools/build_all.sh vascular > $T/build_$1.log 2>&1
+  A3D_BLENDER=$PWD/tools/tests/fake_blender.zsh A3D_BLENDER_DISTINTO=1 FAKE_BLENDER_MODE=$1 A3D_PUBLISHED=$PUB zsh tools/build_all.sh vascular > $T/build_$1.log 2>&1
 }
 for mode desc in crash 'Blender falla (excepción)' silent 'Blender «termina bien» sin escribir nada' corrupt 'la exportación deja un GLB roto'; do
   run_build $mode; code=$?

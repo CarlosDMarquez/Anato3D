@@ -8,6 +8,25 @@ blender_version() {
   "$BLENDER" --version 2>/dev/null | awk 'NR == 1 { v = $0 } /build hash/ { h = $3 } END { print v (h ? " (" h ")" : "") }'
 }
 
+# check_blender: el Blender instalado tiene que ser la compilación con la que se calibraron los modelos
+# (tools/blender_esperado.txt; su instalador se guarda con tools/backup.sh). Otra versión puede cambiar en silencio las
+# mallas (reducción de caras, exportador) o romper la API. A3D_BLENDER_DISTINTO=1 deja seguir a propósito (para probar
+# una versión nueva en una copia); el manifiesto anota siempre la versión usada.
+check_blender() {
+  local want have
+  want=$(<tools/blender_esperado.txt)
+  have=$(blender_version)
+  [[ $have == "$want" ]] && return 0
+  if [[ ${A3D_BLENDER_DISTINTO:-} == 1 ]]; then
+    print -u2 "Aviso: Blender distinto del esperado (A3D_BLENDER_DISTINTO=1): «$have» en lugar de «$want»"
+    return 0
+  fi
+  print -u2 "✗ Blender distinto del esperado: «$have» en lugar de «$want» (tools/blender_esperado.txt)."
+  print -u2 "  Los modelos se calibraron con esa compilación; su instalador está en ~/Copias de seguridad/Anato3D/blender/."
+  print -u2 "  Para probar otra a propósito: A3D_BLENDER_DISTINTO=1 (y comparar con zsh tools/check_all.sh)."
+  return 1
+}
+
 # run_blender <paso> <argumentos de Blender…>: registro completo en build/logs/<modelo>_<paso>.log; devuelve el código de
 # salida de Blender. Con --python-exit-code 1, una excepción en el script da 1: sin él, Blender terminaba con 0 y el
 # fallo solo quedaba en el registro (y `grep … | …` sin pipefail lo daba por bueno).

@@ -9,6 +9,8 @@
 #   ligera: los modelos base ligeros de las pantallas táctiles (male.ligero.glb y female.ligero.glb, tools/base_ligera.py),
 #   de los publicados. Con «base» se hacen también, de los nuevos.
 # Modelo femenino: A3D_MODEL=female zsh tools/build_all.sh. Otro Blender: A3D_BLENDER=/ruta/al/Blender.
+# Solo construye con la compilación de Blender de tools/blender_esperado.txt (A3D_BLENDER_DISTINTO=1 para probar otra).
+# Después de construir: zsh tools/check_all.sh <modelo> (auditoría, simetría, picos y fichas frente a la referencia).
 #
 # Garantías (2026-11-02; antes, un error de Blender podía pasar por éxito: `set -e` sin pipefail, salida filtrada con
 # grep y Blender terminando con 0 aunque el script fallara):
@@ -30,6 +32,7 @@ source tools/build_lib.sh
 
 for s in ${=ALL}; do [[ $KNOWN == *" $s "* ]] || { print -u2 "✗ sistema desconocido: $s (válidos:$KNOWN)"; exit 2; }; done
 [[ -x $BLENDER ]] || { print -u2 "✗ no se encuentra Blender en $BLENDER (A3D_BLENDER=/ruta/al/Blender)"; exit 2; }
+check_blender || exit 2
 Z=sources/z-anatomy/extracted/Z-Anatomy/Startup.blend
 [[ -f $Z ]] || { print -u2 "✗ falta $Z: ver docs/construccion.md"; exit 2; }
 F2=Anato3D_Male_30_Fase2.blend

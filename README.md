@@ -14,14 +14,14 @@ Abre http://localhost:5173 (o el puerto que indique Vite). Para producción: `np
 
 Pruebas: `npm --prefix web test` (lógica de carga, sin navegador) y `npm --prefix web run check` (fichas de todas las piezas).
 
-Modelos: `zsh tools/build_all.sh` (masculino) y `A3D_MODEL=female zsh tools/build_all.sh`. Solo publica en `web/public/models` lo que pasa las comprobaciones. Herramientas, fuentes que no están en git y sus sumas, y pasos desde una copia nueva: `docs/construccion.md`. Pruebas de fallos: `zsh tools/tests/test_build.sh`. Los comandos de Blender sueltos de las secciones de cada fase son históricos: escriben directamente en `web/public/models` si no se define `A3D_WEB_MODELS`.
+Modelos: `zsh tools/build_all.sh` (masculino) y `A3D_MODEL=female zsh tools/build_all.sh`. Solo publica en `web/public/models` lo que pasa las comprobaciones. Herramientas, fuentes que no están en git y sus sumas, y pasos desde una copia nueva: `docs/construccion.md`. Pruebas de fallos: `zsh tools/tests/test_build.sh`. **Después de cada reconstrucción:** `zsh tools/check_all.sh male` y `zsh tools/check_all.sh female` (dicen si algo empeoró respecto a la referencia guardada; ver «Comprobación de los modelos»). Los comandos de Blender sueltos de las secciones de cada fase son históricos: escriben directamente en `web/public/models` si no se define `A3D_WEB_MODELS`.
 
 ## Estructura
 
 | Ruta | Qué es |
 |---|---|
 | `*.blend`, `*.glb` (raíz) | Modelos fuente. Fase 1 = piel + ojos; Fase 2 = piel + esqueleto completo (`Anato3D_Male_30_Fase2`, `Anato3D_Female_30_Fase2`). |
-| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app), `audit_models.py` (busca errores medibles en los modelos), `vessel_regions.py` (región del cuerpo de cada vaso), `skin_regions.py` (divide la piel en zonas al exportar), `backup.sh` (copia de seguridad en este Mac), `build_lib.sh` (funciones de `build_all.sh`: Blender con código de salida, preparación, validación y publicación), `validate_models.py` (valida los archivos nuevos antes de publicarlos), `manifest.py` (manifiesto de versiones y sumas), `logo_neurofuture.py` (logo de NeuroFuture para fondo negro), `logo_anato3d.py` (logo e iconos de Anato3D: el cráneo del modelo), `huesos_invertidos.py` (piezas del esqueleto del revés: AO de la pareja derecha), `nombres_idiomas.py` (nombres de las estructuras en francés e italiano) y `tests/` (pruebas de fallos de la construcción, con un Blender falso). |
+| `tools/` | Scripts de Blender: `fix_neck.py`, `anato3d_fit.py` (ajuste compartido), `proportions.py` (extremidades y hombros), `musculature.py` (complexión musculosa), `build_muscular.py`, `build_connective.py`, `build_vascular.py`, `build_nervous.py`, `build_visceral.py`, `build_genital_skin.py`, `female.py` (esqueleto femenino), `female_pelvis.py` (forma de la pelvis femenina), `female_perineum.py` (referencias del periné, genitales externos profundos y músculos del periné femenino), `male_perineum.py` (músculos del periné masculino), `female_organs.py` (órganos femeninos), `build_female_skin.py` (vulva), `export_glb.py`, `build_all.sh` (regenera todos los sistemas), `search_index.py` (índice de búsqueda de la app), `audit_models.py` (busca errores medibles en los modelos), `vessel_regions.py` (región del cuerpo de cada vaso), `skin_regions.py` (divide la piel en zonas al exportar), `backup.sh` (copia de seguridad en este Mac), `build_lib.sh` (funciones de `build_all.sh`: Blender con código de salida y versión esperada, preparación, validación y publicación), `blender_esperado.txt` (la compilación de Blender con la que se calibraron los modelos), `check_all.sh` y `checks/` (comprobación de un modelo entero frente a una referencia guardada: auditoría, simetría, picos y fichas; diagnóstico de cada problema), `validate_models.py` (valida los archivos nuevos antes de publicarlos), `manifest.py` (manifiesto de versiones y sumas), `logo_neurofuture.py` (logo de NeuroFuture para fondo negro), `logo_anato3d.py` (logo e iconos de Anato3D: el cráneo del modelo), `huesos_invertidos.py` (piezas del esqueleto del revés: AO de la pareja derecha), `nombres_idiomas.py` (nombres de las estructuras en francés e italiano) y `tests/` (pruebas de fallos de la construcción, con un Blender falso). |
 | `Anato3D_Male_30_Fase2_musculature.npz` | Campo de desplazamiento de la complexión musculosa (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas). |
 | `Anato3D_Female_30_Fase2_pelvis.npz` | Campo de desplazamiento de la pelvis femenina y los huesos de la pelvis antes de deformarla (lo escribe `fix_neck.py` y lo aplica `anato3d_fit.py` a todos los sistemas femeninos). |
 | `sources/originals/` | Copia de los modelos tal como estaban antes de corregir el cuello. |
@@ -149,6 +149,36 @@ Detalle en `docs/hitos/01b-construccion-fiable.md`.
 - **Errata:** «Nervio músculocutáneo», «Arteria músculofrénica» y «Venas músculofrénicas», en los dos modelos. Las escribía la regla `\b([Mm])usculo` de `ES_FIXES` (sin final de palabra).
 - **Arreglo:** regla corregida; `check-cards` la detecta (`errata`) y revisa solo el modelo construido.
 - **Publicación:** `build_all.sh vascular nervous` en los dos modelos, unos 3 min cada uno. Solo cambiaron esos nombres, salvo 2–3 vértices de la cámara anterior del ojo en el nervioso masculino (ver `docs/construccion.md`).
+
+## Comprobación de los modelos (2026-11-08)
+
+Una orden por modelo, **después de cada reconstrucción**, que dice si algo empeoró:
+
+```bash
+zsh tools/check_all.sh male      # unos 2 minutos; female para el modelo femenino
+```
+
+- **Qué mide** (lo último construido en `build/`, junto a la Fase 2):
+  - la auditoría (`tools/audit_models.py`): piezas fuera de la piel o dentro del hueso, choques entre órganos, mallas y nombres;
+  - la simetría izquierda/derecha y los picos (`tools/checks/simetria_picos.py`): cada pieza izquierda frente a su pareja derecha reflejada, y las aristas disparadas;
+  - las fichas de todas las piezas publicadas (`check-cards`).
+- **Qué compara** (`tools/checks/comparar.py`): un resumen pequeño de lo anterior frente a la referencia guardada en `tools/checks/referencia/<modelo>.json`. Termina con error si algo empeora:
+  - una pieza sale más de la piel (0,5 mm) o pasa a verse desde fuera;
+  - entra más en el hueso (2 % de sus vértices, o 1 mm más hondo);
+  - caras de área nula, mallas invertidas o vacías, o piezas sin nombre en español nuevas;
+  - un choque de 1 mm o más que no estaba, o uno más hondo;
+  - una pareja menos simétrica (+2 mm y +25 % en la distancia máxima, o una nueva de 8 mm o más);
+  - picos nuevos o más largos (5 mm);
+  - menos piezas en un sistema.
+  - Los roces nuevos (menos de 1 mm), las mejoras, los niveles vertebrales que cambian y las piezas nuevas solo se informan. Informe completo en `build/checks/<modelo>_informe.md`.
+- **Referencia:** tras un cambio intencionado y revisado a mano, `zsh tools/check_all.sh <modelo> --referencia` guarda el estado nuevo; hay que hacer commit de ella. La primera se guardó el 2026-11-08 (commit `730fbae`, con los sistemas publicados entonces).
+  - Hombre: 2870 piezas; 0 choques, 20 roces; 1202 parejas; 17 con una distancia máxima de 10 mm o más (casi todas, asimetrías reales: nervio vago, riñones y suprarrenales con sus vasos, uréteres, vasos lumbares e intercostales posteriores, ilíacos comunes).
+  - Mujer: 2897 piezas; 0 choques, 24 roces; 1218 parejas, 17 de 10 mm o más (además, el surco subparietal y la arteria ovárica).
+  - Las «aristas sospechosas» (189 y 180 mallas) son casi todas triángulos alargados de mallas largas (fémur, tibia, vasto intermedio, duramadre espinal): no son picos, pero quedan en la referencia para que se note uno nuevo.
+- **Diagnóstico** de lo que señale (`tools/checks/diagnostico.py`, con Blender): en qué hueso entra una pieza y cuánto (`hueso`), por qué una pareja no es simétrica (`asimetria`), dónde están las aristas más largas de una malla (`picos`) y qué discos intervertebrales invaden una vértebra (`discos`). Uso en la cabecera del archivo.
+- **Blender:** `build_all.sh` y `check_all.sh` solo funcionan con la compilación de `tools/blender_esperado.txt` (5.4.0 Alpha, `c31386f6fc84`); con otra se niegan y dicen cuál esperaban. `A3D_BLENDER_DISTINTO=1` deja probar otra a propósito.
+- **Origen:** son las herramientas de la revisión de errores del 2026-11-01 (comparación de auditorías, simetría, picos, dónde entra una pieza en el hueso, asimetrías y discos), que solo estaban en una carpeta temporal y se perdieron al vaciarse. Se recuperaron el 2026-11-08 del historial de aquella sesión, adaptadas al formato actual de la auditoría.
+- **Pruebas:** `python3 tools/tests/test_comparar.py` (qué cuenta como «empeora»: 8 pruebas) y `zsh tools/tests/test_build.sh` (incluye que `build_all` se niega con otro Blender: 23 pruebas).
 
 ## Revisión por un especialista (2026-11-05)
 

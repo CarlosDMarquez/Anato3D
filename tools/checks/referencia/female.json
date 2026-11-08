@@ -1,0 +1,4066 @@
+{
+ "modelo": "female",
+ "fecha": "2026-11-08T13:13:27",
+ "commit": "730fbae",
+ "objetos": 2897,
+ "por_sistema": {
+  "arterial": 440,
+  "nervous": 580,
+  "muscular": 486,
+  "venous": 232,
+  "digestive": 47,
+  "connective": 614,
+  "endocrine": 10,
+  "lymphatic": 144,
+  "respiratory": 48,
+  "urogenital": 38,
+  "skeletal": 258
+ },
+ "piezas": {
+  "Abducens_nerve_VI_L": {
+   "hueso": 0.074,
+   "hueso_mm": 1.9,
+   "sistema": "nervous"
+  },
+  "Abducens_nerve_VI_R": {
+   "hueso": 0.041,
+   "hueso_mm": 2.5,
+   "sistema": "nervous"
+  },
+  "Angular_vein_L": {
+   "hueso": 0.016,
+   "hueso_mm": 1.1,
+   "sistema": "venous"
+  },
+  "Angular_vein_R": {
+   "hueso": 0.016,
+   "hueso_mm": 1.0,
+   "sistema": "venous"
+  },
+  "Anterior_chamber_of_eyeball_L": {
+   "piel_mm": 11.8,
+   "visible": 99,
+   "sistema": "nervous"
+  },
+  "Anterior_chamber_of_eyeball_R": {
+   "piel_mm": 12.3,
+   "visible": 90,
+   "sistema": "nervous"
+  },
+  "Anterior_division_of_mandibular_nerve_L": {
+   "piel_mm": 0.6,
+   "sistema": "nervous"
+  },
+  "Anterior_division_of_mandibular_nerve_R": {
+   "piel_mm": 0.7,
+   "sistema": "nervous"
+  },
+  "Anterior_division_of_retromandibular_vein_L": {
+   "hueso": 0.019,
+   "hueso_mm": 1.2,
+   "sistema": "venous"
+  },
+  "Anterior_ethmoidal_artery_L": {
+   "hueso": 0.006,
+   "hueso_mm": 1.0,
+   "sistema": "arterial"
+  },
+  "Anterior_ethmoidal_artery_R": {
+   "hueso": 0.006,
+   "hueso_mm": 1.0,
+   "sistema": "arterial"
+  },
+  "Anterior_inferior_cerebellar_artery_L": {
+   "hueso": 0.054,
+   "hueso_mm": 1.7,
+   "sistema": "arterial"
+  },
+  "Anterior_inferior_cerebellar_artery_R": {
+   "hueso": 0.038,
+   "hueso_mm": 1.6,
+   "sistema": "arterial"
+  },
+  "Anterior_longitudinal_ligament": {
+   "piel_mm": 2.1,
+   "sistema": "connective"
+  },
+  "Anterior_segment_of_eyeball_L": {
+   "piel_mm": 12.7,
+   "visible": 62,
+   "sistema": "nervous"
+  },
+  "Anterior_segment_of_eyeball_R": {
+   "piel_mm": 12.8,
+   "visible": 58,
+   "sistema": "nervous"
+  },
+  "Anterior_septal_branches_of_anterior_ethmoidal_artery_L": {
+   "hueso": 0.041,
+   "hueso_mm": 1.7,
+   "sistema": "arterial"
+  },
+  "Anterior_septal_branches_of_anterior_ethmoidal_artery_R": {
+   "hueso": 0.033,
+   "hueso_mm": 1.7,
+   "sistema": "arterial"
+  },
+  "Anterior_temporal_branch_L": {
+   "hueso": 0.157,
+   "hueso_mm": 1.4,
+   "sistema": "arterial"
+  },
+  "Anterior_temporal_branch_R": {
+   "hueso": 0.181,
+   "hueso_mm": 1.8,
+   "sistema": "arterial"
+  },
+  "Artery_of_central_sulcus_R": {
+   "hueso": 0.023,
+   "hueso_mm": 1.1,
+   "sistema": "arterial"
+  },
+  "Artery_of_precentral_sulcus_L": {
+   "hueso": 0.017,
+   "hueso_mm": 1.1,
+   "sistema": "arterial"
+  },
+  "Artery_of_precentral_sulcus_R": {
+   "hueso": 0.017,
+   "hueso_mm": 1.3,
+   "sistema": "arterial"
+  },
+  "Artery_of_pterygoid_canal_L": {
+   "piel_mm": 4.1,
+   "sistema": "arterial"
+  },
+  "Artery_of_pterygoid_canal_R": {
+   "piel_mm": 4.1,
+   "sistema": "arterial"
+  },
+  "Articular_capsule_of_temporomandibular_joint_L": {
+   "hueso": 0.008,
+   "hueso_mm": 1.0,
+   "sistema": "connective"
+  },
+  "Articular_capsules_of_metatarsophalangeal_joints_L": {
+   "piel_mm": 1.3,
+   "sistema": "connective"
+  },
+  "Articular_capsules_of_metatarsophalangeal_joints_R": {
+   "piel_mm": 1.3,
+   "sistema": "connective"
+  },
+  "Articular_capsules_of_proximal_interphalangeal_joints_of_foot_L": {
+   "piel_mm": 1.3,
+   "sistema": "connective"
+  },
+  "Articular_capsules_of_proximal_interphalangeal_joints_of_foot_R": {
+   "piel_mm": 1.4,
+   "sistema": "connective"
+  },
+  "Articular_disc_of_temporomandibular_joint_L": {
+   "hueso": 0.007,
+   "hueso_mm": 1.0,
+   "sistema": "connective"
+  },
+  "Articular_disc_of_temporomandibular_joint_R": {
+   "hueso": 0.007,
+   "hueso_mm": 1.1,
+   "sistema": "connective"
+  },
+  "Ascending_pharyngeal_artery_L": {
+   "piel_mm": 14.6,
+   "sistema": "arterial"
+  },
+  "Ascending_pharyngeal_artery_R": {
+   "piel_mm": 14.6,
+   "sistema": "arterial"
+  },
+  "Auditory_tube_L": {
+   "hueso": 0.273,
+   "hueso_mm": 2.4,
+   "sistema": "nervous"
+  },
+  "Auditory_tube_R": {
+   "hueso": 0.258,
+   "hueso_mm": 2.4,
+   "sistema": "nervous"
+  },
+  "Basilar_artery": {
+   "hueso": 0.077,
+   "hueso_mm": 1.3,
+   "sistema": "arterial"
+  },
+  "Basilic_vein_L": {
+   "hueso": 0.008,
+   "hueso_mm": 1.7,
+   "sistema": "venous"
+  },
+  "Basilic_vein_R": {
+   "hueso": 0.008,
+   "hueso_mm": 1.7,
+   "sistema": "venous"
+  },
+  "Branch_to_angular_gyrus_L": {
+   "hueso": 0.705,
+   "hueso_mm": 1.7,
+   "sistema": "arterial"
+  },
+  "Branch_to_angular_gyrus_R": {
+   "hueso": 0.718,
+   "hueso_mm": 1.8,
+   "sistema": "arterial"
+  },
+  "Buccal_artery_L": {
+   "piel_mm": 2.5,
+   "sistema": "arterial"
+  },
+  "Buccal_artery_R": {
+   "piel_mm": 2.5,
+   "sistema": "arterial"
+  },
+  "Buccal_nerve_L": {
+   "piel_mm": 2.2,
+   "sistema": "nervous"
+  },
+  "Buccal_nerve_R": {
+   "piel_mm": 2.2,
+   "sistema": "nervous"
+  },
+  "Callosomarginal_artery_L": {
+   "hueso": 0.023,
+   "hueso_mm": 2.0,
+   "sistema": "arterial"
+  },
+  "Callosomarginal_artery_R": {
+   "hueso": 0.023,
+   "hueso_mm": 2.0,
+   "sistema": "arterial"
+  },
+  "Cavernous_sinus_L": {
+   "hueso": 0.012,
+   "hueso_mm": 2.4,
+   "sistema": "venous"
+  },
+  "Cavernous_sinus_R": {
+   "hueso": 0.006,
+   "hueso_mm": 2.5,
+   "sistema": "venous"
+  },
+  "Central_retinal_artery_L": {
+   "piel_mm": 6.1,
+   "visible": 13,
+   "sistema": "arterial"
+  },
+  "Central_retinal_artery_R": {
+   "piel_mm": 6.1,
+   "visible": 13,
+   "sistema": "arterial"
+  },
+  "Chorda_tympani_L": {
+   "piel_mm": 2.9,
+   "sistema": "nervous"
+  },
+  "Chorda_tympani_R": {
+   "piel_mm": 3.0,
+   "sistema": "nervous"
+  },
+  "Cochlea_L": {
+   "hueso": 0.287,
+   "hueso_mm": 2.6,
+   "sistema": "nervous"
+  },
+  "Cochlea_R": {
+   "hueso": 0.279,
+   "hueso_mm": 2.6,
+   "sistema": "nervous"
+  },
+  "Cochlear_nerve": {
+   "hueso": 0.411,
+   "hueso_mm": 3.5,
+   "sistema": "nervous"
+  },
+  "Cochlear_nerve_L": {
+   "hueso": 0.178,
+   "hueso_mm": 2.6,
+   "sistema": "nervous"
+  },
+  "Collateral_interphalangeal_ligaments_of_foot_L": {
+   "piel_mm": 1.3,
+   "area_nula": 1,
+   "sistema": "connective"
+  },
+  "Collateral_interphalangeal_ligaments_of_foot_R": {
+   "piel_mm": 0.9,
+   "sistema": "connective"
+  },
+  "Collateral_metatarsophalangeal_ligaments_L": {
+   "piel_mm": 1.3,
+   "sistema": "connective"
+  },
+  "Collateral_metatarsophalangeal_ligaments_R": {
+   "piel_mm": 1.3,
+   "sistema": "connective"
+  },
+  "Cornea_L": {
+   "piel_mm": 12.0,
+   "visible": 104,
+   "sistema": "nervous"
+  },
+  "Cornea_R": {
+   "piel_mm": 12.3,
+   "visible": 98,
+   "sistema": "nervous"
+  },
+  "Crus_of_clitoris_L": {
+   "hueso": 0.01,
+   "hueso_mm": 4.0,
+   "sistema": "urogenital"
+  },
+  "Descending_palatine_artery_L": {
+   "piel_mm": 15.4,
+   "sistema": "arterial"
+  },
+  "Descending_palatine_artery_R": {
+   "piel_mm": 15.4,
+   "sistema": "arterial"
+  },
+  "Distal_Phalanx_Foot_1_L": {
+   "piel_mm": 0.6,
+   "visible": 6,
+   "sistema": "skeletal"
+  },
+  "Distal_Phalanx_Foot_1_R": {
+   "piel_mm": 0.6,
+   "visible": 6,
+   "sistema": "skeletal"
+  },
+  "Dorsal_digital_arteries_of_foot_R": {
+   "piel_mm": 1.8,
+   "sistema": "arterial"
+  },
+  "Dorsal_digital_branches_of_superficial_fibular_nerve_L": {
+   "piel_mm": 1.7,
+   "sistema": "nervous"
+  },
+  "Dorsal_digital_branches_of_superficial_fibular_nerve_R": {
+   "piel_mm": 1.8,
+   "sistema": "nervous"
+  },
+  "Dorsal_digital_veins_of_foot_L": {
+   "piel_mm": 1.6,
+   "area_nula": 1,
+   "sistema": "venous"
+  },
+  "Dorsal_interossei_muscles_of_foot_L": {
+   "piel_mm": 0.7,
+   "sistema": "muscular"
+  },
+  "Dorsal_interossei_muscles_of_foot_R": {
+   "piel_mm": 1.0,
+   "sistema": "muscular"
+  },
+  "Epiglottis": {
+   "piel_mm": 5.7,
+   "sistema": "respiratory"
+  },
+  "Ethmoid_Bone": {
+   "piel_mm": 2.3,
+   "sistema": "skeletal"
+  },
+  "Extensor_retinaculum_of_wrist_L": {
+   "hueso": 0.022,
+   "hueso_mm": 1.5,
+   "sistema": "connective"
+  },
+  "Extensor_retinaculum_of_wrist_R": {
+   "hueso": 0.016,
+   "hueso_mm": 1.4,
+   "sistema": "connective"
+  },
+  "Facial_nerve_VII_L": {
+   "hueso": 0.065,
+   "hueso_mm": 3.6,
+   "sistema": "nervous"
+  },
+  "Facial_nerve_VII_R": {
+   "hueso": 0.065,
+   "hueso_mm": 3.6,
+   "sistema": "nervous"
+  },
+  "Facial_vein_L": {
+   "hueso": 0.014,
+   "hueso_mm": 1.2,
+   "sistema": "venous"
+  },
+  "Facial_vein_R": {
+   "hueso": 0.014,
+   "hueso_mm": 1.2,
+   "sistema": "venous"
+  },
+  "Flexor_digitorum_brevis_L": {
+   "piel_mm": 1.3,
+   "sistema": "muscular"
+  },
+  "Flexor_digitorum_longus_L": {
+   "piel_mm": 1.3,
+   "sistema": "muscular"
+  },
+  "Flexor_digitorum_longus_R": {
+   "piel_mm": 1.3,
+   "sistema": "muscular"
+  },
+  "Genioglossus_muscle_L": {
+   "piel_mm": 12.0,
+   "sistema": "muscular"
+  },
+  "Genioglossus_muscle_R": {
+   "piel_mm": 11.9,
+   "sistema": "muscular"
+  },
+  "Geniohyoid_muscle_L": {
+   "piel_mm": 1.5,
+   "sistema": "muscular"
+  },
+  "Geniohyoid_muscle_R": {
+   "piel_mm": 1.5,
+   "sistema": "muscular"
+  },
+  "Gingiva": {
+   "piel_mm": 21.4,
+   "hueso": 0.144,
+   "hueso_mm": 3.2,
+   "sistema": "digestive"
+  },
+  "Greater_palatine_artery_L": {
+   "piel_mm": 18.2,
+   "hueso": 0.046,
+   "hueso_mm": 1.7,
+   "sistema": "arterial"
+  },
+  "Greater_palatine_artery_R": {
+   "piel_mm": 18.2,
+   "hueso": 0.034,
+   "hueso_mm": 1.6,
+   "sistema": "arterial"
+  },
+  "Hyoglossus_muscle_L": {
+   "piel_mm": 2.1,
+   "sistema": "muscular"
+  },
+  "Hyoglossus_muscle_R": {
+   "piel_mm": 2.1,
+   "sistema": "muscular"
+  },
+  "Hypoglossal_nerve_XII_L": {
+   "piel_mm": 4.0,
+   "hueso": 0.024,
+   "hueso_mm": 3.1,
+   "sistema": "nervous"
+  },
+  "Hypoglossal_nerve_XII_R": {
+   "piel_mm": 3.8,
+   "hueso": 0.024,
+   "hueso_mm": 2.9,
+   "sistema": "nervous"
+  },
+  "Inferior_alveolar_artery_L": {
+   "hueso": 0.226,
+   "hueso_mm": 2.7,
+   "sistema": "arterial"
+  },
+  "Inferior_alveolar_artery_R": {
+   "hueso": 0.233,
+   "hueso_mm": 2.7,
+   "sistema": "arterial"
+  },
+  "Inferior_alveolar_nerve_L": {
+   "hueso": 0.258,
+   "hueso_mm": 3.2,
+   "sistema": "nervous"
+  },
+  "Inferior_alveolar_nerve_R": {
+   "hueso": 0.266,
+   "hueso_mm": 3.2,
+   "sistema": "nervous"
+  },
+  "Inferior_head_of_lateral_pterygoid_muscle_L": {
+   "piel_mm": 5.2,
+   "sistema": "muscular"
+  },
+  "Inferior_head_of_lateral_pterygoid_muscle_R": {
+   "piel_mm": 5.3,
+   "sistema": "muscular"
+  },
+  "Inferior_Nasal_Concha_L": {
+   "piel_mm": 19.2,
+   "sistema": "skeletal"
+  },
+  "Inferior_Nasal_Concha_R": {
+   "piel_mm": 19.2,
+   "sistema": "skeletal"
+  },
+  "Inferior_oblique_muscle_L": {
+   "piel_mm": 0.6,
+   "sistema": "muscular"
+  },
+  "Inferior_oblique_muscle_R": {
+   "piel_mm": 0.6,
+   "sistema": "muscular"
+  },
+  "Inferior_petrosal_sinus_L": {
+   "hueso": 0.013,
+   "hueso_mm": 1.4,
+   "sistema": "venous"
+  },
+  "Inferior_petrosal_sinus_R": {
+   "hueso": 0.02,
+   "hueso_mm": 1.1,
+   "sistema": "venous"
+  },
+  "Inferior_pharyngeal_constrictor_L": {
+   "piel_mm": 2.0,
+   "sistema": "muscular"
+  },
+  "Inferior_pharyngeal_constrictor_R": {
+   "piel_mm": 2.0,
+   "sistema": "muscular"
+  },
+  "Inferior_rectus_muscle_L": {
+   "piel_mm": 0.5,
+   "sistema": "muscular"
+  },
+  "Infra_orbital_artery_L": {
+   "piel_mm": 1.7,
+   "hueso": 0.353,
+   "hueso_mm": 2.9,
+   "sistema": "arterial"
+  },
+  "Infra_orbital_artery_R": {
+   "piel_mm": 1.6,
+   "hueso": 0.353,
+   "hueso_mm": 2.9,
+   "sistema": "arterial"
+  },
+  "Internal_abdominal_oblique_muscle_L": {
+   "area_nula": 2,
+   "sistema": "muscular"
+  },
+  "Internal_carotid_artery_L": {
+   "hueso": 0.11,
+   "hueso_mm": 3.7,
+   "sistema": "arterial"
+  },
+  "Internal_carotid_artery_R": {
+   "hueso": 0.104,
+   "hueso_mm": 3.7,
+   "sistema": "arterial"
+  },
+  "Internal_jugular_vein_L": {
+   "hueso": 0.008,
+   "hueso_mm": 1.4,
+   "sistema": "venous"
+  },
+  "Internal_jugular_vein_R": {
+   "hueso": 0.008,
+   "hueso_mm": 1.4,
+   "sistema": "venous"
+  },
+  "Intervertebral_disc_C3_C4": {
+   "hueso": 0.022,
+   "hueso_mm": 1.3,
+   "sistema": "connective"
+  },
+  "Intervertebral_disc_L1_L2": {
+   "hueso": 0.016,
+   "hueso_mm": 1.1,
+   "sistema": "connective"
+  },
+  "Intervertebral_disc_L2_L3": {
+   "hueso": 0.008,
+   "hueso_mm": 1.0,
+   "sistema": "connective"
+  },
+  "Intervertebral_disc_L5_S1": {
+   "hueso": 0.023,
+   "hueso_mm": 2.1,
+   "sistema": "connective"
+  },
+  "Intervertebral_disc_T10_T11": {
+   "hueso": 0.016,
+   "hueso_mm": 1.3,
+   "sistema": "connective"
+  },
+  "Intervertebral_disc_T11_T12": {
+   "hueso": 0.049,
+   "hueso_mm": 1.4,
+   "sistema": "connective"
+  },
+  "Intervertebral_disc_T7_T8": {
+   "hueso": 0.046,
+   "hueso_mm": 1.1,
+   "sistema": "connective"
+  },
+  "Intervertebral_disc_T8_T9": {
+   "hueso": 0.024,
+   "hueso_mm": 1.1,
+   "sistema": "connective"
+  },
+  "Iris_L": {
+   "piel_mm": 13.3,
+   "visible": 117,
+   "sistema": "nervous"
+  },
+  "Iris_R": {
+   "piel_mm": 13.5,
+   "visible": 115,
+   "sistema": "nervous"
+  },
+  "Ischiocavernosus_muscle_L": {
+   "hueso": 0.008,
+   "hueso_mm": 4.2,
+   "sistema": "muscular"
+  },
+  "Lacrimal_artery_L": {
+   "piel_mm": 4.8,
+   "visible": 20,
+   "sistema": "arterial"
+  },
+  "Lacrimal_artery_R": {
+   "piel_mm": 4.8,
+   "visible": 24,
+   "sistema": "arterial"
+  },
+  "Lacrimal_gland_L": {
+   "piel_mm": 4.0,
+   "visible": 4,
+   "hueso": 0.069,
+   "hueso_mm": 2.1,
+   "sistema": "nervous"
+  },
+  "Lacrimal_gland_R": {
+   "piel_mm": 4.3,
+   "visible": 5,
+   "hueso": 0.069,
+   "hueso_mm": 2.1,
+   "sistema": "nervous"
+  },
+  "Lacrimal_sac_L": {
+   "hueso": 0.066,
+   "hueso_mm": 1.4,
+   "sistema": "nervous"
+  },
+  "Lacrimal_sac_R": {
+   "hueso": 0.059,
+   "hueso_mm": 1.4,
+   "sistema": "nervous"
+  },
+  "Laryngopharynx": {
+   "piel_mm": 1.6,
+   "sistema": "digestive"
+  },
+  "Lateral_frontobasal_artery_L": {
+   "hueso": 0.163,
+   "hueso_mm": 1.9,
+   "sistema": "arterial"
+  },
+  "Lateral_frontobasal_artery_R": {
+   "hueso": 0.236,
+   "hueso_mm": 2.0,
+   "sistema": "arterial"
+  },
+  "Lateral_occipital_artery_L": {
+   "hueso": 0.008,
+   "hueso_mm": 1.0,
+   "sistema": "arterial"
+  },
+  "Lateral_process_of_nasal_septal_cartilage_L": {
+   "hueso": 0.023,
+   "hueso_mm": 1.3,
+   "sistema": "respiratory"
+  },
+  "Lateral_process_of_nasal_septal_cartilage_R": {
+   "hueso": 0.023,
+   "hueso_mm": 1.3,
+   "sistema": "respiratory"
+  },
+  "Lateral_rectus_muscle_L": {
+   "piel_mm": 7.9,
+   "visible": 26,
+   "sistema": "muscular"
+  },
+  "Lateral_rectus_muscle_R": {
+   "piel_mm": 8.0,
+   "visible": 25,
+   "sistema": "muscular"
+  },
+  "Lens_L": {
+   "piel_mm": 13.3,
+   "visible": 95,
+   "sistema": "nervous"
+  },
+  "Lens_R": {
+   "piel_mm": 13.3,
+   "visible": 89,
+   "sistema": "nervous"
+  },
+  "Levator_palpebrae_superioris_L": {
+   "piel_mm": 8.7,
+   "visible": 16,
+   "sistema": "muscular"
+  },
+  "Levator_palpebrae_superioris_R": {
+   "piel_mm": 9.0,
+   "visible": 17,
+   "sistema": "muscular"
+  },
+  "Lingual_nerve_L": {
+   "piel_mm": 2.6,
+   "sistema": "nervous"
+  },
+  "Lingual_nerve_R": {
+   "piel_mm": 2.7,
+   "sistema": "nervous"
+  },
+  "Lingual_vein_L": {
+   "piel_mm": 7.6,
+   "sistema": "venous"
+  },
+  "Lingual_vein_R": {
+   "piel_mm": 7.7,
+   "sistema": "venous"
+  },
+  "Liver": {
+   "area_nula": 1,
+   "sistema": "digestive"
+  },
+  "Long_plantar_ligament_L": {
+   "area_nula": 11,
+   "sistema": "connective"
+  },
+  "Long_plantar_ligament_R": {
+   "area_nula": 6,
+   "sistema": "connective"
+  },
+  "Longus_capitis_muscle_L": {
+   "piel_mm": 2.9,
+   "sistema": "muscular"
+  },
+  "Longus_capitis_muscle_R": {
+   "piel_mm": 2.8,
+   "sistema": "muscular"
+  },
+  "Longus_colli_muscle_L": {
+   "piel_mm": 2.2,
+   "sistema": "muscular"
+  },
+  "Longus_colli_muscle_R": {
+   "piel_mm": 2.3,
+   "sistema": "muscular"
+  },
+  "Masseteric_fascia_L": {
+   "hueso": 0.009,
+   "hueso_mm": 1.2,
+   "sistema": "connective"
+  },
+  "Maxilla_L": {
+   "piel_mm": 19.8,
+   "sistema": "skeletal"
+  },
+  "Maxilla_R": {
+   "piel_mm": 19.8,
+   "sistema": "skeletal"
+  },
+  "Maxillary_artery_L": {
+   "piel_mm": 7.0,
+   "hueso": 0.264,
+   "hueso_mm": 3.8,
+   "sistema": "arterial"
+  },
+  "Maxillary_artery_R": {
+   "piel_mm": 7.0,
+   "hueso": 0.289,
+   "hueso_mm": 3.9,
+   "sistema": "arterial"
+  },
+  "Maxillary_nerve_L": {
+   "piel_mm": 4.9,
+   "hueso": 0.049,
+   "hueso_mm": 1.7,
+   "sistema": "nervous"
+  },
+  "Maxillary_nerve_R": {
+   "piel_mm": 4.9,
+   "hueso": 0.057,
+   "hueso_mm": 1.6,
+   "sistema": "nervous"
+  },
+  "Maxillary_veins_L": {
+   "piel_mm": 2.9,
+   "hueso": 0.024,
+   "hueso_mm": 1.4,
+   "sistema": "venous"
+  },
+  "Maxillary_veins_R": {
+   "piel_mm": 2.9,
+   "sistema": "venous"
+  },
+  "Medial_pontine_branches_of_basilar_artery_L": {
+   "hueso": 0.118,
+   "hueso_mm": 1.4,
+   "sistema": "arterial"
+  },
+  "Medial_pontine_branches_of_basilar_artery_R": {
+   "hueso": 0.186,
+   "hueso_mm": 1.8,
+   "sistema": "arterial"
+  },
+  "Medial_pterygoid_muscle_L": {
+   "piel_mm": 13.4,
+   "sistema": "muscular"
+  },
+  "Medial_pterygoid_muscle_R": {
+   "piel_mm": 13.5,
+   "sistema": "muscular"
+  },
+  "Medial_rectus_muscle_L": {
+   "piel_mm": 6.2,
+   "visible": 8,
+   "sistema": "muscular"
+  },
+  "Medial_rectus_muscle_R": {
+   "piel_mm": 5.7,
+   "visible": 6,
+   "sistema": "muscular"
+  },
+  "Middle_meningeal_artery_L": {
+   "hueso": 0.095,
+   "hueso_mm": 2.0,
+   "sistema": "arterial"
+  },
+  "Middle_meningeal_artery_R": {
+   "hueso": 0.095,
+   "hueso_mm": 1.9,
+   "sistema": "arterial"
+  },
+  "Middle_Phalanx_Foot_5_L": {
+   "piel_mm": 3.8,
+   "sistema": "skeletal"
+  },
+  "Middle_Phalanx_Foot_5_R": {
+   "piel_mm": 3.4,
+   "sistema": "skeletal"
+  },
+  "Middle_pharyngeal_constrictor_L": {
+   "piel_mm": 6.0,
+   "sistema": "muscular"
+  },
+  "Middle_pharyngeal_constrictor_R": {
+   "piel_mm": 6.1,
+   "sistema": "muscular"
+  },
+  "Mucosa_of_nasal_cavity": {
+   "piel_mm": 20.0,
+   "hueso": 0.007,
+   "hueso_mm": 1.2,
+   "sistema": "respiratory"
+  },
+  "Nasal_septal_cartilage": {
+   "hueso": 0.027,
+   "hueso_mm": 1.1,
+   "sistema": "respiratory"
+  },
+  "Nasolacrimal_duct_L": {
+   "piel_mm": 15.2,
+   "hueso": 0.026,
+   "hueso_mm": 1.2,
+   "sistema": "nervous"
+  },
+  "Nasolacrimal_duct_R": {
+   "piel_mm": 15.3,
+   "hueso": 0.026,
+   "hueso_mm": 1.3,
+   "sistema": "nervous"
+  },
+  "Nasopharynx": {
+   "piel_mm": 17.0,
+   "hueso": 0.01,
+   "hueso_mm": 1.7,
+   "sistema": "respiratory"
+  },
+  "Nucleus_pulposus_L1_L2": {
+   "hueso": 0.016,
+   "hueso_mm": 1.0,
+   "sistema": "connective"
+  },
+  "Occipital_artery_L": {
+   "hueso": 0.008,
+   "hueso_mm": 1.0,
+   "sistema": "arterial"
+  },
+  "Occipital_Bone": {
+   "area_nula": 6,
+   "sistema": "skeletal"
+  },
+  "Occipital_sinus": {
+   "hueso": 0.176,
+   "hueso_mm": 2.7,
+   "sistema": "venous"
+  },
+  "Oculomotor_nerve_III_L": {
+   "piel_mm": 0.9,
+   "sistema": "nervous"
+  },
+  "Oculomotor_nerve_III_R": {
+   "piel_mm": 0.6,
+   "sistema": "nervous"
+  },
+  "Olfactory_nerve_I_L": {
+   "hueso": 0.008,
+   "hueso_mm": 1.1,
+   "sistema": "nervous"
+  },
+  "Olfactory_nerve_I_R": {
+   "hueso": 0.008,
+   "hueso_mm": 1.2,
+   "sistema": "nervous"
+  },
+  "Optic_nerve_II_L": {
+   "piel_mm": 4.4,
+   "visible": 18,
+   "sistema": "nervous"
+  },
+  "Optic_nerve_II_R": {
+   "piel_mm": 4.2,
+   "visible": 15,
+   "sistema": "nervous"
+  },
+  "Oropharynx": {
+   "piel_mm": 14.4,
+   "hueso": 0.024,
+   "hueso_mm": 3.6,
+   "sistema": "digestive"
+  },
+  "Palatine_Bone_L": {
+   "piel_mm": 21.7,
+   "sistema": "skeletal"
+  },
+  "Palatine_Bone_R": {
+   "piel_mm": 21.6,
+   "sistema": "skeletal"
+  },
+  "Palatine_tonsil_L": {
+   "piel_mm": 7.6,
+   "sistema": "lymphatic"
+  },
+  "Palatine_tonsil_R": {
+   "piel_mm": 7.7,
+   "sistema": "lymphatic"
+  },
+  "Palatopharyngeus_muscle_L": {
+   "piel_mm": 11.9,
+   "sistema": "muscular"
+  },
+  "Palatopharyngeus_muscle_R": {
+   "piel_mm": 11.4,
+   "sistema": "muscular"
+  },
+  "Pancreatic_duct": {
+   "area_nula": 1,
+   "sistema": "digestive"
+  },
+  "Paracentral_gyrus_and_sulcus_R": {
+   "hueso": 0.006,
+   "hueso_mm": 1.5,
+   "sistema": "nervous"
+  },
+  "Parietal_branches_of_middle_cerebral_artery_L": {
+   "hueso": 0.149,
+   "hueso_mm": 2.1,
+   "sistema": "arterial"
+  },
+  "Parietal_branches_of_middle_cerebral_artery_R": {
+   "hueso": 0.138,
+   "hueso_mm": 1.9,
+   "sistema": "arterial"
+  },
+  "Parotid_gland_L": {
+   "hueso": 0.037,
+   "hueso_mm": 2.0,
+   "sistema": "digestive"
+  },
+  "Parotid_gland_R": {
+   "hueso": 0.042,
+   "hueso_mm": 1.6,
+   "sistema": "digestive"
+  },
+  "Pericallosal_artery_L": {
+   "hueso": 0.024,
+   "hueso_mm": 1.3,
+   "sistema": "arterial"
+  },
+  "Plantar_digital_veins_L": {
+   "piel_mm": 1.8,
+   "area_nula": 4,
+   "sistema": "venous"
+  },
+  "Plantar_digital_veins_R": {
+   "piel_mm": 1.9,
+   "area_nula": 5,
+   "sistema": "venous"
+  },
+  "Plantar_interphalangeal_ligaments_L": {
+   "piel_mm": 2.3,
+   "sistema": "connective"
+  },
+  "Plantar_interphalangeal_ligaments_R": {
+   "piel_mm": 1.4,
+   "sistema": "connective"
+  },
+  "Postcentral_arterial_branch_R": {
+   "hueso": 0.014,
+   "hueso_mm": 1.1,
+   "sistema": "arterial"
+  },
+  "Posterior_deep_temporal_artery_L": {
+   "hueso": 0.073,
+   "hueso_mm": 1.5,
+   "sistema": "arterial"
+  },
+  "Posterior_deep_temporal_artery_R": {
+   "hueso": 0.109,
+   "hueso_mm": 1.6,
+   "sistema": "arterial"
+  },
+  "Posterior_lateral_nasal_branches_of_sphenopalatine_artery_L": {
+   "piel_mm": 11.4,
+   "hueso": 0.091,
+   "hueso_mm": 1.6,
+   "sistema": "arterial"
+  },
+  "Posterior_lateral_nasal_branches_of_sphenopalatine_artery_R": {
+   "piel_mm": 11.4,
+   "hueso": 0.106,
+   "hueso_mm": 1.8,
+   "sistema": "arterial"
+  },
+  "Posterior_segment_of_eyeball_L": {
+   "piel_mm": 11.3,
+   "visible": 37,
+   "sistema": "nervous"
+  },
+  "Posterior_segment_of_eyeball_R": {
+   "piel_mm": 11.3,
+   "visible": 32,
+   "sistema": "nervous"
+  },
+  "Posterior_septal_branches_of_sphenopalatine_artery_L": {
+   "piel_mm": 13.9,
+   "hueso": 0.006,
+   "hueso_mm": 1.1,
+   "sistema": "arterial"
+  },
+  "Posterior_septal_branches_of_sphenopalatine_artery_R": {
+   "piel_mm": 13.0,
+   "hueso": 0.006,
+   "hueso_mm": 1.0,
+   "sistema": "arterial"
+  },
+  "Posterior_superior_alveolar_artery_L": {
+   "piel_mm": 6.9,
+   "hueso": 0.081,
+   "hueso_mm": 3.1,
+   "sistema": "arterial"
+  },
+  "Posterior_superior_alveolar_artery_R": {
+   "piel_mm": 6.9,
+   "hueso": 0.135,
+   "hueso_mm": 3.3,
+   "sistema": "arterial"
+  },
+  "Posterior_temporal_branch_L": {
+   "hueso": 0.065,
+   "hueso_mm": 2.8,
+   "sistema": "arterial"
+  },
+  "Posterior_temporal_branch_R": {
+   "hueso": 0.097,
+   "hueso_mm": 3.1,
+   "sistema": "arterial"
+  },
+  "Prefrontal_artery_L": {
+   "hueso": 0.281,
+   "hueso_mm": 2.4,
+   "sistema": "arterial"
+  },
+  "Prefrontal_artery_R": {
+   "hueso": 0.252,
+   "hueso_mm": 2.1,
+   "sistema": "arterial"
+  },
+  "Proper_plantar_digital_arteries_L": {
+   "piel_mm": 1.7,
+   "area_nula": 17,
+   "sistema": "arterial"
+  },
+  "Proper_plantar_digital_arteries_R": {
+   "piel_mm": 1.2,
+   "sistema": "arterial"
+  },
+  "Proper_plantar_digital_branches_of_lateral_plantar_nerve_L": {
+   "piel_mm": 1.7,
+   "sistema": "nervous"
+  },
+  "Proper_plantar_digital_branches_of_lateral_plantar_nerve_R": {
+   "piel_mm": 1.8,
+   "sistema": "nervous"
+  },
+  "Proper_plantar_digital_branches_of_medial_plantar_nerve_L": {
+   "hueso": 0.014,
+   "hueso_mm": 1.8,
+   "sistema": "nervous"
+  },
+  "Proper_plantar_digital_branches_of_medial_plantar_nerve_R": {
+   "hueso": 0.014,
+   "hueso_mm": 1.8,
+   "sistema": "nervous"
+  },
+  "Proximal_Phalanx_Foot_1_L": {
+   "piel_mm": 0.8,
+   "visible": 12,
+   "sistema": "skeletal"
+  },
+  "Proximal_Phalanx_Foot_1_R": {
+   "piel_mm": 0.8,
+   "visible": 12,
+   "sistema": "skeletal"
+  },
+  "Proximal_Phalanx_Foot_4_L": {
+   "piel_mm": 4.4,
+   "sistema": "skeletal"
+  },
+  "Proximal_Phalanx_Foot_4_R": {
+   "piel_mm": 1.4,
+   "sistema": "skeletal"
+  },
+  "Proximal_Phalanx_Foot_5_L": {
+   "piel_mm": 3.1,
+   "sistema": "skeletal"
+  },
+  "Proximal_Phalanx_Foot_5_R": {
+   "piel_mm": 2.9,
+   "sistema": "skeletal"
+  },
+  "Pterygospinous_ligament_L": {
+   "piel_mm": 0.6,
+   "sistema": "connective"
+  },
+  "Pterygospinous_ligament_R": {
+   "piel_mm": 0.7,
+   "sistema": "connective"
+  },
+  "Retina_L": {
+   "piel_mm": 10.5,
+   "visible": 58,
+   "sistema": "nervous"
+  },
+  "Retina_R": {
+   "piel_mm": 10.0,
+   "visible": 27,
+   "sistema": "nervous"
+  },
+  "Retromandibular_vein_L": {
+   "hueso": 0.185,
+   "hueso_mm": 1.4,
+   "sistema": "venous"
+  },
+  "Retropharyngeal_nodes_L": {
+   "piel_mm": 13.2,
+   "sistema": "lymphatic"
+  },
+  "Retropharyngeal_nodes_R": {
+   "piel_mm": 12.9,
+   "sistema": "lymphatic"
+  },
+  "Round_ligament_of_uterus_L": {
+   "hueso": 0.008,
+   "hueso_mm": 1.9,
+   "sistema": "urogenital"
+  },
+  "Round_ligament_of_uterus_R": {
+   "hueso": 0.008,
+   "hueso_mm": 1.9,
+   "sistema": "urogenital"
+  },
+  "Scapula_L": {
+   "area_nula": 2,
+   "sistema": "skeletal"
+  },
+  "Scapula_R": {
+   "area_nula": 2,
+   "sistema": "skeletal"
+  },
+  "Sclera_L": {
+   "piel_mm": 11.7,
+   "visible": 20,
+   "sistema": "nervous"
+  },
+  "Sclera_R": {
+   "piel_mm": 12.0,
+   "visible": 20,
+   "sistema": "nervous"
+  },
+  "Septal_branches_of_posterior_ethmoidal_artery_L": {
+   "piel_mm": 1.8,
+   "sistema": "arterial"
+  },
+  "Septal_branches_of_posterior_ethmoidal_artery_R": {
+   "piel_mm": 1.8,
+   "sistema": "arterial"
+  },
+  "Sigmoid_sinus_L": {
+   "hueso": 0.212,
+   "hueso_mm": 2.4,
+   "sistema": "venous"
+  },
+  "Sigmoid_sinus_R": {
+   "hueso": 0.173,
+   "hueso_mm": 2.1,
+   "sistema": "venous"
+  },
+  "Soft_palate": {
+   "piel_mm": 21.7,
+   "sistema": "digestive"
+  },
+  "Sphenoid_Bone": {
+   "piel_mm": 17.3,
+   "area_nula": 4,
+   "sistema": "skeletal"
+  },
+  "Sphenomandibular_ligament_L": {
+   "hueso": 0.312,
+   "hueso_mm": 2.7,
+   "sistema": "connective"
+  },
+  "Sphenomandibular_ligament_R": {
+   "hueso": 0.312,
+   "hueso_mm": 2.6,
+   "sistema": "connective"
+  },
+  "Stylopharyngeus_muscle_L": {
+   "piel_mm": 7.1,
+   "sistema": "muscular"
+  },
+  "Stylopharyngeus_muscle_R": {
+   "piel_mm": 6.8,
+   "sistema": "muscular"
+  },
+  "Superficial_layer_of_temporal_fascia_L": {
+   "hueso": 0.006,
+   "hueso_mm": 1.0,
+   "sistema": "connective"
+  },
+  "Superficial_layer_of_temporal_fascia_R": {
+   "hueso": 0.006,
+   "hueso_mm": 1.1,
+   "sistema": "connective"
+  },
+  "Superficial_temporal_artery_L": {
+   "hueso": 0.017,
+   "hueso_mm": 1.5,
+   "sistema": "arterial"
+  },
+  "Superior_oblique_muscle_L": {
+   "piel_mm": 5.3,
+   "visible": 25,
+   "sistema": "muscular"
+  },
+  "Superior_oblique_muscle_R": {
+   "piel_mm": 5.2,
+   "visible": 26,
+   "sistema": "muscular"
+  },
+  "Superior_ophthalmic_vein_L": {
+   "hueso": 0.029,
+   "hueso_mm": 1.2,
+   "sistema": "venous"
+  },
+  "Superior_ophthalmic_vein_R": {
+   "hueso": 0.01,
+   "hueso_mm": 1.1,
+   "sistema": "venous"
+  },
+  "Superior_petrosal_sinus_L": {
+   "hueso": 0.067,
+   "hueso_mm": 1.6,
+   "sistema": "venous"
+  },
+  "Superior_petrosal_sinus_R": {
+   "hueso": 0.067,
+   "hueso_mm": 1.6,
+   "sistema": "venous"
+  },
+  "Superior_pharyngeal_constrictor_L": {
+   "piel_mm": 12.4,
+   "sistema": "muscular"
+  },
+  "Superior_pharyngeal_constrictor_R": {
+   "piel_mm": 12.0,
+   "sistema": "muscular"
+  },
+  "Superior_rectus_muscle_L": {
+   "piel_mm": 11.9,
+   "visible": 32,
+   "sistema": "muscular"
+  },
+  "Superior_rectus_muscle_R": {
+   "piel_mm": 12.1,
+   "visible": 33,
+   "sistema": "muscular"
+  },
+  "Superior_sagittal_sinus": {
+   "hueso": 0.056,
+   "hueso_mm": 1.8,
+   "sistema": "venous"
+  },
+  "Suspensory_ligament_of_eyeball_L": {
+   "piel_mm": 3.5,
+   "visible": 5,
+   "hueso": 0.083,
+   "hueso_mm": 2.0,
+   "sistema": "nervous"
+  },
+  "Suspensory_ligament_of_eyeball_R": {
+   "piel_mm": 3.4,
+   "visible": 5,
+   "hueso": 0.083,
+   "hueso_mm": 2.0,
+   "sistema": "nervous"
+  },
+  "Temporal_branches_of_middle_cerebral_artery_L": {
+   "hueso": 0.047,
+   "hueso_mm": 1.8,
+   "sistema": "arterial"
+  },
+  "Temporo_occipital_branch_L": {
+   "hueso": 0.119,
+   "hueso_mm": 2.1,
+   "sistema": "arterial"
+  },
+  "Temporo_occipital_branch_R": {
+   "hueso": 0.105,
+   "hueso_mm": 2.2,
+   "sistema": "arterial"
+  },
+  "Tongue": {
+   "piel_mm": 15.9,
+   "sistema": "digestive"
+  },
+  "Tooth_Lower_Canine_L": {
+   "piel_mm": 3.9,
+   "sistema": "skeletal"
+  },
+  "Tooth_Lower_Canine_R": {
+   "piel_mm": 3.8,
+   "sistema": "skeletal"
+  },
+  "Tooth_Lower_First_Molar_L": {
+   "piel_mm": 1.8,
+   "sistema": "skeletal"
+  },
+  "Tooth_Lower_First_Molar_R": {
+   "piel_mm": 1.6,
+   "sistema": "skeletal"
+  },
+  "Tooth_Lower_First_Premolar_L": {
+   "piel_mm": 2.2,
+   "sistema": "skeletal"
+  },
+  "Tooth_Lower_First_Premolar_R": {
+   "piel_mm": 2.1,
+   "sistema": "skeletal"
+  },
+  "Tooth_Lower_Lateral_Incisor_L": {
+   "piel_mm": 3.7,
+   "sistema": "skeletal"
+  },
+  "Tooth_Lower_Lateral_Incisor_R": {
+   "piel_mm": 3.3,
+   "sistema": "skeletal"
+  },
+  "Tooth_Lower_Medial_Incisor_L": {
+   "piel_mm": 3.8,
+   "sistema": "skeletal"
+  },
+  "Tooth_Lower_Medial_Incisor_R": {
+   "piel_mm": 3.6,
+   "sistema": "skeletal"
+  },
+  "Tooth_Lower_Second_Molar_L": {
+   "piel_mm": 1.0,
+   "sistema": "skeletal"
+  },
+  "Tooth_Lower_Second_Molar_R": {
+   "piel_mm": 1.1,
+   "sistema": "skeletal"
+  },
+  "Tooth_Lower_Second_Premolar_L": {
+   "piel_mm": 2.1,
+   "sistema": "skeletal"
+  },
+  "Tooth_Lower_Second_Premolar_R": {
+   "piel_mm": 1.9,
+   "sistema": "skeletal"
+  },
+  "Tooth_Upper_Canine_L": {
+   "piel_mm": 12.3,
+   "sistema": "skeletal"
+  },
+  "Tooth_Upper_Canine_R": {
+   "piel_mm": 12.3,
+   "sistema": "skeletal"
+  },
+  "Tooth_Upper_First_Molar_L": {
+   "piel_mm": 14.3,
+   "sistema": "skeletal"
+  },
+  "Tooth_Upper_First_Molar_R": {
+   "piel_mm": 14.3,
+   "sistema": "skeletal"
+  },
+  "Tooth_Upper_First_Premolar_L": {
+   "piel_mm": 14.0,
+   "sistema": "skeletal"
+  },
+  "Tooth_Upper_First_Premolar_R": {
+   "piel_mm": 14.1,
+   "sistema": "skeletal"
+  },
+  "Tooth_Upper_Lateral_Incisor_L": {
+   "piel_mm": 12.7,
+   "sistema": "skeletal"
+  },
+  "Tooth_Upper_Lateral_Incisor_R": {
+   "piel_mm": 12.7,
+   "sistema": "skeletal"
+  },
+  "Tooth_Upper_Medial_Incisor_L": {
+   "piel_mm": 12.5,
+   "sistema": "skeletal"
+  },
+  "Tooth_Upper_Medial_Incisor_R": {
+   "piel_mm": 12.5,
+   "sistema": "skeletal"
+  },
+  "Tooth_Upper_Second_Molar_L": {
+   "piel_mm": 13.3,
+   "sistema": "skeletal"
+  },
+  "Tooth_Upper_Second_Molar_R": {
+   "piel_mm": 13.4,
+   "sistema": "skeletal"
+  },
+  "Tooth_Upper_Second_Premolar_L": {
+   "piel_mm": 13.5,
+   "sistema": "skeletal"
+  },
+  "Tooth_Upper_Second_Premolar_R": {
+   "piel_mm": 13.5,
+   "sistema": "skeletal"
+  },
+  "Transverse_sinus_L": {
+   "hueso": 0.075,
+   "hueso_mm": 1.6,
+   "sistema": "venous"
+  },
+  "Transverse_sinus_R": {
+   "hueso": 0.034,
+   "hueso_mm": 1.4,
+   "sistema": "venous"
+  },
+  "Tympanic_membrane_L": {
+   "hueso": 0.106,
+   "hueso_mm": 2.7,
+   "sistema": "nervous"
+  },
+  "Tympanic_membrane_R": {
+   "hueso": 0.106,
+   "hueso_mm": 2.7,
+   "sistema": "nervous"
+  },
+  "Ulnar_head_of_extensor_carpi_ulnaris_L": {
+   "piel_mm": 0.5,
+   "visible": 2,
+   "sistema": "muscular"
+  },
+  "Uvula_of_palate": {
+   "piel_mm": 13.1,
+   "sistema": "digestive"
+  },
+  "Vagus_nerve_X_L": {
+   "piel_mm": 8.7,
+   "sistema": "nervous"
+  },
+  "Vagus_nerve_X_R": {
+   "piel_mm": 8.5,
+   "sistema": "nervous"
+  },
+  "Vertebra_C1_Atlas": {
+   "piel_mm": 1.8,
+   "sistema": "skeletal"
+  },
+  "Vestibular_nerve_L": {
+   "hueso": 0.072,
+   "hueso_mm": 3.2,
+   "sistema": "nervous"
+  },
+  "Vestibular_nerve_R": {
+   "hueso": 0.079,
+   "hueso_mm": 3.1,
+   "sistema": "nervous"
+  },
+  "Vestibule_L": {
+   "hueso": 0.192,
+   "hueso_mm": 2.2,
+   "sistema": "nervous"
+  },
+  "Vestibule_R": {
+   "hueso": 0.192,
+   "hueso_mm": 2.3,
+   "sistema": "nervous"
+  },
+  "Vitreous_body_L": {
+   "piel_mm": 12.8,
+   "visible": 75,
+   "sistema": "nervous"
+  },
+  "Vitreous_body_R": {
+   "piel_mm": 12.6,
+   "visible": 73,
+   "sistema": "nervous"
+  },
+  "Vomer": {
+   "piel_mm": 13.1,
+   "sistema": "skeletal"
+  },
+  "Zonular_fibres_L": {
+   "piel_mm": 9.6,
+   "sistema": "nervous"
+  },
+  "Zonular_fibres_R": {
+   "piel_mm": 13.5,
+   "visible": 85,
+   "sistema": "nervous"
+  }
+ },
+ "choques": {
+  "Accessory_pancreatic_duct | Pancreas": {
+   "tipo": "natural",
+   "mm": 5.9,
+   "frac": 0.778
+  },
+  "Accessory_pancreatic_duct | Transverse_colon": {
+   "tipo": "contacto",
+   "mm": 0.4,
+   "frac": 0.041
+  },
+  "Anterior_lateral_segment_of_liver_VI | Posterior_lateral_segment_of_liver_VII": {
+   "tipo": "natural",
+   "mm": 0.1,
+   "frac": 0.045
+  },
+  "Posterior_lateral_segment_of_liver_VII | Anterior_lateral_segment_of_liver_VI": {
+   "tipo": "natural",
+   "mm": 0.1,
+   "frac": 0.083
+  },
+  "Appendicular_nodes | Meso_appendix": {
+   "tipo": "natural",
+   "mm": 0.4,
+   "frac": 0.446
+  },
+  "Meso_appendix | Ascending_colon": {
+   "tipo": "contacto",
+   "mm": 0.4,
+   "frac": 0.038
+  },
+  "Mesocolic_taenia | Ascending_colon": {
+   "tipo": "contacto",
+   "mm": 0.5,
+   "frac": 0.07
+  },
+  "Omental_taenia | Ascending_colon": {
+   "tipo": "contacto",
+   "mm": 0.5,
+   "frac": 0.048
+  },
+  "Brachiocephalic_nodes | Pleura": {
+   "tipo": "contacto",
+   "mm": 0.2,
+   "frac": 0.089
+  },
+  "Central_superior_mesenteric_nodes | Transverse_colon": {
+   "tipo": "contacto",
+   "mm": 0.4,
+   "frac": 0.182
+  },
+  "Corniculate_cartilage_L | Laryngopharynx": {
+   "tipo": "contacto",
+   "mm": 0.2,
+   "frac": 0.486
+  },
+  "Corniculate_cartilage_R | Laryngopharynx": {
+   "tipo": "contacto",
+   "mm": 0.2,
+   "frac": 0.357
+  },
+  "Free_taenia | Descending_colon": {
+   "tipo": "contacto",
+   "mm": 0.6,
+   "frac": 0.042
+  },
+  "Mesocolic_taenia | Descending_colon": {
+   "tipo": "contacto",
+   "mm": 0.5,
+   "frac": 0.076
+  },
+  "Sigmoid_colon | Descending_colon": {
+   "tipo": "contacto",
+   "mm": 0.6,
+   "frac": 0.025
+  },
+  "Superior_gluteal_nodes_L | Descending_colon": {
+   "tipo": "contacto",
+   "mm": 0.6,
+   "frac": 0.177
+  },
+  "Fat_of_breast_L | Suspensory_ligaments_of_breast_L": {
+   "tipo": "natural",
+   "mm": 0.2,
+   "frac": 0.176
+  },
+  "Suspensory_ligaments_of_breast_L | Fat_of_breast_L": {
+   "tipo": "natural",
+   "mm": 0.3,
+   "frac": 0.31
+  },
+  "Fat_of_breast_R | Suspensory_ligaments_of_breast_R": {
+   "tipo": "natural",
+   "mm": 0.2,
+   "frac": 0.176
+  },
+  "Suspensory_ligaments_of_breast_R | Fat_of_breast_R": {
+   "tipo": "natural",
+   "mm": 0.3,
+   "frac": 0.295
+  },
+  "Right_colic_nodes | Free_taenia": {
+   "tipo": "contacto",
+   "mm": 0.2,
+   "frac": 0.035
+  },
+  "Oropharynx | Gingiva": {
+   "tipo": "aceptado",
+   "mm": 1.4,
+   "frac": 0.06
+  },
+  "Sublingual_gland_L | Gingiva": {
+   "tipo": "aceptado",
+   "mm": 2.2,
+   "frac": 0.524
+  },
+  "Sublingual_gland_R | Gingiva": {
+   "tipo": "aceptado",
+   "mm": 2.2,
+   "frac": 0.524
+  },
+  "Submandibular_gland_L | Gingiva": {
+   "tipo": "aceptado",
+   "mm": 1.9,
+   "frac": 0.298
+  },
+  "Submandibular_gland_R | Gingiva": {
+   "tipo": "aceptado",
+   "mm": 1.9,
+   "frac": 0.298
+  },
+  "Inferior_parathyroid_gland_L | Thyroid_gland": {
+   "tipo": "natural",
+   "mm": 0.1,
+   "frac": 0.076
+  },
+  "Inferior_parathyroid_gland_R | Thyroid_gland": {
+   "tipo": "natural",
+   "mm": 0.1,
+   "frac": 0.076
+  },
+  "Intermediate_external_iliac_nodes_R | Meso_appendix": {
+   "tipo": "contacto",
+   "mm": 0.4,
+   "frac": 0.05
+  },
+  "Intraglandular_parotid_nodes_L | Parotid_gland_L": {
+   "tipo": "natural",
+   "mm": 2.2,
+   "frac": 0.333
+  },
+  "Intraglandular_parotid_nodes_R | Parotid_gland_R": {
+   "tipo": "natural",
+   "mm": 2.2,
+   "frac": 0.333
+  },
+  "Juxta_oesophageal_nodes | Prevertebral_nodes": {
+   "tipo": "contacto",
+   "mm": 0.6,
+   "frac": 0.137
+  },
+  "Prevertebral_nodes | Juxta_oesophageal_nodes": {
+   "tipo": "contacto",
+   "mm": 0.6,
+   "frac": 0.123
+  },
+  "Lateral_caval_nodes | Pre_aortic_nodes": {
+   "tipo": "contacto",
+   "mm": 0.7,
+   "frac": 0.042
+  },
+  "Pre_aortic_nodes | Lateral_caval_nodes": {
+   "tipo": "contacto",
+   "mm": 0.7,
+   "frac": 0.049
+  },
+  "Lateral_pericardial_nodes | Pleura": {
+   "tipo": "contacto",
+   "mm": 0.2,
+   "frac": 0.206
+  },
+  "Left_anterior_lateral_segment_of_liver_III | Left_posterior_lateral_segment_of_liver_II": {
+   "tipo": "natural",
+   "mm": 0.1,
+   "frac": 0.038
+  },
+  "Left_posterior_lateral_segment_of_liver_II | Left_anterior_lateral_segment_of_liver_III": {
+   "tipo": "natural",
+   "mm": 0.1,
+   "frac": 0.051
+  },
+  "Lesser_omentum | Left_anterior_lateral_segment_of_liver_III": {
+   "tipo": "natural",
+   "mm": 0.6,
+   "frac": 0.041
+  },
+  "Left_lobe_of_thymus | Right_lobe_of_thymus": {
+   "tipo": "natural",
+   "mm": 2.1,
+   "frac": 0.023
+  },
+  "Major_alar_cartilage_R | Nasal_septal_cartilage": {
+   "tipo": "natural",
+   "mm": 0.4,
+   "frac": 0.023
+  },
+  "Meso_appendix | Vermiform_appendix": {
+   "tipo": "natural",
+   "mm": 3.1,
+   "frac": 0.157
+  },
+  "Mesocolic_taenia | Transverse_colon": {
+   "tipo": "natural",
+   "mm": 0.3,
+   "frac": 0.029
+  },
+  "Mesocolon | Transverse_colon": {
+   "tipo": "natural",
+   "mm": 0.5,
+   "frac": 0.044
+  },
+  "Node_of_ligamentum_arteriosum | Pleura": {
+   "tipo": "contacto",
+   "mm": 0.2,
+   "frac": 0.267
+  },
+  "Retropharyngeal_nodes_L | Oropharynx": {
+   "tipo": "contacto",
+   "mm": 0.3,
+   "frac": 0.064
+  },
+  "Oropharynx | Soft_palate": {
+   "tipo": "natural",
+   "mm": 0.2,
+   "frac": 0.022
+  },
+  "Pancreatic_duct | Pancreas": {
+   "tipo": "natural",
+   "mm": 6.1,
+   "frac": 0.993
+  },
+  "Parasternal_nodes_R | Pleura": {
+   "tipo": "contacto",
+   "mm": 0.2,
+   "frac": 0.122
+  },
+  "Right_lobe_of_thymus | Pleura": {
+   "tipo": "contacto",
+   "mm": 0.1,
+   "frac": 0.025
+  },
+  "Posterior_lateral_segment_of_liver_VII | Posterior_medial_segment_of_liver_VIII": {
+   "tipo": "natural",
+   "mm": 0.2,
+   "frac": 0.073
+  },
+  "Posterior_medial_segment_of_liver_VIII | Posterior_lateral_segment_of_liver_VII": {
+   "tipo": "natural",
+   "mm": 0.2,
+   "frac": 0.053
+  },
+  "Posterior_medial_segment_of_liver_VIII | Posterior_segment_of_liver_I": {
+   "tipo": "natural",
+   "mm": 0.0,
+   "frac": 0.036
+  },
+  "Posterior_segment_of_liver_I | Posterior_medial_segment_of_liver_VIII": {
+   "tipo": "natural",
+   "mm": 0.0,
+   "frac": 0.031
+  },
+  "Postvesical_nodes | Sigmoid_colon": {
+   "tipo": "contacto",
+   "mm": 0.3,
+   "frac": 0.031
+  },
+  "Uvula_of_palate | Soft_palate": {
+   "tipo": "natural",
+   "mm": 0.5,
+   "frac": 0.066
+  },
+  "Superior_parathyroid_gland_L | Thyroid_gland": {
+   "tipo": "natural",
+   "mm": 0.1,
+   "frac": 0.061
+  },
+  "Superior_parathyroid_gland_R | Thyroid_gland": {
+   "tipo": "natural",
+   "mm": 0.1,
+   "frac": 0.061
+  }
+ },
+ "simetria": {
+  "arterial:Anterior_branch_of_renal_artery": {
+   "max_mm": 17.6,
+   "mediana_mm": 8.03
+  },
+  "arterial:Anterior_temporal_branch": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.11
+  },
+  "arterial:Artery_of_central_sulcus": {
+   "max_mm": 3.0,
+   "mediana_mm": 1.71
+  },
+  "arterial:Branch_to_angular_gyrus": {
+   "max_mm": 3.3,
+   "mediana_mm": 2.78
+  },
+  "arterial:Common_iliac_artery": {
+   "max_mm": 9.5,
+   "mediana_mm": 3.41
+  },
+  "arterial:First_posterior_intercostal_artery": {
+   "max_mm": 3.5,
+   "mediana_mm": 1.35
+  },
+  "arterial:Inferior_suprarenal_artery": {
+   "max_mm": 20.0,
+   "mediana_mm": 9.34
+  },
+  "arterial:Lumbar_arteries": {
+   "max_mm": 12.6,
+   "mediana_mm": 0.47
+  },
+  "arterial:Middle_cerebral_artery_M3_segment": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.86
+  },
+  "arterial:Occipital_artery": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.3
+  },
+  "arterial:Ovarian_artery": {
+   "max_mm": 19.1,
+   "mediana_mm": 0.62
+  },
+  "arterial:Parietal_branches_of_middle_cerebral_artery": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.98
+  },
+  "arterial:Pericallosal_artery": {
+   "max_mm": 3.0,
+   "mediana_mm": 1.45
+  },
+  "arterial:Postcentral_arterial_branch": {
+   "max_mm": 3.2,
+   "mediana_mm": 1.64
+  },
+  "arterial:Posterior_branch_of_renal_artery": {
+   "max_mm": 16.4,
+   "mediana_mm": 7.45
+  },
+  "arterial:Posterior_deep_temporal_artery": {
+   "max_mm": 3.2,
+   "mediana_mm": 1.4
+  },
+  "arterial:Posterior_intercostal_arteries": {
+   "max_mm": 31.5,
+   "mediana_mm": 0.14
+  },
+  "arterial:Posterior_parietal_artery": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.53
+  },
+  "arterial:Posterior_temporal_branch": {
+   "max_mm": 3.0,
+   "mediana_mm": 1.5
+  },
+  "arterial:Second_posterior_intercostal_artery": {
+   "max_mm": 7.6,
+   "mediana_mm": 0.84
+  },
+  "arterial:Superficial_epigastric_artery": {
+   "max_mm": 3.2,
+   "mediana_mm": 0.06
+  },
+  "arterial:Superficial_temporal_artery": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.5
+  },
+  "arterial:Superior_epigastric_artery": {
+   "max_mm": 3.9,
+   "mediana_mm": 0.34
+  },
+  "arterial:Temporal_branches_of_middle_cerebral_artery": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.99
+  },
+  "arterial:Temporo_occipital_branch": {
+   "max_mm": 3.3,
+   "mediana_mm": 0.81
+  },
+  "arterial:Vaginal_branches_of_uterine_artery": {
+   "max_mm": 3.2,
+   "mediana_mm": 0.11
+  },
+  "connective:Costoclavicular_ligament": {
+   "max_mm": 7.3,
+   "mediana_mm": 5.63
+  },
+  "connective:External_intercostal_membrane": {
+   "max_mm": 3.3,
+   "mediana_mm": 0.07
+  },
+  "connective:Iliopsoas_fascia": {
+   "max_mm": 53.3,
+   "mediana_mm": 16.63
+  },
+  "connective:Infrapatellar_fat_pad": {
+   "max_mm": 3.0,
+   "mediana_mm": 1.3
+  },
+  "connective:Interclavicular_ligament": {
+   "max_mm": 3.1,
+   "mediana_mm": 0.21
+  },
+  "connective:Investing_abdominal_fascia": {
+   "max_mm": 3.6,
+   "mediana_mm": 0.13
+  },
+  "connective:Palmar_radio_ulnar_ligament": {
+   "max_mm": 3.7,
+   "mediana_mm": 1.08
+  },
+  "connective:Posterior_sternoclavicular_ligament": {
+   "max_mm": 10.7,
+   "mediana_mm": 2.88
+  },
+  "connective:Sacrospinous_ligament": {
+   "max_mm": 5.7,
+   "mediana_mm": 3.09
+  },
+  "connective:Sacrotuberous_ligament": {
+   "max_mm": 6.1,
+   "mediana_mm": 1.39
+  },
+  "connective:Superficial_layer_of_temporal_fascia": {
+   "max_mm": 3.4,
+   "mediana_mm": 1.77
+  },
+  "connective:Superior_extensor_retinaculum_of_ankle": {
+   "max_mm": 3.1,
+   "mediana_mm": 0.16
+  },
+  "connective:Ulnocapitate_ligament": {
+   "max_mm": 12.5,
+   "mediana_mm": 2.35
+  },
+  "connective:Ulnolunate_ligament": {
+   "max_mm": 5.8,
+   "mediana_mm": 2.13
+  },
+  "connective:Ulnotriquetral_ligament": {
+   "max_mm": 3.0,
+   "mediana_mm": 1.33
+  },
+  "endocrine:Suprarenal_gland": {
+   "max_mm": 23.9,
+   "mediana_mm": 10.06
+  },
+  "lymphatic:Infra_auricular_nodes": {
+   "max_mm": 3.0,
+   "mediana_mm": 1.61
+  },
+  "muscular:Descending_part_of_trapezius_muscle": {
+   "max_mm": 4.9,
+   "mediana_mm": 0.18
+  },
+  "muscular:Epicranial_aponeurosis": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.01
+  },
+  "muscular:Fibularis_brevis_muscle": {
+   "max_mm": 4.6,
+   "mediana_mm": 0.09
+  },
+  "muscular:Flexor_digitorum_brevis": {
+   "max_mm": 4.7,
+   "mediana_mm": 0.14
+  },
+  "muscular:Iliocostalis_thoracis_muscle": {
+   "max_mm": 7.4,
+   "mediana_mm": 0.1
+  },
+  "muscular:Lateral_rectus_muscle": {
+   "max_mm": 3.2,
+   "mediana_mm": 0.13
+  },
+  "muscular:Latissimus_dorsi_muscle": {
+   "max_mm": 3.1,
+   "mediana_mm": 0.16
+  },
+  "muscular:Multifidus_colli_muscle": {
+   "max_mm": 3.7,
+   "mediana_mm": 0.1
+  },
+  "muscular:Occipitalis_muscle": {
+   "max_mm": 3.3,
+   "mediana_mm": 0.72
+  },
+  "muscular:Palpebral_part_of_orbicularis_oculi": {
+   "max_mm": 3.9,
+   "mediana_mm": 0.26
+  },
+  "muscular:Perineal_membrane": {
+   "max_mm": 4.5,
+   "mediana_mm": 0.03
+  },
+  "muscular:Rotatores": {
+   "max_mm": 3.1,
+   "mediana_mm": 0.2
+  },
+  "muscular:Spinalis_thoracis_muscle": {
+   "max_mm": 3.1,
+   "mediana_mm": 0.23
+  },
+  "muscular:Sternocleidomastoid_muscle": {
+   "max_mm": 3.6,
+   "mediana_mm": 0.11
+  },
+  "muscular:Temporalis_muscle": {
+   "max_mm": 3.8,
+   "mediana_mm": 0.9
+  },
+  "muscular:Temporoparietalis_muscle": {
+   "max_mm": 3.5,
+   "mediana_mm": 1.32
+  },
+  "nervous:Angular_gyrus": {
+   "max_mm": 3.4,
+   "mediana_mm": 1.67
+  },
+  "nervous:Central_sulcus": {
+   "max_mm": 3.2,
+   "mediana_mm": 1.48
+  },
+  "nervous:Cuneus": {
+   "max_mm": 5.6,
+   "mediana_mm": 1.31
+  },
+  "nervous:Inferior_occipital_gyrus_and_sulcus": {
+   "max_mm": 7.6,
+   "mediana_mm": 0.65
+  },
+  "nervous:Inferior_temporal_gyrus": {
+   "max_mm": 3.9,
+   "mediana_mm": 0.91
+  },
+  "nervous:Insula_Subcentral_gyrus_and_ant_and_post_sulci": {
+   "max_mm": 3.1,
+   "mediana_mm": 1.66
+  },
+  "nervous:Intercostal_nerves": {
+   "max_mm": 3.0,
+   "mediana_mm": 0.09
+  },
+  "nervous:Intraparietal_sulcus": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.56
+  },
+  "nervous:Lat_Fis_post": {
+   "max_mm": 3.2,
+   "mediana_mm": 1.62
+  },
+  "nervous:Lateral_occipital_gyrus_Middle_occipital_gyrus": {
+   "max_mm": 3.0,
+   "mediana_mm": 1.34
+  },
+  "nervous:Meningeal_branch_of_maxillary_nerve": {
+   "max_mm": 3.2,
+   "mediana_mm": 0.87
+  },
+  "nervous:Middle_frontal_gyrus": {
+   "max_mm": 3.0,
+   "mediana_mm": 0.6
+  },
+  "nervous:Middle_temporal_gyrus": {
+   "max_mm": 3.6,
+   "mediana_mm": 1.48
+  },
+  "nervous:Nerve_to_mylohyoid_muscle": {
+   "max_mm": 3.5,
+   "mediana_mm": 0.16
+  },
+  "nervous:Occipital_pole": {
+   "max_mm": 4.9,
+   "mediana_mm": 0.16
+  },
+  "nervous:Orbital_gyri": {
+   "max_mm": 4.7,
+   "mediana_mm": 0.23
+  },
+  "nervous:Orbital_part_of_inferior_frontal_gyrus": {
+   "max_mm": 4.6,
+   "mediana_mm": 1.18
+  },
+  "nervous:Orbital_sulci_Lateral_Orbital_sulcus": {
+   "max_mm": 4.7,
+   "mediana_mm": 0.65
+  },
+  "nervous:Paracentral_gyrus_and_sulcus": {
+   "max_mm": 4.7,
+   "mediana_mm": 1.8
+  },
+  "nervous:Parieto_occipital_sulcus": {
+   "max_mm": 3.4,
+   "mediana_mm": 1.56
+  },
+  "nervous:Postcentral_gyrus": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.67
+  },
+  "nervous:Postcentral_sulcus": {
+   "max_mm": 3.2,
+   "mediana_mm": 1.54
+  },
+  "nervous:Precentral_gyrus": {
+   "max_mm": 3.7,
+   "mediana_mm": 1.66
+  },
+  "nervous:Precentral_sulcus_Superior_part": {
+   "max_mm": 3.2,
+   "mediana_mm": 1.74
+  },
+  "nervous:Precuneus": {
+   "max_mm": 3.6,
+   "mediana_mm": 1.63
+  },
+  "nervous:Subparietal_sulcus": {
+   "max_mm": 22.8,
+   "mediana_mm": 1.68
+  },
+  "nervous:Sulcus_interm_prim_Jensen": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.43
+  },
+  "nervous:Superior_occipital_gyri": {
+   "max_mm": 3.0,
+   "mediana_mm": 1.37
+  },
+  "nervous:Superior_parietal_lobule": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.69
+  },
+  "nervous:Superior_temporal_gyrus_Lateral_part": {
+   "max_mm": 4.8,
+   "mediana_mm": 1.76
+  },
+  "nervous:Superior_temporal_sulcus": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.51
+  },
+  "nervous:Supramarginal_gyrus": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.7
+  },
+  "nervous:Temporal_plane": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.93
+  },
+  "nervous:Tentorium_cerebelli": {
+   "max_mm": 3.9,
+   "mediana_mm": 0.19
+  },
+  "nervous:Triangular_part_of_inferior_frontal_gyrus": {
+   "max_mm": 5.9,
+   "mediana_mm": 1.17
+  },
+  "nervous:Vagus_nerve_X": {
+   "max_mm": 202.3,
+   "mediana_mm": 0.21
+  },
+  "nervous:White_matter_of_telencephalon": {
+   "max_mm": 3.3,
+   "mediana_mm": 1.38
+  },
+  "nervous:Zonular_fibres": {
+   "max_mm": 7.0,
+   "mediana_mm": 5.59
+  },
+  "skeletal:Parietal_Bone": {
+   "max_mm": 6.5,
+   "mediana_mm": 1.7
+  },
+  "urogenital:Kidney": {
+   "max_mm": 17.9,
+   "mediana_mm": 6.18
+  },
+  "urogenital:Renal_pelvis": {
+   "max_mm": 18.9,
+   "mediana_mm": 5.7
+  },
+  "urogenital:Ureter": {
+   "max_mm": 15.4,
+   "mediana_mm": 3.51
+  },
+  "venous:Common_iliac_vein": {
+   "max_mm": 13.9,
+   "mediana_mm": 4.24
+  },
+  "venous:Fibular_veins": {
+   "max_mm": 6.3,
+   "mediana_mm": 0.08
+  },
+  "venous:Internal_jugular_vein": {
+   "max_mm": 4.1,
+   "mediana_mm": 0.14
+  },
+  "venous:Lumbar_veins": {
+   "max_mm": 15.2,
+   "mediana_mm": 1.05
+  },
+  "venous:Superficial_temporal_veins": {
+   "max_mm": 3.1,
+   "mediana_mm": 0.6
+  },
+  "venous:Superior_epigastric_veins": {
+   "max_mm": 3.8,
+   "mediana_mm": 0.29
+  },
+  "venous:Superior_thyroid_vein": {
+   "max_mm": 4.1,
+   "mediana_mm": 0.3
+  },
+  "venous:Transverse_sinus": {
+   "max_mm": 3.1,
+   "mediana_mm": 0.19
+  },
+  "venous:Uterine_veins": {
+   "max_mm": 5.0,
+   "mediana_mm": 0.44
+  },
+  "venous:Uterine_venous_plexus": {
+   "max_mm": 3.2,
+   "mediana_mm": 0.07
+  }
+ },
+ "picos": {
+  "Skin_Body": {
+   "n": 2,
+   "max_mm": 21.4,
+   "en_cm": [
+    -5.3,
+    4.3,
+    73.1
+   ]
+  },
+  "Parietal_Bone_R": {
+   "n": 70,
+   "max_mm": 32.7,
+   "en_cm": [
+    -5.9,
+    -4.4,
+    152.2
+   ]
+  },
+  "Parietal_Bone_L": {
+   "n": 75,
+   "max_mm": 41.5,
+   "en_cm": [
+    5.4,
+    -5.1,
+    153.5
+   ]
+  },
+  "Occipital_Bone": {
+   "n": 38,
+   "max_mm": 28.8,
+   "en_cm": [
+    2.9,
+    2.2,
+    145.4
+   ]
+  },
+  "Frontal_Bone": {
+   "n": 14,
+   "max_mm": 23.0,
+   "en_cm": [
+    2.8,
+    -9.5,
+    154.2
+   ]
+  },
+  "Vertebra_L1": {
+   "n": 2,
+   "max_mm": 20.3,
+   "en_cm": [
+    0.8,
+    -4.0,
+    106.1
+   ]
+  },
+  "Sternum_Body": {
+   "n": 4,
+   "max_mm": 20.4,
+   "en_cm": [
+    -0.5,
+    -9.3,
+    119.0
+   ]
+  },
+  "Ulna_R": {
+   "n": 41,
+   "max_mm": 61.9,
+   "en_cm": [
+    -18.6,
+    -1.6,
+    91.2
+   ]
+  },
+  "Ulna_L": {
+   "n": 41,
+   "max_mm": 62.1,
+   "en_cm": [
+    18.6,
+    -1.6,
+    91.2
+   ]
+  },
+  "Radius_R": {
+   "n": 37,
+   "max_mm": 59.9,
+   "en_cm": [
+    -20.7,
+    -2.4,
+    96.1
+   ]
+  },
+  "Radius_L": {
+   "n": 37,
+   "max_mm": 60.1,
+   "en_cm": [
+    20.7,
+    -2.4,
+    96.1
+   ]
+  },
+  "Humerus_R": {
+   "n": 108,
+   "max_mm": 58.9,
+   "en_cm": [
+    -17.1,
+    -1.0,
+    108.3
+   ]
+  },
+  "Humerus_L": {
+   "n": 108,
+   "max_mm": 58.8,
+   "en_cm": [
+    17.1,
+    -1.0,
+    108.3
+   ]
+  },
+  "Metacarpal_4_R": {
+   "n": 2,
+   "max_mm": 23.5,
+   "en_cm": [
+    -21.5,
+    -2.0,
+    76.1
+   ]
+  },
+  "Metacarpal_4_L": {
+   "n": 2,
+   "max_mm": 23.6,
+   "en_cm": [
+    21.5,
+    -2.0,
+    76.2
+   ]
+  },
+  "Metacarpal_3_R": {
+   "n": 1,
+   "max_mm": 22.8,
+   "en_cm": [
+    -23.5,
+    -2.5,
+    76.3
+   ]
+  },
+  "Metacarpal_3_L": {
+   "n": 1,
+   "max_mm": 22.8,
+   "en_cm": [
+    23.5,
+    -2.5,
+    76.3
+   ]
+  },
+  "Metacarpal_2_R": {
+   "n": 4,
+   "max_mm": 29.7,
+   "en_cm": [
+    -25.0,
+    -2.6,
+    77.2
+   ]
+  },
+  "Metacarpal_2_L": {
+   "n": 4,
+   "max_mm": 29.6,
+   "en_cm": [
+    25.0,
+    -2.6,
+    77.2
+   ]
+  },
+  "Tibia_R": {
+   "n": 61,
+   "max_mm": 141.2,
+   "en_cm": [
+    -11.0,
+    -4.8,
+    25.1
+   ]
+  },
+  "Tibia_L": {
+   "n": 61,
+   "max_mm": 141.3,
+   "en_cm": [
+    11.0,
+    -4.7,
+    25.1
+   ]
+  },
+  "Fibula_R": {
+   "n": 44,
+   "max_mm": 80.9,
+   "en_cm": [
+    -12.7,
+    -2.1,
+    15.6
+   ]
+  },
+  "Fibula_L": {
+   "n": 44,
+   "max_mm": 81.1,
+   "en_cm": [
+    12.7,
+    -2.1,
+    15.6
+   ]
+  },
+  "Femur_R": {
+   "n": 113,
+   "max_mm": 128.9,
+   "en_cm": [
+    -10.5,
+    -7.7,
+    59.2
+   ]
+  },
+  "Femur_L": {
+   "n": 113,
+   "max_mm": 128.9,
+   "en_cm": [
+    10.5,
+    -7.7,
+    59.2
+   ]
+  },
+  "Metatarsal_5_R": {
+   "n": 1,
+   "max_mm": 21.0,
+   "en_cm": [
+    -13.0,
+    -11.4,
+    2.5
+   ]
+  },
+  "Metatarsal_5_L": {
+   "n": 1,
+   "max_mm": 21.0,
+   "en_cm": [
+    13.0,
+    -11.4,
+    2.5
+   ]
+  },
+  "Metatarsal_4_R": {
+   "n": 10,
+   "max_mm": 39.4,
+   "en_cm": [
+    -12.1,
+    -11.3,
+    3.2
+   ]
+  },
+  "Metatarsal_4_L": {
+   "n": 10,
+   "max_mm": 39.4,
+   "en_cm": [
+    12.1,
+    -11.3,
+    3.2
+   ]
+  },
+  "Metatarsal_2_R": {
+   "n": 7,
+   "max_mm": 45.1,
+   "en_cm": [
+    -9.8,
+    -12.1,
+    4.1
+   ]
+  },
+  "Metatarsal_2_L": {
+   "n": 7,
+   "max_mm": 45.1,
+   "en_cm": [
+    9.8,
+    -12.1,
+    4.1
+   ]
+  },
+  "Metatarsal_1_R": {
+   "n": 8,
+   "max_mm": 29.4,
+   "en_cm": [
+    -8.0,
+    -12.0,
+    4.3
+   ]
+  },
+  "Metatarsal_1_L": {
+   "n": 8,
+   "max_mm": 29.5,
+   "en_cm": [
+    8.0,
+    -12.0,
+    4.3
+   ]
+  },
+  "Hip_Bone_R": {
+   "n": 12,
+   "max_mm": 47.7,
+   "en_cm": [
+    -9.0,
+    -5.0,
+    88.4
+   ]
+  },
+  "Hip_Bone_L": {
+   "n": 12,
+   "max_mm": 47.7,
+   "en_cm": [
+    9.0,
+    -5.0,
+    88.4
+   ]
+  },
+  "Transversus_thoracis_muscle_R": {
+   "n": 1,
+   "max_mm": 52.8,
+   "en_cm": [
+    -3.0,
+    -10.2,
+    114.6
+   ]
+  },
+  "Transversus_thoracis_muscle_L": {
+   "n": 1,
+   "max_mm": 52.9,
+   "en_cm": [
+    3.0,
+    -10.2,
+    114.6
+   ]
+  },
+  "Temporoparietalis_muscle_R": {
+   "n": 1,
+   "max_mm": 21.3,
+   "en_cm": [
+    -5.4,
+    -0.0,
+    146.8
+   ]
+  },
+  "Temporalis_muscle_R": {
+   "n": 2,
+   "max_mm": 30.3,
+   "en_cm": [
+    -6.2,
+    -2.0,
+    150.2
+   ]
+  },
+  "Temporalis_muscle_L": {
+   "n": 2,
+   "max_mm": 30.2,
+   "en_cm": [
+    6.5,
+    -2.2,
+    150.0
+   ]
+  },
+  "Levator_anguli_oris_R": {
+   "n": 1,
+   "max_mm": 20.9,
+   "en_cm": [
+    -2.6,
+    -11.5,
+    142.9
+   ]
+  },
+  "Levator_anguli_oris_L": {
+   "n": 1,
+   "max_mm": 20.9,
+   "en_cm": [
+    2.6,
+    -11.5,
+    142.9
+   ]
+  },
+  "Spinalis_capitis_muscle_R": {
+   "n": 1,
+   "max_mm": 38.8,
+   "en_cm": [
+    -1.3,
+    -0.2,
+    136.2
+   ]
+  },
+  "Spinalis_colli_muscle_R": {
+   "n": 1,
+   "max_mm": 34.2,
+   "en_cm": [
+    -0.6,
+    0.4,
+    135.1
+   ]
+  },
+  "Spinalis_capitis_muscle_L": {
+   "n": 1,
+   "max_mm": 38.8,
+   "en_cm": [
+    1.3,
+    -0.2,
+    136.2
+   ]
+  },
+  "Spinalis_colli_muscle_L": {
+   "n": 1,
+   "max_mm": 35.1,
+   "en_cm": [
+    0.6,
+    0.4,
+    135.1
+   ]
+  },
+  "Latissimus_dorsi_muscle_R": {
+   "n": 3,
+   "max_mm": 46.0,
+   "en_cm": [
+    -6.5,
+    1.5,
+    111.6
+   ]
+  },
+  "Serratus_posterior_inferior_muscle_R": {
+   "n": 1,
+   "max_mm": 37.3,
+   "en_cm": [
+    -4.5,
+    1.4,
+    109.3
+   ]
+  },
+  "Latissimus_dorsi_muscle_L": {
+   "n": 4,
+   "max_mm": 46.1,
+   "en_cm": [
+    6.5,
+    1.5,
+    111.6
+   ]
+  },
+  "Serratus_posterior_inferior_muscle_L": {
+   "n": 1,
+   "max_mm": 37.3,
+   "en_cm": [
+    4.5,
+    1.4,
+    109.3
+   ]
+  },
+  "Ascending_part_of_trapezius_muscle_R": {
+   "n": 2,
+   "max_mm": 39.3,
+   "en_cm": [
+    -7.4,
+    2.5,
+    129.9
+   ]
+  },
+  "Descending_part_of_trapezius_muscle_R": {
+   "n": 13,
+   "max_mm": 47.5,
+   "en_cm": [
+    -2.6,
+    4.0,
+    118.8
+   ]
+  },
+  "Transverse_part_of_trapezius_muscle_R": {
+   "n": 1,
+   "max_mm": 37.6,
+   "en_cm": [
+    -8.4,
+    4.2,
+    127.6
+   ]
+  },
+  "Ascending_part_of_trapezius_muscle_L": {
+   "n": 2,
+   "max_mm": 39.4,
+   "en_cm": [
+    7.4,
+    2.5,
+    129.9
+   ]
+  },
+  "Descending_part_of_trapezius_muscle_L": {
+   "n": 16,
+   "max_mm": 47.6,
+   "en_cm": [
+    2.6,
+    4.0,
+    118.8
+   ]
+  },
+  "Transverse_part_of_trapezius_muscle_L": {
+   "n": 1,
+   "max_mm": 37.6,
+   "en_cm": [
+    8.4,
+    4.1,
+    127.6
+   ]
+  },
+  "Rectus_abdominis_muscle_R": {
+   "n": 10,
+   "max_mm": 47.9,
+   "en_cm": [
+    -0.6,
+    -10.5,
+    92.0
+   ]
+  },
+  "Rectus_abdominis_muscle_L": {
+   "n": 10,
+   "max_mm": 47.0,
+   "en_cm": [
+    0.5,
+    -10.5,
+    92.0
+   ]
+  },
+  "External_abdominal_oblique_muscle_R": {
+   "n": 17,
+   "max_mm": 56.6,
+   "en_cm": [
+    -2.8,
+    -10.2,
+    83.7
+   ]
+  },
+  "External_abdominal_oblique_muscle_L": {
+   "n": 17,
+   "max_mm": 56.6,
+   "en_cm": [
+    2.8,
+    -10.2,
+    83.7
+   ]
+  },
+  "Pyramidalis_muscle_R": {
+   "n": 1,
+   "max_mm": 46.9,
+   "en_cm": [
+    -0.7,
+    -9.9,
+    83.1
+   ]
+  },
+  "Scapular_spinal_part_of_deltoid_muscle_R": {
+   "n": 1,
+   "max_mm": 42.8,
+   "en_cm": [
+    -14.9,
+    2.4,
+    121.1
+   ]
+  },
+  "Scapular_spinal_part_of_deltoid_muscle_L": {
+   "n": 1,
+   "max_mm": 42.9,
+   "en_cm": [
+    14.9,
+    2.4,
+    121.1
+   ]
+  },
+  "Brachialis_muscle_R": {
+   "n": 3,
+   "max_mm": 80.1,
+   "en_cm": [
+    -17.7,
+    -2.5,
+    110.6
+   ]
+  },
+  "Brachialis_muscle_L": {
+   "n": 3,
+   "max_mm": 80.1,
+   "en_cm": [
+    17.7,
+    -2.5,
+    110.6
+   ]
+  },
+  "Medial_head_of_triceps_brachii_R": {
+   "n": 1,
+   "max_mm": 69.3,
+   "en_cm": [
+    -17.0,
+    -1.1,
+    108.9
+   ]
+  },
+  "Medial_head_of_triceps_brachii_L": {
+   "n": 1,
+   "max_mm": 69.2,
+   "en_cm": [
+    17.0,
+    -1.1,
+    108.9
+   ]
+  },
+  "Ulnar_head_of_flexor_carpi_ulnaris_R": {
+   "n": 1,
+   "max_mm": 42.9,
+   "en_cm": [
+    -18.3,
+    -1.3,
+    94.8
+   ]
+  },
+  "Ulnar_head_of_flexor_carpi_ulnaris_L": {
+   "n": 1,
+   "max_mm": 43.0,
+   "en_cm": [
+    18.3,
+    -1.3,
+    94.8
+   ]
+  },
+  "Extensor_digitorum_R": {
+   "n": 2,
+   "max_mm": 33.9,
+   "en_cm": [
+    -19.9,
+    -0.2,
+    93.6
+   ]
+  },
+  "Extensor_digitorum_L": {
+   "n": 2,
+   "max_mm": 34.0,
+   "en_cm": [
+    19.9,
+    -0.2,
+    93.6
+   ]
+  },
+  "Humeral_head_of_extensor_carpi_ulnaris_R": {
+   "n": 1,
+   "max_mm": 53.7,
+   "en_cm": [
+    -19.3,
+    -0.4,
+    92.2
+   ]
+  },
+  "Humeral_head_of_extensor_carpi_ulnaris_L": {
+   "n": 1,
+   "max_mm": 53.9,
+   "en_cm": [
+    19.3,
+    -0.4,
+    92.2
+   ]
+  },
+  "Extensor_carpi_radialis_longus_R": {
+   "n": 1,
+   "max_mm": 38.1,
+   "en_cm": [
+    -22.0,
+    -1.7,
+    96.3
+   ]
+  },
+  "Extensor_carpi_radialis_longus_L": {
+   "n": 1,
+   "max_mm": 38.1,
+   "en_cm": [
+    22.0,
+    -1.7,
+    96.3
+   ]
+  },
+  "Abductor_digiti_minimi_of_hand_R": {
+   "n": 1,
+   "max_mm": 20.3,
+   "en_cm": [
+    -19.4,
+    -3.6,
+    76.2
+   ]
+  },
+  "Abductor_digiti_minimi_of_hand_L": {
+   "n": 1,
+   "max_mm": 20.4,
+   "en_cm": [
+    19.4,
+    -3.6,
+    76.2
+   ]
+  },
+  "Iliotibial_tract_R": {
+   "n": 66,
+   "max_mm": 36.3,
+   "en_cm": [
+    -13.7,
+    -4.4,
+    57.3
+   ]
+  },
+  "Iliotibial_tract_L": {
+   "n": 67,
+   "max_mm": 36.3,
+   "en_cm": [
+    13.7,
+    -4.4,
+    57.3
+   ]
+  },
+  "Rectus_femoris_muscle_R": {
+   "n": 2,
+   "max_mm": 60.1,
+   "en_cm": [
+    -10.4,
+    -12.1,
+    58.1
+   ]
+  },
+  "Vastus_medialis_muscle_R": {
+   "n": 4,
+   "max_mm": 71.4,
+   "en_cm": [
+    -7.8,
+    -6.8,
+    50.1
+   ]
+  },
+  "Vastus_intermedius_muscle_R": {
+   "n": 8,
+   "max_mm": 124.7,
+   "en_cm": [
+    -10.7,
+    -7.7,
+    56.1
+   ]
+  },
+  "Rectus_femoris_muscle_L": {
+   "n": 2,
+   "max_mm": 60.1,
+   "en_cm": [
+    10.4,
+    -12.1,
+    58.1
+   ]
+  },
+  "Vastus_medialis_muscle_L": {
+   "n": 4,
+   "max_mm": 71.6,
+   "en_cm": [
+    7.8,
+    -6.8,
+    50.1
+   ]
+  },
+  "Vastus_intermedius_muscle_L": {
+   "n": 8,
+   "max_mm": 124.8,
+   "en_cm": [
+    10.7,
+    -7.7,
+    56.1
+   ]
+  },
+  "Sartorius_muscle_R": {
+   "n": 3,
+   "max_mm": 63.3,
+   "en_cm": [
+    -6.7,
+    -9.7,
+    71.3
+   ]
+  },
+  "Sartorius_muscle_L": {
+   "n": 3,
+   "max_mm": 63.2,
+   "en_cm": [
+    6.7,
+    -9.7,
+    71.3
+   ]
+  },
+  "Adductor_magnus_R": {
+   "n": 20,
+   "max_mm": 87.3,
+   "en_cm": [
+    -2.7,
+    -3.6,
+    67.7
+   ]
+  },
+  "Pectineus_muscle_R": {
+   "n": 1,
+   "max_mm": 49.4,
+   "en_cm": [
+    -4.3,
+    -8.6,
+    76.4
+   ]
+  },
+  "Adductor_magnus_L": {
+   "n": 20,
+   "max_mm": 87.3,
+   "en_cm": [
+    2.7,
+    -3.6,
+    67.7
+   ]
+  },
+  "Pectineus_muscle_L": {
+   "n": 2,
+   "max_mm": 49.5,
+   "en_cm": [
+    4.3,
+    -8.6,
+    76.4
+   ]
+  },
+  "Short_head_of_biceps_femoris_R": {
+   "n": 1,
+   "max_mm": 80.0,
+   "en_cm": [
+    -9.9,
+    -5.1,
+    58.7
+   ]
+  },
+  "Short_head_of_biceps_femoris_L": {
+   "n": 1,
+   "max_mm": 80.0,
+   "en_cm": [
+    9.9,
+    -5.1,
+    58.7
+   ]
+  },
+  "Semitendinosus_muscle_R": {
+   "n": 16,
+   "max_mm": 78.5,
+   "en_cm": [
+    -4.8,
+    -0.4,
+    67.8
+   ]
+  },
+  "Semitendinosus_muscle_L": {
+   "n": 16,
+   "max_mm": 78.5,
+   "en_cm": [
+    4.8,
+    -0.5,
+    67.8
+   ]
+  },
+  "Tibialis_anterior_muscle_R": {
+   "n": 11,
+   "max_mm": 92.9,
+   "en_cm": [
+    -10.8,
+    -5.9,
+    24.1
+   ]
+  },
+  "Tibialis_anterior_muscle_L": {
+   "n": 11,
+   "max_mm": 92.9,
+   "en_cm": [
+    10.8,
+    -5.9,
+    24.1
+   ]
+  },
+  "Fibularis_longus_muscle_R": {
+   "n": 4,
+   "max_mm": 47.9,
+   "en_cm": [
+    -12.6,
+    -1.4,
+    10.7
+   ]
+  },
+  "Fibularis_brevis_muscle_R": {
+   "n": 2,
+   "max_mm": 60.6,
+   "en_cm": [
+    -12.9,
+    -2.5,
+    15.8
+   ]
+  },
+  "Fibularis_longus_muscle_L": {
+   "n": 4,
+   "max_mm": 47.9,
+   "en_cm": [
+    12.6,
+    -1.4,
+    10.7
+   ]
+  },
+  "Fibularis_brevis_muscle_L": {
+   "n": 2,
+   "max_mm": 60.6,
+   "en_cm": [
+    12.8,
+    -2.5,
+    15.8
+   ]
+  },
+  "Medial_head_of_gastrocnemius_R": {
+   "n": 2,
+   "max_mm": 48.1,
+   "en_cm": [
+    -10.2,
+    0.2,
+    32.0
+   ]
+  },
+  "Calcaneal_tendon_R": {
+   "n": 7,
+   "max_mm": 48.0,
+   "en_cm": [
+    -11.1,
+    0.0,
+    7.2
+   ]
+  },
+  "Medial_head_of_gastrocnemius_L": {
+   "n": 2,
+   "max_mm": 48.2,
+   "en_cm": [
+    10.1,
+    0.2,
+    32.0
+   ]
+  },
+  "Calcaneal_tendon_L": {
+   "n": 7,
+   "max_mm": 48.1,
+   "en_cm": [
+    11.1,
+    0.0,
+    7.2
+   ]
+  },
+  "Tibialis_posterior_muscle_R": {
+   "n": 2,
+   "max_mm": 49.5,
+   "en_cm": [
+    -10.4,
+    -3.6,
+    20.0
+   ]
+  },
+  "Tibialis_posterior_muscle_L": {
+   "n": 2,
+   "max_mm": 49.5,
+   "en_cm": [
+    10.4,
+    -3.6,
+    20.0
+   ]
+  },
+  "Flexor_digitorum_brevis_R": {
+   "n": 2,
+   "max_mm": 48.3,
+   "en_cm": [
+    -11.0,
+    -4.7,
+    1.0
+   ]
+  },
+  "Flexor_digitorum_brevis_L": {
+   "n": 2,
+   "max_mm": 48.2,
+   "en_cm": [
+    11.0,
+    -4.7,
+    1.0
+   ]
+  },
+  "Supraspinous_ligament": {
+   "n": 14,
+   "max_mm": 54.9,
+   "en_cm": [
+    0.3,
+    0.6,
+    101.4
+   ]
+  },
+  "Sacrospinous_ligament_R": {
+   "n": 18,
+   "max_mm": 47.9,
+   "en_cm": [
+    -3.2,
+    1.2,
+    82.8
+   ]
+  },
+  "Sacrospinous_ligament_L": {
+   "n": 20,
+   "max_mm": 46.6,
+   "en_cm": [
+    3.1,
+    1.4,
+    82.8
+   ]
+  },
+  "Interosseous_membrane_of_leg_L": {
+   "n": 1,
+   "max_mm": 22.3,
+   "en_cm": [
+    11.8,
+    -4.2,
+    30.5
+   ]
+  },
+  "Interosseous_membrane_of_leg_R": {
+   "n": 1,
+   "max_mm": 22.4,
+   "en_cm": [
+    -11.8,
+    -4.2,
+    30.5
+   ]
+  },
+  "Articular_capsule_of_hip_joint_R": {
+   "n": 4,
+   "max_mm": 45.4,
+   "en_cm": [
+    -7.9,
+    -3.3,
+    78.5
+   ]
+  },
+  "Articular_capsule_of_hip_joint_L": {
+   "n": 4,
+   "max_mm": 45.4,
+   "en_cm": [
+    7.9,
+    -3.3,
+    78.5
+   ]
+  },
+  "Inguinal_ligament_L": {
+   "n": 4,
+   "max_mm": 32.3,
+   "en_cm": [
+    7.3,
+    -8.7,
+    85.8
+   ]
+  },
+  "Inguinal_ligament_R": {
+   "n": 5,
+   "max_mm": 32.2,
+   "en_cm": [
+    -7.3,
+    -8.7,
+    85.8
+   ]
+  },
+  "Linea_alba": {
+   "n": 1,
+   "max_mm": 113.8,
+   "en_cm": [
+    0.6,
+    -10.8,
+    93.7
+   ]
+  },
+  "Medial_patellar_retinaculum_R": {
+   "n": 2,
+   "max_mm": 45.0,
+   "en_cm": [
+    -6.4,
+    -6.2,
+    40.2
+   ]
+  },
+  "Medial_patellar_retinaculum_L": {
+   "n": 2,
+   "max_mm": 45.0,
+   "en_cm": [
+    6.4,
+    -6.2,
+    40.1
+   ]
+  },
+  "Crural_fascia_R": {
+   "n": 1,
+   "max_mm": 38.8,
+   "en_cm": [
+    -9.5,
+    -5.7,
+    25.3
+   ]
+  },
+  "Crural_fascia_L": {
+   "n": 1,
+   "max_mm": 38.9,
+   "en_cm": [
+    9.5,
+    -5.7,
+    25.3
+   ]
+  },
+  "Deep_femoral_artery_R": {
+   "n": 11,
+   "max_mm": 20.4,
+   "en_cm": [
+    -8.8,
+    -6.7,
+    62.6
+   ]
+  },
+  "Deep_femoral_artery_L": {
+   "n": 11,
+   "max_mm": 20.4,
+   "en_cm": [
+    8.8,
+    -6.7,
+    62.6
+   ]
+  },
+  "Superficial_external_pudendal_artery_R": {
+   "n": 8,
+   "max_mm": 24.7,
+   "en_cm": [
+    -2.1,
+    -9.0,
+    75.8
+   ]
+  },
+  "Superficial_external_pudendal_artery_L": {
+   "n": 8,
+   "max_mm": 24.7,
+   "en_cm": [
+    2.1,
+    -9.0,
+    75.8
+   ]
+  },
+  "Superficial_epigastric_vein_R": {
+   "n": 3,
+   "max_mm": 20.2,
+   "en_cm": [
+    -6.5,
+    -9.2,
+    99.3
+   ]
+  },
+  "Superficial_epigastric_vein_L": {
+   "n": 4,
+   "max_mm": 20.7,
+   "en_cm": [
+    6.4,
+    -9.2,
+    99.3
+   ]
+  },
+  "External_pudendal_veins_R": {
+   "n": 6,
+   "max_mm": 24.1,
+   "en_cm": [
+    -2.1,
+    -9.0,
+    75.9
+   ]
+  },
+  "External_pudendal_veins_L": {
+   "n": 6,
+   "max_mm": 24.1,
+   "en_cm": [
+    2.1,
+    -9.0,
+    75.9
+   ]
+  },
+  "Falx_cerebri": {
+   "n": 287,
+   "max_mm": 45.8,
+   "en_cm": [
+    0.1,
+    1.0,
+    149.6
+   ]
+  },
+  "Spinal_dura": {
+   "n": 61,
+   "max_mm": 99.7,
+   "en_cm": [
+    -0.0,
+    0.2,
+    125.5
+   ]
+  },
+  "Subparietal_sulcus_R": {
+   "n": 9,
+   "max_mm": 35.6,
+   "en_cm": [
+    -0.2,
+    0.9,
+    151.0
+   ]
+  },
+  "Precuneus_R": {
+   "n": 1,
+   "max_mm": 28.8,
+   "en_cm": [
+    -0.2,
+    1.3,
+    150.9
+   ]
+  },
+  "White_matter_of_telencephalon_R": {
+   "n": 1,
+   "max_mm": 33.2,
+   "en_cm": [
+    -0.3,
+    1.0,
+    151.0
+   ]
+  },
+  "Hippocampal_commissure": {
+   "n": 66,
+   "max_mm": 40.2,
+   "en_cm": [
+    0.0,
+    -2.6,
+    148.3
+   ]
+  },
+  "Pons_R": {
+   "n": 1,
+   "max_mm": 22.0,
+   "en_cm": [
+    -0.0,
+    -4.6,
+    145.9
+   ]
+  },
+  "Pons_L": {
+   "n": 1,
+   "max_mm": 22.0,
+   "en_cm": [
+    0.0,
+    -4.6,
+    145.9
+   ]
+  },
+  "Medulla_oblongata_L": {
+   "n": 1,
+   "max_mm": 26.5,
+   "en_cm": [
+    0.0,
+    -3.3,
+    143.6
+   ]
+  },
+  "Medulla_oblongata_R": {
+   "n": 1,
+   "max_mm": 26.5,
+   "en_cm": [
+    -0.0,
+    -3.3,
+    143.6
+   ]
+  },
+  "Posterior_femoral_cutaneous_nerve_R": {
+   "n": 30,
+   "max_mm": 44.2,
+   "en_cm": [
+    -7.0,
+    1.9,
+    67.5
+   ]
+  },
+  "Posterior_femoral_cutaneous_nerve_L": {
+   "n": 30,
+   "max_mm": 44.2,
+   "en_cm": [
+    7.0,
+    1.9,
+    67.5
+   ]
+  },
+  "Lateral_femoral_cutaneous_nerve_R": {
+   "n": 54,
+   "max_mm": 28.6,
+   "en_cm": [
+    -13.2,
+    -10.1,
+    74.1
+   ]
+  },
+  "Lateral_femoral_cutaneous_nerve_L": {
+   "n": 55,
+   "max_mm": 28.6,
+   "en_cm": [
+    13.2,
+    -10.1,
+    74.1
+   ]
+  },
+  "Anterior_cutaneous_branches_of_femoral_nerve_R": {
+   "n": 63,
+   "max_mm": 45.1,
+   "en_cm": [
+    -5.7,
+    -9.4,
+    70.8
+   ]
+  },
+  "Anterior_cutaneous_branches_of_femoral_nerve_L": {
+   "n": 66,
+   "max_mm": 45.1,
+   "en_cm": [
+    5.7,
+    -9.4,
+    70.8
+   ]
+  },
+  "Femoral_nerve_R": {
+   "n": 66,
+   "max_mm": 41.8,
+   "en_cm": [
+    -6.2,
+    -9.1,
+    70.6
+   ]
+  },
+  "Femoral_nerve_L": {
+   "n": 60,
+   "max_mm": 41.8,
+   "en_cm": [
+    6.1,
+    -9.1,
+    70.6
+   ]
+  },
+  "Saphenous_nerve_R": {
+   "n": 54,
+   "max_mm": 31.6,
+   "en_cm": [
+    -5.7,
+    -8.5,
+    56.4
+   ]
+  },
+  "Sural_nerve_R": {
+   "n": 12,
+   "max_mm": 21.9,
+   "en_cm": [
+    -12.0,
+    -1.4,
+    5.6
+   ]
+  },
+  "Medial_sural_cutaneous_nerve_R": {
+   "n": 24,
+   "max_mm": 33.7,
+   "en_cm": [
+    -8.6,
+    -3.0,
+    45.8
+   ]
+  },
+  "Saphenous_nerve_L": {
+   "n": 54,
+   "max_mm": 31.6,
+   "en_cm": [
+    5.7,
+    -8.5,
+    56.4
+   ]
+  },
+  "Sural_nerve_L": {
+   "n": 12,
+   "max_mm": 21.8,
+   "en_cm": [
+    12.0,
+    -1.4,
+    5.6
+   ]
+  },
+  "Medial_sural_cutaneous_nerve_L": {
+   "n": 24,
+   "max_mm": 33.8,
+   "en_cm": [
+    8.6,
+    -3.0,
+    45.8
+   ]
+  },
+  "Genital_branch_of_genitofemoral_nerve_R": {
+   "n": 6,
+   "max_mm": 21.3,
+   "en_cm": [
+    -4.0,
+    -7.6,
+    87.3
+   ]
+  },
+  "Genital_branch_of_genitofemoral_nerve_L": {
+   "n": 6,
+   "max_mm": 21.0,
+   "en_cm": [
+    4.0,
+    -7.6,
+    87.3
+   ]
+  },
+  "Anterior_branch_of_obturator_nerve_R": {
+   "n": 24,
+   "max_mm": 29.0,
+   "en_cm": [
+    -4.5,
+    -7.6,
+    71.9
+   ]
+  },
+  "Anterior_branch_of_obturator_nerve_L": {
+   "n": 24,
+   "max_mm": 29.0,
+   "en_cm": [
+    4.5,
+    -7.6,
+    71.9
+   ]
+  },
+  "Sciatic_nerve_R": {
+   "n": 13,
+   "max_mm": 23.0,
+   "en_cm": [
+    -6.9,
+    -1.1,
+    69.7
+   ]
+  },
+  "Sciatic_nerve_L": {
+   "n": 13,
+   "max_mm": 23.0,
+   "en_cm": [
+    6.9,
+    -1.2,
+    69.7
+   ]
+  },
+  "Tibial_nerve_R": {
+   "n": 12,
+   "max_mm": 20.5,
+   "en_cm": [
+    -10.6,
+    -2.3,
+    23.1
+   ]
+  },
+  "Tibial_nerve_L": {
+   "n": 12,
+   "max_mm": 20.6,
+   "en_cm": [
+    10.6,
+    -2.3,
+    23.1
+   ]
+  },
+  "Trachea": {
+   "n": 7,
+   "max_mm": 25.3,
+   "en_cm": [
+    -0.1,
+    -2.4,
+    125.7
+   ]
+  },
+  "Lateral_process_of_nasal_septal_cartilage_R": {
+   "n": 1,
+   "max_mm": 23.7,
+   "en_cm": [
+    -0.2,
+    -14.5,
+    144.7
+   ]
+  },
+  "Nasal_septal_cartilage": {
+   "n": 3,
+   "max_mm": 24.1,
+   "en_cm": [
+    -0.1,
+    -14.1,
+    144.1
+   ]
+  },
+  "Lateral_process_of_nasal_septal_cartilage_L": {
+   "n": 1,
+   "max_mm": 23.8,
+   "en_cm": [
+    0.2,
+    -14.5,
+    144.6
+   ]
+  },
+  "Liver": {
+   "n": 16,
+   "max_mm": 35.2,
+   "en_cm": [
+    -5.5,
+    -7.2,
+    106.9
+   ]
+  },
+  "Mucosa_of_stomach": {
+   "n": 1,
+   "max_mm": 21.8,
+   "en_cm": [
+    4.2,
+    -7.6,
+    105.4
+   ]
+  },
+  "Gingiva": {
+   "n": 4,
+   "max_mm": 21.7,
+   "en_cm": [
+    2.7,
+    -9.4,
+    139.2
+   ]
+  },
+  "Stomach": {
+   "n": 1,
+   "max_mm": 21.8,
+   "en_cm": [
+    4.2,
+    -7.6,
+    105.3
+   ]
+  },
+  "Duodenum": {
+   "n": 1,
+   "max_mm": 27.3,
+   "en_cm": [
+    -4.3,
+    -6.0,
+    102.9
+   ]
+  },
+  "Mesocolic_taenia": {
+   "n": 1,
+   "max_mm": 24.2,
+   "en_cm": [
+    -6.6,
+    -7.0,
+    104.4
+   ]
+  },
+  "Ascending_colon": {
+   "n": 10,
+   "max_mm": 40.7,
+   "en_cm": [
+    -6.5,
+    -6.0,
+    104.3
+   ]
+  },
+  "Descending_colon": {
+   "n": 3,
+   "max_mm": 40.7,
+   "en_cm": [
+    6.5,
+    -6.0,
+    104.5
+   ]
+  },
+  "Transverse_colon": {
+   "n": 4,
+   "max_mm": 37.0,
+   "en_cm": [
+    -5.9,
+    -6.6,
+    104.3
+   ]
+  },
+  "Anterior_medial_segment_of_liver_V": {
+   "n": 29,
+   "max_mm": 32.6,
+   "en_cm": [
+    -4.9,
+    -7.5,
+    107.1
+   ]
+  },
+  "Anterior_lateral_segment_of_liver_VI": {
+   "n": 18,
+   "max_mm": 38.6,
+   "en_cm": [
+    -5.6,
+    -7.0,
+    107.0
+   ]
+  },
+  "Kidney_L": {
+   "n": 1,
+   "max_mm": 21.9,
+   "en_cm": [
+    4.2,
+    -1.6,
+    106.2
+   ]
+  },
+  "Spleen": {
+   "n": 2,
+   "max_mm": 20.8,
+   "en_cm": [
+    8.8,
+    -3.3,
+    109.1
+   ]
+  }
+ },
+ "niveles": {
+  "Accessory_pancreatic_duct": "T12–L1",
+  "Adenohypophysis": "C1–C1",
+  "Anterior_basal_segmental_bronchus_of_left_lung_BVIII": "T7–T9",
+  "Anterior_basal_segmental_bronchus_of_right_lung_BVIII": "T6–T8",
+  "Anterior_lateral_segment_of_liver_VI": "T10–L1",
+  "Anterior_medial_segment_of_liver_V": "T10–T12",
+  "Anterior_segmental_bronchus_of_left_lung_BIII": "T4–T5",
+  "Anterior_segmental_bronchus_of_right_lung_BIII": "T4–T5",
+  "Apical_segmental_bronchus_of_right_lung_BI": "T1–T5",
+  "Apicoposterior_segmental_bronchus_of_left_lung_BI_BII": "T2–T5",
+  "Arytenoid_cartilage_L": "C5–C5",
+  "Arytenoid_cartilage_R": "C5–C5",
+  "Ascending_colon": "T12–L5",
+  "Bile_duct": "T11–L1",
+  "Body_of_clitoris": "L5–L5",
+  "Bulb_of_vestibule_L": "L5–L5",
+  "Bulb_of_vestibule_R": "L5–L5",
+  "Corniculate_cartilage_L": "C5–C5",
+  "Corniculate_cartilage_R": "C5–C5",
+  "Cricoid_cartilage": "C5–C6",
+  "Crus_of_clitoris_L": "L5–L5",
+  "Crus_of_clitoris_R": "L5–L5",
+  "Descending_colon": "T12–L5",
+  "Duct_of_greater_vestibular_gland_L": "L5–L5",
+  "Duct_of_greater_vestibular_gland_R": "L5–L5",
+  "Duodenum": "T12–L3",
+  "Epiglottis": "C2–C4",
+  "Fat_of_breast_L": "T5–T10",
+  "Fat_of_breast_R": "T5–T10",
+  "Fimbriae_of_uterine_tube_L": "L5–L5",
+  "Fimbriae_of_uterine_tube_R": "L5–L5",
+  "Free_taenia": "T12–L5",
+  "Gallbladder": "T11–T12",
+  "Gingiva": "C1–C3",
+  "Glans_of_clitoris": "L5–L5",
+  "Greater_omentum": "T11–L5",
+  "Greater_vestibular_gland_L": "L5–L5",
+  "Greater_vestibular_gland_R": "L5–L5",
+  "Inferior_lingular_segmental_bronchus_of_left_lung_BV": "T6–T8",
+  "Inferior_lobe_of_left_lung": "T4–T11",
+  "Inferior_lobe_of_right_lung": "T5–T11",
+  "Inferior_parathyroid_gland_L": "C6–C6",
+  "Inferior_parathyroid_gland_R": "C6–C6",
+  "Intermediate_bronchus_R": "T5–T6",
+  "Jejunum": "L1–L5",
+  "Kidney_L": "T11–L2",
+  "Kidney_R": "T12–L3",
+  "Lactiferous_ducts_L": "T7–T9",
+  "Lactiferous_ducts_R": "T7–T9",
+  "Laryngopharynx": "C2–C6",
+  "Lateral_basal_segmental_bronchus_of_left_lung_BIX": "T7–T10",
+  "Lateral_basal_segmental_bronchus_of_right_lung_BIX": "T7–T10",
+  "Lateral_process_of_nasal_septal_cartilage_L": "C1–C1",
+  "Lateral_process_of_nasal_septal_cartilage_R": "C1–C1",
+  "Lateral_segmental_bronchus_of_right_lung_BIV": "T6–T8",
+  "Left_anterior_lateral_segment_of_liver_III": "T9–T11",
+  "Left_inferior_lobar_bronchus": "T5–T7",
+  "Left_lobe_of_thymus": "T4–T6",
+  "Left_main_bronchus": "T4–T6",
+  "Left_medial_segment_of_liver_IV": "T8–T12",
+  "Left_posterior_lateral_segment_of_liver_II": "T8–T10",
+  "Left_superior_lobar_bronchus": "T5–T6",
+  "Lesser_omentum": "T10–T12",
+  "Ligament_of_ovary_L": "L5–L5",
+  "Ligament_of_ovary_R": "L5–L5",
+  "Liver": "T8–L1",
+  "Major_alar_cartilage_L": "C1–C1",
+  "Major_alar_cartilage_R": "C1–C1",
+  "Mammary_gland_L": "T5–T10",
+  "Mammary_gland_R": "T5–T10",
+  "Medial_basal_segmental_bronchus_of_left_lung_BVII": "T6–T10",
+  "Medial_basal_segmental_bronchus_of_right_lung_BVII": "T6–T8",
+  "Medial_segmental_bronchus_of_right_lung_BV": "T6–T7",
+  "Meso_appendix": "L5–L5",
+  "Mesocolic_taenia": "T12–L5",
+  "Mesocolon": "T11–L1",
+  "Middle_lobar_bronchus_R": "T6–T6",
+  "Middle_lobe_of_right_lung": "T6–T9",
+  "Mucosa_of_nasal_cavity": "C1–C1",
+  "Mucosa_of_stomach": "T9–L1",
+  "Nasal_septal_cartilage": "C1–C1",
+  "Nasopharynx": "C1–C1",
+  "Neurohypophysis": "C1–C1",
+  "Oesophagus": "C5–T10",
+  "Omental_taenia": "L1–L5",
+  "Oropharynx": "C1–C3",
+  "Ovary_L": "L5–L5",
+  "Ovary_R": "L5–L5",
+  "Palatine_tonsil_L": "C1–C1",
+  "Palatine_tonsil_R": "C1–C1",
+  "Pancreas": "T11–L2",
+  "Pancreatic_duct": "T12–L1",
+  "Parotid_duct_L": "C1–C1",
+  "Parotid_duct_R": "C1–C1",
+  "Parotid_gland_L": "C1–C2",
+  "Parotid_gland_R": "C1–C2",
+  "Pineal_gland": "C1–C1",
+  "Pleura": "T1–T11",
+  "Posterior_basal_segmental_bronchus_of_left_lung_BX": "T7–T10",
+  "Posterior_basal_segmental_bronchus_of_right_lung_BX": "T8–T10",
+  "Posterior_lateral_segment_of_liver_VII": "T8–T11",
+  "Posterior_medial_segment_of_liver_VIII": "T8–T10",
+  "Posterior_segment_of_liver_I": "T8–T11",
+  "Posterior_segmental_bronchus_of_right_lung_BII": "T3–T5",
+  "Renal_pelvis_L": "T11–L2",
+  "Renal_pelvis_R": "T12–L2",
+  "Right_inferior_lobar_bronchus": "T6–T8",
+  "Right_lobe_of_thymus": "T4–T6",
+  "Right_main_bronchus": "T4–T5",
+  "Right_superior_lobar_bronchus": "T4–T5",
+  "Round_ligament_of_uterus_L": "L5–L5",
+  "Round_ligament_of_uterus_R": "L5–L5",
+  "Sigmoid_colon": "L5–L5",
+  "Soft_palate": "C1–C1",
+  "Spleen": "T10–T12",
+  "Stomach": "T9–L1",
+  "Sublingual_gland_L": "C2–C3",
+  "Sublingual_gland_R": "C2–C3",
+  "Submandibular_duct_L": "C2–C3",
+  "Submandibular_duct_R": "C2–C3",
+  "Submandibular_gland_L": "C2–C3",
+  "Submandibular_gland_R": "C2–C3",
+  "Superior_lingular_segmental_bronchus_of_left_lung_BIV": "T6–T7",
+  "Superior_lobe_of_left_lung": "T1–T9",
+  "Superior_lobe_of_right_lung": "T1–T6",
+  "Superior_parathyroid_gland_L": "C5–C5",
+  "Superior_parathyroid_gland_R": "C5–C5",
+  "Superior_segmental_bronchus_of_left_lung_BVI": "T5–T7",
+  "Superior_segmental_bronchus_of_right_lung_BVI": "T5–T7",
+  "Suprarenal_gland_L": "T10–T12",
+  "Suprarenal_gland_R": "T11–T12",
+  "Suspensory_ligaments_of_breast_L": "T5–T10",
+  "Suspensory_ligaments_of_breast_R": "T5–T10",
+  "Thyroid_cartilage": "C3–C6",
+  "Thyroid_gland": "C4–C6",
+  "Tongue": "C1–C3",
+  "Trachea": "C6–T5",
+  "Transverse_colon": "T12–L2",
+  "Ureter_L": "L1–L5",
+  "Ureter_R": "L1–L5",
+  "Urethra": "L5–L5",
+  "Urinary_bladder": "L5–L5",
+  "Uterine_tube_L": "L5–L5",
+  "Uterine_tube_R": "L5–L5",
+  "Uterus": "L5–L5",
+  "Uvula_of_palate": "C1–C1",
+  "Vagina": "L5–L5",
+  "Vermiform_appendix": "L5–L5"
+ }
+}
