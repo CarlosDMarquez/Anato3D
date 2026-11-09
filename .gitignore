@@ -7,3 +7,6 @@ web/dist/
 .DS_Store
 # Caché de Python
 __pycache__/
+# Claves y ajustes locales: la clave de la API de Anthropic va en web/.env.local
+.env.local
+.env.*.local

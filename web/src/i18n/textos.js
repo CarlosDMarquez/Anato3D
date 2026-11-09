@@ -2,6 +2,7 @@
 // {x}: valores que pone el código. Un valor en lista es [singular, plural] (tn() en idioma.js).
 // Las descripciones de las fichas y el módulo de estudio siguen solo en español (ficha.soloEs, estudio.soloEs).
 import { TEXTOS_BIBLIOTECA, ETIQUETAS_BIBLIOTECA } from './textos-biblioteca.js';
+import { TEXTOS_PET } from './textos-pet.js';
 
 export const TEXTOS = {
   'doc.titulo': {
@@ -410,6 +411,7 @@ export const TEXTOS = {
   'estudio.sinFallos': { es: 'Sin fallos en este intento.', en: 'No mistakes in this attempt.', de: 'Keine Fehler in diesem Versuch.', fr: 'Aucune erreur lors de cette tentative.', it: 'Nessun errore in questo tentativo.' },
   'estudio.volverModulo': { es: 'Volver al módulo', en: 'Back to the module', de: 'Zurück zum Modul', fr: 'Retour au module', it: 'Torna al modulo' },
   ...TEXTOS_BIBLIOTECA,
+  ...TEXTOS_PET,
 };
 
 // Etiquetas cortas que el código ya da en español (sistemas y capas de systems.js; tipo de pieza, lado y tejido de

@@ -69,8 +69,18 @@ export const TIPOS_PREGUNTA = ['identificar', 'localizar', 'relacion', 'funcion'
 export const CAMARAS = ['anterior', 'posterior', 'lateral', 'medial', 'superior', 'inferior', 'anterolateral', 'posterolateral'];
 export const TIPOS_ESTRUCTURA = ['hueso', 'diente', 'cartilago', 'ligamento', 'capsula', 'bolsa', 'vaina', 'fascia', 'musculo',
   'tendon', 'arteria', 'vena', 'corazon', 'nervio', 'ganglio', 'snc', 'nodo', 'organo', 'glandula', 'piel'];
-// Verbos con los que empieza un objetivo observable (se puede comprobar si se cumple).
-const VERBOS = /^(Decir|Localizar|Identificar|Nombrar|Reconocer|Señalar|Situar|Describir|Explicar|Relacionar|Distinguir|Diferenciar|Comparar|Ordenar|Seguir|Enumerar|Asociar|Indicar|Predecir|Usar|Orientar|Clasificar)\b/;
+// Verbos con los que empieza un objetivo observable (se puede comprobar si se cumple), en el idioma de la lección: las
+// de la biblioteca están en español; las que crea Neuri, en el de la conversación. En alemán el verbo puede ir al final
+// («Die Rotatorenmanschette beschreiben»), así que basta con que esté.
+const VERBOS = {
+  es: /^(Decir|Localizar|Identificar|Nombrar|Reconocer|Señalar|Situar|Describir|Explicar|Relacionar|Distinguir|Diferenciar|Comparar|Ordenar|Seguir|Enumerar|Asociar|Indicar|Predecir|Usar|Orientar|Clasificar)\b/,
+  en: /^(State|Name|Locate|Identify|Recogni[sz]e|Point|Place|Describe|Explain|Relate|Distinguish|Differentiate|Compare|Order|Sequence|Trace|Follow|List|Associate|Indicate|Predict|Use|Orient|Classify)\b/,
+  de: /\b(benennen|nennen|lokalisieren|identifizieren|erkennen|zeigen|beschreiben|erklären|erläutern|zuordnen|unterscheiden|vergleichen|ordnen|verfolgen|aufzählen|angeben|vorhersagen|klassifizieren|einordnen|darstellen)\b/i,
+  fr: /^(Nommer|Localiser|Identifier|Reconnaître|Situer|Décrire|Expliquer|Relier|Distinguer|Différencier|Comparer|Ordonner|Suivre|Énumérer|Associer|Indiquer|Prédire|Utiliser|Orienter|Classer)\b/,
+  it: /^(Nominare|Localizzare|Identificare|Riconoscere|Indicare|Situare|Descrivere|Spiegare|Collegare|Distinguere|Differenziare|Confrontare|Ordinare|Seguire|Elencare|Associare|Prevedere|Usare|Orientare|Classificare)\b/,
+};
+/** ¿Empieza el objetivo por un verbo observable en el idioma de la lección? */
+export const objetivoObservable = (o, idioma = 'es') => (VERBOS[idioma] ?? VERBOS.es).test(String(o ?? ''));
 
 /** Una lección con los valores por defecto. */
 export function leccion(def) {
@@ -116,7 +126,7 @@ export function revisarLeccion(L, ctx = {}) {
   }
   // Objetivos
   if (!(L.objetivos?.length >= 2 && L.objetivos.length <= 6)) err('necesita entre 2 y 6 objetivos');
-  for (const o of L.objetivos ?? []) if (!VERBOS.test(o)) err(`objetivo no observable (debe empezar por un verbo como Localizar o Explicar): «${o}»`);
+  for (const o of L.objetivos ?? []) if (!objetivoObservable(o, L.idiomas?.[0])) err(`objetivo no observable (debe empezar por un verbo como Localizar o Explicar): «${o}»`);
 
   // Estructuras: piezas que existen en los modelos declarados.
   const E = L.estructuras ?? {};

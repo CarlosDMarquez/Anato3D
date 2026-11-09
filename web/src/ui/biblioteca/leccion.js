@@ -8,7 +8,7 @@ import { instanciar, corregir, NO_LO_SE } from '../../biblioteca/evaluar.js';
 import { FUENTES } from '../../content/fuentes.js';
 import { t } from '../../i18n/idioma.js';
 import { tr, trCita } from '../../i18n/contenido.js';
-import { esc, icono, fecha } from './comun.js';
+import { esc, icono, fechaDia } from './comun.js';
 import { abrirLeccion, evaluarLeccion, siguienteDeSesion, avanzarSesion } from './explorar.js';
 
 const CAMARA = (nombre) => t(`camara.${nombre}`);
@@ -30,8 +30,11 @@ function htmlFrases(lista) {
   return out.join('');
 }
 
-/** Fuentes de un paso: cada página, con las frases citadas (en el idioma de la fuente). */
-export function htmlFuentes(ctx, lista) {
+/**
+ * Fuentes de un paso: cada página, con las frases citadas (en el idioma de la fuente). `L`: la lección, cuyas fuentes
+ * propias (las que bajó Neuri para una lección creada con IA) no están en el registro de la biblioteca.
+ */
+export function htmlFuentes(ctx, lista, L = null) {
   const porFuente = new Map();
   for (const e of lista) {
     if (e.m) { porFuente.set(`m:${e.m}`, { m: e.m, citas: [] }); continue; }
@@ -45,9 +48,9 @@ export function htmlFuentes(ctx, lista) {
       const f = FUENTES[x.m];
       return f ? `<li><a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(trCita(f.texto))}</a></li>` : '';
     }
-    const reg = ctx.fuentes?.[x.f];
+    const reg = ctx.fuentes?.[x.f] ?? L?.fuentesUsadas?.[x.f];
     const nombre = reg ? `${x.f.startsWith('tma:') ? 'TeachMeAnatomy' : x.f.startsWith('wpes:') ? t('bib.wikipediaEs') : t('bib.wikipediaEn')}: «${reg.titulo}»` : x.f;
-    const version = reg?.revid ? t('bib.revisionDel', { fecha: fecha(Date.parse(reg.fecha)) }) : reg?.actualizada ? t('bib.actualizada', { fecha: fecha(Date.parse(reg.actualizada)) }) : '';
+    const version = reg?.revid ? t('bib.revisionDel', { fecha: fechaDia(reg.fecha) }) : reg?.actualizada ? t('bib.actualizada', { fecha: fechaDia(reg.actualizada) }) : '';
     return `<li><a href="${esc(reg?.url ?? '#')}" target="_blank" rel="noopener">${esc(nombre)}</a> <small>${esc(version)}${reg?.licencia ? ` · ${esc(reg.licencia)}` : ''}</small>
       <ul class="bib-citas">${x.citas.map((c) => `<li lang="${x.f.startsWith('wpes:') ? 'es' : 'en'}">“${esc(c)}”</li>`).join('')}</ul></li>`;
   }).join('');
@@ -99,7 +102,7 @@ export async function renderLeccion(ctx) {
     ${s.actividad ? htmlActividad(L, s.actividad) : ''}
     ${cq ? htmlComprobar(L, cq) : ''}
     ${v ? `<p class="bib-vista-acc"><button class="link" data-recuperar>${icono('restart')}${esc(t('bib.recuperarVista'))}</button></p>` : ''}
-    ${htmlFuentes(ctx, todasEv)}
+    ${htmlFuentes(ctx, todasEv, L)}
     <div class="step-nav">
       <button class="btn" data-paso="anterior" ${i ? '' : 'disabled'}>${esc(t('estudio.anterior'))}</button>
       <button class="btn primary" data-paso="siguiente">${esc(t(ultimo ? 'estudio.terminar' : 'estudio.siguiente'))}</button>

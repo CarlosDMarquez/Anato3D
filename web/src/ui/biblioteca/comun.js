@@ -8,6 +8,12 @@ import { etiqueta } from '../../i18n/idioma.js';
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 export const icono = uiIcon;
 export const fecha = (ms) => new Date(ms).toLocaleDateString(idioma(), { day: 'numeric', month: 'short' });
+/** Un día escrito «2026-11-09» (sin hora), sin que la zona horaria lo cambie: `Date.parse` lo lee en UTC y en América
+ * sería el día anterior. */
+export function fechaDia(s) {
+  const [y, m, d] = String(s ?? '').split('-').map(Number);
+  return y && m && d ? fecha(new Date(y, m - 1, d).getTime()) : '';
+}
 
 // La taxonomía está en español; sus nombres pasan por las etiquetas traducidas de la interfaz (textos.js, ETIQUETAS).
 export const nomRegion = (id) => etiqueta(REGION_POR_ID.get(id)?.nombre ?? id);
@@ -28,6 +34,11 @@ export const nomSistema = (id) => etiqueta(SISTEMA_POR_ID.get(id)?.corto ?? id);
 export const nomNivel = (n) => etiqueta(NIVEL_POR_ID.get(n)?.nombre ?? '');
 export const nomFormato = (id) => etiqueta(FORMATO_POR_ID.get(id)?.nombre ?? id);
 
+/** Nombre de un idioma en el de la interfaz («inglés», «English»…). */
+export function nombreIdioma(id) {
+  try { return new Intl.DisplayNames([idioma()], { type: 'language' }).of(id) ?? id; } catch { return id; }
+}
+
 /** ¿La lección se puede leer en el idioma de la interfaz? Si no, se avisa: «Solo en español». */
 export const enEsteIdioma = (L) => (L.idiomas ?? ['es']).includes(idioma());
 
@@ -39,7 +50,8 @@ export function chipsMeta(L) {
     `<span>${esc(nomNivel(L.nivel))}</span>`,
     `<span>${icono('clock')}${esc(t('bib.minutos', { n: L.minutos }))}</span>`,
   ];
-  if (!enEsteIdioma(L)) partes.push(`<span class="bib-idioma">${esc(t('bib.soloEspanol'))}</span>`);
+  if (!enEsteIdioma(L)) partes.push(`<span class="bib-idioma">${esc(L.idiomas?.[0] && L.idiomas[0] !== 'es' ? t('pet.soloIdioma', { idioma: nombreIdioma(L.idiomas[0]) }) : t('bib.soloEspanol'))}</span>`);
+  if (L.propia) partes.push(`<span class="bib-propia">${icono('sparkles')}${esc(t('pet.propia'))}</span>`);
   return `<p class="bib-meta">${partes.join('')}</p>`;
 }
 
@@ -53,8 +65,11 @@ export function etiquetaEstado(e) {
   return `<span class="bib-estado ${e.estado}">${esc(t(`progreso.${e.estado}`))}</span>`;
 }
 
-/** Tarjeta de una lección del catálogo. `e`: su estado (progreso.estadoLeccion); `fav`: si está guardada. */
-export function tarjetaLeccion(L, e, fav, { compacta = false } = {}) {
+/**
+ * Tarjeta de una lección del catálogo. `e`: su estado (progreso.estadoLeccion); `fav`: si está guardada; `nota`: por
+ * qué la recomienda Neuri.
+ */
+export function tarjetaLeccion(L, e, fav, { compacta = false, nota = '' } = {}) {
   const accion = e.estado === 'en-curso' ? 'bib.seguir' : e.estado === 'sin-empezar' ? 'bib.empezar' : 'bib.repetir';
   return `
   <article class="bib-card" data-leccion="${esc(L.id)}">
@@ -62,6 +77,7 @@ export function tarjetaLeccion(L, e, fav, { compacta = false } = {}) {
       <h3><button class="bib-titulo" data-ir="info">${esc(tr(L.titulo))}</button></h3>
       <button class="bib-fav ${fav ? 'on' : ''}" data-fav aria-pressed="${fav}" aria-label="${esc(t(fav ? 'bib.quitarGuardada' : 'bib.guardar'))}">${icono('star')}</button>
     </div>
+    ${nota ? `<p class="bib-nota-pet">${icono('sparkles')}<span>${esc(nota)}</span></p>` : ''}
     ${compacta ? '' : `<p class="bib-resumen">${esc(tr(L.resumen))}</p>`}
     ${chipsMeta(L)}
     <div class="bib-card-foot">

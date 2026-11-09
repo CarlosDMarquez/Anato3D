@@ -11,9 +11,10 @@ import { tr } from '../../i18n/contenido.js';
 import { SYSTEM_BY_ID } from '../../systems.js';
 import { etiqueta } from '../../i18n/idioma.js';
 import {
-  esc, icono, fecha, tarjetaLeccion, tarjetaRecorrido, barra, etiquetaEstado, chipsMeta, vacio, enEsteIdioma,
+  esc, icono, fecha, fechaDia, tarjetaLeccion, tarjetaRecorrido, barra, etiquetaEstado, chipsMeta, vacio, enEsteIdioma,
   nomRegion, nomSub, nomSistema, nomFormato, nomTema, nomNivel, nomLugar,
 } from './comun.js';
+import { svgNeuri } from './neuri-svg.js';
 
 const atras = (texto) => `<button class="link back" data-atras>${icono('chevron')}<span>${esc(texto)}</span></button>`;
 
@@ -85,9 +86,9 @@ export async function renderResultados(ctx) {
   if (b.texto.trim()) await ctx.cargarEstructuras().catch(() => {});
   const r = b.texto.trim() ? ctx.buscador.buscar(b.texto) : null;
   const ctxF = { estado: (L) => ctx.estado(L), favorita: (id) => ctx.data.favoritos.includes(id), terminada: ctx.terminada };
-  const base = r ? r.lecciones : catalogo.lecciones;
+  const base = r ? r.lecciones : b.solo === 'propias' ? catalogo.lecciones.filter((L) => L.propia) : catalogo.lecciones;
   const lecciones = F.ordenar(F.filtrar(base, b.filtros, ctxF), b.orden === 'relevancia' && !r ? 'recomendado' : b.orden, ctxF);
-  const recorridos = b.solo === 'lecciones' ? [] : r ? r.recorridos : b.solo === 'recorridos' ? RECORRIDOS : [];
+  const recorridos = b.solo === 'lecciones' || b.solo === 'propias' ? [] : r ? r.recorridos : b.solo === 'recorridos' ? RECORRIDOS : [];
   const estructuras = r ? r.estructuras.slice(0, 8) : [];
   const verLecciones = b.solo !== 'recorridos';
   const activos = F.activos(b.filtros, t);
@@ -123,6 +124,7 @@ export async function renderResultados(ctx) {
     ${verLecciones && !lecciones.length ? `<div class="bib-sin">
       <p>${esc(t(r ? 'bib.sinLeccionesBusqueda' : 'bib.sinLeccionesFiltros'))}</p>
       ${ampliar.length ? `<p>${esc(t('bib.ampliar'))}</p><p class="bib-chips">${ampliar.map((a) => `<button class="bib-chip" data-quitar="${a.clave}">${esc(t('bib.sinFiltro', { f: etiqueta(a.nombre), n: a.n }))}</button>`).join('')}</p>` : ''}
+      ${r ? `<div class="neuri-sin">${svgNeuri()}<p>${esc(t('pet.sinResultados'))}</p><button class="btn primary" type="button" data-neuri-q>${icono('sparkles')}<span>${esc(t('pet.preguntar'))}</span></button></div>` : ''}
       ${r ? `<p class="bib-sugerencias"><span>${esc(t('bib.prueba'))}</span>${t('bib.sugerencias').split('|').map((s) => `<button type="button" class="bib-chip" data-sug="${esc(s)}">${esc(s)}</button>`).join('')}</p>` : ''}
     </div>` : ''}
     ${estructuras.length ? `<h3 class="bib-h">${esc(t('bib.estructuras'))}</h3><ul class="bib-estructuras">${estructuras.map((e) => {
@@ -144,6 +146,8 @@ export async function renderResultados(ctx) {
   body.querySelectorAll('[data-quitar]').forEach((x) => x.addEventListener('click', () => { b.filtros = F.quitar(b.filtros, x.dataset.quitar); renderResultados(ctx); }));
   body.querySelector('[data-quitar-todos]')?.addEventListener('click', () => { b.filtros = F.vacios(); renderResultados(ctx); });
   body.querySelectorAll('[data-sug]').forEach((x) => x.addEventListener('click', () => nueva(x.dataset.sug)));
+  body.querySelector('[data-neuri-q]')?.addEventListener('click', () => ctx.neuri.abrir(b.texto));
+  if (r && verLecciones && !lecciones.length) ctx.neuri.sinResultados();
   body.querySelectorAll('[data-region-entera]').forEach((x) => x.addEventListener('click', () => {
     ctx.busqueda = { texto: '', filtros: { ...F.vacios(), region: x.dataset.regionEntera, sistema: r?.materias.find((m) => m.sistema)?.sistema ?? null }, orden: 'recomendado' };
     ctx.ir({ tipo: 'resultados' }, { reemplazar: true });
@@ -259,11 +263,13 @@ export function renderInfo(ctx) {
     ${chipsMeta(L)}
     ${e.cambiada ? `<p class="mod-note">${esc(t('bib.cambiada'))}</p>` : ''}
     ${soloUno ? `<p class="bib-nota">${esc(t(`bib.soloModelo.${soloUno}`))}</p>` : ''}
+    ${L.propia ? `<p class="bib-nota bib-nota-propia">${icono('sparkles')}<span>${esc(t(L.origen?.modo === 'adaptar' && L.origen?.base ? 'pet.propiaAdaptada' : 'pet.propiaCreada', { fecha: fechaDia(L.origen?.fecha), base: L.origen?.base && ctx.porId.get(L.origen.base) ? tr(ctx.porId.get(L.origen.base).titulo) : '' }))}</span></p>` : ''}
     <div class="bib-acciones">
       <button class="btn primary" data-accion="leccion">${esc(t(accion))}</button>
       <button class="btn" data-accion="evaluar">${esc(t('bib.evaluarme'))}</button>
       <button class="btn" data-accion="repasar" ${e.pendientes ? '' : 'disabled'}>${esc(t('bib.repasar'))}${e.pendientes ? ` (${e.pendientes})` : ''}</button>
       <button class="btn" data-fav aria-pressed="${fav}">${icono('star')}${esc(t(fav ? 'bib.quitarGuardada' : 'bib.guardar'))}</button>
+      <button class="btn" data-accion="adaptar">${icono('sparkles')}${esc(t('pet.adaptarCon'))}</button>
     </div>
     <h4>${esc(t('bib.tuProgreso'))}</h4>
     <dl class="mod-stats">
@@ -284,7 +290,11 @@ export function renderInfo(ctx) {
     </dl>
     <p class="mod-foot">${esc(t('estudio.progresoLocal'))}
       <button class="link" data-accion="reiniciar">${esc(t('bib.reiniciar'))}</button> ·
-      <button class="link" data-accion="borrar">${esc(t('bib.borrar'))}</button></p>
+      <button class="link" data-accion="borrar">${esc(t('bib.borrar'))}</button>${L.propia ? ` · <button class="link" data-accion="quitar">${esc(t('pet.quitarPropia'))}</button>` : ''}</p>
+    ${L.propia ? `<div class="mod-confirm mod-confirm-propia" hidden>
+      <p>${esc(t('pet.quitarPregunta'))}</p>
+      <button class="btn danger" data-accion="quitar-si">${esc(t('pet.quitarSi'))}</button> <button class="btn" data-accion="quitar-no">${esc(t('estudio.cancelar'))}</button>
+    </div>` : ''}
     <div class="mod-confirm" hidden>
       <p>${esc(t('bib.borrarPregunta'))}</p>
       <button class="btn danger" data-accion="borrar-si">${esc(t('estudio.borrarSi'))}</button> <button class="btn" data-accion="borrar-no">${esc(t('estudio.cancelar'))}</button>
@@ -305,6 +315,10 @@ export function renderInfo(ctx) {
       ctx.toast(t('estudio.reiniciada'));
       return renderInfo(ctx);
     }
+    if (a === 'adaptar') return ctx.neuri.abrir(null, { borrador: t('pet.adaptarBorrador', { titulo: tr(L.titulo) }) });
+    if (a === 'quitar') { body.querySelector('.mod-confirm-propia').hidden = false; body.querySelector('.mod-confirm-propia .danger').focus(); return; }
+    if (a === 'quitar-no') { body.querySelector('.mod-confirm-propia').hidden = true; return; }
+    if (a === 'quitar-si') { ctx.borrarPropia(L.id); ctx.toast(t('pet.quitada')); ctx.pila = ctx.pila.filter((v) => v.id !== L.id); return ctx.volver(); }
     if (a === 'borrar') { body.querySelector('.mod-confirm').hidden = false; body.querySelector('.mod-confirm .danger').focus(); }
     if (a === 'borrar-no') body.querySelector('.mod-confirm').hidden = true;
     if (a === 'borrar-si') { P.borrarLeccion(ctx.data, L.id); ctx.guardar(); ctx.toast(t('estudio.borrado')); renderInfo(ctx); }

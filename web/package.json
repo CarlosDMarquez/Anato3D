@@ -9,11 +9,13 @@
     "preview": "vite preview",
     "icons": "node scripts/extract-icons.mjs",
     "test": "node --test tests/",
-    "check": "node scripts/check-cards.mjs && node scripts/contenido-i18n.mjs --comprobar && node scripts/biblioteca.mjs --comprobar",
+    "check": "node scripts/check-cards.mjs && node scripts/contenido-i18n.mjs --comprobar && node scripts/biblioteca.mjs --comprobar && node scripts/neuri-datos.mjs --comprobar",
     "biblioteca": "node scripts/biblioteca.mjs",
-    "fuentes": "node scripts/biblioteca/fuentes.mjs"
+    "fuentes": "node scripts/biblioteca/fuentes.mjs",
+    "pet:prueba": "node scripts/pet-prueba.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.7.0",
     "@fontsource/ibm-plex-sans": "^5.3.0",
     "@fontsource/ibm-plex-serif": "^5.3.0",
     "three": "0.186.1"

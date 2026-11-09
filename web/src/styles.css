@@ -603,3 +603,187 @@ body.saliendo .start { opacity: 0; }
   .bib-cols { columns: 1; }
   .bib-chip, .bib-fila, .bib-tile, .opt { min-height: 40px; }
 }
+
+/* ── Neuri, el pet de «Estudiar» (ui/biblioteca/pet.js y neuri-svg.js) ───────────────
+   Una neurona con cara que recomienda lecciones. Sus gestos son data-estado en el SVG: reposo, escuchando, pensando
+   (le recorren impulsos nerviosos), contento y dudando. Con «reducir movimiento», quieto. */
+.neuri { display: block; overflow: visible; }
+.neuri .neuri-cuerpo { transform-origin: 60px 64px; animation: neuri-flota 4.2s ease-in-out infinite; }
+.neuri .neuri-ramas { transform-origin: 60px 61px; animation: neuri-mece 6.5s ease-in-out infinite; }
+.neuri .neuri-ojos { transform-box: fill-box; transform-origin: center; animation: neuri-parpadea 5.2s infinite; transition: opacity 0.2s; }
+.neuri .neuri-mirada { transition: transform 0.25s ease; }
+.neuri .neuri-halo { transform-origin: 60px 60px; opacity: 0.8; }
+.neuri .neuri-boca { transition: opacity 0.2s; }
+.neuri .neuri-ojos-felices, .neuri .neuri-boca-duda, .neuri .neuri-impulsos { opacity: 0; transition: opacity 0.2s; }
+.neuri .neuri-mejilla { opacity: 0.3; transition: opacity 0.3s; }
+.neuri .neuri-impulsos path { stroke-dasharray: 9 191; stroke-dashoffset: 200; }
+.neuri[data-estado="escuchando"] .neuri-mirada { transform: translate(-1.2px, 1.8px); }
+.neuri[data-estado="pensando"] .neuri-mirada { transform: translate(1.6px, -2.4px); }
+.neuri[data-estado="pensando"] .neuri-impulsos { opacity: 1; }
+.neuri[data-estado="pensando"] .neuri-impulsos path { animation: neuri-impulso 1.6s linear infinite; }
+.neuri[data-estado="pensando"] .neuri-impulsos path:nth-child(2) { animation-delay: 0.35s; }
+.neuri[data-estado="pensando"] .neuri-impulsos path:nth-child(3) { animation-delay: 0.7s; }
+.neuri[data-estado="pensando"] .neuri-impulsos path:nth-child(4) { animation-delay: 1.05s; }
+.neuri[data-estado="pensando"] .neuri-impulsos path:nth-child(5) { animation-delay: 0.5s; animation-duration: 1.2s; }
+.neuri[data-estado="pensando"] .neuri-halo { animation: neuri-late 1.2s ease-in-out infinite; }
+.neuri[data-estado="contento"] .neuri-ojos { opacity: 0; }
+.neuri[data-estado="contento"] .neuri-ojos-felices { opacity: 1; }
+.neuri[data-estado="contento"] .neuri-mejilla { opacity: 0.6; }
+.neuri[data-estado="contento"] .neuri-cuerpo { animation: neuri-salta 0.9s ease-out, neuri-flota 4.2s ease-in-out 0.9s infinite; }
+.neuri[data-estado="dudando"] .neuri-boca { opacity: 0; }
+.neuri[data-estado="dudando"] .neuri-boca-duda { opacity: 1; }
+.neuri[data-estado="dudando"] .neuri-cuerpo { animation: neuri-ladea 0.45s ease-out forwards; }
+@keyframes neuri-flota { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.4px); } }
+@keyframes neuri-mece { 0%, 100% { transform: rotate(-1.6deg); } 50% { transform: rotate(1.6deg); } }
+@keyframes neuri-parpadea { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.12); } }
+@keyframes neuri-impulso { from { stroke-dashoffset: 200; } to { stroke-dashoffset: 0; } }
+@keyframes neuri-late { 0%, 100% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.09); } }
+@keyframes neuri-salta { 0% { transform: translateY(0); } 35% { transform: translateY(-7px) scale(1.03); } 65% { transform: translateY(0); } 82% { transform: translateY(-2px); } 100% { transform: translateY(0); } }
+@keyframes neuri-ladea { to { transform: rotate(-8deg) translateX(-1px); } }
+@keyframes neuri-onda { 0% { opacity: 0.7; transform: scale(1); } 100% { opacity: 0; transform: scale(1.35); } }
+@keyframes neuri-aparece { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes neuri-punto { 0%, 60%, 100% { opacity: 0.3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+
+/* Lanzador: abajo a la derecha del panel y siempre a la vista al desplazarse (el panel es el que se desplaza). */
+.neuri-lanzador { position: sticky; bottom: 0; height: 0; z-index: 4; pointer-events: none; }
+.panel-study.con-neuri #study-body { padding-bottom: 58px; }
+.neuri-fab { position: absolute; right: -6px; bottom: 0; width: 68px; height: 68px; padding: 4px; border-radius: 50%; pointer-events: auto;
+  background: radial-gradient(circle at 50% 38%, #18263a, #0c131d 72%); border: 1px solid rgba(77, 163, 255, 0.45);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 0 4px rgba(77, 163, 255, 0.07), 0 0 24px rgba(77, 163, 255, 0.22); transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; }
+.neuri-fab:hover { transform: translateY(-2px); border-color: rgba(77, 163, 255, 0.8); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55), 0 0 0 4px rgba(77, 163, 255, 0.12), 0 0 30px rgba(77, 163, 255, 0.35); }
+.neuri-fab .neuri { width: 100%; height: 100%; }
+.neuri-lanzador.llamada .neuri-fab::after { content: ''; position: absolute; inset: -5px; border-radius: 50%; border: 2px solid rgba(77, 163, 255, 0.55); animation: neuri-onda 2.2s ease-out infinite; pointer-events: none; }
+.neuri-burbuja { position: absolute; right: 72px; bottom: 14px; display: flex; align-items: flex-start; gap: 2px; width: max-content; max-width: 240px; padding: 3px 3px 3px 0; border-radius: 12px 12px 4px 12px;
+  background: var(--surface-solid); border: 1px solid rgba(77, 163, 255, 0.4); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45); pointer-events: auto; animation: neuri-aparece 0.22s ease-out; }
+.neuri-burbuja-texto { padding: 6px 4px 6px 12px; text-align: left; font-size: 13px; line-height: 1.4; color: var(--text); }
+.neuri-burbuja-x { flex: none; width: 22px; height: 22px; display: grid; place-items: center; border-radius: 6px; color: var(--muted); }
+.neuri-burbuja-x:hover { background: var(--raise-2); color: var(--text); }
+.neuri-burbuja-x .ui-icon { width: 13px; height: 13px; }
+
+/* Entrada en la portada y cuando una búsqueda no encuentra lecciones. */
+.neuri-entrada { display: flex; align-items: center; gap: 10px; width: 100%; margin: 12px 0 0; padding: 6px 12px 6px 6px; border-radius: 12px; border: 1px solid rgba(77, 163, 255, 0.28);
+  background: linear-gradient(90deg, rgba(77, 163, 255, 0.13), rgba(77, 163, 255, 0.02)); color: var(--text); font-size: 13.5px; text-align: left; transition: border-color 0.15s, background 0.15s; }
+.neuri-entrada:hover { border-color: rgba(77, 163, 255, 0.6); background: linear-gradient(90deg, rgba(77, 163, 255, 0.2), rgba(77, 163, 255, 0.04)); }
+.neuri-entrada .neuri { width: 42px; height: 42px; flex: none; }
+.neuri-entrada span { flex: 1; }
+.neuri-entrada > .ui-icon { width: 16px; height: 16px; color: var(--accent); }
+.neuri-sin { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 12px; margin: 14px 0 4px; padding: 12px; border-radius: 12px; border: 1px solid rgba(77, 163, 255, 0.3); background: rgba(77, 163, 255, 0.07); }
+.neuri-sin .neuri { width: 54px; height: 54px; flex: none; }
+.neuri-sin p { flex: 1 1 200px; margin: 0; font-size: 13px; line-height: 1.45; color: var(--text-2); }
+
+/* La conversación: ocupa el panel; los mensajes se desplazan y lo de escribir queda abajo. */
+.panel-study.ancho.chat { height: calc(100% - var(--dock-h, 86px) - 34px); display: flex; flex-direction: column; overflow: hidden; padding-bottom: 12px; }
+.panel-study.chat #study-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.neuri-vista { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.neuri-cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.neuri-cab .back { margin-bottom: 0; }
+.neuri-cab .btn { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; font-size: 12px; }
+.neuri-cab .btn .ui-icon { width: 15px; height: 15px; }
+.neuri-presenta { display: flex; align-items: center; gap: 12px; margin: 6px 0 8px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.neuri-presenta .neuri { width: 66px; height: 66px; flex: none; }
+.neuri-presenta h3 { margin: 0 !important; font-size: 17px !important; font-weight: 600; letter-spacing: 0 !important; text-transform: none !important; color: var(--text) !important; }
+.neuri-lema { margin: 1px 0 0; font-size: 12.5px; color: var(--text-2); }
+.neuri-modo { display: inline-flex; align-items: center; gap: 5px; margin: 6px 0 0; padding: 2px 8px; border-radius: 99px; font-size: 11px; color: var(--muted); background: var(--raise); }
+.neuri-modo.ia { color: #bfe0ff; background: var(--accent-soft); }
+.neuri-modo .ui-icon { width: 12px; height: 12px; }
+.neuri-log { position: relative; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 6px 2px 12px; overscroll-behavior: contain; }
+.neuri-log:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+.neuri-msg { display: flex; flex-direction: column; gap: 8px; max-width: 100%; }
+.neuri-msg.yo { align-items: flex-end; }
+.neuri-msg.yo p { margin: 0; max-width: 85%; padding: 9px 13px; border-radius: 14px 14px 4px 14px; background: var(--accent); color: #04111f; font-size: 14px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+.neuri-globo { align-self: flex-start; max-width: 92%; padding: 10px 13px; border-radius: 14px 14px 14px 4px; background: var(--raise-2); border: 1px solid var(--line); font-size: 14px; line-height: 1.5; color: var(--text); overflow-wrap: anywhere; }
+.neuri-globo p { margin: 0; }
+.neuri-globo p + p { margin-top: 6px; }
+.neuri-globo .neuri-origen, .neuri-globo .neuri-aviso { display: flex; align-items: center; gap: 5px; margin-top: 8px; font-size: 11.5px; line-height: 1.4; color: var(--muted); }
+.neuri-globo .neuri-aviso { color: #f0c27a; }
+.neuri-origen .ui-icon { width: 12px; height: 12px; flex: none; }
+.neuri-recs { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.neuri-sugs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+.bib-nota-pet { display: flex; gap: 6px; margin: 0; font-size: 12.5px; line-height: 1.45; color: #bfe0ff; }
+.bib-nota-pet .ui-icon { width: 13px; height: 13px; flex: none; margin-top: 2px; color: var(--accent); }
+.neuri-puntos { display: inline-flex; gap: 4px; padding: 4px 0; }
+.neuri-puntos i { width: 7px; height: 7px; border-radius: 50%; background: var(--text-2); animation: neuri-punto 1.2s ease-in-out infinite; }
+.neuri-puntos i:nth-child(2) { animation-delay: 0.15s; }
+.neuri-puntos i:nth-child(3) { animation-delay: 0.3s; }
+.neuri-form { display: flex; align-items: flex-end; gap: 8px; padding: 10px 0 0; border-top: 1px solid var(--line); }
+.neuri-form textarea { flex: 1; min-width: 0; height: 44px; max-height: 120px; padding: 11px 12px; border-radius: 12px; border: 1px solid var(--line-strong); background: var(--raise-2); color: var(--text); font: 400 14.5px/1.4 var(--sans); resize: none; outline: none; }
+.neuri-form textarea:focus { border-color: var(--accent); }
+.neuri-form textarea::placeholder { color: var(--muted); }
+.neuri-enviar { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border-radius: 12px; background: var(--accent); color: #04111f; transition: background 0.15s, opacity 0.15s; }
+.neuri-enviar:hover:not(:disabled) { background: #6bb4ff; }
+.neuri-enviar:disabled { opacity: 0.4; cursor: default; }
+.neuri-enviar .ui-icon { width: 18px; height: 18px; }
+.neuri-nota { margin: 8px 0 0; font-size: 11px; line-height: 1.45; color: var(--muted); }
+@media (max-width: 760px) {
+  .panel-study.ancho.chat { height: auto; }
+  .neuri-fab { width: 60px; height: 60px; }
+  .neuri-burbuja { right: 64px; max-width: 210px; }
+  .neuri-presenta .neuri { width: 54px; height: 54px; }
+  .neuri-recs { grid-template-columns: 1fr; }
+  .neuri-form textarea { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .neuri .neuri-cuerpo, .neuri .neuri-ramas, .neuri .neuri-ojos, .neuri .neuri-halo { animation: none !important; }
+  .neuri[data-estado="pensando"] .neuri-impulsos path { animation: none; stroke-dasharray: none; opacity: 0.5; }
+  .neuri[data-estado="dudando"] .neuri-cuerpo { transform: rotate(-8deg); }
+  .neuri-lanzador.llamada .neuri-fab::after, .neuri-puntos i, .neuri-burbuja { animation: none; }
+  .neuri-fab:hover { transform: none; }
+}
+.neuri-sin .btn { display: inline-flex; align-items: center; gap: 6px; }
+
+/* Neuri v2: propuesta, plan, creación, fuentes de una explicación, sesión y «Mis lecciones». */
+.bib-propia { display: inline-flex; align-items: center; gap: 4px; padding: 1px 7px; border-radius: 99px; background: var(--accent-soft); color: #bfe0ff; }
+.bib-propia .ui-icon { width: 11px; height: 11px; }
+.bib-nota-propia { display: flex; gap: 6px; align-items: flex-start; color: #bfe0ff !important; }
+.bib-nota-propia .ui-icon { width: 14px; height: 14px; flex: none; margin-top: 2px; color: var(--accent); }
+.bib-nota-propias { margin: -2px 0 10px; font-size: 12px; line-height: 1.45; color: var(--muted); }
+.neuri-tarjeta { align-self: stretch; display: flex; flex-direction: column; gap: 8px; padding: 12px 13px; border-radius: 12px; border: 1px solid rgba(77, 163, 255, 0.32); background: linear-gradient(180deg, rgba(77, 163, 255, 0.08), rgba(77, 163, 255, 0.02)); font-size: 13.5px; line-height: 1.5; color: var(--text-2); }
+.neuri-tarjeta p { margin: 0; }
+.neuri-tarjeta-t { display: flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #bfe0ff; }
+.neuri-tarjeta-t .ui-icon { width: 15px; height: 15px; color: var(--accent); }
+.neuri-campos { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; }
+.neuri-campos dt { color: var(--muted); font-size: 12.5px; }
+.neuri-campos dd { margin: 0; color: var(--text); }
+.neuri-acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+.neuri-acciones .btn { display: inline-flex; align-items: center; gap: 6px; }
+.neuri-aviso-t { color: #f0c27a !important; font-size: 12.5px; }
+.neuri-plan-t { margin: 0; font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: 0; text-transform: none; }
+.neuri-plan-base { font-size: 12.5px; color: var(--muted); }
+.neuri-plan-r { color: var(--text-2); }
+.neuri-tarjeta h5 { margin: 6px 0 0; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.neuri-lista { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.neuri-lista small { color: var(--muted); font-size: 11.5px; }
+.neuri-lista span { color: var(--text-2); }
+.neuri-plan-nota { font-size: 12px; color: var(--muted); }
+.neuri-pasos-gen { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.neuri-pasos-gen li { display: flex; align-items: center; gap: 8px; color: var(--muted); }
+.neuri-pasos-gen li.hecho { color: var(--text-2); }
+.neuri-pasos-gen li.actual { color: var(--text); font-weight: 500; }
+.neuri-pasos-gen li .ui-icon { width: 15px; height: 15px; color: #8fe0b3; flex: none; }
+.neuri-pasos-gen li > i { width: 15px; height: 15px; flex: none; border-radius: 50%; border: 2px solid var(--line-strong); }
+.neuri-pasos-gen li.actual > i { border-color: var(--accent); border-right-color: transparent; animation: neuri-gira 0.9s linear infinite; }
+@keyframes neuri-gira { to { transform: rotate(360deg); } }
+/* «Planificando…»: el botón sigue a la vista, con su giro, mientras se prepara el plan. */
+.btn.ocupado:disabled { opacity: 1; cursor: progress; }
+.neuri-giro { width: 14px; height: 14px; flex: none; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; animation: neuri-gira 0.9s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .neuri-giro { animation: none; border-right-color: currentColor; opacity: 0.6; } }
+.neuri-gen.ok { border-color: rgba(90, 200, 140, 0.4); background: linear-gradient(180deg, rgba(90, 200, 140, 0.09), rgba(90, 200, 140, 0.02)); }
+.neuri-gen.ok .neuri-tarjeta-t { color: #c9f0d9; }
+.neuri-gen.ok .neuri-tarjeta-t .ui-icon { color: #8fe0b3; }
+.neuri-gen.mal { border-color: rgba(240, 180, 80, 0.35); background: rgba(240, 180, 80, 0.06); }
+.neuri-gen.mal .neuri-tarjeta-t { color: #f0c27a; }
+.neuri-gen.mal .neuri-tarjeta-t .ui-icon { color: #f0c27a; }
+.neuri-globo-in { align-self: stretch; max-width: none; }
+.neuri-informe { font-size: 12.5px; color: var(--text-2); }
+.neuri-detalles summary { cursor: pointer; font-size: 12px; color: var(--muted); }
+.neuri-detalles ul { margin: 6px 0 0; padding-left: 18px; font-size: 12px; color: var(--muted); }
+.neuri-fuentes { align-self: stretch; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--raise); font-size: 12.5px; }
+.neuri-fuentes summary { display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-2); }
+.neuri-fuentes summary .ui-icon { width: 13px; height: 13px; color: var(--accent); }
+.neuri-fuentes ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px; }
+.neuri-fuentes p { margin: 0; }
+.neuri-ev-texto { color: var(--text); }
+.neuri-ev-cita { margin-top: 3px !important; color: var(--text-2); font-style: italic; }
+.neuri-ev-de { margin-top: 3px !important; color: var(--muted); font-size: 12px; }
+.neuri-ev-de a { color: var(--text-2); }
+@media (prefers-reduced-motion: reduce) { .neuri-pasos-gen li.actual > i { animation: none; border-right-color: var(--accent); } }

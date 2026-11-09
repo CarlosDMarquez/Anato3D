@@ -24,16 +24,19 @@ import { renderPortada } from './portada.js';
 import { renderResultados, renderRecorrido, renderInfo, renderSesion } from './explorar.js';
 import { renderLeccion } from './leccion.js';
 import { renderPreguntas, renderResultado, teclaPreguntas } from './preguntas.js';
+import { crearNeuri } from './pet.js';
+import { cargarPropias, entradaCatalogo, guardarPropia, borrarPropia } from '../../biblioteca/propias.js';
 
 const ARCHIVOS = import.meta.glob('../../biblioteca/lecciones/*.js');
 // Vistas que necesitan sitio (catálogo) y vistas que dejan el modelo a la vista (lección y preguntas).
-const ANCHAS = new Set(['portada', 'resultados', 'recorrido', 'info', 'sesion']);
+const ANCHAS = new Set(['portada', 'resultados', 'recorrido', 'info', 'sesion', 'neuri']);
 
 export function createBiblioteca({ panel, body, storage, api, toast }) {
   const antiguas = new Map(MODULOS.map(deModulo).filter(Boolean).map((L) => [L.id, L]));
   const ctx = {
     body, api, toast,
-    catalogo: null, porId: new Map(), lecciones: new Map(antiguas), fuentes: null, buscador: null, estructuras: null,
+    catalogo: null, catalogoBase: null, porId: new Map(), lecciones: new Map(antiguas), fuentes: null, buscador: null, estructuras: null,
+    propias: [], storage,
     data: P.cargar(storage, { lecciones: antiguas }),
     vista: { tipo: 'portada' }, pila: [],
     busqueda: { texto: '', filtros: F.vacios(), orden: 'relevancia' },
@@ -41,16 +44,45 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     estado(L, extra) { return P.estadoLeccion(ctx.data, L, extra); },
     terminada(id) { return ['completada', 'demostrada', 'dominada'].includes(ctx.estado(ctx.porId.get(id) ?? { id, pasos: 1, preguntas: 0 }).estado); },
     ir, volver, render, cargarLeccion, resumenRecorrido, recorridosDe,
+    esPropia: (id) => ctx.propias.some((L) => L.id === id),
+    /** Guarda una lección de Neuri en «Mis lecciones» y la añade al catálogo. Devuelve { ok, error? }. */
+    guardarPropia(L) {
+      const r = guardarPropia(storage, L);
+      if (r.ok) actualizarPropias();
+      return r;
+    },
+    borrarPropia(id) {
+      const ok = borrarPropia(storage, id);
+      P.borrarLeccion(ctx.data, id);
+      ctx.data.favoritos = ctx.data.favoritos.filter((x) => x !== id);
+      ctx.guardar();
+      actualizarPropias();
+      return ok;
+    },
   };
+  // Neuri, el pet que recomienda lecciones (pet.js): su lanzador vive en el panel y su conversación es la vista «neuri».
+  ctx.neuri = crearNeuri(ctx, panel);
   // Si el progreso se migró desde la versión anterior, se guarda ya en el formato nuevo (la clave antigua no se toca).
   if (ctx.data.migracion && !storage?.getItem?.(P.CLAVE)) ctx.guardar();
 
   async function cargarCatalogo() {
     if (ctx.catalogo) return;
-    ctx.catalogo = (await import('../../biblioteca/generado/catalogo.json')).default;
-    for (const L of ctx.catalogo.lecciones) ctx.porId.set(L.id, L);
-    ctx.buscador = crearBuscador({ lecciones: ctx.catalogo.lecciones, recorridos: RECORRIDOS });
+    ctx.catalogoBase = (await import('../../biblioteca/generado/catalogo.json')).default;
+    actualizarPropias();
   }
+
+  /** «Mis lecciones» (las de Neuri, en este navegador) se suman al catálogo, al buscador y a las lecciones cargadas. */
+  function actualizarPropias() {
+    if (!ctx.catalogoBase) return;
+    for (const L of ctx.propias) ctx.lecciones.delete(L.id);
+    ctx.propias = cargarPropias(storage);
+    for (const L of ctx.propias) ctx.lecciones.set(L.id, L);
+    const base = ctx.catalogoBase;
+    ctx.catalogo = { ...base, lecciones: [...base.lecciones, ...ctx.propias.map((L, i) => entradaCatalogo(L, 1000 + i))] };
+    ctx.porId = new Map(ctx.catalogo.lecciones.map((L) => [L.id, L]));
+    ctx.buscador = crearBuscador({ lecciones: ctx.catalogo.lecciones, recorridos: RECORRIDOS, estructuras: ctx.estructuras?.lista ?? [] });
+  }
+  ctx.actualizarPropias = actualizarPropias;
 
   /** Estructuras del modelo para el buscador (se piden la primera vez que se busca y al cambiar de modelo). */
   async function cargarEstructuras() {
@@ -59,7 +91,7 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     const lista = await api.piezas();
     const conSinonimos = lista.map((e) => ({ ...e, sinonimos: sinonimosDePieza(e.clave, modelo) }));
     ctx.estructuras = { modelo, lista: conSinonimos };
-    ctx.buscador = crearBuscador({ lecciones: ctx.catalogo.lecciones, recorridos: RECORRIDOS, estructuras: conSinonimos });
+    ctx.buscador = crearBuscador({ lecciones: ctx.catalogo.lecciones, recorridos: RECORRIDOS, estructuras: conSinonimos });   // con las propias
   }
   ctx.cargarEstructuras = cargarEstructuras;
 
@@ -102,6 +134,7 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     await cargarCatalogo();
     const v = ctx.vista;
     panel.classList.toggle('ancho', ANCHAS.has(v.tipo));
+    ctx.neuri.actualizar(v);
     api.ajustar();
     if (!['preguntas'].includes(v.tipo)) { api.modoEvaluacion(false); api.alTocar(null); }
     if (v.tipo === 'resultados') return renderResultados(ctx);
@@ -111,12 +144,14 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     if (v.tipo === 'leccion') return renderLeccion(ctx);
     if (v.tipo === 'preguntas') return renderPreguntas(ctx);
     if (v.tipo === 'resultado') return renderResultado(ctx);
+    if (v.tipo === 'neuri') return ctx.neuri.renderVista();
     return renderPortada(ctx);
   }
 
   return {
     abrir() {
       ctx.data = P.cargar(storage, { lecciones: antiguas });
+      actualizarPropias();                                  // otra pestaña pudo crear o borrar lecciones propias
       return render();
     },
     // Cambio de idioma o de modelo: rehace la vista actual (sin mover la cámara ni cambiar la pregunta).

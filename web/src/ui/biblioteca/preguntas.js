@@ -118,7 +118,7 @@ function feedback(ctx, L, q, v) {
   return `
     <p class="q-result ${r}" tabindex="-1">${r === 'fallo' ? t('estudio.fallo', { respuesta: `<b>${esc(correcta)}</b>` }) : esc(t(r === 'duda' ? 'estudio.duda' : 'estudio.correcto'))}</p>
     ${expl ? `<p class="q-expl">${esc(expl)}</p>` : ''}
-    ${htmlFuentes(ctx, q.evidencia ?? [])}
+    ${htmlFuentes(ctx, q.evidencia ?? [], L)}
     <div class="step-nav">
       ${paso ? `<button class="btn" data-volver-paso>${esc(t('bib.volverPaso', { paso: tr(paso.titulo) }))}</button>` : ''}
       ${q.estructuras?.length ? `<button class="btn" data-ver3d>${esc(t('estudio.ver3d'))}</button>` : ''}

@@ -8,6 +8,7 @@ import { itemsDePractica } from '../../biblioteca/sesion.js';
 import { t, tn } from '../../i18n/idioma.js';
 import { esc, icono, fecha, tarjetaLeccion, tarjetaRecorrido, nomRegion, nomSistema, nomTema } from './comun.js';
 import { enlazarTarjetas, empezarPractica } from './explorar.js';
+import { svgNeuri } from './neuri-svg.js';
 
 const MINUTOS = [10, 15, 20, 30, 45];
 
@@ -38,12 +39,22 @@ export function renderPortada(ctx) {
       <div class="bib-buscar-caja">${icono('search')}<input id="bib-q" type="search" autocomplete="off" spellcheck="false"
         placeholder="${esc(t('bib.buscarEjemplo'))}" value="${esc(ctx.busqueda.texto)}" aria-describedby="bib-sug" /></div>
       <p class="bib-sugerencias" id="bib-sug"><span>${esc(t('bib.prueba'))}</span>${t('bib.sugerencias').split('|').map((s) => `<button type="button" class="bib-chip" data-sug="${esc(s)}">${esc(s)}</button>`).join('')}</p>
+      <button type="button" class="neuri-entrada" data-neuri>${svgNeuri()}<span>${esc(t('pet.portada'))}</span>${icono('chevron')}</button>
     </form>
 
     ${enCurso.length ? `
     <section class="bib-sec" aria-labelledby="bib-h-seguir">
       <h3 id="bib-h-seguir" class="bib-h">${esc(t('bib.continuar'))}</h3>
       <div class="bib-grid">${enCurso.slice(0, 2).map((L) => tarjetaLeccion(L, estado(L), data.favoritos.includes(L.id), { compacta: true })).join('')}</div>
+    </section>` : ''}
+
+    ${ctx.propias.length ? `
+    <section class="bib-sec" aria-labelledby="bib-h-propias">
+      <div class="bib-h-fila"><h3 id="bib-h-propias" class="bib-h">${esc(t('pet.misLecciones'))}</h3>
+        <button class="link" data-neuri>${esc(t('pet.crearOtra'))}</button></div>
+      <p class="bib-nota-propias">${esc(t('pet.misLeccionesNota'))}</p>
+      <div class="bib-grid">${lecciones.filter((L) => L.propia).slice(0, 4).map((L) => tarjetaLeccion(L, estado(L), data.favoritos.includes(L.id), { compacta: true })).join('')}</div>
+      ${ctx.propias.length > 4 ? `<p class="bib-todas"><button class="link" data-todos="propias">${esc(t('pet.verMisLecciones', { n: ctx.propias.length }))}</button></p>` : ''}
     </section>` : ''}
 
     <section class="bib-sec bib-hoy" aria-labelledby="bib-h-hoy">
@@ -112,6 +123,7 @@ export function renderPortada(ctx) {
   // Al escribir se pasa a los resultados (que conservan el foco y la consulta).
   q.addEventListener('input', () => { if (q.value.trim().length >= 2) { ctx.busqueda.foco = true; buscar(q.value); } });
   body.querySelectorAll('[data-sug]').forEach((b) => b.addEventListener('click', () => buscar(b.dataset.sug)));
+  body.querySelectorAll('[data-neuri]').forEach((b) => b.addEventListener('click', () => ctx.neuri.abrir()));
   body.querySelectorAll('[data-filtro]').forEach((b) => b.addEventListener('click', () => {
     if (b.getAttribute('aria-disabled') === 'true') return ctx.toast(t('bib.sinLeccionesAun'));
     ctx.busqueda = { texto: '', filtros: { ...F.vacios(), [b.dataset.filtro]: b.dataset.valor }, orden: 'recomendado' };
