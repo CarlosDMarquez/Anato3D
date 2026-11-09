@@ -312,21 +312,35 @@ const ESTRUCTURAS = [
   },
 ];
 
+// Pasos de la lección. `tipo` (biblioteca de estudio, src/biblioteca/formato.js): orientación, explicación, relaciones o
+// síntesis. La orientación y la síntesis se añadieron el 2026-11-09 al pasar el módulo a la biblioteca.
 const LECCION = [
-  { id: 'huesos', titulo: 'Radio y ulna', fichas: ['radio', 'ulna'], fuentes: ['tma_radio', 'tma_ulna'],
+  { id: 'orientacion', tipo: 'orientacion', titulo: 'Tres capas de flexores y pronadores',
+    fichas: ['pronador-redondo', 'flexor-radial-carpo', 'palmar-largo', 'flexor-ulnar-carpo', 'flexor-superficial-dedos', 'flexor-profundo-dedos', 'flexor-largo-pulgar', 'pronador-cuadrado'],
+    fuentes: ['tma_antebrazo_ant'],
+    texto: 'El compartimento anterior del antebrazo reúne músculos que sobre todo flexionan y pronan. Se ordenan en tres capas según su profundidad: cuatro superficiales, uno intermedio y tres profundos. La mayoría los inerva el nervio mediano.' },
+  { id: 'huesos', tipo: 'explicacion', titulo: 'Radio y ulna', fichas: ['radio', 'ulna'], fuentes: ['tma_radio', 'tma_ulna'],
     texto: 'Los dos huesos del antebrazo. La ulna, medial, es el hueso estable; el radio, lateral, gira a su alrededor en las articulaciones radioulnares proximal y distal.' },
-  { id: 'superficial', titulo: 'Capa superficial', fichas: ['pronador-redondo', 'flexor-radial-carpo', 'palmar-largo', 'flexor-ulnar-carpo'], fuentes: ['tma_antebrazo_ant'],
+  { id: 'superficial', tipo: 'explicacion', titulo: 'Capa superficial', fichas: ['pronador-redondo', 'flexor-radial-carpo', 'palmar-largo', 'flexor-ulnar-carpo'], fuentes: ['tma_antebrazo_ant'],
     texto: 'Cuatro músculos que nacen de un tendón común en el epicóndilo medial del húmero: flexor ulnar del carpo, palmar largo, flexor radial del carpo y pronador redondo. Los inerva el nervio mediano, salvo el flexor ulnar del carpo, que inerva el ulnar.' },
-  { id: 'intermedia', titulo: 'Capa intermedia', fichas: ['flexor-superficial-dedos'], fuentes: ['tma_antebrazo_ant'],
+  { id: 'intermedia', tipo: 'explicacion', titulo: 'Capa intermedia', fichas: ['flexor-superficial-dedos'], fuentes: ['tma_antebrazo_ant'],
     texto: 'Un solo músculo, el flexor superficial de los dedos. Sus cuatro tendones llegan a la falange media de los dedos, y entre sus dos cabezas pasan el nervio mediano y la arteria ulnar.' },
-  { id: 'profunda', titulo: 'Capa profunda', fichas: ['flexor-profundo-dedos', 'flexor-largo-pulgar', 'pronador-cuadrado', 'nervio-interoseo-anterior'],
+  { id: 'profunda', tipo: 'explicacion', titulo: 'Capa profunda', fichas: ['flexor-profundo-dedos', 'flexor-largo-pulgar', 'pronador-cuadrado', 'nervio-interoseo-anterior'],
     fuentes: ['tma_antebrazo_ant', 'tma_mediano'],
     texto: 'Flexor profundo de los dedos, flexor largo del pulgar y pronador cuadrado. Los inerva el nervio interóseo anterior, rama del mediano, salvo la mitad medial del flexor profundo, que inerva el ulnar.' },
-  { id: 'arterias', titulo: 'Arterias radial y ulnar', fichas: ['arteria-radial', 'arteria-ulnar'], fuentes: ['tma_arterias'],
+  { id: 'arterias', tipo: 'relaciones', titulo: 'Arterias radial y ulnar', fichas: ['arteria-radial', 'arteria-ulnar'], fuentes: ['tma_arterias'],
     texto: 'La braquial se divide en la fosa cubital en radial y ulnar. La radial irriga la parte posterolateral del antebrazo y la ulnar, la anteromedial; en la mano se unen en los arcos palmares superficial y profundo.' },
+  { id: 'sintesis', tipo: 'sintesis', titulo: 'En resumen',
+    fichas: ['pronador-redondo', 'flexor-radial-carpo', 'palmar-largo', 'flexor-ulnar-carpo', 'flexor-superficial-dedos', 'flexor-profundo-dedos', 'flexor-largo-pulgar', 'pronador-cuadrado'],
+    fuentes: ['tma_antebrazo_ant'],
+    texto: 'Capa superficial: flexor ulnar del carpo, palmar largo, flexor radial del carpo y pronador redondo, que nacen de un tendón común en el epicóndilo medial. Capa intermedia: flexor superficial de los dedos. Capa profunda: flexor largo del pulgar, flexor profundo de los dedos y pronador cuadrado. Los inerva el nervio mediano, salvo el flexor ulnar del carpo y la mitad medial del flexor profundo de los dedos, que inerva el nervio ulnar.' },
 ];
 
 const PREGUNTAS = [
+  { id: 'capas', fichas: ['flexor-superficial-dedos'], fuente: 'tma_antebrazo_ant',
+    enunciado: '¿En qué capa del compartimento anterior del antebrazo está el flexor superficial de los dedos?',
+    correcta: 'En la capa intermedia, de la que es el único músculo', distractores: ['En la capa superficial', 'En la capa profunda', 'En el compartimento posterior'],
+    explicacion: 'La capa intermedia la forma solo el flexor superficial de los dedos: por encima están los cuatro músculos superficiales y por debajo, los tres profundos.' },
   { id: 'origen-comun', fichas: ['pronador-redondo', 'flexor-radial-carpo', 'palmar-largo', 'flexor-ulnar-carpo'], fuente: 'tma_antebrazo_ant',
     enunciado: '¿De dónde nacen, por un tendón común, los cuatro músculos de la capa superficial del compartimento anterior del antebrazo?',
     correcta: 'Del epicóndilo medial del húmero', distractores: ['Del epicóndilo lateral del húmero', 'Del proceso coronoides de la ulna', 'De la tuberosidad del radio'],
@@ -381,7 +395,7 @@ const PREGUNTAS = [
 
 export const MODULO_ANTEBRAZO = {
   id: 'antebrazo',
-  version: '2026-11-08',        // cambiarla cuando cambie el contenido evaluable (el progreso guarda con cuál se hizo)
+  version: '2026-11-09',        // cambiarla cuando cambie el contenido evaluable (el progreso guarda con cuál se hizo)
   titulo: 'El antebrazo: compartimento anterior',
   region: REGION,
   publico: 'Estudiantes universitarios de anatomía básica (supuesto inicial, por validar)',

@@ -1,6 +1,8 @@
 // Textos de la interfaz en los cinco idiomas: es (el original), en, de, fr, it.
 // {x}: valores que pone el código. Un valor en lista es [singular, plural] (tn() en idioma.js).
 // Las descripciones de las fichas y el módulo de estudio siguen solo en español (ficha.soloEs, estudio.soloEs).
+import { TEXTOS_BIBLIOTECA, ETIQUETAS_BIBLIOTECA } from './textos-biblioteca.js';
+
 export const TEXTOS = {
   'doc.titulo': {
     es: 'Anato3D · Anatomía humana en 3D', en: 'Anato3D · Human anatomy in 3D', de: 'Anato3D · Anatomie des Menschen in 3D',
@@ -310,10 +312,10 @@ export const TEXTOS = {
 
   // ── Estudiar ──
   'estudio.traduccion': {
-    es: '', en: 'This module was translated from Spanish with AI and has not yet been reviewed by a specialist.',
-    de: 'Dieses Modul wurde mit KI aus dem Spanischen übersetzt und noch nicht von Fachleuten geprüft.',
-    fr: 'Ce module a été traduit de l’espagnol par IA et n’a pas encore été relu par un spécialiste.',
-    it: 'Questo modulo è stato tradotto dallo spagnolo con l’IA e non è ancora stato rivisto da uno specialista.',
+    es: '', en: 'The arm and forearm lessons were translated from Spanish with AI and have not yet been reviewed by a specialist; the other lessons are in Spanish only for now.',
+    de: 'Die Lektionen zu Oberarm und Unterarm wurden mit KI aus dem Spanischen übersetzt und noch nicht von Fachleuten geprüft; die übrigen Lektionen gibt es vorerst nur auf Spanisch.',
+    fr: 'Les leçons du bras et de l’avant-bras ont été traduites de l’espagnol par IA et pas encore relues par un spécialiste ; les autres leçons sont pour l’instant en espagnol uniquement.',
+    it: 'Le lezioni di braccio e avambraccio sono state tradotte dallo spagnolo con l’IA e non ancora riviste da uno specialista; le altre lezioni per ora sono solo in spagnolo.',
   },
   'estudio.noGuardado': { es: 'No se pudo guardar el progreso en este navegador', en: 'Progress could not be saved in this browser', de: 'Der Fortschritt konnte in diesem Browser nicht gespeichert werden', fr: 'Impossible d’enregistrer la progression dans ce navigateur', it: 'Impossibile salvare i progressi in questo browser' },
   'estudio.meta': { es: '{n} estructuras evaluables · {k} pasos', en: '{n} assessable structures · {k} steps', de: '{n} prüfbare Strukturen · {k} Schritte', fr: '{n} structures évaluables · {k} étapes', it: '{n} strutture valutabili · {k} passi' },
@@ -407,6 +409,7 @@ export const TEXTOS = {
   'estudio.volveran': { es: 'Volverán antes al repaso. Las acertadas con duda no avanzan.', en: 'They will come back to review sooner. Correct answers marked as unsure do not advance.', de: 'Sie kommen früher zur Wiederholung. Unsicher richtige Antworten steigen nicht auf.', fr: 'Elles reviendront plus tôt en révision. Les bonnes réponses incertaines n’avancent pas.', it: 'Torneranno prima nel ripasso. Quelle indovinate con dubbio non avanzano.' },
   'estudio.sinFallos': { es: 'Sin fallos en este intento.', en: 'No mistakes in this attempt.', de: 'Keine Fehler in diesem Versuch.', fr: 'Aucune erreur lors de cette tentative.', it: 'Nessun errore in questo tentativo.' },
   'estudio.volverModulo': { es: 'Volver al módulo', en: 'Back to the module', de: 'Zurück zum Modul', fr: 'Retour au module', it: 'Torna al modulo' },
+  ...TEXTOS_BIBLIOTECA,
 };
 
 // Etiquetas cortas que el código ya da en español (sistemas y capas de systems.js; tipo de pieza, lado y tejido de
@@ -534,6 +537,7 @@ export const ETIQUETAS = {
   'Huesecillo del oído': { en: 'Ear ossicle', de: 'Gehörknöchelchen', fr: 'Osselet de l’oreille', it: 'Ossicino dell’orecchio' },
   'Diente permanente': { en: 'Permanent tooth', de: 'Bleibender Zahn', fr: 'Dent permanente', it: 'Dente permanente' },
   'Vértebra cervical': { en: 'Cervical vertebra', de: 'Halswirbel', fr: 'Vertèbre cervicale', it: 'Vertebra cervicale' },
+  ...ETIQUETAS_BIBLIOTECA,
 };
 
 // Nombres de los campos de las fichas (data/ y content/schema.js) y estados de revisión.

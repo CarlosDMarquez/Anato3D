@@ -1,0 +1,195 @@
+// Lección «Arterias y venas del miembro superior». Formato y evidencias: ../formato.js.
+import { leccion, T, GUIA } from '../formato.js';
+
+const ART = 'upper-limb/vessels/arteries';
+const VEN = 'upper-limb/vessels/veins';
+const vaso = (nombre, piezas, tipo, lado = 'bilateral') => ({ nombre, piezas, lado, papel: 'nucleo', tipo });
+const contexto = (nombre, piezas, tipo, lado = 'bilateral') => ({ nombre, piezas, lado, papel: 'contexto', tipo });
+
+const ARTERIAS = ['subclavia', 'axilar', 'braquial', 'radial', 'ulnar'];
+const ARCOS = ['arco-superficial', 'arco-profundo'];
+const HUESOS = ['clavicula', 'escapula', 'humero', 'radio', 'ulna', 'costilla-1'];
+
+export default leccion({
+  id: 'ms-vasos',
+  version: 1,
+  titulo: 'Arterias y venas del miembro superior',
+  resumen: 'Las cinco arterias que llevan la sangre al brazo (subclavia, axilar, braquial, radial y ulnar), dónde cambia de nombre cada una, la braquial profunda, los arcos palmares de la mano y el pulso radial; y las venas: las superficiales (cefálica, basílica y mediana del codo) y las profundas, que acompañan a las arterias.',
+  lugares: [['miembro-superior', null]],
+  sistemas: ['cardiovascular'],
+  formato: 'trayectos',
+  temas: ['arterias-venas'],
+  nivel: 2,
+  minutos: 16,
+  requisitos: ['sis-cardiovascular', 'ms-cintura-escapular'],
+  siguiente: ['ms-axila', 'ms-codo', 'cue-vasos'],
+  objetivos: [
+    'Ordenar las cinco arterias principales del miembro superior y decir dónde cambia de nombre cada una.',
+    'Describir cómo se unen la radial y la ulnar en los arcos palmares.',
+    'Localizar dónde se toma el pulso radial.',
+    'Seguir el trayecto de las venas cefálica y basílica hasta la axilar.',
+  ],
+  estructuras: {
+    subclavia: vaso('Arteria subclavia derecha', ['Right_subclavian_artery'], 'arteria', 'impar'),
+    axilar: vaso('Arteria axilar', ['Axillary_artery'], 'arteria'),
+    braquial: vaso('Arteria braquial', ['Brachial_artery'], 'arteria'),
+    'braquial-profunda': vaso('Arteria braquial profunda', ['Deep_brachial_artery'], 'arteria'),
+    radial: vaso('Arteria radial', ['Radial_artery'], 'arteria'),
+    ulnar: vaso('Arteria ulnar', ['Ulnar_artery'], 'arteria'),
+    'arco-superficial': vaso('Arco palmar superficial', ['Superficial_palmar_arch'], 'arteria'),
+    'arco-profundo': vaso('Arco palmar profundo', ['Deep_palmar_arch'], 'arteria'),
+    cefalica: vaso('Vena cefálica', ['Cephalic_vein'], 'vena'),
+    basilica: vaso('Vena basílica', ['Basilic_vein'], 'vena'),
+    'mediana-codo': vaso('Vena mediana del codo', ['Median_cubital_vein'], 'vena'),
+    'vena-axilar': vaso('Vena axilar', ['Axillary_vein'], 'vena'),
+    'venas-braquiales': contexto('Venas braquiales', ['Brachial_veins'], 'vena'),
+    'red-dorsal': contexto('Red venosa dorsal de la mano', ['Dorsal_venous_network_of_hand'], 'vena'),
+    'interosea-comun': contexto('Arteria interósea común', ['Common_interosseous_artery'], 'arteria'),
+    circunflejas: contexto('Arterias circunflejas humerales', ['Anterior_circumflex_humeral_artery', 'Posterior_circumflex_humeral_artery'], 'arteria'),
+    'tronco-braquiocefalico': contexto('Tronco braquiocefálico', ['Brachiocephalic_trunk'], 'arteria', 'impar'),
+    'escaleno-anterior': contexto('Músculo escaleno anterior', ['Scalenus_anterior_muscle'], 'musculo'),
+    'pectoral-menor': contexto('Músculo pectoral menor', ['Pectoralis_minor_muscle'], 'musculo'),
+    'redondo-mayor': contexto('Músculo redondo mayor', ['Teres_major_muscle'], 'musculo'),
+    'flexor-radial': contexto('Músculo flexor radial del carpo', ['Flexor_carpi_radialis'], 'musculo'),
+    clavicula: contexto('Clavícula', ['Clavicle'], 'hueso'),
+    escapula: contexto('Escápula', ['Scapula'], 'hueso'),
+    humero: contexto('Húmero', ['Humerus'], 'hueso'),
+    radio: contexto('Radio', ['Radius'], 'hueso'),
+    ulna: contexto('Ulna', ['Ulna'], 'hueso'),
+    'costilla-1': contexto('Primera costilla', ['Rib_1'], 'hueso'),
+    mano: contexto('Huesos de la mano', ['Metacarpal_1', 'Metacarpal_2', 'Metacarpal_3', 'Metacarpal_4', 'Metacarpal_5'], 'hueso'),
+  },
+  pasos: [
+    {
+      id: 'orientacion', tipo: 'orientacion', titulo: 'Cinco arterias en fila',
+      texto: [
+        ['La sangre llega al miembro superior por cinco arterias, de proximal a distal: subclavia, axilar, braquial, radial y ulnar.', T(ART, 'The arterial supply to the upper limb is delivered via five main vessels (proximal to distal):')],
+        ['Es casi siempre el mismo vaso, que cambia de nombre al pasar ciertas referencias.', T(ART, 'At the lateral border of the first rib, the subclavian artery enters the axilla – and is renamed the axillary artery.'), T(ART, 'At the lower border of the teres major muscle, the axillary artery is renamed the brachial artery.')],
+        ['Síguelas desde el cuello hasta la mano.', GUIA],
+      ],
+      vista: { ver: ARTERIAS, contexto: HUESOS, camara: 'anterior', lado: 'R' },
+      actividad: { tipo: 'vistas', texto: 'Recorre el miembro.', vistas: [{ nombre: 'De frente', camara: 'anterior' }, { nombre: 'Por dentro', camara: 'medial' }] },
+      comprobar: 'rel-primera-costilla',
+    },
+    {
+      id: 'subclavia-axilar', tipo: 'exploracion', titulo: 'Subclavia y axilar',
+      texto: [
+        ['La subclavia derecha sale del tronco braquiocefálico, y la izquierda, directamente del cayado de la aorta; va hacia la axila pasando por detrás del escaleno anterior.', T(ART, 'On the right, the subclavian artery arises from the brachiocephalic trunk. On the left, it branches directly from the arch of aorta.'), T(ART, 'Second part – posterior to the anterior scalene.')],
+        ['Al pasar el borde lateral de la primera costilla se llama axilar; esta va bajo el pectoral menor, envuelta con los fascículos del plexo braquial en la vaina axilar.', T(ART, 'At the lateral border of the first rib, the subclavian artery enters the axilla'), T(ART, 'The axillary artery lies deep to the pectoralis minor and is enclosed in the axillary sheath (a fibrous layer that covers the artery and the three cords of the brachial plexus).')],
+        ['Sus circunflejas humerales rodean el cuello quirúrgico del húmero y pueden dañarse en sus fracturas.', T(ART, 'The anterior and posterior circumflex humeral arteries form an anastomotic network around the surgical neck of the humerus and can be damaged in cases of fracture.')],
+      ],
+      vista: { ver: ['subclavia', 'axilar'], contexto: ['tronco-braquiocefalico', 'escaleno-anterior', 'pectoral-menor', 'circunflejas', 'clavicula', 'costilla-1', 'escapula', 'humero'], camara: 'anterior', lado: 'R' },
+      actividad: { tipo: 'comparar', estructuras: ['subclavia', 'axilar'], texto: 'Alterna: la subclavia, hasta la primera costilla; la axilar, desde ahí hasta el redondo mayor.' },
+      comprobar: 'rel-pectoral-menor',
+    },
+    {
+      id: 'braquial', tipo: 'exploracion', titulo: 'La braquial',
+      texto: [
+        ['Pasado el borde inferior del redondo mayor, la axilar se llama braquial: es la arteria principal del brazo.', T(ART, 'The brachial artery is a continuation of the axillary artery past the lower border of the teres major. It is the main supply of blood for the arm.')],
+        ['Enseguida da la braquial profunda, que va con el nervio radial por su surco del húmero hacia la parte posterior del brazo.', T(ART, 'the brachial artery gives rise to the profunda brachii (deep artery), which travels with the radial nerve in the radial groove of the humerus and supplies structures in the posterior aspect of the upper arm')],
+        ['En la fosa cubital, bajo la aponeurosis bicipital, se divide en radial y ulnar.', T(ART, 'As it moves through the cubital fossa, underneath the bicipital aponeurosis, the brachial artery terminates by bifurcating into the radial and ulnar arteries.')],
+      ],
+      vista: { ver: ['braquial', 'braquial-profunda'], contexto: ['axilar', 'radial', 'ulnar', 'redondo-mayor', 'humero', 'radio', 'ulna'], camara: 'anterior', lado: 'R' },
+      actividad: { tipo: 'comparar', estructuras: ['braquial', 'braquial-profunda'], texto: 'Alterna: la braquial baja por delante; la profunda se va hacia atrás, por el surco radial.' },
+      comprobar: 'rel-braquial-profunda',
+    },
+    {
+      id: 'antebrazo-mano', tipo: 'exploracion', titulo: 'Antebrazo y mano',
+      texto: [
+        ['La radial irriga la parte posterolateral del antebrazo y la ulnar, la anteromedial; la ulnar da además las interóseas.', T(ART, 'Radial artery – supplies the posterolateral aspect of the forearm.'), T(ART, 'Ulnar artery – supplies the anteromedial aspect of the forearm.'), T(ART, 'Also gives rise to the anterior and posterior interosseous arteries, which supply deeper structures in the forearm.')],
+        ['En la mano se unen en dos arcos: el superficial, delante de los tendones flexores, y el profundo, por debajo de ellos.', T(ART, 'These two arteries anastomose in the hand by forming two arches – the superficial palmar arch, and the deep palmar arch.'), T(ART, 'Superficial palmar arch – located anteriorly to the flexor tendons in the hand and deep to the palmar aponeurosis.'), T(ART, 'Deep palmar arch – located deep to the flexor tendons of the hand.')],
+        ['El pulso radial se toma en la muñeca, justo por fuera del tendón del flexor radial del carpo.', T(ART, 'The radial pulse can be palpated in the distal forearm, immediately lateral to the prominent tendon of the flexor carpi radialis muscle.')],
+      ],
+      vista: { ver: ['radial', 'ulnar', ...ARCOS], contexto: ['interosea-comun', 'flexor-radial', 'radio', 'ulna', 'mano'], camara: 'anterior', lado: 'R' },
+      actividad: { tipo: 'comparar', estructuras: ARCOS, texto: 'Alterna los dos arcos palmares: el superficial, más cerca de la piel; el profundo, junto a los huesos.' },
+      comprobar: 'rel-pulso-radial',
+    },
+    {
+      id: 'venas', tipo: 'relaciones', titulo: 'Las venas',
+      texto: [
+        ['Las venas superficiales principales son la cefálica y la basílica, que salen de la red venosa dorsal de la mano.', T(VEN, 'The major superficial veins of the upper limb are the cephalic and basilic veins.'), T(VEN, 'The basilic vein originates from the dorsal venous network of the hand')],
+        ['La basílica sube por dentro y, en el redondo mayor, se une a las braquiales para formar la axilar; la cefálica sube por fuera, pasa entre el deltoides y el pectoral mayor y desemboca en la axilar.', T(VEN, 'At the border of the teres major, the vein moves deep into the arm. Here, it combines with the brachial veins from the deep venous system to form the axillary vein.'), T(VEN, 'At the shoulder, the cephalic vein travels between the deltoid and pectoralis major muscles')],
+        ['En el codo las une la mediana del codo, sitio habitual para sacar sangre; las venas profundas van por pares a los lados de las arterias.', T(VEN, 'The cephalic and basilic veins are connected at the elbow by the median cubital vein.'), T(VEN, 'The median cubital vein is a common site of venepuncture.'), T(VEN, 'It is formed by paired veins, which accompany and lie either side of an artery.')],
+      ],
+      vista: { ver: ['cefalica', 'basilica', 'mediana-codo', 'vena-axilar'], contexto: ['venas-braquiales', 'red-dorsal', 'humero', 'radio', 'ulna', 'clavicula'], camara: 'anterior', lado: 'R' },
+      actividad: { tipo: 'comparar', estructuras: ['cefalica', 'basilica'], texto: 'Alterna: la cefálica sube por fuera hasta el hombro; la basílica, por dentro hasta el brazo.' },
+      comprobar: 'rel-cefalica',
+    },
+    {
+      id: 'sintesis', tipo: 'sintesis', titulo: 'En resumen',
+      texto: [
+        ['Subclavia → (primera costilla) axilar → (redondo mayor) braquial → (fosa cubital) radial y ulnar → arcos palmares.', T(ART, 'At the lateral border of the first rib, the subclavian artery enters the axilla – and is renamed the axillary artery.'), T(ART, 'At the lower border of the teres major muscle, the axillary artery is renamed the brachial artery.'), T(ART, 'the brachial artery terminates by bifurcating into the radial and ulnar arteries.')],
+        ['Venas: cefálica por fuera y basílica por dentro, unidas por la mediana del codo; las profundas acompañan a las arterias.', T(VEN, 'The cephalic and basilic veins are connected at the elbow by the median cubital vein.'), T(VEN, 'the deep veins share the name of the artery they accompany.')],
+      ],
+    },
+  ],
+  preguntas: [
+    {
+      id: 'rel-primera-costilla', tipo: 'relacion', objetivo: 0, paso: 'orientacion', estructuras: ['subclavia', 'axilar'],
+      enunciado: '¿Dónde pasa a llamarse axilar la arteria subclavia?',
+      correcta: 'En el borde lateral de la primera costilla',
+      distractores: ['En el borde inferior del redondo mayor', 'En la fosa cubital', 'En el cayado de la aorta'],
+      explicacion: 'En el redondo mayor la axilar pasa a ser braquial; en la fosa cubital, la braquial se divide.',
+      evidencia: [T(ART, 'At the lateral border of the first rib, the subclavian artery enters the axilla – and is renamed the axillary artery.')],
+    },
+    {
+      id: 'sec-arterias', tipo: 'secuencia', objetivo: 0, paso: 'orientacion',
+      enunciado: 'Ordena las arterias del miembro superior de proximal a distal.',
+      orden: ['Subclavia', 'Axilar', 'Braquial', 'Radial y ulnar', 'Arcos palmares'],
+      explicacion: 'Es el mismo eje arterial, que cambia de nombre y al final se divide y vuelve a unirse en la mano.',
+      evidencia: [T(ART, 'The arterial supply to the upper limb is delivered via five main vessels (proximal to distal):'), T(ART, 'These two arteries anastomose in the hand by forming two arches')],
+    },
+    { id: 'id-axilar', tipo: 'identificar', estructura: 'axilar', objetivo: 0, paso: 'subclavia-axilar' },
+    { id: 'id-braquial', tipo: 'identificar', estructura: 'braquial', objetivo: 0, paso: 'braquial' },
+    {
+      id: 'rel-pectoral-menor', tipo: 'relacion', objetivo: 0, paso: 'subclavia-axilar', estructuras: ['axilar', 'pectoral-menor'],
+      enunciado: '¿Qué músculo sirve de referencia para dividir la arteria axilar en tres partes?',
+      correcta: 'El pectoral menor',
+      distractores: ['El escaleno anterior', 'El redondo mayor', 'El deltoides'],
+      explicacion: 'El escaleno anterior divide en tres la subclavia; el redondo mayor marca el final de la axilar.',
+      evidencia: [T(ART, 'the artery can be divided into three parts based on its position relative to the pectoralis minor muscle:')],
+    },
+    {
+      id: 'rel-braquial-profunda', tipo: 'relacion', objetivo: 0, paso: 'braquial', estructuras: ['braquial-profunda'],
+      enunciado: '¿Con qué nervio va la arteria braquial profunda?',
+      correcta: 'Con el radial, por el surco radial del húmero',
+      distractores: ['Con el mediano, por delante del codo', 'Con el ulnar, detrás del epicóndilo medial', 'Con el axilar, por el espacio cuadrangular'],
+      explicacion: 'Irriga la parte posterior del brazo, como el tríceps.',
+      evidencia: [T(ART, 'which travels with the radial nerve in the radial groove of the humerus')],
+    },
+    { id: 'id-radial', tipo: 'identificar', estructura: 'radial', objetivo: 1, paso: 'antebrazo-mano' },
+    {
+      id: 'rel-arcos', tipo: 'relacion', objetivo: 1, paso: 'antebrazo-mano', estructuras: ARCOS,
+      enunciado: '¿Qué forman la arteria radial y la ulnar en la mano?',
+      correcta: 'Los arcos palmares superficial y profundo',
+      distractores: ['La arteria braquial', 'El arco plantar', 'Las arterias interóseas'],
+      explicacion: 'Las dos se unen en dos arcos; el arco plantar es del pie.',
+      evidencia: [T(ART, 'These two arteries anastomose in the hand by forming two arches – the superficial palmar arch, and the deep palmar arch.')],
+    },
+    {
+      id: 'rel-pulso-radial', tipo: 'relacion', objetivo: 2, paso: 'antebrazo-mano', estructuras: ['radial', 'flexor-radial'],
+      enunciado: '¿Dónde se toma el pulso radial?',
+      correcta: 'En la muñeca, por fuera del tendón del flexor radial del carpo',
+      distractores: ['En la fosa cubital, por dentro del bíceps', 'En la axila', 'En el dorso de la mano, sobre los metacarpianos'],
+      explicacion: 'La radial queda superficial en el extremo del antebrazo, junto a ese tendón.',
+      evidencia: [T(ART, 'The radial pulse can be palpated in the distal forearm, immediately lateral to the prominent tendon of the flexor carpi radialis muscle.')],
+    },
+    { id: 'id-cefalica', tipo: 'identificar', estructura: 'cefalica', objetivo: 3, paso: 'venas' },
+    {
+      id: 'rel-cefalica', tipo: 'relacion', objetivo: 3, paso: 'venas', estructuras: ['cefalica'],
+      enunciado: '¿Por dónde pasa la vena cefálica en el hombro?',
+      correcta: 'Entre el deltoides y el pectoral mayor',
+      distractores: ['Por el borde del redondo mayor, hacia lo profundo', 'Por la fosa cubital', 'Por detrás de la clavícula, junto a la subclavia'],
+      explicacion: 'Es la basílica la que se hace profunda en el redondo mayor.',
+      evidencia: [T(VEN, 'At the shoulder, the cephalic vein travels between the deltoid and pectoralis major muscles (known as the deltopectoral groove)')],
+    },
+    {
+      id: 'rel-axilar-vena', tipo: 'relacion', objetivo: 3, paso: 'venas', estructuras: ['basilica', 'vena-axilar'],
+      enunciado: '¿Qué venas forman la vena axilar?',
+      correcta: 'La basílica y las braquiales',
+      distractores: ['La cefálica y la mediana del codo', 'Las radiales y las ulnares', 'La subclavia y la yugular'],
+      explicacion: 'La cefálica desemboca después en la axilar, ya formada.',
+      evidencia: [T(VEN, 'Here, it combines with the brachial veins from the deep venous system to form the axillary vein.')],
+    },
+  ],
+});

@@ -1,0 +1,268 @@
+// Lección «Articulación de la cadera». Formato y evidencias: ../formato.js.
+import { leccion, W, T, GUIA, MODELO } from '../formato.js';
+
+const CAD = 'lower-limb/joints/hip-joint';
+const GLU = 'lower-limb/muscles/gluteal-region';
+const nucleo = (nombre, piezas, tipo, extra = {}) => ({ nombre, piezas, lado: 'bilateral', papel: 'nucleo', tipo, ...extra });
+const contexto = (nombre, piezas, tipo) => ({ nombre, piezas, lado: 'bilateral', papel: 'contexto', tipo });
+
+const EXTRACAPSULARES = ['iliofemoral', 'pubofemoral', 'isquiofemoral'];
+const CIRCUNFLEJAS = ['circunfleja-medial', 'circunfleja-lateral'];
+
+export default leccion({
+  id: 'mi-cadera',
+  version: 1,
+  titulo: 'Articulación de la cadera',
+  resumen: 'La cadera, una articulación esferoidea hecha para cargar el peso: el acetábulo y el labro, la cápsula con la zona orbicular, el ligamento de la cabeza del fémur, los tres ligamentos que la refuerzan por fuera y lo que frena cada uno, los músculos de cada movimiento y la irrigación de la cabeza del fémur.',
+  lugares: [['miembro-inferior', 'cadera']],
+  sistemas: ['articular'],
+  formato: 'articulacion',
+  temas: ['articulaciones', 'movimientos'],
+  nivel: 2,
+  minutos: 18,
+  requisitos: ['pel-pelvis-osea', 'mi-huesos'],
+  siguiente: ['mi-glutea', 'mi-rodilla', 'mi-muslo-anterior-medial'],
+  objetivos: [
+    'Describir las superficies articulares de la cadera y cómo el acetábulo y el labro la estabilizan.',
+    'Localizar la cápsula, el labro y los ligamentos de la cadera.',
+    'Explicar qué movimiento frena cada ligamento extracapsular.',
+    'Relacionar los grupos musculares con los movimientos de la cadera.',
+    'Explicar la irrigación de la cabeza del fémur y por qué una lesión de la arteria circunfleja femoral medial puede necrosarla.',
+  ],
+  estructuras: {
+    labro: nucleo('Labro acetabular', ['Acetabular_labrum'], 'cartilago', { confusiones: ['Labro glenoideo'] }),
+    'acetabular-transverso': nucleo('Ligamento transverso del acetábulo', ['Transverse_acetabular_ligament'], 'ligamento'),
+    'lig-cabeza': nucleo('Ligamento de la cabeza del fémur (redondo)', ['Ligament_of_head_of_femur'], 'ligamento'),
+    capsula: nucleo('Cápsula articular de la cadera', ['Articular_capsule_of_hip_joint'], 'capsula'),
+    'zona-orbicular': nucleo('Zona orbicular', ['Zona_orbicularis'], 'ligamento'),
+    iliofemoral: nucleo('Ligamento iliofemoral', ['Descending_part_of_iliofemoral_ligament', 'Transverse_part_of_iliofemoral_ligament'], 'ligamento'),
+    pubofemoral: nucleo('Ligamento pubofemoral', ['Pubofemoral_ligament'], 'ligamento'),
+    isquiofemoral: nucleo('Ligamento isquiofemoral', ['Ischiofemoral_ligament'], 'ligamento'),
+    'circunfleja-medial': nucleo('Arteria circunfleja femoral medial', ['Medial_circumflex_femoral_artery'], 'arteria'),
+    'circunfleja-lateral': nucleo('Arteria circunfleja femoral lateral', ['Lateral_circumflex_femoral_artery'], 'arteria'),
+    coxal: contexto('Hueso coxal', ['Hip_Bone'], 'hueso'),
+    femur: contexto('Fémur', ['Femur'], 'hueso'),
+    'femoral-profunda': contexto('Arteria femoral profunda', ['Deep_femoral_artery'], 'arteria'),
+    'arteria-femoral': contexto('Arteria femoral', ['Femoral_artery'], 'arteria'),
+    iliopsoas: contexto('Músculo iliopsoas', ['Psoas_major', 'Iliacus_muscle'], 'musculo'),
+    gluteos: contexto('Músculos glúteos mayor, medio y menor', ['Gluteus_maximus_muscle', 'Gluteus_medius_muscle', 'Gluteus_minimus_muscle'], 'musculo'),
+    ciatico: contexto('Nervio ciático', ['Sciatic_nerve'], 'nervio'),
+  },
+  pasos: [
+    {
+      id: 'orientacion', tipo: 'orientacion', titulo: 'La cadera',
+      texto: [
+        ['La cadera es una articulación sinovial esferoidea entre el acetábulo de la pelvis y la cabeza del fémur.', T(CAD, 'The hip joint is a ball and socket synovial joint, formed by an articulation between the pelvic acetabulum and the head of the femur.')],
+        ['Une el miembro inferior a la cintura pélvica y está hecha para la estabilidad y la carga del peso más que para un gran rango de movimiento.', T(CAD, 'It forms a connection from the lower limb to the pelvic girdle, and thus is designed for stability and weight-bearing – rather than a large range of movement.')],
+        ['Aun así, su cápsula, fuerte pero laxa, le da el segundo mayor rango de movimiento del cuerpo, después del hombro.', W('Hip', 'The strong but loose fibrous capsule of the hip joint permits the hip joint to have the second largest range of movement (second only to the shoulder)')],
+        ['Mírala de frente y por detrás: los ligamentos envuelven la cápsula.', GUIA],
+      ],
+      vista: { ver: EXTRACAPSULARES, contexto: ['coxal', 'femur'], camara: 'anterior', lado: 'R' },
+      actividad: { tipo: 'vistas', texto: 'Recorre la cadera.', vistas: [{ nombre: 'De frente', camara: 'anterior' }, { nombre: 'Por fuera', camara: 'lateral' }, { nombre: 'Por detrás', camara: 'posterior' }] },
+      comprobar: 'rel-diseno',
+    },
+    {
+      id: 'superficies', tipo: 'explicacion', titulo: 'El acetábulo y el labro',
+      texto: [
+        ['El acetábulo es una cavidad en forma de copa en la cara inferolateral de la pelvis, formada por la unión del ilion, el isquion y el pubis.', T(CAD, 'The acetabulum is a cup-like depression located on the inferolateral aspect of the pelvis.'), W('Hip', 'The cuplike acetabulum forms at the union of three pelvic bones')],
+        ['Lo profundiza el labro acetabular, un anillo de fibrocartílago que se fija al borde óseo y al ligamento transverso.', W('Acetabular_labrum', 'is a fibrocartilaginous ring which surrounds the circumference of the acetabulum of the hip, deepening the acetabulum. The labrum is attached onto the bony rim and transverse acetabular ligament.')],
+        ['El labro abraza la cabeza del fémur, la sujeta en la cavidad y sella la articulación.', W('Acetabular_labrum', 'It embraces the femoral head, holding it firmly in the joint socket to stabilise the joint. It thus also seals the joint cavity')],
+        ['Las dos superficies están cubiertas de cartílago articular, más grueso donde se carga el peso.', T(CAD, 'Both the acetabulum and head of femur are covered in articular cartilage, which is thicker at the places of weight bearing.')],
+      ],
+      detalle: [
+        ['La parte anterior del labro es la que más se rompe.', W('Acetabular_labrum', 'The anterior portion of the labrum is most susceptible to an acetabular labrum tear.')],
+      ],
+      vista: { ver: ['labro', 'acetabular-transverso'], contexto: ['coxal'], fantasma: ['femur'], camara: 'lateral', lado: 'R' },
+      actividad: { tipo: 'localizar', estructura: 'labro', texto: 'Toca el anillo de fibrocartílago que rodea el borde del acetábulo.' },
+      comprobar: 'rel-labro',
+    },
+    {
+      id: 'intracapsular', tipo: 'relaciones', titulo: 'Dentro de la articulación',
+      texto: [
+        ['El ligamento transverso cierra la escotadura del acetábulo y deja un orificio por el que entran vasos y nervios a la articulación.', W('Transverse_acetabular_ligament', 'bridges the acetabular notch, creating the a foramen (through which blood vessels and nerves pass into the joint cavity).')],
+        ['El único ligamento dentro de la cápsula es el de la cabeza del fémur: pequeño, va de la fosa del acetábulo a la fóvea del fémur y se fija también en el ligamento transverso.', T(CAD, 'The only intracapsular ligament is the ligament of head of femur. It is a relatively small structure, which runs from the acetabular fossa to the fovea of the femur.'), W('Transverse_acetabular_ligament', 'The ligament is one of the sites of attachment of the ligament of head of femur.')],
+        ['Lleva una rama de la arteria obturatriz, una fuente menor de sangre para la cadera.', T(CAD, 'It encloses a branch of the obturator artery (artery to head of femur), a minor source of arterial supply to the hip joint.')],
+      ],
+      detalle: [
+        ['Pasada la infancia suele ser demasiado débil para actuar como ligamento: los que limitan los movimientos son los tres de la cápsula.', W('Ligament_of_head_of_femur', 'The ligament is usually too weak to actually function as a ligament past childhood; excessive movement at the hip joint is instead primarily limited by the three capsular ligament of the hip joint.')],
+      ],
+      vista: { ver: ['lig-cabeza', 'acetabular-transverso'], contexto: ['coxal'], fantasma: ['femur'], camara: 'lateral', lado: 'R' },
+      actividad: { tipo: 'comparar', estructuras: ['lig-cabeza', 'acetabular-transverso'], texto: 'Alterna: el ligamento de la cabeza va hacia el fémur; el transverso cruza la escotadura, abajo.' },
+      comprobar: 'rel-lig-cabeza',
+    },
+    {
+      id: 'capsula', tipo: 'exploracion', titulo: 'La cápsula y la zona orbicular',
+      texto: [
+        ['La cápsula se fija arriba en el borde del acetábulo; abajo, en la línea intertrocantérea por delante y en el cuello del fémur por detrás.', T(CAD, 'The capsule of the hip joint attaches to the edge of the acetabulum proximally. Distally, it attaches to the intertrochanteric line anteriorly and the femoral neck posteriorly.')],
+        ['Es mucho más gruesa arriba y delante, donde más resistencia hace falta, y fina y laxa atrás y abajo.', W('Zona_orbicularis', 'The articular capsule is much thicker above and in front of the joint, where the greatest amount of resistance is required, and thin and loose behind and below the joint.')],
+        ['Sus fibras circulares forman la zona orbicular, un anillo alrededor del cuello del fémur que ayuda a que la cabeza no se separe.', W('Zona_orbicularis', 'The zona orbicularis forms a ring around the neck of the femur.'), W('Zona_orbicularis', 'acts biomechanically as a locking ring wrapped around the femoral neck and thus is a key structure for hip stability in distraction.')],
+      ],
+      vista: { ver: ['capsula', 'zona-orbicular'], contexto: ['coxal', 'femur'], camara: 'posterior', lado: 'R' },
+      actividad: { tipo: 'localizar', estructura: 'zona-orbicular', texto: 'Toca el anillo de fibras que rodea el cuello del fémur.' },
+      comprobar: 'rel-capsula',
+    },
+    {
+      id: 'ligamentos', tipo: 'relaciones', titulo: 'Los tres ligamentos de fuera',
+      texto: [
+        ['El iliofemoral, en forma de Y, va de la espina ilíaca anteroinferior a la línea intertrocantérea, frena la hiperextensión y es el más fuerte de los tres.', T(CAD, 'Iliofemoral ligament – arises from the anterior inferior iliac spine and then bifurcates before inserting into the intertrochanteric line of the femur.'), T(CAD, 'shaped appearance, and prevents hyperextension of the hip joint. It is the strongest of the three ligaments.')],
+        ['El pubofemoral, triangular, refuerza la cápsula por delante y por abajo y frena la abducción y la extensión excesivas.', T(CAD, 'Pubofemoral – spans between the superior pubic rami and the intertrochanteric line of the femur, reinforcing the capsule anteriorly and inferiorly.'), T(CAD, 'It has a triangular shape, and prevents excessive abduction and extension.')],
+        ['El isquiofemoral va del isquion al trocánter mayor, refuerza la cápsula por detrás, frena la hiperextensión y mantiene la cabeza en el acetábulo.', T(CAD, 'Ischiofemoral– spans between the body of the ischium and the greater trochanter of the femur, reinforcing the capsule posteriorly.'), T(CAD, 'It has a spiral orientation, and prevents hyperextension and holds the femoral head in the acetabulum.')],
+      ],
+      detalle: [
+        ['El iliofemoral es, además, el ligamento más fuerte del cuerpo.', W('Iliofemoral_ligament', 'not only stronger than the two other ligaments of the hip joint, the ischiofemoral and the pubofemoral, but also the strongest ligament in the human body')],
+        ['El modelo separa el iliofemoral en sus dos partes, transversa y descendente; aquí se estudian juntas.', MODELO],
+      ],
+      vista: { ver: EXTRACAPSULARES, contexto: ['coxal', 'femur'], fantasma: ['capsula'], camara: 'anterior', lado: 'R' },
+      actividad: { tipo: 'comparar', estructuras: EXTRACAPSULARES, texto: 'Alterna los tres y gira la cadera: dos por delante (iliofemoral y pubofemoral) y uno por detrás (isquiofemoral).' },
+      comprobar: 'fun-iliofemoral',
+    },
+    {
+      id: 'estabilidad', tipo: 'funcion', titulo: 'Por qué es tan estable',
+      texto: [
+        ['El acetábulo es profundo, y eso hace difícil que la cabeza del fémur se salga (luxación); el labro lo profundiza todavía más.', T(CAD, 'The first structure is the acetabulum. It is deep'), T(CAD, 'This decreases the probability of the head slipping out of the acetabulum (dislocation).'), T(CAD, 'The increase in depth provides a larger articular surface, further improving the stability of the joint.')],
+        ['Los tres ligamentos y la cápsula engrosada dan mucha estabilidad; por su disposición en espiral se tensan cuando la cadera se extiende.', T(CAD, 'The iliofemoral, pubofemoral and ischiofemoral ligaments are very strong, and along with the thickened joint capsule, provide a large degree of stability. These ligaments have a unique spiral orientation; this causes them to become tighter when the joint is extended.')],
+        ['Por detrás, los músculos glúteos profundos, rotadores laterales, también la estabilizan.', T(GLU, 'The deep gluteal muscles are a set of smaller muscles, located underneath the gluteus minimus. The general action of these muscles is to laterally rotate the lower limb. They also stabilise the hip joint by')],
+      ],
+      detalle: [
+        ['Por eso las luxaciones adquiridas de la cadera son poco frecuentes.', T(CAD, 'Acquired dislocations of the hip joint are relatively uncommon, owing to the strength and stability of the joint.')],
+      ],
+      vista: { ver: EXTRACAPSULARES, contexto: ['coxal', 'femur', 'labro'], camara: 'lateral', lado: 'R' },
+      comprobar: 'fun-espiral',
+    },
+    {
+      id: 'movimientos', tipo: 'funcion', titulo: 'Los músculos de cada movimiento',
+      texto: [
+        ['Flexionan la cadera el iliopsoas, el recto femoral, el sartorio y el pectíneo; la extienden el glúteo mayor y los isquiotibiales.', T(CAD, 'Flexion – iliopsoas, rectus femoris, sartorius, pectineus'), T(CAD, 'Extension – gluteus maximus; semimembranosus, semitendinosus and biceps femoris (the hamstrings)')],
+        ['La abducen el glúteo medio y el menor, el piriforme y el tensor de la fascia lata; la aducen los aductores, el pectíneo y el grácil.', T(CAD, 'Abduction – gluteus medius, gluteus minimus, piriformis and tensor fascia latae'), T(CAD, 'Adduction – adductors longus, brevis and magnus, pectineus and gracilis')],
+        ['La flexión llega más lejos con la rodilla flexionada, porque los isquiotibiales se relajan; la extensión la limitan la cápsula y el iliofemoral.', T(CAD, 'The degree to which flexion at the hip can occur depends on whether the knee is flexed – this relaxes the hamstring muscles, and increases the range of flexion.'), T(CAD, 'Extension at the hip joint is limited by the joint capsule and the iliofemoral ligament.')],
+      ],
+      detalle: [
+        ['Rotan hacia fuera el bíceps femoral, el glúteo mayor y el piriforme, con los obturadores, los gemelos y el cuadrado femoral; hacia dentro, las fibras anteriores del glúteo medio y del menor y el tensor de la fascia lata.', T(CAD, 'Lateral rotation – biceps femoris, gluteus maximus, piriformis, assisted by the obturators, gemelli and quadratus femoris.'), T(CAD, 'Medial rotation – anterior fibres of gluteus medius and minimus, tensor fascia latae')],
+      ],
+      vista: { ver: ['capsula'], contexto: ['coxal', 'femur', 'iliopsoas', 'gluteos'], camara: 'anterolateral', lado: 'R' },
+      actividad: { tipo: 'vistas', texto: 'Mira los flexores por delante y los glúteos por detrás.', vistas: [{ nombre: 'Iliopsoas, por delante', camara: 'anterior' }, { nombre: 'Glúteos, por detrás', camara: 'posterior' }] },
+      comprobar: 'fun-flexion',
+    },
+    {
+      id: 'irrigacion', tipo: 'relaciones', titulo: 'La sangre de la cabeza del fémur',
+      texto: [
+        ['La cadera recibe sangre sobre todo de las arterias circunflejas femorales medial y lateral, ramas de la femoral profunda, que forman un anillo en la base del cuello del fémur.', T(CAD, 'The arterial supply to the hip joint is largely via the medial and lateral circumflex femoral arteries – branches of the profunda femoris artery (deep femoral artery). They anastomose at the base of the femoral neck to form a ring')],
+        ['La medial aporta la mayor parte: si se lesiona, la cabeza del fémur puede necrosarse por falta de sangre.', T(CAD, 'The medial circumflex femoral artery is responsible for the majority of the arterial supply'), T(CAD, 'Damage to the medial circumflex femoral artery can result in avascular necrosis of the femoral head.')],
+        ['Sus ramas se rompen a menudo en las fracturas del cuello del fémur y en las luxaciones de la cadera.', W('Medial_circumflex_femoral_artery', 'Branches of the medial circumflex femoral artery supplying the head and neck of the femur are often torn in femoral neck fractures and in hip dislocation.')],
+      ],
+      detalle: [
+        ['La inervan los nervios ciático, femoral y obturador, los mismos que la rodilla: por eso el dolor de cadera puede notarse en la rodilla, y al revés.', T(CAD, 'The hip joint is innervated primarily by the sciatic, femoral and obturator nerves. These same nerves innervate the knee, which explains why pain can be referred to the knee from the hip and vice versa.')],
+        ['En la luxación posterior, la más frecuente, la cabeza rompe la cápsula por detrás y por abajo, donde es más débil, y el nervio ciático, que pasa por detrás, corre riesgo.', T(CAD, 'Posterior dislocation (90%) – the femoral head is forced posteriorly, and tears through the inferior and posterior part of the joint capsule, where it is at its weakest.'), T(CAD, 'The sciatic nerve runs posteriorly to the hip joint, and is at risk of injury')],
+      ],
+      vista: { ver: CIRCUNFLEJAS, contexto: ['femoral-profunda', 'arteria-femoral', 'femur', 'coxal'], camara: 'anterior', lado: 'R' },
+      actividad: { tipo: 'comparar', estructuras: CIRCUNFLEJAS, texto: 'Alterna: la medial rodea el fémur por dentro y por detrás; la lateral, por fuera.' },
+      comprobar: 'rel-necrosis',
+    },
+    {
+      id: 'sintesis', tipo: 'sintesis', titulo: 'En resumen',
+      texto: [
+        ['La cadera es una esferoidea hecha para la estabilidad y la carga: el acetábulo es profundo y el labro lo profundiza más.', T(CAD, 'is designed for stability and weight-bearing'), T(CAD, 'Its cavity is deepened by the presence of a fibrocartilaginous collar – the acetabular labrum.')],
+        ['El iliofemoral frena la hiperextensión; el pubofemoral, la abducción excesiva; el isquiofemoral, la hiperextensión, y todos se tensan al extender.', T(CAD, 'prevents hyperextension of the hip joint'), T(CAD, 'prevents excessive abduction and extension'), T(CAD, 'this causes them to become tighter when the joint is extended')],
+        ['Dentro, el ligamento de la cabeza del fémur es pequeño y lleva una arteria menor; la sangre principal llega por la circunfleja femoral medial.', T(CAD, 'a minor source of arterial supply to the hip joint'), T(CAD, 'The medial circumflex femoral artery is responsible for the majority of the arterial supply')],
+      ],
+    },
+  ],
+  preguntas: [
+    {
+      id: 'rel-diseno', tipo: 'relacion', objetivo: 0, paso: 'orientacion', estructuras: ['coxal', 'femur'],
+      enunciado: '¿Para qué está hecha sobre todo la cadera?',
+      correcta: 'Para la estabilidad y la carga del peso',
+      distractores: ['Para tener el mayor rango de movimiento del cuerpo', 'Para permitir solo flexión y extensión, como una bisagra', 'Para unir los dos coxales por delante'],
+      explicacion: 'Es una esferoidea que une el miembro inferior a la pelvis; su rango es el segundo del cuerpo, después del hombro.',
+      evidencia: [T(CAD, 'thus is designed for stability and weight-bearing – rather than a large range of movement.'), W('Hip', 'second only to the shoulder')],
+    },
+    { id: 'id-labro', tipo: 'identificar', estructura: 'labro', objetivo: 1, paso: 'superficies' },
+    {
+      id: 'rel-labro', tipo: 'relacion', objetivo: 0, paso: 'superficies', estructuras: ['labro'],
+      enunciado: '¿Qué hace el labro acetabular?',
+      correcta: 'Profundiza el acetábulo y abraza la cabeza del fémur',
+      distractores: ['Une la cabeza del fémur con el fondo del acetábulo', 'Forma un anillo alrededor del cuello del fémur', 'Refuerza la cápsula por detrás'],
+      explicacion: 'El labro es un anillo de fibrocartílago en el borde del acetábulo; lo que une la cabeza con el acetábulo es el ligamento de la cabeza, y el anillo del cuello es la zona orbicular.',
+      evidencia: [W('Acetabular_labrum', 'deepening the acetabulum'), W('Acetabular_labrum', 'It embraces the femoral head, holding it firmly in the joint socket to stabilise the joint.')],
+    },
+    { id: 'id-lig-cabeza', tipo: 'identificar', estructura: 'lig-cabeza', objetivo: 1, paso: 'intracapsular' },
+    {
+      id: 'rel-lig-cabeza', tipo: 'relacion', objetivo: 4, paso: 'intracapsular', estructuras: ['lig-cabeza'],
+      enunciado: '¿Qué lleva el ligamento de la cabeza del fémur?',
+      correcta: 'Una rama de la arteria obturatriz, fuente menor de sangre',
+      distractores: ['La rama principal de la circunfleja femoral medial', 'El nervio ciático', 'La arteria femoral profunda'],
+      explicacion: 'La arteria del ligamento es una fuente menor; la mayor parte de la sangre de la cabeza llega por la circunfleja femoral medial.',
+      evidencia: [T(CAD, 'It encloses a branch of the obturator artery (artery to head of femur), a minor source of arterial supply to the hip joint.')],
+    },
+    { id: 'id-zona-orbicular', tipo: 'identificar', estructura: 'zona-orbicular', objetivo: 1, paso: 'capsula' },
+    {
+      id: 'rel-capsula', tipo: 'relacion', objetivo: 1, paso: 'capsula', estructuras: ['capsula'],
+      enunciado: '¿Dónde es más gruesa la cápsula de la cadera?',
+      correcta: 'Arriba y delante, donde más resistencia hace falta',
+      distractores: ['Atrás y abajo', 'Igual en todo su contorno', 'Solo dentro de la fosa del acetábulo'],
+      explicacion: 'Arriba y delante es gruesa; atrás y abajo, fina y laxa. Por esa zona débil sale la cabeza en la luxación posterior.',
+      evidencia: [W('Zona_orbicularis', 'The articular capsule is much thicker above and in front of the joint, where the greatest amount of resistance is required, and thin and loose behind and below the joint.'), T(CAD, 'tears through the inferior and posterior part of the joint capsule, where it is at its weakest.')],
+    },
+    { id: 'id-iliofemoral', tipo: 'identificar', estructura: 'iliofemoral', objetivo: 1, paso: 'ligamentos' },
+    { id: 'id-pubofemoral', tipo: 'identificar', estructura: 'pubofemoral', objetivo: 1, paso: 'ligamentos' },
+    { id: 'id-isquiofemoral', tipo: 'identificar', estructura: 'isquiofemoral', objetivo: 1, paso: 'ligamentos' },
+    { id: 'loc-isquiofemoral', tipo: 'localizar', estructura: 'isquiofemoral', candidatas: ['iliofemoral', 'pubofemoral'], objetivo: 1, paso: 'ligamentos' },
+    {
+      id: 'fun-iliofemoral', tipo: 'funcion', objetivo: 2, paso: 'ligamentos', estructuras: ['iliofemoral'],
+      enunciado: '¿Qué movimiento frena sobre todo el ligamento iliofemoral?',
+      correcta: 'La hiperextensión de la cadera',
+      distractores: ['La flexión de la cadera', 'La aducción de la cadera', 'La rotación de la rodilla'],
+      explicacion: 'El iliofemoral, en Y y el más fuerte de los tres, frena la hiperextensión; la extensión la limitan la cápsula y este ligamento.',
+      evidencia: [T(CAD, 'prevents hyperextension of the hip joint. It is the strongest of the three ligaments.')],
+    },
+    {
+      id: 'fun-pubofemoral', tipo: 'funcion', objetivo: 2, paso: 'ligamentos', estructuras: ['pubofemoral'],
+      enunciado: '¿Qué frena el ligamento pubofemoral?',
+      correcta: 'La abducción y la extensión excesivas',
+      distractores: ['La flexión y la aducción', 'Solo la rotación medial', 'El deslizamiento de la tibia hacia delante'],
+      explicacion: 'Triangular, refuerza la cápsula por delante y por abajo y frena la abducción y la extensión excesivas.',
+      evidencia: [T(CAD, 'It has a triangular shape, and prevents excessive abduction and extension.')],
+    },
+    {
+      id: 'fun-espiral', tipo: 'funcion', objetivo: 2, paso: 'estabilidad', estructuras: EXTRACAPSULARES,
+      enunciado: '¿Cuándo se tensan los tres ligamentos de la cápsula de la cadera?',
+      correcta: 'Cuando la cadera se extiende',
+      distractores: ['Cuando la cadera se flexiona', 'Cuando la rodilla se flexiona', 'Solo cuando la cadera rota hacia fuera'],
+      explicacion: 'Por su disposición en espiral se tensan en la extensión, que es el movimiento que limitan.',
+      evidencia: [T(CAD, 'These ligaments have a unique spiral orientation; this causes them to become tighter when the joint is extended.')],
+    },
+    {
+      id: 'fun-flexion', tipo: 'funcion', objetivo: 3, paso: 'movimientos', estructuras: ['iliopsoas'],
+      enunciado: '¿Cuál de estos músculos flexiona la cadera?',
+      correcta: 'El iliopsoas',
+      distractores: ['El glúteo mayor', 'El glúteo medio', 'El cuadrado femoral'],
+      explicacion: 'Flexionan el iliopsoas, el recto femoral, el sartorio y el pectíneo; el glúteo mayor extiende, el medio abduce y el cuadrado femoral rota hacia fuera.',
+      evidencia: [T(CAD, 'Flexion – iliopsoas, rectus femoris, sartorius, pectineus')],
+    },
+    {
+      id: 'fun-abduccion', tipo: 'funcion', objetivo: 3, paso: 'movimientos', estructuras: ['gluteos'],
+      enunciado: '¿Qué músculos abducen la cadera?',
+      correcta: 'El glúteo medio y el menor, el piriforme y el tensor de la fascia lata',
+      distractores: ['Los aductores largo, corto y mayor', 'El iliopsoas y el recto femoral', 'Los isquiotibiales'],
+      explicacion: 'Los aductores aducen, el iliopsoas y el recto femoral flexionan, y los isquiotibiales extienden.',
+      evidencia: [T(CAD, 'Abduction – gluteus medius, gluteus minimus, piriformis and tensor fascia latae')],
+    },
+    {
+      id: 'fun-rodilla', tipo: 'funcion', objetivo: 3, paso: 'movimientos', estructuras: ['femur'],
+      enunciado: '¿Por qué la cadera se flexiona más con la rodilla flexionada?',
+      correcta: 'Porque se relajan los isquiotibiales',
+      distractores: ['Porque se relaja el ligamento iliofemoral', 'Porque el labro se aplana', 'Porque se contrae el glúteo mayor'],
+      explicacion: 'Con la rodilla flexionada los isquiotibiales se relajan y dejan más recorrido a la flexión.',
+      evidencia: [T(CAD, 'The degree to which flexion at the hip can occur depends on whether the knee is flexed – this relaxes the hamstring muscles, and increases the range of flexion.')],
+    },
+    { id: 'id-circunfleja-medial', tipo: 'identificar', estructura: 'circunfleja-medial', objetivo: 4, paso: 'irrigacion' },
+    {
+      id: 'rel-necrosis', tipo: 'relacion', objetivo: 4, paso: 'irrigacion', estructuras: ['circunfleja-medial'],
+      enunciado: '¿Qué lesión arterial puede dejar sin sangre la cabeza del fémur?',
+      correcta: 'La de la arteria circunfleja femoral medial',
+      distractores: ['La de la arteria del ligamento de la cabeza del fémur', 'La de la arteria circunfleja femoral lateral', 'La de la arteria glútea superior'],
+      explicacion: 'La circunfleja medial aporta la mayor parte de la sangre de la cabeza y el cuello; sus ramas se rompen en fracturas del cuello y luxaciones.',
+      evidencia: [T(CAD, 'Damage to the medial circumflex femoral artery can result in avascular necrosis of the femoral head.')],
+    },
+  ],
+});

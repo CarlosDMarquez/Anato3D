@@ -11,7 +11,7 @@ import { GRUPOS } from './data/grupos.js';
 import { resolvePart, sideOf } from './data/resolve.js';
 import { Sessions, Stale, createSystemLoader, fetchJSON, describeError, onceByKey } from './loading.js';
 import { FICHA_POR_ID, MODULOS, sinonimosDePieza } from './content/index.js';
-import { createStudy } from './ui/study.js';
+import { mallas } from './biblioteca/formato.js';
 import { createStart } from './ui/start.js';
 import { t, tn, etiqueta, idioma, leerIdioma, fijarIdioma, alCambiar, traducirDom } from './i18n/idioma.js';
 import { cargarNombres, nombrePieza, nombreGrupo } from './i18n/nombres.js';
@@ -483,6 +483,7 @@ function selectionAction(act) {
 }
 
 viewer.addEventListener('pick', ({ detail }) => {
+  if (alTocar) return alTocar(detail.part);              // una actividad de la biblioteca espera que se señale algo
   if (evaluando) return;                                 // la estructura resaltada no cambia mientras se responde
   closePanels({ keep: 'study' });                        // el panel de estudio sigue abierto mientras se explora
   selectPart(detail.part, detail.point);
@@ -538,7 +539,7 @@ function showAll() {
   });
 }
 
-// ── Estudio (panel «Estudiar», ui/study.js) ─────────────────────
+// ── Estudio (panel «Estudiar», ui/biblioteca/) ──────────────────
 // Modo evaluación: mientras se responde no se ve el nombre de la estructura resaltada por ninguna vía (etiqueta, ficha,
 // texto al pasar el ratón, buscador ni atajos que la seleccionen).
 let evaluando = false;
@@ -557,71 +558,179 @@ function modoEvaluacion(on) {
   renderSelection();
 }
 
-// Piezas de unas fichas en un lado («Long_head_of_biceps_brachii» → «…_R»).
-const piezasDe = (ids, lado) => ids.map((id) => FICHA_POR_ID.get(id)).filter(Boolean)
-  .flatMap((f) => f.piezas.map((p) => (f.lado === 'bilateral' ? `${p}_${lado}` : p)));
+// ── Biblioteca de estudio: lo que pide al visor (ui/biblioteca/index.js describe esta interfaz) ──
+// Lo que se toque en el modelo mientras una actividad pide señalar una estructura: va a la biblioteca, no se selecciona.
+let alTocar = null;
 
-// Muestra las estructuras de unas fichas (un lado) con el esqueleto de contexto, aisladas y resaltadas. Las capas se
-// eligen para todas las fichas de `contexto` (en la evaluación, las del módulo entero), así la barra de sistemas es la
-// misma en cada pregunta y no delata si lo resaltado es un nervio o un vaso. Devuelve si se pudo mostrar todo.
-async function mostrarFichas(ids, { quiz = false, contexto = ids, lado = 'R' } = {}) {
-  if (!ids.length) {                                     // pregunta de texto: sin resaltar nada
+// Direcciones de cámara de los pasos. El cuerpo mira hacia +Z y su lado derecho queda en −X: «lateral» del lado
+// derecho mira desde −X; en el izquierdo, desde +X.
+const DIRECCIONES = {
+  anterior: [0, 0.05, 1], posterior: [0, 0.05, -1], superior: [0, 1, 0.001], inferior: [0, -1, 0.001],
+  lateral: [-1, 0.05, 0], medial: [1, 0.05, 0], anterolateral: [-0.7, 0.05, 0.7], posterolateral: [-0.7, 0.05, -0.7],
+};
+function direccion(nombre, lado = 'R') {
+  const d = DIRECCIONES[nombre];
+  return !d ? null : lado === 'L' ? [-d[0], d[1], d[2]] : d;
+}
+
+// Piezas de unas estructuras de una lección en un lado («Supraspinatus_muscle» → «Supraspinatus_muscle_R»).
+const piezasLeccion = (L, ids, lado) => ids.flatMap((id) => mallas(L.estructuras[id], lado));
+const parte = (n) => viewer.parts.find((p) => p.id === n);
+
+// Descarga los sistemas de las piezas que aún no están. false si se cambió de modelo mientras tanto.
+async function asegurarPiezas(nombres) {
+  const s = sessions.current;
+  if (nombres.every(parte)) return true;
+  await loadPendingIndex();
+  const keys = new Set(unloaded.model === state.model ? unloaded.parts.filter((p) => nombres.includes(p.id)).map((p) => p.key) : []);
+  for (const k of keys) if (!(await ensureSystem(k, { quiet: true }))) return false;
+  return s === sessions.current;
+}
+
+// Para cada sistema, una capa del visor que muestre todas esas piezas (si la actual no lo hace).
+function capasPara(parts) {
+  for (const sysId of new Set(parts.map((p) => p.system))) {
+    const mine = parts.filter((p) => p.system === sysId);
+    if (mine.every((p) => stageOf(p)?.filter(p) && !stageOf(p).ghost)) continue;
+    const muestra = (st) => available[sysId]?.has(st.id) && !st.ghost && mine.every((p) => st.filter(p));
+    state.stages[sysId] = SYSTEM_BY_ID[sysId].stages.find(muestra)?.id ?? state.stages[sysId];
+  }
+}
+
+/**
+ * La vista de un paso o de una pregunta: `ver` resaltadas, `contexto` visibles, `fantasma` translúcidas y el esqueleto
+ * entero si se pide, aisladas del resto, con la cámara en la dirección pedida. Sin vista, solo quita la selección.
+ * Devuelve { ok, faltan }: las estructuras que no tienen piezas en este modelo (la lección lo explica).
+ */
+async function mostrarVista(L, vista, { sinResaltar = false } = {}) {
+  if (!vista) {
     viewer.select([]);
     current = null;
     renderSelection();
-    return true;
+    return { ok: true, faltan: [] };
   }
-  const s = sessions.current;
-  const nombres = piezasDe(ids, lado);
-  const todos = [...new Set([...nombres, ...piezasDe(contexto, lado)])];
-  const find = (n) => viewer.parts.find((p) => p.id === n);
-  if (todos.some((n) => !find(n))) {
-    await loadPendingIndex();
-    const keys = new Set(unloaded.model === state.model ? unloaded.parts.filter((p) => todos.includes(p.id)).map((p) => p.key) : []);
-    for (const k of keys) if (!(await ensureSystem(k, { quiet: true }))) return false;
+  const lado = vista.lado ?? 'R';
+  // El contexto que la lección restringe al otro modelo (modelos: ['female'], p. ej.) no se pide ni se avisa; lo
+  // resaltado sí se avisa si falta, porque el paso habla de ello.
+  const deEsteModelo = (id) => !L.estructuras[id]?.modelos || L.estructuras[id].modelos.includes(state.model);
+  vista = { ...vista, contexto: (vista.contexto ?? []).filter(deEsteModelo), fantasma: (vista.fantasma ?? []).filter(deEsteModelo) };
+  const ids = [...new Set([...(vista.ver ?? []), ...vista.contexto, ...vista.fantasma])];
+  const nombres = piezasLeccion(L, ids, lado);
+  if (!(await asegurarPiezas(nombres))) return { ok: false, faltan: [] };
+  // Sistemas enteros (visión general de un sistema): se encienden en su capa, sin aislar nada.
+  if (vista.capas) {
+    const s = sessions.current;
+    for (const sys of Object.keys(vista.capas)) if (!(await ensureSystem(sys, { quiet: true }))) return { ok: false, faltan: [] };
+    if (s !== sessions.current) return { ok: false, faltan: [] };
   }
-  if (s !== sessions.current) return false;              // se cambió de modelo mientras se descargaba
-  const parts = nombres.map(find).filter(Boolean);
-  const ctx = todos.map(find).filter(Boolean);
+  const faltan = ids.filter((id) => piezasLeccion(L, [id], lado).some((n) => !parte(n)));
+  const ver = piezasLeccion(L, vista.ver ?? [], lado).map(parte).filter(Boolean);
+  const todas = nombres.map(parte).filter(Boolean);
+  const fantasma = piezasLeccion(L, vista.fantasma ?? [], lado).map(parte).filter(Boolean);
   change(() => {
-    // Por sistema, una capa que muestre todas sus piezas del contexto.
-    for (const sysId of new Set(ctx.map((p) => p.system))) {
-      const mine = ctx.filter((p) => p.system === sysId);
-      const sys = SYSTEM_BY_ID[sysId];
-      const ok = (st) => available[sysId].has(st.id) && !st.ghost && mine.every((p) => st.filter(p));
-      if (!(stageOf(mine[0]) && mine.every((p) => stageOf(p)?.filter(p) && !stageOf(p).ghost))) {
-        state.stages[sysId] = sys.stages.find(ok)?.id ?? sys.stages.find((st) => available[sysId].has(st.id) && !st.ghost && parts.every((p) => p.system !== sysId || st.filter(p)))?.id ?? state.stages[sysId];
-      }
+    if (vista.capas) {
+      for (const sys of SYSTEMS) state.stages[sys.id] = available[sys.id]?.has(vista.capas[sys.id]) ? vista.capas[sys.id] : null;
+      if (vista.esqueleto) state.stages.skeletal = 'all';
     }
-    state.stages.skeletal = 'all';
-    for (const part of parts) { state.hidden.delete(part.id); state.faded.delete(part.id); }
-    state.isolated = new Set([...parts, ...viewer.parts.filter((p) => p.system === 'skeletal')].map((p) => p.id));
+    capasPara(todas);
+    if (vista.esqueleto) state.stages.skeletal = 'all';
+    for (const p of todas) state.hidden.delete(p.id);
+    state.faded = new Set(fantasma.map((p) => p.id));
+    state.isolated = vista.capas ? null
+      : new Set([...todas, ...(vista.esqueleto ? viewer.parts.filter((p) => p.system === 'skeletal') : [])].map((p) => p.id));
   });
   current = null;
-  viewer.select(parts);
+  viewer.select(sinResaltar ? [] : ver);
   renderSelection();
-  if (parts.length) viewer.focus(parts);
-  return parts.length === nombres.length;
+  // Sin nada resaltado ni de contexto (una vista del esqueleto entero), se encuadra todo lo visible.
+  const encuadre = ver.length ? ver : todas.length ? todas : viewer.parts.filter((p) => (state.isolated ? state.isolated.has(p.id) : p.visible));
+  if (encuadre.length) viewer.focus(encuadre, direccion(vista.camara, lado));
+  return { ok: faltan.length === 0, faltan };
 }
 
-// Abre la ficha de una estructura del módulo: la pieza del lado que está resaltado, si la hay.
-function abrirFicha(id, { sinCamara = false } = {}) {
-  const f = FICHA_POR_ID.get(id);
-  if (!f) return;
-  const lado = [...viewer.selection].find((p) => p.side)?.side ?? 'R';
-  const part = [...piezasDe([id], lado), ...piezasDe([id], lado === 'R' ? 'L' : 'R')].map((n) => viewer.parts.find((p) => p.id === n)).find(Boolean);
-  if (!part) return openFicha(id);
-  if (part.visible) selectPart(part, null, { focus: !sinCamara });
-  else reveal(part);
+// Resalta unas estructuras de la lección (todas sus piezas) con la ficha de la primera y las encuadra; si no están a la
+// vista, las añade a lo que se ve. Si en ese lado no existen, prueba el otro.
+async function resaltar(L, ids, { lado = 'R', ficha = true, sinCamara = false } = {}) {
+  let nombres = piezasLeccion(L, ids, lado);
+  if (!(await asegurarPiezas(nombres))) return false;
+  if (!nombres.some(parte)) nombres = piezasLeccion(L, ids, lado === 'R' ? 'L' : 'R');
+  const parts = nombres.map(parte).filter(Boolean);
+  if (!parts.length) return false;
+  change(() => {
+    capasPara(parts);
+    for (const p of parts) { state.hidden.delete(p.id); state.faded.delete(p.id); }
+    if (state.isolated) for (const p of parts) state.isolated.add(p.id);
+  });
+  current = ficha && !evaluando ? { kind: 'part', part: parts[0] } : null;
+  collapsed = isMobile();
+  viewer.select(parts);
+  if (!sinCamara) viewer.focus(parts);
+  renderSelection();
+  return true;
 }
 
-const study = createStudy({
-  body: $('#study-body'),
-  modulos: MODULOS,
-  storage: almacen,
-  toast,
-  api: { mostrar: mostrarFichas, abrirFicha, modoEvaluacion, modelo: () => state.model },
-});
+// Gira la cámara hacia una vista alrededor de lo resaltado (o de lo visible).
+function camaraBiblioteca(nombre, lado = 'R') {
+  const sel = [...viewer.selection];
+  const parts = sel.length ? sel : viewer.parts.filter((p) => p.visible);
+  if (parts.length) viewer.focus(parts, direccion(nombre, lado));
+}
+
+// Estructuras del modelo actual para el buscador de la biblioteca: las descargadas y las del índice (sin lado).
+async function piezasBuscables() {
+  await loadPendingIndex();
+  const out = new Map();
+  const add = (p) => {
+    const clave = p.id.replace(/_[LR]$/, '');
+    if (!out.has(clave)) out.set(clave, { clave, id: p.id, nombre: p.info.title, latin: p.info.latin, en: p.info.en, sistema: p.system, key: p.key ?? null });
+  };
+  for (const p of viewer.parts) if (!(viewer.modesty && p.modestEmpty)) add(p);
+  if (unloaded.model === state.model) for (const p of unloaded.parts) if (!(viewer.modesty && GENITAL_NAME.test(p.id))) add(p);
+  return [...out.values()];
+}
+
+// Muestra una estructura desde el buscador de la biblioteca: se cierra el panel para verla, con su ficha.
+async function verEstructura(clave) {
+  const ids = [clave, `${clave}_R`, `${clave}_L`];
+  let part = ids.map(parte).find(Boolean);
+  if (!part) {
+    await loadPendingIndex();
+    const hit = unloaded.model === state.model && unloaded.parts.find((p) => ids.includes(p.id));
+    if (!hit) return toast(t('aviso.noEnModelo'));
+    if (!(await ensureSystem(hit.key, { retry: () => verEstructura(clave) }))) return;
+    part = ids.map(parte).find(Boolean);
+  }
+  if (!part) return;
+  closePanels();
+  if (state.isolated && !state.isolated.has(part.id)) change(() => (state.isolated = null));
+  reveal(part);
+}
+
+// La biblioteca se descarga la primera vez que se abre «Estudiar».
+let biblioteca = null;
+async function abrirEstudio() {
+  if (!biblioteca) {
+    const { createBiblioteca } = await import('./ui/biblioteca/index.js');
+    biblioteca = createBiblioteca({
+      panel: $('#panel-study'),
+      body: $('#study-body'),
+      storage: almacen,
+      toast,
+      api: {
+        modelo: () => state.model,
+        mostrar: mostrarVista,
+        resaltar,
+        camara: camaraBiblioteca,
+        modoEvaluacion,
+        alTocar: (fn) => { alTocar = fn; },
+        piezas: piezasBuscables,
+        verEstructura,
+        ajustar: () => updateInsets(),
+      },
+    });
+  }
+  await biblioteca.abrir();
+}
 
 // Abre la estructura de una relación de una ficha de módulo (del mismo lado si existe), aunque su sistema esté apagado o
 // sin descargar.
@@ -662,7 +771,10 @@ function updateInsets() {
   document.documentElement.style.setProperty('--dock-h', `${dockH}px`);
   const studyOpen = $('#panel-study').classList.contains('open');
   const sheet = isMobile() ? Math.max(current ? infoEl.offsetHeight : 0, studyOpen ? $('#panel-study').offsetHeight + 8 : 0) : 0;
-  viewer.insets = { top: isMobile() ? 56 : 64, bottom: dockH + sheet + 8 };
+  // En el escritorio, el panel de estudio abierto ocupa la derecha: lo encuadrado se centra en el hueco que queda.
+  const estudio = $('#panel-study');
+  const right = !isMobile() && studyOpen ? estudio.offsetWidth + (window.innerWidth - estudio.getBoundingClientRect().right) + 12 : 0;
+  viewer.insets = { top: isMobile() ? 56 : 64, bottom: dockH + sheet + 8, right };
 }
 window.addEventListener('resize', () => { updateInsets(); updatePin(); });
 
@@ -679,7 +791,7 @@ function closePanels({ keep = null } = {}) {
     const opener = $(`.toolbar [data-panel="${name}"]`);
     opener?.classList.remove('on');
     opener?.setAttribute('aria-expanded', 'false');
-    if (name === 'study') { study.cerrar(); updateInsets(); }
+    if (name === 'study') { biblioteca?.cerrar(); updateInsets(); }
     if (hadFocus) opener?.focus();
   });
 }
@@ -695,9 +807,8 @@ function togglePanel(name) {
   $(`.toolbar [data-panel="${name}"]`).classList.add('on');
   $(`.toolbar [data-panel="${name}"]`).setAttribute('aria-expanded', 'true');
   if (name === 'study') {
-    study.abrir();
-    updateInsets();
     panel.querySelector('h2').focus();
+    abrirEstudio().then(updateInsets, (err) => { console.error(err); toast(t('bib.noCarga')); });
     return;
   }
   if (name !== 'search') panel.querySelector('h2')?.focus();
@@ -865,7 +976,7 @@ function buildChrome() {
 
   window.addEventListener('keydown', (e) => {
     if (portada.abierta) return;                         // la pantalla de inicio tiene sus propias teclas
-    if ($('#panel-study').classList.contains('open') && study.onKey(e)) { e.preventDefault(); return; }
+    if ($('#panel-study').classList.contains('open') && biblioteca?.onKey(e)) { e.preventDefault(); return; }
     if (e.target instanceof Element && e.target.matches('input, textarea, select')) return;
     const has = !evaluando && selectionParts().length > 0;
     const k = e.key.toLowerCase();
@@ -962,6 +1073,7 @@ async function loadModel(id) {
     renderSearch($('#search-input').value);
     loadPendingIndex();
   }
+  biblioteca?.refrescar({ modelo: true });             // lo que se puede estudiar depende del modelo
   // Un cambio de modelo pedido antes de volver a la pantalla de inicio: «Continuar» sigue con el modelo nuevo, y mientras
   // tanto la pantalla muestra su esqueleto.
   if (pausa) {
@@ -1006,7 +1118,7 @@ alCambiar(async (id) => {
   renderDock();
   renderStatus();
   renderSelection();
-  study.refrescar();
+  biblioteca?.refrescar();
   if ($('#panel-search').classList.contains('open')) renderSearch($('#search-input').value);
 });
 // La tabla del idioma inicial puede llegar después de nombrar los grupos (con el latín mientras tanto).

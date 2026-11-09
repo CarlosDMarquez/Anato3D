@@ -1,0 +1,3834 @@
+{
+ "tma:abdomen/areas/inguinal-canal": {
+  "id": "tma:abdomen/areas/inguinal-canal",
+  "titulo": "Inguinal Canal Anatomy – Boundaries, Contents &amp; Clinical Relevance",
+  "url": "https://teachmeanatomy.info/abdomen/areas/inguinal-canal/",
+  "actualizada": "2026-04-09",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "5aca6492d472"
+ },
+ "tma:abdomen/gi-tract/appendix": {
+  "id": "tma:abdomen/gi-tract/appendix",
+  "titulo": "The Appendix - Retrocecal - Arterial supply - Appendicitis",
+  "url": "https://teachmeanatomy.info/abdomen/gi-tract/appendix/",
+  "actualizada": "2026-04-09",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "cae224cd0079"
+ },
+ "tma:abdomen/gi-tract/colon": {
+  "id": "tma:abdomen/gi-tract/colon",
+  "titulo": "The Colon - Ascending - Transverse - Descending - Sigmoid",
+  "url": "https://teachmeanatomy.info/abdomen/gi-tract/colon/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "b8502f4e277a"
+ },
+ "tma:abdomen/gi-tract/small-intestine": {
+  "id": "tma:abdomen/gi-tract/small-intestine",
+  "titulo": "The Small Intestine - Duodenum - Jejunum - Ileum",
+  "url": "https://teachmeanatomy.info/abdomen/gi-tract/small-intestine/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "748bf9824c21"
+ },
+ "tma:abdomen/gi-tract/stomach": {
+  "id": "tma:abdomen/gi-tract/stomach",
+  "titulo": "Stomach Anatomy | Structure, Blood Supply and Innervation",
+  "url": "https://teachmeanatomy.info/abdomen/gi-tract/stomach/",
+  "actualizada": "2026-05-11",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "3d39db430777"
+ },
+ "tma:abdomen/muscles/abdominal-wall": {
+  "id": "tma:abdomen/muscles/abdominal-wall",
+  "titulo": "The Anterolateral Abdominal Wall - Muscles",
+  "url": "https://teachmeanatomy.info/abdomen/muscles/abdominal-wall/",
+  "actualizada": "2026-02-01",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "5616de1a4260"
+ },
+ "tma:abdomen/vasculature/arteries/aorta": {
+  "id": "tma:abdomen/vasculature/arteries/aorta",
+  "titulo": "Aorta Anatomy | Ascending, Arch, Thoracic &amp; Abdominal – TeachMeAnatomy",
+  "url": "https://teachmeanatomy.info/abdomen/vasculature/arteries/aorta/",
+  "actualizada": "2026-04-13",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "0cf37f384323"
+ },
+ "tma:abdomen/vasculature/arteries/coeliac-trunk": {
+  "id": "tma:abdomen/vasculature/arteries/coeliac-trunk",
+  "titulo": "The Coeliac Trunk - Branches - Anastomoses",
+  "url": "https://teachmeanatomy.info/abdomen/vasculature/arteries/coeliac-trunk/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "5176fce5fc72"
+ },
+ "tma:abdomen/vasculature/arteries/inferior-mesenteric": {
+  "id": "tma:abdomen/vasculature/arteries/inferior-mesenteric",
+  "titulo": "The Inferior Mesenteric Artery - Position - Branches - TeachMeANatomy",
+  "url": "https://teachmeanatomy.info/abdomen/vasculature/arteries/inferior-mesenteric/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "d84b8a1012eb"
+ },
+ "tma:abdomen/vasculature/arteries/superior-mesenteric": {
+  "id": "tma:abdomen/vasculature/arteries/superior-mesenteric",
+  "titulo": "The Superior Mesenteric Artery - Position - Branches",
+  "url": "https://teachmeanatomy.info/abdomen/vasculature/arteries/superior-mesenteric/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "58721957c975"
+ },
+ "tma:abdomen/vasculature/venous-drainage": {
+  "id": "tma:abdomen/vasculature/venous-drainage",
+  "titulo": "Venous Drainage of the Abdomen",
+  "url": "https://teachmeanatomy.info/abdomen/vasculature/venous-drainage/",
+  "actualizada": "2026-05-26",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "4150e9c11af9"
+ },
+ "tma:abdomen/viscera/adrenal-glands": {
+  "id": "tma:abdomen/viscera/adrenal-glands",
+  "titulo": "The Adrenal Glands - Location - Structure",
+  "url": "https://teachmeanatomy.info/abdomen/viscera/adrenal-glands/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "ebe0628c88e0"
+ },
+ "tma:abdomen/viscera/gallbladder": {
+  "id": "tma:abdomen/viscera/gallbladder",
+  "titulo": "The Gallbladder - Biliary Tree - Gallstones",
+  "url": "https://teachmeanatomy.info/abdomen/viscera/gallbladder/",
+  "actualizada": "2025-11-17",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "61d98031dccc"
+ },
+ "tma:abdomen/viscera/kidney": {
+  "id": "tma:abdomen/viscera/kidney",
+  "titulo": "The Kidneys - Position - Structure - Vasculature",
+  "url": "https://teachmeanatomy.info/abdomen/viscera/kidney/",
+  "actualizada": "2026-10-11",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "038fda9d1728"
+ },
+ "tma:abdomen/viscera/liver": {
+  "id": "tma:abdomen/viscera/liver",
+  "titulo": "The Liver - Lobes - Ligaments - Vasculature",
+  "url": "https://teachmeanatomy.info/abdomen/viscera/liver/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "c7bf5ca6a37e"
+ },
+ "tma:abdomen/viscera/mesentery": {
+  "id": "tma:abdomen/viscera/mesentery",
+  "titulo": "The Mesentery - Function - Structure - Vasculature",
+  "url": "https://teachmeanatomy.info/abdomen/viscera/mesentery/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "6e5533818b7a"
+ },
+ "tma:abdomen/viscera/pancreas": {
+  "id": "tma:abdomen/viscera/pancreas",
+  "titulo": "The Pancreas - Anatomy - Duct System - Vasculature",
+  "url": "https://teachmeanatomy.info/abdomen/viscera/pancreas/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "99cfa50e962f"
+ },
+ "tma:abdomen/viscera/spleen": {
+  "id": "tma:abdomen/viscera/spleen",
+  "titulo": "The Spleen - Position - Structure - Neurovasculature",
+  "url": "https://teachmeanatomy.info/abdomen/viscera/spleen/",
+  "actualizada": "2026-10-10",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "bef23acd2a86"
+ },
+ "tma:back/bones/vertebral-column": {
+  "id": "tma:back/bones/vertebral-column",
+  "titulo": "Vertebral Column Anatomy | Structure, Regions &amp; Function",
+  "url": "https://teachmeanatomy.info/back/bones/vertebral-column/",
+  "actualizada": "2026-10-27",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "37c33f06bf31"
+ },
+ "tma:back/muscles/intermediate": {
+  "id": "tma:back/muscles/intermediate",
+  "titulo": "The Intermediate Back Muscles - Attachments - Actions",
+  "url": "https://teachmeanatomy.info/back/muscles/intermediate/",
+  "actualizada": "2025-11-20",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "54c1084383d3"
+ },
+ "tma:back/muscles/intrinsic": {
+  "id": "tma:back/muscles/intrinsic",
+  "titulo": "The Intrinsic Back Muscles - Attachments - Actions",
+  "url": "https://teachmeanatomy.info/back/muscles/intrinsic/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "ffdf62dd9dfd"
+ },
+ "tma:back/muscles/superficial": {
+  "id": "tma:back/muscles/superficial",
+  "titulo": "The Superficial Back Muscles - Attachments - Actions",
+  "url": "https://teachmeanatomy.info/back/muscles/superficial/",
+  "actualizada": "2024-11-02",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "86e4761d3d80"
+ },
+ "tma:back/nerves/spinal-cord": {
+  "id": "tma:back/nerves/spinal-cord",
+  "titulo": "The Spinal Cord - Meninges - Vasculature",
+  "url": "https://teachmeanatomy.info/back/nerves/spinal-cord/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "ea3e2077a55e"
+ },
+ "tma:head/cranial-nerves/abducens-nerve": {
+  "id": "tma:head/cranial-nerves/abducens-nerve",
+  "titulo": "The Abducens Nerve (CN VI) - Course - Motor",
+  "url": "https://teachmeanatomy.info/head/cranial-nerves/abducens-nerve/",
+  "actualizada": "2026-06-26",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "f6e30c27d969"
+ },
+ "tma:head/cranial-nerves/accessory": {
+  "id": "tma:head/cranial-nerves/accessory",
+  "titulo": "The Accessory Nerve (CN XI) - Course - Motor",
+  "url": "https://teachmeanatomy.info/head/cranial-nerves/accessory/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "c701c7a14476"
+ },
+ "tma:head/cranial-nerves/facial-nerve": {
+  "id": "tma:head/cranial-nerves/facial-nerve",
+  "titulo": "Facial Nerve Anatomy (CN VII) | Course &amp; Functions",
+  "url": "https://teachmeanatomy.info/head/cranial-nerves/facial-nerve/",
+  "actualizada": "2026-04-20",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "dc99f5af79c4"
+ },
+ "tma:head/cranial-nerves/glossopharyngeal-nerve": {
+  "id": "tma:head/cranial-nerves/glossopharyngeal-nerve",
+  "titulo": "The Glossopharyngeal Nerve (CN IX) - Course - Sensory",
+  "url": "https://teachmeanatomy.info/head/cranial-nerves/glossopharyngeal-nerve/",
+  "actualizada": "2026-01-21",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "1b732170e579"
+ },
+ "tma:head/cranial-nerves/hypoglossal": {
+  "id": "tma:head/cranial-nerves/hypoglossal",
+  "titulo": "The Hypoglossal Nerve (CN XII) - Course - Motor",
+  "url": "https://teachmeanatomy.info/head/cranial-nerves/hypoglossal/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "161a6ddf2fcc"
+ },
+ "tma:head/cranial-nerves/oculomotor": {
+  "id": "tma:head/cranial-nerves/oculomotor",
+  "titulo": "The Oculomotor Nerve (CN III) - Course - Motor",
+  "url": "https://teachmeanatomy.info/head/cranial-nerves/oculomotor/",
+  "actualizada": "2025-12-10",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "c04a6843e3c7"
+ },
+ "tma:head/cranial-nerves/olfactory-cni": {
+  "id": "tma:head/cranial-nerves/olfactory-cni",
+  "titulo": "The Olfactory Nerve (CN I) - Pathway - Anosmia",
+  "url": "https://teachmeanatomy.info/head/cranial-nerves/olfactory-cni/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "aabdd6ccd3af"
+ },
+ "tma:head/cranial-nerves/optic-cnii": {
+  "id": "tma:head/cranial-nerves/optic-cnii",
+  "titulo": "The Optic Nerve - Visual Pathway - Chiasm - Tract",
+  "url": "https://teachmeanatomy.info/head/cranial-nerves/optic-cnii/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "71946020f60c"
+ },
+ "tma:head/cranial-nerves/summary": {
+  "id": "tma:head/cranial-nerves/summary",
+  "titulo": "Cranial Nerves Anatomy | Origin, Course &amp; Functions",
+  "url": "https://teachmeanatomy.info/head/cranial-nerves/summary/",
+  "actualizada": "2025-12-13",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "e6f3fef59d2a"
+ },
+ "tma:head/cranial-nerves/trigeminal-nerve": {
+  "id": "tma:head/cranial-nerves/trigeminal-nerve",
+  "titulo": "The Trigeminal Nerve (CN V) - Course - Divisions",
+  "url": "https://teachmeanatomy.info/head/cranial-nerves/trigeminal-nerve/",
+  "actualizada": "2025-11-07",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "095f3a13702d"
+ },
+ "tma:head/cranial-nerves/trochlear-nerve": {
+  "id": "tma:head/cranial-nerves/trochlear-nerve",
+  "titulo": "The Trochlear Nerve (CN IV) - Course - Motor",
+  "url": "https://teachmeanatomy.info/head/cranial-nerves/trochlear-nerve/",
+  "actualizada": "2025-12-10",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "9c32acd74107"
+ },
+ "tma:head/cranial-nerves/vagus-nerve-cn-x": {
+  "id": "tma:head/cranial-nerves/vagus-nerve-cn-x",
+  "titulo": "The Vagus Nerve (CN X) - Course - Functions",
+  "url": "https://teachmeanatomy.info/head/cranial-nerves/vagus-nerve-cn-x/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "53bbe5a7eead"
+ },
+ "tma:head/cranial-nerves/vestibulocochlear": {
+  "id": "tma:head/cranial-nerves/vestibulocochlear",
+  "titulo": "The Vestibulocochlear Nerve (CN VIII) - Balance - Hearing",
+  "url": "https://teachmeanatomy.info/head/cranial-nerves/vestibulocochlear/",
+  "actualizada": "2025-12-01",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "81d1fa5b0e63"
+ },
+ "tma:head/joints/temporomandibular": {
+  "id": "tma:head/joints/temporomandibular",
+  "titulo": "The Temporomandibular Joint - Structure - Function",
+  "url": "https://teachmeanatomy.info/head/joints/temporomandibular/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "c8b336383a25"
+ },
+ "tma:head/muscles/facial-expression": {
+  "id": "tma:head/muscles/facial-expression",
+  "titulo": "The Muscles of Facial Expression - Orbital Group - Nasal Group - Oral Group",
+  "url": "https://teachmeanatomy.info/head/muscles/facial-expression/",
+  "actualizada": "2025-12-03",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "e8e9309d5d52"
+ },
+ "tma:head/muscles/mastication": {
+  "id": "tma:head/muscles/mastication",
+  "titulo": "The Muscles of Mastication - Attachments - Actions - Innervation",
+  "url": "https://teachmeanatomy.info/head/muscles/mastication/",
+  "actualizada": "2025-12-03",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "5134f6023f8e"
+ },
+ "tma:head/muscles/tongue": {
+  "id": "tma:head/muscles/tongue",
+  "titulo": "The Tongue - Muscles - Innervation - Vasculature",
+  "url": "https://teachmeanatomy.info/head/muscles/tongue/",
+  "actualizada": "2026-10-10",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "40b7568277e1"
+ },
+ "tma:head/organs/eye/bony-orbit": {
+  "id": "tma:head/organs/eye/bony-orbit",
+  "titulo": "The Bony Orbit - Borders - Contents - Fractures",
+  "url": "https://teachmeanatomy.info/head/organs/eye/bony-orbit/",
+  "actualizada": "2026-04-19",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "d6aa9d3134e8"
+ },
+ "tma:head/organs/eye/extraocular-muscles": {
+  "id": "tma:head/organs/eye/extraocular-muscles",
+  "titulo": "The Extraocular Muscles - The Eyelid - Eye Movement",
+  "url": "https://teachmeanatomy.info/head/organs/eye/extraocular-muscles/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "df6195c4ae08"
+ },
+ "tma:head/organs/eye/eyeball": {
+  "id": "tma:head/organs/eye/eyeball",
+  "titulo": "The Eyeball - Structure - Vasculature",
+  "url": "https://teachmeanatomy.info/head/organs/eye/eyeball/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "b0d7801292c4"
+ },
+ "tma:head/organs/eye/lacrimal-gland": {
+  "id": "tma:head/organs/eye/lacrimal-gland",
+  "titulo": "Lacrimal Glands and Apparatus - Vasculature - Innervation",
+  "url": "https://teachmeanatomy.info/head/organs/eye/lacrimal-gland/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "3ba0beee4518"
+ },
+ "tma:head/organs/mouth/child-adult-dentition": {
+  "id": "tma:head/organs/mouth/child-adult-dentition",
+  "titulo": "Child and Adult Dentition (Teeth) - Structure - Primary - Permanent",
+  "url": "https://teachmeanatomy.info/head/organs/mouth/child-adult-dentition/",
+  "actualizada": "2025-12-04",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "d09a02dc9c60"
+ },
+ "tma:head/organs/mouth/oral-cavity": {
+  "id": "tma:head/organs/mouth/oral-cavity",
+  "titulo": "The Oral Cavity - Divisions - Innervation",
+  "url": "https://teachmeanatomy.info/head/organs/mouth/oral-cavity/",
+  "actualizada": "2025-12-04",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "9475b764755f"
+ },
+ "tma:head/organs/salivary-glands/parotid": {
+  "id": "tma:head/organs/salivary-glands/parotid",
+  "titulo": "The Parotid Gland - Position - Vasculature - Innervation",
+  "url": "https://teachmeanatomy.info/head/organs/salivary-glands/parotid/",
+  "actualizada": "2025-12-18",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "a05377dcaffb"
+ },
+ "tma:head/organs/salivary-glands/sublingual": {
+  "id": "tma:head/organs/salivary-glands/sublingual",
+  "titulo": "The Sublingual Gland - Structure - Vasculature - Innervation",
+  "url": "https://teachmeanatomy.info/head/organs/salivary-glands/sublingual/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "c48f66989ed2"
+ },
+ "tma:head/organs/salivary-glands/submandibular": {
+  "id": "tma:head/organs/salivary-glands/submandibular",
+  "titulo": "The Submandibular Gland - Structure - Vasculature - Innervation",
+  "url": "https://teachmeanatomy.info/head/organs/salivary-glands/submandibular/",
+  "actualizada": "2026-10-09",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "c23f7bee9bf1"
+ },
+ "tma:head/osteology/skull": {
+  "id": "tma:head/osteology/skull",
+  "titulo": "Overview of the Bones of the Skull | Cranial and Facial Anatomy",
+  "url": "https://teachmeanatomy.info/head/osteology/skull/",
+  "actualizada": "2025-12-15",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "ebee47fe4340"
+ },
+ "tma:lower-limb/areas/femoral-triangle": {
+  "id": "tma:lower-limb/areas/femoral-triangle",
+  "titulo": "The Femoral Triangle - Borders - Contents",
+  "url": "https://teachmeanatomy.info/lower-limb/areas/femoral-triangle/",
+  "actualizada": "2026-04-09",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "19f9604562cd"
+ },
+ "tma:lower-limb/areas/popliteal-fossa": {
+  "id": "tma:lower-limb/areas/popliteal-fossa",
+  "titulo": "The Popliteal Fossa - Borders - Contents",
+  "url": "https://teachmeanatomy.info/lower-limb/areas/popliteal-fossa/",
+  "actualizada": "2026-04-09",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "cb0ce7c08a0d"
+ },
+ "tma:lower-limb/areas/tarsal-tunnel": {
+  "id": "tma:lower-limb/areas/tarsal-tunnel",
+  "titulo": "The Tarsal Tunnel - Borders - Contents - Compression",
+  "url": "https://teachmeanatomy.info/lower-limb/areas/tarsal-tunnel/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "ba731b91eb67"
+ },
+ "tma:lower-limb/bones/bones-of-the-foot-tarsals-metatarsals-and-phalanges": {
+  "id": "tma:lower-limb/bones/bones-of-the-foot-tarsals-metatarsals-and-phalanges",
+  "titulo": "Bones of the Foot - Tarsals - Metatarsals - Phalanges",
+  "url": "https://teachmeanatomy.info/lower-limb/bones/bones-of-the-foot-tarsals-metatarsals-and-phalanges/",
+  "actualizada": "2026-01-02",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "95035e7612e6"
+ },
+ "tma:lower-limb/bones/femur": {
+  "id": "tma:lower-limb/bones/femur",
+  "titulo": "The Femur - Proximal - Distal - Shaft",
+  "url": "https://teachmeanatomy.info/lower-limb/bones/femur/",
+  "actualizada": "2026-10-11",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "9de65ee9d877"
+ },
+ "tma:lower-limb/bones/patella": {
+  "id": "tma:lower-limb/bones/patella",
+  "titulo": "The Patella - Surface Anatomy - Functions - Dislocation",
+  "url": "https://teachmeanatomy.info/lower-limb/bones/patella/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "7b36c8807e02"
+ },
+ "tma:lower-limb/bones/tibia": {
+  "id": "tma:lower-limb/bones/tibia",
+  "titulo": "The Tibia - Proximal - Shaft - Distal",
+  "url": "https://teachmeanatomy.info/lower-limb/bones/tibia/",
+  "actualizada": "2025-12-29",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "83779a726e38"
+ },
+ "tma:lower-limb/joints/ankle-joint": {
+  "id": "tma:lower-limb/joints/ankle-joint",
+  "titulo": "The Ankle Joint - Articulations - Movements",
+  "url": "https://teachmeanatomy.info/lower-limb/joints/ankle-joint/",
+  "actualizada": "2026-01-02",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "8267cbf4f993"
+ },
+ "tma:lower-limb/joints/hip-joint": {
+  "id": "tma:lower-limb/joints/hip-joint",
+  "titulo": "The Hip Joint - Articulations - Movements",
+  "url": "https://teachmeanatomy.info/lower-limb/joints/hip-joint/",
+  "actualizada": "2026-10-11",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "548bed4038e6"
+ },
+ "tma:lower-limb/joints/knee-joint": {
+  "id": "tma:lower-limb/joints/knee-joint",
+  "titulo": "The Knee Joint - Articulations - Movements - Injuries",
+  "url": "https://teachmeanatomy.info/lower-limb/joints/knee-joint/",
+  "actualizada": "2026-10-10",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "956bf0839b20"
+ },
+ "tma:lower-limb/muscles/foot": {
+  "id": "tma:lower-limb/muscles/foot",
+  "titulo": "Muscles of the Foot - Dorsal - Plantar",
+  "url": "https://teachmeanatomy.info/lower-limb/muscles/foot/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "4de4d1e4a749"
+ },
+ "tma:lower-limb/muscles/gluteal-region": {
+  "id": "tma:lower-limb/muscles/gluteal-region",
+  "titulo": "Muscles of the Gluteal Region - Superficial - Deep",
+  "url": "https://teachmeanatomy.info/lower-limb/muscles/gluteal-region/",
+  "actualizada": "2026-04-09",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "817f48dfef11"
+ },
+ "tma:lower-limb/muscles/leg/anterior-compartment": {
+  "id": "tma:lower-limb/muscles/leg/anterior-compartment",
+  "titulo": "Muscles of the Anterior Leg - Attachments - Actions",
+  "url": "https://teachmeanatomy.info/lower-limb/muscles/leg/anterior-compartment/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "607fcfe3c52e"
+ },
+ "tma:lower-limb/muscles/leg/lateral-compartment": {
+  "id": "tma:lower-limb/muscles/leg/lateral-compartment",
+  "titulo": "Muscles in the Lateral Compartment of the Leg",
+  "url": "https://teachmeanatomy.info/lower-limb/muscles/leg/lateral-compartment/",
+  "actualizada": "2026-04-09",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "a6a5fc1624f7"
+ },
+ "tma:lower-limb/muscles/leg/posterior-compartment": {
+  "id": "tma:lower-limb/muscles/leg/posterior-compartment",
+  "titulo": "Muscles of the Posterior Leg - Attachments - Actions",
+  "url": "https://teachmeanatomy.info/lower-limb/muscles/leg/posterior-compartment/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "9214d7dfec60"
+ },
+ "tma:lower-limb/muscles/thigh/anterior-compartment": {
+  "id": "tma:lower-limb/muscles/thigh/anterior-compartment",
+  "titulo": "Muscles of the Anterior Thigh - Quadriceps",
+  "url": "https://teachmeanatomy.info/lower-limb/muscles/thigh/anterior-compartment/",
+  "actualizada": "2026-10-11",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "0a719db467a7"
+ },
+ "tma:lower-limb/muscles/thigh/hamstrings": {
+  "id": "tma:lower-limb/muscles/thigh/hamstrings",
+  "titulo": "Muscles of the Posterior Thigh - Hamstrings - Damage",
+  "url": "https://teachmeanatomy.info/lower-limb/muscles/thigh/hamstrings/",
+  "actualizada": "2026-04-09",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "78d8a8a5e4e1"
+ },
+ "tma:lower-limb/muscles/thigh/medial-compartment": {
+  "id": "tma:lower-limb/muscles/thigh/medial-compartment",
+  "titulo": "Muscles of the Medial Thigh",
+  "url": "https://teachmeanatomy.info/lower-limb/muscles/thigh/medial-compartment/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "956d9eb8a82d"
+ },
+ "tma:lower-limb/nerves/common-fibular-nerve": {
+  "id": "tma:lower-limb/nerves/common-fibular-nerve",
+  "titulo": "The Common Fibular Nerve - Course - Motor - Sensory",
+  "url": "https://teachmeanatomy.info/lower-limb/nerves/common-fibular-nerve/",
+  "actualizada": "2026-04-09",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "d15f0bebc79a"
+ },
+ "tma:lower-limb/nerves/femoral-nerve": {
+  "id": "tma:lower-limb/nerves/femoral-nerve",
+  "titulo": "The Femoral Nerve - Course - Motor - Sensory",
+  "url": "https://teachmeanatomy.info/lower-limb/nerves/femoral-nerve/",
+  "actualizada": "2026-04-09",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "d2138f999a44"
+ },
+ "tma:lower-limb/nerves/lumbar-plexus": {
+  "id": "tma:lower-limb/nerves/lumbar-plexus",
+  "titulo": "The Lumbar Plexus - Spinal Nerves - Branches",
+  "url": "https://teachmeanatomy.info/lower-limb/nerves/lumbar-plexus/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "987067f5ebda"
+ },
+ "tma:lower-limb/nerves/obturator-nerve": {
+  "id": "tma:lower-limb/nerves/obturator-nerve",
+  "titulo": "The Obturator Nerve - Course - Motor - Sensory",
+  "url": "https://teachmeanatomy.info/lower-limb/nerves/obturator-nerve/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "d0b9c6bf19cd"
+ },
+ "tma:lower-limb/nerves/sacral-plexus": {
+  "id": "tma:lower-limb/nerves/sacral-plexus",
+  "titulo": "The Sacral Plexus - Spinal Nerves - Branches",
+  "url": "https://teachmeanatomy.info/lower-limb/nerves/sacral-plexus/",
+  "actualizada": "2026-04-09",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "cd87b8e27fea"
+ },
+ "tma:lower-limb/nerves/sciatic-nerve": {
+  "id": "tma:lower-limb/nerves/sciatic-nerve",
+  "titulo": "The Sciatic Nerve - Course - Motor - Sensory",
+  "url": "https://teachmeanatomy.info/lower-limb/nerves/sciatic-nerve/",
+  "actualizada": "2026-04-09",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "ded93892b54e"
+ },
+ "tma:lower-limb/nerves/tibial-nerve": {
+  "id": "tma:lower-limb/nerves/tibial-nerve",
+  "titulo": "The Tibial Nerve - Course - Motor - Sensory",
+  "url": "https://teachmeanatomy.info/lower-limb/nerves/tibial-nerve/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "0afdb79cfd9e"
+ },
+ "tma:lower-limb/vessels/arterial-supply": {
+  "id": "tma:lower-limb/vessels/arterial-supply",
+  "titulo": "Arteries of the Lower Limb - Thigh - Leg - Foot",
+  "url": "https://teachmeanatomy.info/lower-limb/vessels/arterial-supply/",
+  "actualizada": "2026-10-11",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "53569ebace13"
+ },
+ "tma:lower-limb/vessels/venous-drainage": {
+  "id": "tma:lower-limb/vessels/venous-drainage",
+  "titulo": "Venous Drainage of the Lower Limb",
+  "url": "https://teachmeanatomy.info/lower-limb/vessels/venous-drainage/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "d671e25c460d"
+ },
+ "tma:neck/muscles/suprahyoid-muscles": {
+  "id": "tma:neck/muscles/suprahyoid-muscles",
+  "titulo": "The Suprahyoid Muscles - Stylohyoid - Digastric",
+  "url": "https://teachmeanatomy.info/neck/muscles/suprahyoid-muscles/",
+  "actualizada": "2025-12-29",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "a43da46f3371"
+ },
+ "tma:neck/vessels/arterial/common-carotid-artery": {
+  "id": "tma:neck/vessels/arterial/common-carotid-artery",
+  "titulo": "Common Carotid Artery Anatomy – Course, Branches &amp; Supply",
+  "url": "https://teachmeanatomy.info/neck/vessels/arterial/common-carotid-artery/",
+  "actualizada": "2026-04-07",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "dbca75b548df"
+ },
+ "tma:neck/vessels/arterial/external-carotid-artery": {
+  "id": "tma:neck/vessels/arterial/external-carotid-artery",
+  "titulo": "External Carotid Artery – Course, Branches &amp; Supply",
+  "url": "https://teachmeanatomy.info/neck/vessels/arterial/external-carotid-artery/",
+  "actualizada": "2026-04-13",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "57d5ba4c5ef2"
+ },
+ "tma:neck/vessels/arterial/overview": {
+  "id": "tma:neck/vessels/arterial/overview",
+  "titulo": "Arterial Supply of the Head and Neck | Carotid, Vertebral &amp; Subclavian Arteries",
+  "url": "https://teachmeanatomy.info/neck/vessels/arterial/overview/",
+  "actualizada": "2026-05-30",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "2e5e93fe7c9f"
+ },
+ "tma:neck/vessels/venous-drainage": {
+  "id": "tma:neck/vessels/venous-drainage",
+  "titulo": "Venous Drainage of the Head and Neck - Dural Sinuses",
+  "url": "https://teachmeanatomy.info/neck/vessels/venous-drainage/",
+  "actualizada": "2026-04-07",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "aebf77e782c4"
+ },
+ "tma:neck/viscera/larynx/laryngealcartilages": {
+  "id": "tma:neck/viscera/larynx/laryngealcartilages",
+  "titulo": "Laryngeal Cartilages - Paired - Unpaired",
+  "url": "https://teachmeanatomy.info/neck/viscera/larynx/laryngealcartilages/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "93e5516410a6"
+ },
+ "tma:neck/viscera/larynx/ligaments-folds": {
+  "id": "tma:neck/viscera/larynx/ligaments-folds",
+  "titulo": "Laryngeal Ligaments and Folds - Vocal - Vestibular",
+  "url": "https://teachmeanatomy.info/neck/viscera/larynx/ligaments-folds/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "2d283a32c217"
+ },
+ "tma:neck/viscera/larynx/muscles": {
+  "id": "tma:neck/viscera/larynx/muscles",
+  "titulo": "Muscles of the Larynx - Intrinsic - Extrinsic",
+  "url": "https://teachmeanatomy.info/neck/viscera/larynx/muscles/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "5cd8bdd7ae83"
+ },
+ "tma:neck/viscera/larynx/organ": {
+  "id": "tma:neck/viscera/larynx/organ",
+  "titulo": "The Larynx - Cartilages - Muscles",
+  "url": "https://teachmeanatomy.info/neck/viscera/larynx/organ/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "5bf3e29b2ec1"
+ },
+ "tma:neck/viscera/parathyroid-glands": {
+  "id": "tma:neck/viscera/parathyroid-glands",
+  "titulo": "The Parathyroid Glands - Blood Supply - Nerves",
+  "url": "https://teachmeanatomy.info/neck/viscera/parathyroid-glands/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "1366565e5a95"
+ },
+ "tma:neck/viscera/pharynx": {
+  "id": "tma:neck/viscera/pharynx",
+  "titulo": "The Pharynx - Subdivisions - Blood Supply",
+  "url": "https://teachmeanatomy.info/neck/viscera/pharynx/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "9be4d174ec03"
+ },
+ "tma:neck/viscera/thyroid-gland": {
+  "id": "tma:neck/viscera/thyroid-gland",
+  "titulo": "The Thyroid Gland - Location - Blood Supply",
+  "url": "https://teachmeanatomy.info/neck/viscera/thyroid-gland/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "97f2510a08f8"
+ },
+ "tma:neuroanatomy/vessels/arterial-supply": {
+  "id": "tma:neuroanatomy/vessels/arterial-supply",
+  "titulo": "Arterial Supply to the Brain - Carotid - Vertebral",
+  "url": "https://teachmeanatomy.info/neuroanatomy/vessels/arterial-supply/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "43c8cbce85fc"
+ },
+ "tma:pelvis/areas/perineum": {
+  "id": "tma:pelvis/areas/perineum",
+  "titulo": "The Perineum - Boundaries - Contents - Innervation",
+  "url": "https://teachmeanatomy.info/pelvis/areas/perineum/",
+  "actualizada": "2026-04-30",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "2543685a5ba0"
+ },
+ "tma:pelvis/bones/hip-bone": {
+  "id": "tma:pelvis/bones/hip-bone",
+  "titulo": "The Hip Bone - Ilium - Ischium - Pubis",
+  "url": "https://teachmeanatomy.info/pelvis/bones/hip-bone/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "dde1a694e3f1"
+ },
+ "tma:pelvis/muscles/pelvic-floor": {
+  "id": "tma:pelvis/muscles/pelvic-floor",
+  "titulo": "The Pelvic Floor - Structure - Function - Muscles",
+  "url": "https://teachmeanatomy.info/pelvis/muscles/pelvic-floor/",
+  "actualizada": "2026-08-24",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "a229835959d0"
+ },
+ "tma:thorax/areas/anterior-mediastinum": {
+  "id": "tma:thorax/areas/anterior-mediastinum",
+  "titulo": "The Anterior Mediastinum - Borders - Contents",
+  "url": "https://teachmeanatomy.info/thorax/areas/anterior-mediastinum/",
+  "actualizada": "2026-01-29",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "791e0142b5ac"
+ },
+ "tma:thorax/areas/middle-mediastinum": {
+  "id": "tma:thorax/areas/middle-mediastinum",
+  "titulo": "The Middle Mediastinum - Borders - Contents",
+  "url": "https://teachmeanatomy.info/thorax/areas/middle-mediastinum/",
+  "actualizada": "2026-01-29",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "f3c76d17366e"
+ },
+ "tma:thorax/areas/posterior-mediastinum": {
+  "id": "tma:thorax/areas/posterior-mediastinum",
+  "titulo": "The Posterior Mediastinum - Borders - Contents",
+  "url": "https://teachmeanatomy.info/thorax/areas/posterior-mediastinum/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "44dcc51fbeff"
+ },
+ "tma:thorax/areas/superior-mediastinum": {
+  "id": "tma:thorax/areas/superior-mediastinum",
+  "titulo": "The Superior Mediastinum - Borders - Contents",
+  "url": "https://teachmeanatomy.info/thorax/areas/superior-mediastinum/",
+  "actualizada": "2026-05-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "9b435d50504a"
+ },
+ "tma:thorax/bones/sternum": {
+  "id": "tma:thorax/bones/sternum",
+  "titulo": "The Sternum - Body - Manubrium - Xiphoid",
+  "url": "https://teachmeanatomy.info/thorax/bones/sternum/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "9ce74e0e9807"
+ },
+ "tma:thorax/muscles/diaphragm": {
+  "id": "tma:thorax/muscles/diaphragm",
+  "titulo": "The Diaphragm - Actions - Innervation",
+  "url": "https://teachmeanatomy.info/thorax/muscles/diaphragm/",
+  "actualizada": "2026-10-10",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "2349ab4061f0"
+ },
+ "tma:thorax/muscles/thoracic-cage": {
+  "id": "tma:thorax/muscles/thoracic-cage",
+  "titulo": "Thoracic Muscles - Attachments - Actions",
+  "url": "https://teachmeanatomy.info/thorax/muscles/thoracic-cage/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "2b829d1c60e5"
+ },
+ "tma:thorax/organs/heart/heart-valves": {
+  "id": "tma:thorax/organs/heart/heart-valves",
+  "titulo": "The Heart Valves - Tricuspid - Aortic - Mitral - Pulmonary",
+  "url": "https://teachmeanatomy.info/thorax/organs/heart/heart-valves/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "dc3f62de7a62"
+ },
+ "tma:thorax/organs/lungs": {
+  "id": "tma:thorax/organs/lungs",
+  "titulo": "Lung Anatomy | Structure, Vasculature &amp; Nerve Supply",
+  "url": "https://teachmeanatomy.info/thorax/organs/lungs/",
+  "actualizada": "2026-05-26",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "8aeb57658893"
+ },
+ "tma:thorax/organs/pleurae": {
+  "id": "tma:thorax/organs/pleurae",
+  "titulo": "The Pleurae - Visceral - Parietal",
+  "url": "https://teachmeanatomy.info/thorax/organs/pleurae/",
+  "actualizada": "2026-05-02",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "fdae4c5472af"
+ },
+ "tma:thorax/organs/thymus": {
+  "id": "tma:thorax/organs/thymus",
+  "titulo": "The Thymus Gland - Structure - Vasculature",
+  "url": "https://teachmeanatomy.info/thorax/organs/thymus/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "4ca1d2bc3215"
+ },
+ "tma:thorax/organs/tracheobronchial-tree": {
+  "id": "tma:thorax/organs/tracheobronchial-tree",
+  "titulo": "The Tracheobronchial Tree - Trachea - Bronchi",
+  "url": "https://teachmeanatomy.info/thorax/organs/tracheobronchial-tree/",
+  "actualizada": "2025-11-19",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "956486a3e941"
+ },
+ "tma:upper-limb/areas/axilla": {
+  "id": "tma:upper-limb/areas/axilla",
+  "titulo": "The Axilla Region - Borders - Contents",
+  "url": "https://teachmeanatomy.info/upper-limb/areas/axilla/",
+  "actualizada": "2026-06-03",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "689e6008540b"
+ },
+ "tma:upper-limb/areas/cubital-fossa": {
+  "id": "tma:upper-limb/areas/cubital-fossa",
+  "titulo": "The Cubital Fossa - Borders - Contents",
+  "url": "https://teachmeanatomy.info/upper-limb/areas/cubital-fossa/",
+  "actualizada": "2026-10-11",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "641fba67887b"
+ },
+ "tma:upper-limb/bones/bones-of-the-hand-carpals-metacarpals-and-phalanges": {
+  "id": "tma:upper-limb/bones/bones-of-the-hand-carpals-metacarpals-and-phalanges",
+  "titulo": "Bones of the Hand - Carpals - Metacarpals - Phalanges",
+  "url": "https://teachmeanatomy.info/upper-limb/bones/bones-of-the-hand-carpals-metacarpals-and-phalanges/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "2c9869bf073a"
+ },
+ "tma:upper-limb/bones/clavicle": {
+  "id": "tma:upper-limb/bones/clavicle",
+  "titulo": "The Clavicle - Functions - Landmarks - Fractures",
+  "url": "https://teachmeanatomy.info/upper-limb/bones/clavicle/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "2a77bfa1f6fe"
+ },
+ "tma:upper-limb/bones/scapula": {
+  "id": "tma:upper-limb/bones/scapula",
+  "titulo": "The Scapula - Surfaces - Fractures - Winging",
+  "url": "https://teachmeanatomy.info/upper-limb/bones/scapula/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "2c0d66ecad26"
+ },
+ "tma:upper-limb/joints/acromioclavicular": {
+  "id": "tma:upper-limb/joints/acromioclavicular",
+  "titulo": "The Acromioclavicular Joint - Structure - Movement",
+  "url": "https://teachmeanatomy.info/upper-limb/joints/acromioclavicular/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "21edbf13233c"
+ },
+ "tma:upper-limb/joints/elbow-joint": {
+  "id": "tma:upper-limb/joints/elbow-joint",
+  "titulo": "The Elbow Joint - Structure - Movement",
+  "url": "https://teachmeanatomy.info/upper-limb/joints/elbow-joint/",
+  "actualizada": "2026-10-10",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "7713ff545638"
+ },
+ "tma:upper-limb/joints/radioulnar-joints": {
+  "id": "tma:upper-limb/joints/radioulnar-joints",
+  "titulo": "The Radioulnar Joints",
+  "url": "https://teachmeanatomy.info/upper-limb/joints/radioulnar-joints/",
+  "actualizada": "2026-10-10",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "1c5826fda0b9"
+ },
+ "tma:upper-limb/joints/shoulder": {
+  "id": "tma:upper-limb/joints/shoulder",
+  "titulo": "The Shoulder Joint - Structure - Movement",
+  "url": "https://teachmeanatomy.info/upper-limb/joints/shoulder/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "9d6641736429"
+ },
+ "tma:upper-limb/joints/sternoclavicular": {
+  "id": "tma:upper-limb/joints/sternoclavicular",
+  "titulo": "The Sternoclavicular Joint - Structure - Movement",
+  "url": "https://teachmeanatomy.info/upper-limb/joints/sternoclavicular/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "86618fc9027e"
+ },
+ "tma:upper-limb/muscles/anterior-forearm": {
+  "id": "tma:upper-limb/muscles/anterior-forearm",
+  "titulo": "Anterior Forearm Flexor Muscles | Anatomy &amp; Innervation",
+  "url": "https://teachmeanatomy.info/upper-limb/muscles/anterior-forearm/",
+  "actualizada": "2025-12-15",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "a07fd9b17dc7"
+ },
+ "tma:upper-limb/muscles/hand": {
+  "id": "tma:upper-limb/muscles/hand",
+  "titulo": "The Muscles of the Hand - Thenar - Hypothenar",
+  "url": "https://teachmeanatomy.info/upper-limb/muscles/hand/",
+  "actualizada": "2026-10-11",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "640d68506ad8"
+ },
+ "tma:upper-limb/muscles/posterior-forearm": {
+  "id": "tma:upper-limb/muscles/posterior-forearm",
+  "titulo": "Posterior Forearm Extensor Muscles | Anatomy &amp; Innervation",
+  "url": "https://teachmeanatomy.info/upper-limb/muscles/posterior-forearm/",
+  "actualizada": "2025-12-12",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "78e83256acfe"
+ },
+ "tma:upper-limb/muscles/shoulder/intrinsic": {
+  "id": "tma:upper-limb/muscles/shoulder/intrinsic",
+  "titulo": "The Intrinsic Muscles of the Shoulder",
+  "url": "https://teachmeanatomy.info/upper-limb/muscles/shoulder/intrinsic/",
+  "actualizada": "2025-10-28",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "cc64f099ee88"
+ },
+ "tma:upper-limb/muscles/upper-arm": {
+  "id": "tma:upper-limb/muscles/upper-arm",
+  "titulo": "The Upper Arm Muscles – Anterior &amp; Posterior Compartments",
+  "url": "https://teachmeanatomy.info/upper-limb/muscles/upper-arm/",
+  "actualizada": "2026-04-10",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "cb4c44bccf1c"
+ },
+ "tma:upper-limb/nerves/axillary-nerve": {
+  "id": "tma:upper-limb/nerves/axillary-nerve",
+  "titulo": "The Axillary Nerve - Course - Motor - Sensory",
+  "url": "https://teachmeanatomy.info/upper-limb/nerves/axillary-nerve/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "ea5ad5457c16"
+ },
+ "tma:upper-limb/nerves/brachial-plexus": {
+  "id": "tma:upper-limb/nerves/brachial-plexus",
+  "titulo": "Brachial Plexus Anatomy | Roots, Trunks, Cords &amp; Branches",
+  "url": "https://teachmeanatomy.info/upper-limb/nerves/brachial-plexus/",
+  "actualizada": "2026-06-03",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "ac8421a9cfbf"
+ },
+ "tma:upper-limb/nerves/median-nerve": {
+  "id": "tma:upper-limb/nerves/median-nerve",
+  "titulo": "The Median Nerve - Course - Motor - Sensory",
+  "url": "https://teachmeanatomy.info/upper-limb/nerves/median-nerve/",
+  "actualizada": "2026-06-03",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "2f73596811de"
+ },
+ "tma:upper-limb/nerves/musculocutaneous-nerve": {
+  "id": "tma:upper-limb/nerves/musculocutaneous-nerve",
+  "titulo": "The Musculocutaneous Nerve - Course - Motor - Sensory",
+  "url": "https://teachmeanatomy.info/upper-limb/nerves/musculocutaneous-nerve/",
+  "actualizada": "2025-08-11",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "6101345eaf78"
+ },
+ "tma:upper-limb/nerves/radial-nerve": {
+  "id": "tma:upper-limb/nerves/radial-nerve",
+  "titulo": "The Radial Nerve - Course - Motor - Sensory",
+  "url": "https://teachmeanatomy.info/upper-limb/nerves/radial-nerve/",
+  "actualizada": "2025-11-10",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "1679ea71c323"
+ },
+ "tma:upper-limb/nerves/ulnar-nerve": {
+  "id": "tma:upper-limb/nerves/ulnar-nerve",
+  "titulo": "The Ulnar Nerve - Course - Motor - Sensory",
+  "url": "https://teachmeanatomy.info/upper-limb/nerves/ulnar-nerve/",
+  "actualizada": "2026-10-11",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "f607c7a53ad0"
+ },
+ "tma:upper-limb/vessels/arteries": {
+  "id": "tma:upper-limb/vessels/arteries",
+  "titulo": "Arterial Supply to the Upper Limb - Subclavian - Brachial",
+  "url": "https://teachmeanatomy.info/upper-limb/vessels/arteries/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "043aab980439"
+ },
+ "tma:upper-limb/vessels/veins": {
+  "id": "tma:upper-limb/vessels/veins",
+  "titulo": "Venous Drainage of the Upper Limb - Basilic - Cephalic",
+  "url": "https://teachmeanatomy.info/upper-limb/vessels/veins/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-09",
+  "huella": "5c5d3718fd98"
+ },
+ "wp:Abdominal_external_oblique_muscle": {
+  "id": "wp:Abdominal_external_oblique_muscle",
+  "titulo": "Abdominal external oblique muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Abdominal_external_oblique_muscle&oldid=1360606362",
+  "revid": 1360606362,
+  "actualizada": "2026-06-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "03a59bd2a3dc"
+ },
+ "wp:Abdominal_internal_oblique_muscle": {
+  "id": "wp:Abdominal_internal_oblique_muscle",
+  "titulo": "Abdominal internal oblique muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Abdominal_internal_oblique_muscle&oldid=1335108303",
+  "revid": 1335108303,
+  "actualizada": "2026-01-27",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "ef7c926f8222"
+ },
+ "wp:Abdominal_wall": {
+  "id": "wp:Abdominal_wall",
+  "titulo": "Abdominal wall",
+  "url": "https://en.wikipedia.org/w/index.php?title=Abdominal_wall&oldid=1359034350",
+  "revid": 1359034350,
+  "actualizada": "2026-06-12",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "e9a9089b141f"
+ },
+ "wp:Acetabular_labrum": {
+  "id": "wp:Acetabular_labrum",
+  "titulo": "Acetabular labrum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Acetabular_labrum&oldid=1319288085",
+  "revid": 1319288085,
+  "actualizada": "2025-10-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "e244834a8475"
+ },
+ "wp:Acetabulum": {
+  "id": "wp:Acetabulum",
+  "titulo": "Acetabulum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Acetabulum&oldid=1383075642",
+  "revid": 1383075642,
+  "actualizada": "2026-10-31",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "a2cefb5d222b"
+ },
+ "wp:Achilles_tendon": {
+  "id": "wp:Achilles_tendon",
+  "titulo": "Achilles tendon",
+  "url": "https://en.wikipedia.org/w/index.php?title=Achilles_tendon&oldid=1374437840",
+  "revid": 1374437840,
+  "actualizada": "2026-09-12",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "3e8c0407b533"
+ },
+ "wp:Acromioclavicular_joint": {
+  "id": "wp:Acromioclavicular_joint",
+  "titulo": "Acromioclavicular joint",
+  "url": "https://en.wikipedia.org/w/index.php?title=Acromioclavicular_joint&oldid=1308303148",
+  "revid": 1308303148,
+  "actualizada": "2025-08-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "79f555beee8b"
+ },
+ "wp:Adductor_brevis_muscle": {
+  "id": "wp:Adductor_brevis_muscle",
+  "titulo": "Adductor brevis muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Adductor_brevis_muscle&oldid=1355350325",
+  "revid": 1355350325,
+  "actualizada": "2026-05-21",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "1c6d7e397efa"
+ },
+ "wp:Adductor_longus_muscle": {
+  "id": "wp:Adductor_longus_muscle",
+  "titulo": "Adductor longus muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Adductor_longus_muscle&oldid=1366565862",
+  "revid": 1366565862,
+  "actualizada": "2026-07-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "8610d760a977"
+ },
+ "wp:Adductor_magnus_muscle": {
+  "id": "wp:Adductor_magnus_muscle",
+  "titulo": "Adductor magnus muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Adductor_magnus_muscle&oldid=1380879907",
+  "revid": 1380879907,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "3bbd5d3a94e9"
+ },
+ "wp:Adrenal_gland": {
+  "id": "wp:Adrenal_gland",
+  "titulo": "Adrenal gland",
+  "url": "https://en.wikipedia.org/w/index.php?title=Adrenal_gland&oldid=1380881001",
+  "revid": 1380881001,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "eb98b92d4766"
+ },
+ "wp:Anatomical_plane": {
+  "id": "wp:Anatomical_plane",
+  "titulo": "Anatomical plane",
+  "url": "https://en.wikipedia.org/w/index.php?title=Anatomical_plane&oldid=1365189539",
+  "revid": 1365189539,
+  "actualizada": "2026-07-20",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "2472e192788b"
+ },
+ "wp:Anatomical_terms_of_location": {
+  "id": "wp:Anatomical_terms_of_location",
+  "titulo": "Anatomical terms of location",
+  "url": "https://en.wikipedia.org/w/index.php?title=Anatomical_terms_of_location&oldid=1383927580",
+  "revid": 1383927580,
+  "actualizada": "2026-11-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "7eda23f2ba6f"
+ },
+ "wp:Anatomical_terms_of_motion": {
+  "id": "wp:Anatomical_terms_of_motion",
+  "titulo": "Anatomical terms of motion",
+  "url": "https://en.wikipedia.org/w/index.php?title=Anatomical_terms_of_motion&oldid=1352375465",
+  "revid": 1352375465,
+  "actualizada": "2026-05-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "4c65261616b6"
+ },
+ "wp:Anatomical_terms_of_muscle": {
+  "id": "wp:Anatomical_terms_of_muscle",
+  "titulo": "Anatomical terms of muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Anatomical_terms_of_muscle&oldid=1373603211",
+  "revid": 1373603211,
+  "actualizada": "2026-09-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "fc4ae642fc7e"
+ },
+ "wp:Ankle": {
+  "id": "wp:Ankle",
+  "titulo": "Ankle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ankle&oldid=1381346518",
+  "revid": 1381346518,
+  "actualizada": "2026-10-21",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "b62d66387599"
+ },
+ "wp:Anterior_cruciate_ligament": {
+  "id": "wp:Anterior_cruciate_ligament",
+  "titulo": "Anterior cruciate ligament",
+  "url": "https://en.wikipedia.org/w/index.php?title=Anterior_cruciate_ligament&oldid=1380884702",
+  "revid": 1380884702,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "dcd4cbb56343"
+ },
+ "wp:Anterior_triangle_of_the_neck": {
+  "id": "wp:Anterior_triangle_of_the_neck",
+  "titulo": "Anterior triangle of the neck",
+  "url": "https://en.wikipedia.org/w/index.php?title=Anterior_triangle_of_the_neck&oldid=1252114429",
+  "revid": 1252114429,
+  "actualizada": "2024-10-19",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "31a67ba3b669"
+ },
+ "wp:Aortic_valve": {
+  "id": "wp:Aortic_valve",
+  "titulo": "Aortic valve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Aortic_valve&oldid=1380879362",
+  "revid": 1380879362,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "0481699368d4"
+ },
+ "wp:Appendicular_skeleton": {
+  "id": "wp:Appendicular_skeleton",
+  "titulo": "Appendicular skeleton",
+  "url": "https://en.wikipedia.org/w/index.php?title=Appendicular_skeleton&oldid=1365389319",
+  "revid": 1365389319,
+  "actualizada": "2026-07-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "67041cd3c70a"
+ },
+ "wp:Atlas_(anatomy)": {
+  "id": "wp:Atlas_(anatomy)",
+  "titulo": "Atlas (anatomy)",
+  "url": "https://en.wikipedia.org/w/index.php?title=Atlas_(anatomy)&oldid=1373214818",
+  "revid": 1373214818,
+  "actualizada": "2026-09-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "b4edd749498f"
+ },
+ "wp:Atrium_(heart)": {
+  "id": "wp:Atrium_(heart)",
+  "titulo": "Atrium (heart)",
+  "url": "https://en.wikipedia.org/w/index.php?title=Atrium_(heart)&oldid=1359168878",
+  "revid": 1359168878,
+  "actualizada": "2026-06-13",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "960861c2bdd1"
+ },
+ "wp:Autonomic_nervous_system": {
+  "id": "wp:Autonomic_nervous_system",
+  "titulo": "Autonomic nervous system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Autonomic_nervous_system&oldid=1383561670",
+  "revid": 1383561670,
+  "actualizada": "2026-11-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "20aa04783c5f"
+ },
+ "wp:Axial_skeleton": {
+  "id": "wp:Axial_skeleton",
+  "titulo": "Axial skeleton",
+  "url": "https://en.wikipedia.org/w/index.php?title=Axial_skeleton&oldid=1370946339",
+  "revid": 1370946339,
+  "actualizada": "2026-08-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "86653fdb55ea"
+ },
+ "wp:Axillary_lymph_nodes": {
+  "id": "wp:Axillary_lymph_nodes",
+  "titulo": "Axillary lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Axillary_lymph_nodes&oldid=1301012830",
+  "revid": 1301012830,
+  "actualizada": "2025-07-17",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "4391043a4fc3"
+ },
+ "wp:Axillary_nerve": {
+  "id": "wp:Axillary_nerve",
+  "titulo": "Axillary nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Axillary_nerve&oldid=1360615075",
+  "revid": 1360615075,
+  "actualizada": "2026-06-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "131bb9c65df2"
+ },
+ "wp:Axis_(anatomy)": {
+  "id": "wp:Axis_(anatomy)",
+  "titulo": "Axis (anatomy)",
+  "url": "https://en.wikipedia.org/w/index.php?title=Axis_(anatomy)&oldid=1380483895",
+  "revid": 1380483895,
+  "actualizada": "2026-10-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "2736091e4e86"
+ },
+ "wp:Basilic_vein": {
+  "id": "wp:Basilic_vein",
+  "titulo": "Basilic vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Basilic_vein&oldid=1375575103",
+  "revid": 1375575103,
+  "actualizada": "2026-09-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "bd68f4fe42c8"
+ },
+ "wp:Bone": {
+  "id": "wp:Bone",
+  "titulo": "Bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Bone&oldid=1383594843",
+  "revid": 1383594843,
+  "actualizada": "2026-11-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "1b545c7d7e46"
+ },
+ "wp:Brachial_plexus": {
+  "id": "wp:Brachial_plexus",
+  "titulo": "Brachial plexus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Brachial_plexus&oldid=1369216793",
+  "revid": 1369216793,
+  "actualizada": "2026-08-13",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "91a851c5ee30"
+ },
+ "wp:Brachioradialis": {
+  "id": "wp:Brachioradialis",
+  "titulo": "Brachioradialis",
+  "url": "https://en.wikipedia.org/w/index.php?title=Brachioradialis&oldid=1378846149",
+  "revid": 1378846149,
+  "actualizada": "2026-10-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "1cc08d255c4c"
+ },
+ "wp:Brainstem": {
+  "id": "wp:Brainstem",
+  "titulo": "Brainstem",
+  "url": "https://en.wikipedia.org/w/index.php?title=Brainstem&oldid=1363586724",
+  "revid": 1363586724,
+  "actualizada": "2026-07-11",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "81f066099eb8"
+ },
+ "wp:Calcaneus": {
+  "id": "wp:Calcaneus",
+  "titulo": "Calcaneus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Calcaneus&oldid=1372908718",
+  "revid": 1372908718,
+  "actualizada": "2026-09-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "ec83641c8a9b"
+ },
+ "wp:Carpal_bones": {
+  "id": "wp:Carpal_bones",
+  "titulo": "Carpal bones",
+  "url": "https://en.wikipedia.org/w/index.php?title=Carpal_bones&oldid=1380880592",
+  "revid": 1380880592,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "54b97cbff16c"
+ },
+ "wp:Carrying_angle": {
+  "id": "wp:Carrying_angle",
+  "titulo": "Elbow",
+  "url": "https://en.wikipedia.org/w/index.php?title=Elbow&oldid=1380372262",
+  "revid": 1380372262,
+  "actualizada": "2026-10-15",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "d127eff73c62"
+ },
+ "wp:Cauda_equina": {
+  "id": "wp:Cauda_equina",
+  "titulo": "Cauda equina",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cauda_equina&oldid=1380880419",
+  "revid": 1380880419,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "b7e3e68c33b1"
+ },
+ "wp:Central_nervous_system": {
+  "id": "wp:Central_nervous_system",
+  "titulo": "Central nervous system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Central_nervous_system&oldid=1382506967",
+  "revid": 1382506967,
+  "actualizada": "2026-10-29",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "58270109dac1"
+ },
+ "wp:Cephalic_vein": {
+  "id": "wp:Cephalic_vein",
+  "titulo": "Cephalic vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cephalic_vein&oldid=1375572338",
+  "revid": 1375572338,
+  "actualizada": "2026-09-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "51dcd14856dd"
+ },
+ "wp:Cerebellum": {
+  "id": "wp:Cerebellum",
+  "titulo": "Cerebellum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cerebellum&oldid=1382226359",
+  "revid": 1382226359,
+  "actualizada": "2026-10-27",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "ecdb10fbc6e1"
+ },
+ "wp:Cerebrum": {
+  "id": "wp:Cerebrum",
+  "titulo": "Cerebrum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cerebrum&oldid=1383615771",
+  "revid": 1383615771,
+  "actualizada": "2026-11-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "07b520977c11"
+ },
+ "wp:Cervical_vertebrae": {
+  "id": "wp:Cervical_vertebrae",
+  "titulo": "Cervical vertebrae",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cervical_vertebrae&oldid=1373214649",
+  "revid": 1373214649,
+  "actualizada": "2026-09-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f60ed42df6db"
+ },
+ "wp:Circle_of_Willis": {
+  "id": "wp:Circle_of_Willis",
+  "titulo": "Circle of Willis",
+  "url": "https://en.wikipedia.org/w/index.php?title=Circle_of_Willis&oldid=1350156501",
+  "revid": 1350156501,
+  "actualizada": "2026-04-20",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "d2e4dd33ac37"
+ },
+ "wp:Circulatory_system": {
+  "id": "wp:Circulatory_system",
+  "titulo": "Circulatory system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Circulatory_system&oldid=1383552084",
+  "revid": 1383552084,
+  "actualizada": "2026-11-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "05ce28b73572"
+ },
+ "wp:Clavicle": {
+  "id": "wp:Clavicle",
+  "titulo": "Clavicle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Clavicle&oldid=1381562536",
+  "revid": 1381562536,
+  "actualizada": "2026-10-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "12de4442638f"
+ },
+ "wp:Coccyx": {
+  "id": "wp:Coccyx",
+  "titulo": "Coccyx",
+  "url": "https://en.wikipedia.org/w/index.php?title=Coccyx&oldid=1378601921",
+  "revid": 1378601921,
+  "actualizada": "2026-10-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "7cc0d3265ed9"
+ },
+ "wp:Cochlea": {
+  "id": "wp:Cochlea",
+  "titulo": "Cochlea",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cochlea&oldid=1382927795",
+  "revid": 1382927795,
+  "actualizada": "2026-10-31",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "4e7d90747469"
+ },
+ "wp:Common_peroneal_nerve": {
+  "id": "wp:Common_peroneal_nerve",
+  "titulo": "Common fibular nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Common_fibular_nerve&oldid=1380881638",
+  "revid": 1380881638,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "5048152c6897"
+ },
+ "wp:Conus_medullaris": {
+  "id": "wp:Conus_medullaris",
+  "titulo": "Conus medullaris",
+  "url": "https://en.wikipedia.org/w/index.php?title=Conus_medullaris&oldid=1360636456",
+  "revid": 1360636456,
+  "actualizada": "2026-06-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "93834b7c32b7"
+ },
+ "wp:Cornea": {
+  "id": "wp:Cornea",
+  "titulo": "Cornea",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cornea&oldid=1381915202",
+  "revid": 1381915202,
+  "actualizada": "2026-10-25",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "bdc6be594893"
+ },
+ "wp:Coronary_circulation": {
+  "id": "wp:Coronary_circulation",
+  "titulo": "Coronary circulation",
+  "url": "https://en.wikipedia.org/w/index.php?title=Coronary_circulation&oldid=1375795392",
+  "revid": 1375795392,
+  "actualizada": "2026-09-20",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "a7da0c4168aa"
+ },
+ "wp:Corpus_callosum": {
+  "id": "wp:Corpus_callosum",
+  "titulo": "Corpus callosum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Corpus_callosum&oldid=1377167607",
+  "revid": 1377167607,
+  "actualizada": "2026-09-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "1f71bd465131"
+ },
+ "wp:Corticospinal_tract": {
+  "id": "wp:Corticospinal_tract",
+  "titulo": "Corticospinal tract",
+  "url": "https://en.wikipedia.org/w/index.php?title=Corticospinal_tract&oldid=1288621810",
+  "revid": 1288621810,
+  "actualizada": "2025-05-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "b63c218164c7"
+ },
+ "wp:Costal_cartilage": {
+  "id": "wp:Costal_cartilage",
+  "titulo": "Costal cartilage",
+  "url": "https://en.wikipedia.org/w/index.php?title=Costal_cartilage&oldid=1350513374",
+  "revid": 1350513374,
+  "actualizada": "2026-04-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "78608c3aecb7"
+ },
+ "wp:Cranial_nerves": {
+  "id": "wp:Cranial_nerves",
+  "titulo": "Cranial nerves",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cranial_nerves&oldid=1357482168",
+  "revid": 1357482168,
+  "actualizada": "2026-06-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "a373610351a0"
+ },
+ "wp:Cubital_fossa": {
+  "id": "wp:Cubital_fossa",
+  "titulo": "Cubital fossa",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cubital_fossa&oldid=1363699441",
+  "revid": 1363699441,
+  "actualizada": "2026-07-11",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "8a6c79f8bb14"
+ },
+ "wp:Cuboid_bone": {
+  "id": "wp:Cuboid_bone",
+  "titulo": "Cuboid bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cuboid_bone&oldid=1372908385",
+  "revid": 1372908385,
+  "actualizada": "2026-09-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "6fa89481c9d3"
+ },
+ "wp:Cuneiform_bones": {
+  "id": "wp:Cuneiform_bones",
+  "titulo": "Cuneiform bones",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cuneiform_bones&oldid=1372908628",
+  "revid": 1372908628,
+  "actualizada": "2026-09-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "2f65f432ab33"
+ },
+ "wp:Deltoid_muscle": {
+  "id": "wp:Deltoid_muscle",
+  "titulo": "Deltoid muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Deltoid_muscle&oldid=1380880370",
+  "revid": 1380880370,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "8bf3fc528a4b"
+ },
+ "wp:Diaphragm": {
+  "id": "wp:Diaphragm",
+  "titulo": "Diaphragm",
+  "url": "https://en.wikipedia.org/w/index.php?title=Diaphragm&oldid=1380298841",
+  "revid": 1380298841,
+  "actualizada": "2026-10-14",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "61f48581032a"
+ },
+ "wp:Diencephalon": {
+  "id": "wp:Diencephalon",
+  "titulo": "Diencephalon",
+  "url": "https://en.wikipedia.org/w/index.php?title=Diencephalon&oldid=1360219661",
+  "revid": 1360219661,
+  "actualizada": "2026-06-20",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "285e9dd686c2"
+ },
+ "wp:Digastric_muscle": {
+  "id": "wp:Digastric_muscle",
+  "titulo": "Digastric muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Digastric_muscle&oldid=1380879218",
+  "revid": 1380879218,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "dceea48147da"
+ },
+ "wp:Dorsal_column-medial_lemniscus_pathway": {
+  "id": "wp:Dorsal_column-medial_lemniscus_pathway",
+  "titulo": "Dorsal column–medial lemniscus pathway",
+  "url": "https://en.wikipedia.org/w/index.php?title=Dorsal_column%E2%80%93medial_lemniscus_pathway&oldid=1309350564",
+  "revid": 1309350564,
+  "actualizada": "2025-09-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "420848d5ebeb"
+ },
+ "wp:Ear": {
+  "id": "wp:Ear",
+  "titulo": "Ear",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ear&oldid=1383992399",
+  "revid": 1383992399,
+  "actualizada": "2026-11-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "6e08e6bc5521"
+ },
+ "wp:Eardrum": {
+  "id": "wp:Eardrum",
+  "titulo": "Eardrum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Eardrum&oldid=1379139744",
+  "revid": 1379139744,
+  "actualizada": "2026-10-08",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "d00d9b67f0b1"
+ },
+ "wp:Elbow": {
+  "id": "wp:Elbow",
+  "titulo": "Elbow",
+  "url": "https://en.wikipedia.org/w/index.php?title=Elbow&oldid=1380372262",
+  "revid": 1380372262,
+  "actualizada": "2026-10-15",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "d127eff73c62"
+ },
+ "wp:Endocrine_system": {
+  "id": "wp:Endocrine_system",
+  "titulo": "Endocrine system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Endocrine_system&oldid=1380496431",
+  "revid": 1380496431,
+  "actualizada": "2026-10-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "adeede6b1fe8"
+ },
+ "wp:Erector_spinae_muscles": {
+  "id": "wp:Erector_spinae_muscles",
+  "titulo": "Erector spinae muscles",
+  "url": "https://en.wikipedia.org/w/index.php?title=Erector_spinae_muscles&oldid=1383021877",
+  "revid": 1383021877,
+  "actualizada": "2026-10-31",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "9259a2d49307"
+ },
+ "wp:Esophagus": {
+  "id": "wp:Esophagus",
+  "titulo": "Esophagus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Esophagus&oldid=1374093321",
+  "revid": 1374093321,
+  "actualizada": "2026-09-09",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "b09fab7ca1df"
+ },
+ "wp:Ethmoid_bone": {
+  "id": "wp:Ethmoid_bone",
+  "titulo": "Ethmoid bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ethmoid_bone&oldid=1381765570",
+  "revid": 1381765570,
+  "actualizada": "2026-10-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "a21e3580adc2"
+ },
+ "wp:Extensor_digitorum_muscle": {
+  "id": "wp:Extensor_digitorum_muscle",
+  "titulo": "Extensor digitorum muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Extensor_digitorum_muscle&oldid=1360657173",
+  "revid": 1360657173,
+  "actualizada": "2026-06-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "5f6b9075346c"
+ },
+ "wp:Eye": {
+  "id": "wp:Eye",
+  "titulo": "Eye",
+  "url": "https://en.wikipedia.org/w/index.php?title=Eye&oldid=1383171823",
+  "revid": 1383171823,
+  "actualizada": "2026-11-01",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "cbed11baa503"
+ },
+ "wp:Facial_skeleton": {
+  "id": "wp:Facial_skeleton",
+  "titulo": "Facial skeleton",
+  "url": "https://en.wikipedia.org/w/index.php?title=Facial_skeleton&oldid=1369614307",
+  "revid": 1369614307,
+  "actualizada": "2026-08-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "50a2c520b81e"
+ },
+ "wp:Female_reproductive_system": {
+  "id": "wp:Female_reproductive_system",
+  "titulo": "Female reproductive system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Female_reproductive_system&oldid=1373346236",
+  "revid": 1373346236,
+  "actualizada": "2026-09-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "6efde1b3ce0a"
+ },
+ "wp:Femoral_nerve": {
+  "id": "wp:Femoral_nerve",
+  "titulo": "Femoral nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Femoral_nerve&oldid=1380880847",
+  "revid": 1380880847,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "0be824acc5a8"
+ },
+ "wp:Femoral_triangle": {
+  "id": "wp:Femoral_triangle",
+  "titulo": "Femoral triangle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Femoral_triangle&oldid=1380880813",
+  "revid": 1380880813,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "c2e3e425fac8"
+ },
+ "wp:Femur": {
+  "id": "wp:Femur",
+  "titulo": "Femur",
+  "url": "https://en.wikipedia.org/w/index.php?title=Femur&oldid=1383828671",
+  "revid": 1383828671,
+  "actualizada": "2026-11-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "8684cb54bc18"
+ },
+ "wp:Fibrous_joint": {
+  "id": "wp:Fibrous_joint",
+  "titulo": "Fibrous joint",
+  "url": "https://en.wikipedia.org/w/index.php?title=Fibrous_joint&oldid=1314020370",
+  "revid": 1314020370,
+  "actualizada": "2025-09-29",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "496a0973aa8a"
+ },
+ "wp:Fibula": {
+  "id": "wp:Fibula",
+  "titulo": "Fibula",
+  "url": "https://en.wikipedia.org/w/index.php?title=Fibula&oldid=1380880559",
+  "revid": 1380880559,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "5e1f6858c89b"
+ },
+ "wp:Fibular_collateral_ligament": {
+  "id": "wp:Fibular_collateral_ligament",
+  "titulo": "Fibular collateral ligament",
+  "url": "https://en.wikipedia.org/w/index.php?title=Fibular_collateral_ligament&oldid=1246487401",
+  "revid": 1246487401,
+  "actualizada": "2024-09-19",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "bd5df74d2ff2"
+ },
+ "wp:Fibularis_longus": {
+  "id": "wp:Fibularis_longus",
+  "titulo": "Fibularis longus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Fibularis_longus&oldid=1360659007",
+  "revid": 1360659007,
+  "actualizada": "2026-06-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "da2aaaf7a742"
+ },
+ "wp:Foot": {
+  "id": "wp:Foot",
+  "titulo": "Foot",
+  "url": "https://en.wikipedia.org/w/index.php?title=Foot&oldid=1365174145",
+  "revid": 1365174145,
+  "actualizada": "2026-07-20",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "df6987b739eb"
+ },
+ "wp:Frontal_bone": {
+  "id": "wp:Frontal_bone",
+  "titulo": "Frontal bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Frontal_bone&oldid=1381766426",
+  "revid": 1381766426,
+  "actualizada": "2026-10-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "c9d0911c2121"
+ },
+ "wp:Gastrocnemius_muscle": {
+  "id": "wp:Gastrocnemius_muscle",
+  "titulo": "Gastrocnemius muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Gastrocnemius_muscle&oldid=1380879124",
+  "revid": 1380879124,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "2fbde298b918"
+ },
+ "wp:Gluteus_maximus": {
+  "id": "wp:Gluteus_maximus",
+  "titulo": "Gluteus maximus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Gluteus_maximus&oldid=1359877966",
+  "revid": 1359877966,
+  "actualizada": "2026-06-17",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "803643008ed1"
+ },
+ "wp:Gluteus_medius": {
+  "id": "wp:Gluteus_medius",
+  "titulo": "Gluteus medius",
+  "url": "https://en.wikipedia.org/w/index.php?title=Gluteus_medius&oldid=1380890721",
+  "revid": 1380890721,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f7d654e2447b"
+ },
+ "wp:Gluteus_minimus": {
+  "id": "wp:Gluteus_minimus",
+  "titulo": "Gluteus minimus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Gluteus_minimus&oldid=1380879741",
+  "revid": 1380879741,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "c75de5f5a78f"
+ },
+ "wp:Gracilis_muscle": {
+  "id": "wp:Gracilis_muscle",
+  "titulo": "Gracilis muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Gracilis_muscle&oldid=1380395616",
+  "revid": 1380395616,
+  "actualizada": "2026-10-15",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "e198d8990b7a"
+ },
+ "wp:Hand": {
+  "id": "wp:Hand",
+  "titulo": "Hand",
+  "url": "https://en.wikipedia.org/w/index.php?title=Hand&oldid=1383614724",
+  "revid": 1383614724,
+  "actualizada": "2026-11-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "262127687855"
+ },
+ "wp:Heart": {
+  "id": "wp:Heart",
+  "titulo": "Heart",
+  "url": "https://en.wikipedia.org/w/index.php?title=Heart&oldid=1383668909",
+  "revid": 1383668909,
+  "actualizada": "2026-11-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "04dd7f0d843d"
+ },
+ "wp:Heart_valve": {
+  "id": "wp:Heart_valve",
+  "titulo": "Heart valve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Heart_valve&oldid=1380878868",
+  "revid": 1380878868,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "fe433699215f"
+ },
+ "wp:Hepatic_portal_vein": {
+  "id": "wp:Hepatic_portal_vein",
+  "titulo": "Portal vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Portal_vein&oldid=1381192222",
+  "revid": 1381192222,
+  "actualizada": "2026-10-20",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "678aab6845b8"
+ },
+ "wp:Hip": {
+  "id": "wp:Hip",
+  "titulo": "Hip",
+  "url": "https://en.wikipedia.org/w/index.php?title=Hip&oldid=1372171026",
+  "revid": 1372171026,
+  "actualizada": "2026-08-30",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f8af6a032f6c"
+ },
+ "wp:Hip_bone": {
+  "id": "wp:Hip_bone",
+  "titulo": "Hip bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Hip_bone&oldid=1358025730",
+  "revid": 1358025730,
+  "actualizada": "2026-06-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "a2e673133696"
+ },
+ "wp:Human_brain": {
+  "id": "wp:Human_brain",
+  "titulo": "Human brain",
+  "url": "https://en.wikipedia.org/w/index.php?title=Human_brain&oldid=1383651066",
+  "revid": 1383651066,
+  "actualizada": "2026-11-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "43966a16cfb2"
+ },
+ "wp:Human_digestive_system": {
+  "id": "wp:Human_digestive_system",
+  "titulo": "Human digestive system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Human_digestive_system&oldid=1379840794",
+  "revid": 1379840794,
+  "actualizada": "2026-10-12",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "c4221ee15db2"
+ },
+ "wp:Human_eye": {
+  "id": "wp:Human_eye",
+  "titulo": "Human eye",
+  "url": "https://en.wikipedia.org/w/index.php?title=Human_eye&oldid=1380432829",
+  "revid": 1380432829,
+  "actualizada": "2026-10-15",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "41f18a91dea9"
+ },
+ "wp:Human_skeleton": {
+  "id": "wp:Human_skeleton",
+  "titulo": "Human skeleton",
+  "url": "https://en.wikipedia.org/w/index.php?title=Human_skeleton&oldid=1382934825",
+  "revid": 1382934825,
+  "actualizada": "2026-10-31",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "b6e887ca95d8"
+ },
+ "wp:Human_skin": {
+  "id": "wp:Human_skin",
+  "titulo": "Human skin",
+  "url": "https://en.wikipedia.org/w/index.php?title=Human_skin&oldid=1383729014",
+  "revid": 1383729014,
+  "actualizada": "2026-11-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "cd39889621b8"
+ },
+ "wp:Hyoid_bone": {
+  "id": "wp:Hyoid_bone",
+  "titulo": "Hyoid bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Hyoid_bone&oldid=1365357229",
+  "revid": 1365357229,
+  "actualizada": "2026-07-21",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "244ed3477965"
+ },
+ "wp:Hypothalamus": {
+  "id": "wp:Hypothalamus",
+  "titulo": "Hypothalamus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Hypothalamus&oldid=1375972522",
+  "revid": 1375972522,
+  "actualizada": "2026-09-21",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "bbc14614c39b"
+ },
+ "wp:Iliofemoral_ligament": {
+  "id": "wp:Iliofemoral_ligament",
+  "titulo": "Iliofemoral ligament",
+  "url": "https://en.wikipedia.org/w/index.php?title=Iliofemoral_ligament&oldid=1262327994",
+  "revid": 1262327994,
+  "actualizada": "2024-12-10",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "346185cbeaca"
+ },
+ "wp:Iliopsoas": {
+  "id": "wp:Iliopsoas",
+  "titulo": "Iliopsoas",
+  "url": "https://en.wikipedia.org/w/index.php?title=Iliopsoas&oldid=1360690555",
+  "revid": 1360690555,
+  "actualizada": "2026-06-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "81a1c94182c4"
+ },
+ "wp:Ilium_(bone)": {
+  "id": "wp:Ilium_(bone)",
+  "titulo": "Ilium (bone)",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ilium_(bone)&oldid=1380889621",
+  "revid": 1380889621,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "329f58819942"
+ },
+ "wp:Incus": {
+  "id": "wp:Incus",
+  "titulo": "Incus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Incus&oldid=1382343608",
+  "revid": 1382343608,
+  "actualizada": "2026-10-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "b29517187c5b"
+ },
+ "wp:Inferior_nasal_concha": {
+  "id": "wp:Inferior_nasal_concha",
+  "titulo": "Inferior nasal concha",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inferior_nasal_concha&oldid=1353690565",
+  "revid": 1353690565,
+  "actualizada": "2026-05-11",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "9bee0ae66cf6"
+ },
+ "wp:Infrahyoid_muscles": {
+  "id": "wp:Infrahyoid_muscles",
+  "titulo": "Infrahyoid muscles",
+  "url": "https://en.wikipedia.org/w/index.php?title=Infrahyoid_muscles&oldid=1360691574",
+  "revid": 1360691574,
+  "actualizada": "2026-06-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "1159d9707748"
+ },
+ "wp:Infraspinatus_muscle": {
+  "id": "wp:Infraspinatus_muscle",
+  "titulo": "Infraspinatus muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Infraspinatus_muscle&oldid=1300467547",
+  "revid": 1300467547,
+  "actualizada": "2025-07-14",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "3d0af528496b"
+ },
+ "wp:Inguinal_canal": {
+  "id": "wp:Inguinal_canal",
+  "titulo": "Inguinal canal",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inguinal_canal&oldid=1380879057",
+  "revid": 1380879057,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "dc37d9bb643a"
+ },
+ "wp:Inguinal_ligament": {
+  "id": "wp:Inguinal_ligament",
+  "titulo": "Inguinal ligament",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inguinal_ligament&oldid=1380889481",
+  "revid": 1380889481,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "4e3b5055d7e4"
+ },
+ "wp:Inner_ear": {
+  "id": "wp:Inner_ear",
+  "titulo": "Inner ear",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inner_ear&oldid=1382340243",
+  "revid": 1382340243,
+  "actualizada": "2026-10-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "042545ac67e6"
+ },
+ "wp:Integumentary_system": {
+  "id": "wp:Integumentary_system",
+  "titulo": "Integumentary system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Integumentary_system&oldid=1383645958",
+  "revid": 1383645958,
+  "actualizada": "2026-11-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "a0ed17110e77"
+ },
+ "wp:Interosseous_membrane_of_forearm": {
+  "id": "wp:Interosseous_membrane_of_forearm",
+  "titulo": "Interosseous membrane of forearm",
+  "url": "https://en.wikipedia.org/w/index.php?title=Interosseous_membrane_of_forearm&oldid=1338850832",
+  "revid": 1338850832,
+  "actualizada": "2026-02-17",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "e8a38ea5e57e"
+ },
+ "wp:Interventricular_septum": {
+  "id": "wp:Interventricular_septum",
+  "titulo": "Interventricular septum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Interventricular_septum&oldid=1369116164",
+  "revid": 1369116164,
+  "actualizada": "2026-08-13",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "4903cca18043"
+ },
+ "wp:Intervertebral_disc": {
+  "id": "wp:Intervertebral_disc",
+  "titulo": "Intervertebral disc",
+  "url": "https://en.wikipedia.org/w/index.php?title=Intervertebral_disc&oldid=1380372774",
+  "revid": 1380372774,
+  "actualizada": "2026-10-15",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "3258a3c87c2d"
+ },
+ "wp:Ischiofemoral_ligament": {
+  "id": "wp:Ischiofemoral_ligament",
+  "titulo": "Ischiofemoral ligament",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ischiofemoral_ligament&oldid=1257183068",
+  "revid": 1257183068,
+  "actualizada": "2024-11-13",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "0b24c1031b32"
+ },
+ "wp:Ischium": {
+  "id": "wp:Ischium",
+  "titulo": "Ischium",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ischium&oldid=1380881793",
+  "revid": 1380881793,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "1d8206d5d18d"
+ },
+ "wp:Joint": {
+  "id": "wp:Joint",
+  "titulo": "Joint",
+  "url": "https://en.wikipedia.org/w/index.php?title=Joint&oldid=1384189655",
+  "revid": 1384189655,
+  "actualizada": "2026-11-07",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "512d8ddbe834"
+ },
+ "wp:Kidney": {
+  "id": "wp:Kidney",
+  "titulo": "Kidney",
+  "url": "https://en.wikipedia.org/w/index.php?title=Kidney&oldid=1384115443",
+  "revid": 1384115443,
+  "actualizada": "2026-11-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "7570ea04b0c9"
+ },
+ "wp:Knee": {
+  "id": "wp:Knee",
+  "titulo": "Knee",
+  "url": "https://en.wikipedia.org/w/index.php?title=Knee&oldid=1384164281",
+  "revid": 1384164281,
+  "actualizada": "2026-11-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "5ba92f855f7a"
+ },
+ "wp:Lacrimal_bone": {
+  "id": "wp:Lacrimal_bone",
+  "titulo": "Lacrimal bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lacrimal_bone&oldid=1381765988",
+  "revid": 1381765988,
+  "actualizada": "2026-10-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "5ef3d46b1a30"
+ },
+ "wp:Lateral_circumflex_femoral_artery": {
+  "id": "wp:Lateral_circumflex_femoral_artery",
+  "titulo": "Lateral circumflex femoral artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lateral_circumflex_femoral_artery&oldid=1373162907",
+  "revid": 1373162907,
+  "actualizada": "2026-09-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "09c7bf36aae2"
+ },
+ "wp:Latissimus_dorsi_muscle": {
+  "id": "wp:Latissimus_dorsi_muscle",
+  "titulo": "Latissimus dorsi muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Latissimus_dorsi_muscle&oldid=1382512580",
+  "revid": 1382512580,
+  "actualizada": "2026-10-29",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "39c83df33084"
+ },
+ "wp:Levator_scapulae_muscle": {
+  "id": "wp:Levator_scapulae_muscle",
+  "titulo": "Levator scapulae muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Levator_scapulae_muscle&oldid=1381764154",
+  "revid": 1381764154,
+  "actualizada": "2026-10-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "44c7dd4edd02"
+ },
+ "wp:Ligament_of_head_of_femur": {
+  "id": "wp:Ligament_of_head_of_femur",
+  "titulo": "Ligament of head of femur",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ligament_of_head_of_femur&oldid=1339527485",
+  "revid": 1339527485,
+  "actualizada": "2026-02-21",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "d4378fcff973"
+ },
+ "wp:Linea_alba_(abdomen)": {
+  "id": "wp:Linea_alba_(abdomen)",
+  "titulo": "Linea alba (abdomen)",
+  "url": "https://en.wikipedia.org/w/index.php?title=Linea_alba_(abdomen)&oldid=1380879078",
+  "revid": 1380879078,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "ccefba36cfba"
+ },
+ "wp:Liver": {
+  "id": "wp:Liver",
+  "titulo": "Liver",
+  "url": "https://en.wikipedia.org/w/index.php?title=Liver&oldid=1382171259",
+  "revid": 1382171259,
+  "actualizada": "2026-10-27",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "78e17b394036"
+ },
+ "wp:Liver_segment": {
+  "id": "wp:Liver_segment",
+  "titulo": "Liver segment",
+  "url": "https://en.wikipedia.org/w/index.php?title=Liver_segment&oldid=1332495227",
+  "revid": 1332495227,
+  "actualizada": "2026-01-12",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "552cbd102a58"
+ },
+ "wp:Lobes_of_the_brain": {
+  "id": "wp:Lobes_of_the_brain",
+  "titulo": "Lobes of the brain",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lobes_of_the_brain&oldid=1364621569",
+  "revid": 1364621569,
+  "actualizada": "2026-07-17",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "fe87fdff7c48"
+ },
+ "wp:Long_thoracic_nerve": {
+  "id": "wp:Long_thoracic_nerve",
+  "titulo": "Long thoracic nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Long_thoracic_nerve&oldid=1360704682",
+  "revid": 1360704682,
+  "actualizada": "2026-06-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "4c33abbc12d0"
+ },
+ "wp:Lumbar_plexus": {
+  "id": "wp:Lumbar_plexus",
+  "titulo": "Lumbar plexus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lumbar_plexus&oldid=1345695045",
+  "revid": 1345695045,
+  "actualizada": "2026-03-27",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "e135ccff48af"
+ },
+ "wp:Lumbar_vertebrae": {
+  "id": "wp:Lumbar_vertebrae",
+  "titulo": "Lumbar vertebrae",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lumbar_vertebrae&oldid=1380677177",
+  "revid": 1380677177,
+  "actualizada": "2026-10-17",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "e76758fbf1f4"
+ },
+ "wp:Lung": {
+  "id": "wp:Lung",
+  "titulo": "Lung",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lung&oldid=1383783274",
+  "revid": 1383783274,
+  "actualizada": "2026-11-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "459ef651b902"
+ },
+ "wp:Lymphatic_system": {
+  "id": "wp:Lymphatic_system",
+  "titulo": "Lymphatic system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lymphatic_system&oldid=1379857409",
+  "revid": 1379857409,
+  "actualizada": "2026-10-12",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "c9822ae4525e"
+ },
+ "wp:Male_reproductive_system": {
+  "id": "wp:Male_reproductive_system",
+  "titulo": "Male reproductive system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Male_reproductive_system&oldid=1379434193",
+  "revid": 1379434193,
+  "actualizada": "2026-10-10",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "60b9f3000965"
+ },
+ "wp:Malleus": {
+  "id": "wp:Malleus",
+  "titulo": "Malleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Malleus&oldid=1382344741",
+  "revid": 1382344741,
+  "actualizada": "2026-10-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "61c098ccd9fb"
+ },
+ "wp:Mandible": {
+  "id": "wp:Mandible",
+  "titulo": "Mandible",
+  "url": "https://en.wikipedia.org/w/index.php?title=Mandible&oldid=1368668773",
+  "revid": 1368668773,
+  "actualizada": "2026-08-10",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "5ffbeebc62d3"
+ },
+ "wp:Maxilla": {
+  "id": "wp:Maxilla",
+  "titulo": "Maxilla",
+  "url": "https://en.wikipedia.org/w/index.php?title=Maxilla&oldid=1381765876",
+  "revid": 1381765876,
+  "actualizada": "2026-10-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "ee15959c5dff"
+ },
+ "wp:Medial_circumflex_femoral_artery": {
+  "id": "wp:Medial_circumflex_femoral_artery",
+  "titulo": "Medial circumflex femoral artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Medial_circumflex_femoral_artery&oldid=1301130795",
+  "revid": 1301130795,
+  "actualizada": "2025-07-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f6382caa0c20"
+ },
+ "wp:Medial_collateral_ligament": {
+  "id": "wp:Medial_collateral_ligament",
+  "titulo": "Medial collateral ligament",
+  "url": "https://en.wikipedia.org/w/index.php?title=Medial_collateral_ligament&oldid=1376133577",
+  "revid": 1376133577,
+  "actualizada": "2026-09-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "5e038812a744"
+ },
+ "wp:Median_nerve": {
+  "id": "wp:Median_nerve",
+  "titulo": "Median nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Median_nerve&oldid=1365975915",
+  "revid": 1365975915,
+  "actualizada": "2026-07-25",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "72292ea8de30"
+ },
+ "wp:Medulla_oblongata": {
+  "id": "wp:Medulla_oblongata",
+  "titulo": "Medulla oblongata",
+  "url": "https://en.wikipedia.org/w/index.php?title=Medulla_oblongata&oldid=1384169209",
+  "revid": 1384169209,
+  "actualizada": "2026-11-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "201260f457ca"
+ },
+ "wp:Meninges": {
+  "id": "wp:Meninges",
+  "titulo": "Meninges",
+  "url": "https://en.wikipedia.org/w/index.php?title=Meninges&oldid=1369815412",
+  "revid": 1369815412,
+  "actualizada": "2026-08-17",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "c01b57c494c3"
+ },
+ "wp:Meniscus_(anatomy)": {
+  "id": "wp:Meniscus_(anatomy)",
+  "titulo": "Meniscus (anatomy)",
+  "url": "https://en.wikipedia.org/w/index.php?title=Meniscus_(anatomy)&oldid=1378896538",
+  "revid": 1378896538,
+  "actualizada": "2026-10-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "859f8e31d7ba"
+ },
+ "wp:Metacarpal_bones": {
+  "id": "wp:Metacarpal_bones",
+  "titulo": "Metacarpal bones",
+  "url": "https://en.wikipedia.org/w/index.php?title=Metacarpal_bones&oldid=1378650322",
+  "revid": 1378650322,
+  "actualizada": "2026-10-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f92b90b0173a"
+ },
+ "wp:Metatarsal_bones": {
+  "id": "wp:Metatarsal_bones",
+  "titulo": "Metatarsal bones",
+  "url": "https://en.wikipedia.org/w/index.php?title=Metatarsal_bones&oldid=1372908307",
+  "revid": 1372908307,
+  "actualizada": "2026-09-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "00a1c62e04b7"
+ },
+ "wp:Midbrain": {
+  "id": "wp:Midbrain",
+  "titulo": "Midbrain",
+  "url": "https://en.wikipedia.org/w/index.php?title=Midbrain&oldid=1377548956",
+  "revid": 1377548956,
+  "actualizada": "2026-09-29",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "92766ae66ded"
+ },
+ "wp:Middle_ear": {
+  "id": "wp:Middle_ear",
+  "titulo": "Middle ear",
+  "url": "https://en.wikipedia.org/w/index.php?title=Middle_ear&oldid=1378638701",
+  "revid": 1378638701,
+  "actualizada": "2026-10-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f5597c9918dd"
+ },
+ "wp:Mitral_valve": {
+  "id": "wp:Mitral_valve",
+  "titulo": "Mitral valve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Mitral_valve&oldid=1382168177",
+  "revid": 1382168177,
+  "actualizada": "2026-10-27",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "d48b8dddcc10"
+ },
+ "wp:Muscle": {
+  "id": "wp:Muscle",
+  "titulo": "Muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Muscle&oldid=1384638339",
+  "revid": 1384638339,
+  "actualizada": "2026-11-09",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f9dab253e7d4"
+ },
+ "wp:Muscles_of_mastication": {
+  "id": "wp:Muscles_of_mastication",
+  "titulo": "Muscles of mastication",
+  "url": "https://en.wikipedia.org/w/index.php?title=Muscles_of_mastication&oldid=1360711262",
+  "revid": 1360711262,
+  "actualizada": "2026-06-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "ed508a268eb9"
+ },
+ "wp:Muscles_of_respiration": {
+  "id": "wp:Muscles_of_respiration",
+  "titulo": "Muscles of respiration",
+  "url": "https://en.wikipedia.org/w/index.php?title=Muscles_of_respiration&oldid=1339208243",
+  "revid": 1339208243,
+  "actualizada": "2026-02-19",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "e9370084c4c8"
+ },
+ "wp:Musculocutaneous_nerve": {
+  "id": "wp:Musculocutaneous_nerve",
+  "titulo": "Musculocutaneous nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Musculocutaneous_nerve&oldid=1365975941",
+  "revid": 1365975941,
+  "actualizada": "2026-07-25",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "287eb0ed6a42"
+ },
+ "wp:Nasal_bone": {
+  "id": "wp:Nasal_bone",
+  "titulo": "Nasal bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Nasal_bone&oldid=1380878906",
+  "revid": 1380878906,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "ee50709e87cd"
+ },
+ "wp:Navicular_bone": {
+  "id": "wp:Navicular_bone",
+  "titulo": "Navicular bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Navicular_bone&oldid=1372908464",
+  "revid": 1372908464,
+  "actualizada": "2026-09-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "db102337a207"
+ },
+ "wp:Nervous_system": {
+  "id": "wp:Nervous_system",
+  "titulo": "Nervous system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Nervous_system&oldid=1373894155",
+  "revid": 1373894155,
+  "actualizada": "2026-09-08",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "6a670c8ba4b1"
+ },
+ "wp:Neurocranium": {
+  "id": "wp:Neurocranium",
+  "titulo": "Neurocranium",
+  "url": "https://en.wikipedia.org/w/index.php?title=Neurocranium&oldid=1377200157",
+  "revid": 1377200157,
+  "actualizada": "2026-09-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "3844d669d75b"
+ },
+ "wp:Obturator_foramen": {
+  "id": "wp:Obturator_foramen",
+  "titulo": "Obturator foramen",
+  "url": "https://en.wikipedia.org/w/index.php?title=Obturator_foramen&oldid=1301154497",
+  "revid": 1301154497,
+  "actualizada": "2025-07-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "27d939e30309"
+ },
+ "wp:Obturator_nerve": {
+  "id": "wp:Obturator_nerve",
+  "titulo": "Obturator nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Obturator_nerve&oldid=1380881494",
+  "revid": 1380881494,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f13ba065bad4"
+ },
+ "wp:Occipital_bone": {
+  "id": "wp:Occipital_bone",
+  "titulo": "Occipital bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Occipital_bone&oldid=1364280307",
+  "revid": 1364280307,
+  "actualizada": "2026-07-15",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "d7c079655b0c"
+ },
+ "wp:Omohyoid_muscle": {
+  "id": "wp:Omohyoid_muscle",
+  "titulo": "Omohyoid muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Omohyoid_muscle&oldid=1380891918",
+  "revid": 1380891918,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "75fbeddd7592"
+ },
+ "wp:Ossicles": {
+  "id": "wp:Ossicles",
+  "titulo": "Ossicles",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ossicles&oldid=1380345853",
+  "revid": 1380345853,
+  "actualizada": "2026-10-15",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "e1b505651600"
+ },
+ "wp:Outer_ear": {
+  "id": "wp:Outer_ear",
+  "titulo": "Outer ear",
+  "url": "https://en.wikipedia.org/w/index.php?title=Outer_ear&oldid=1379107208",
+  "revid": 1379107208,
+  "actualizada": "2026-10-08",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "2a4791088646"
+ },
+ "wp:Palatine_bone": {
+  "id": "wp:Palatine_bone",
+  "titulo": "Palatine bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Palatine_bone&oldid=1382931115",
+  "revid": 1382931115,
+  "actualizada": "2026-10-31",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "a367e8a00dc7"
+ },
+ "wp:Pancreas": {
+  "id": "wp:Pancreas",
+  "titulo": "Pancreas",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pancreas&oldid=1380834414",
+  "revid": 1380834414,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "ea977269bde3"
+ },
+ "wp:Parathyroid_gland": {
+  "id": "wp:Parathyroid_gland",
+  "titulo": "Parathyroid gland",
+  "url": "https://en.wikipedia.org/w/index.php?title=Parathyroid_gland&oldid=1380526820",
+  "revid": 1380526820,
+  "actualizada": "2026-10-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "5dde58b23044"
+ },
+ "wp:Parietal_bone": {
+  "id": "wp:Parietal_bone",
+  "titulo": "Parietal bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Parietal_bone&oldid=1364171996",
+  "revid": 1364171996,
+  "actualizada": "2026-07-14",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "e6bcb0359180"
+ },
+ "wp:Patella": {
+  "id": "wp:Patella",
+  "titulo": "Patella",
+  "url": "https://en.wikipedia.org/w/index.php?title=Patella&oldid=1382758513",
+  "revid": 1382758513,
+  "actualizada": "2026-10-30",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "98a139f0210b"
+ },
+ "wp:Pectineus_muscle": {
+  "id": "wp:Pectineus_muscle",
+  "titulo": "Pectineus muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pectineus_muscle&oldid=1368156766",
+  "revid": 1368156766,
+  "actualizada": "2026-08-07",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "955a2ece4640"
+ },
+ "wp:Pelvis": {
+  "id": "wp:Pelvis",
+  "titulo": "Pelvis",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pelvis&oldid=1368337563",
+  "revid": 1368337563,
+  "actualizada": "2026-08-08",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "4f42911bf8ac"
+ },
+ "wp:Pericardium": {
+  "id": "wp:Pericardium",
+  "titulo": "Pericardium",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pericardium&oldid=1380879990",
+  "revid": 1380879990,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "2fe774222540"
+ },
+ "wp:Peripheral_nervous_system": {
+  "id": "wp:Peripheral_nervous_system",
+  "titulo": "Peripheral nervous system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Peripheral_nervous_system&oldid=1355659754",
+  "revid": 1355659754,
+  "actualizada": "2026-05-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "48900804187d"
+ },
+ "wp:Phalanx_bone": {
+  "id": "wp:Phalanx_bone",
+  "titulo": "Phalanx bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Phalanx_bone&oldid=1378011921",
+  "revid": 1378011921,
+  "actualizada": "2026-10-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "dcefda30203f"
+ },
+ "wp:Piriformis_muscle": {
+  "id": "wp:Piriformis_muscle",
+  "titulo": "Piriformis muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Piriformis_muscle&oldid=1380879535",
+  "revid": 1380879535,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "c5eeded50ac6"
+ },
+ "wp:Platysma": {
+  "id": "wp:Platysma",
+  "titulo": "Platysma muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Platysma_muscle&oldid=1381564032",
+  "revid": 1381564032,
+  "actualizada": "2026-10-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "d8cece4ed817"
+ },
+ "wp:Pons": {
+  "id": "wp:Pons",
+  "titulo": "Pons",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pons&oldid=1371450602",
+  "revid": 1371450602,
+  "actualizada": "2026-08-26",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "413a7289fda5"
+ },
+ "wp:Posterior_cruciate_ligament": {
+  "id": "wp:Posterior_cruciate_ligament",
+  "titulo": "Posterior cruciate ligament",
+  "url": "https://en.wikipedia.org/w/index.php?title=Posterior_cruciate_ligament&oldid=1378808678",
+  "revid": 1378808678,
+  "actualizada": "2026-10-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "8b41ab302843"
+ },
+ "wp:Posterior_triangle_of_the_neck": {
+  "id": "wp:Posterior_triangle_of_the_neck",
+  "titulo": "Posterior triangle of the neck",
+  "url": "https://en.wikipedia.org/w/index.php?title=Posterior_triangle_of_the_neck&oldid=1301331260",
+  "revid": 1301331260,
+  "actualizada": "2025-07-19",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "cf2085d24b15"
+ },
+ "wp:Pubic_symphysis": {
+  "id": "wp:Pubic_symphysis",
+  "titulo": "Pubic symphysis",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pubic_symphysis&oldid=1380886473",
+  "revid": 1380886473,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "95d9c24812da"
+ },
+ "wp:Pubis_(bone)": {
+  "id": "wp:Pubis_(bone)",
+  "titulo": "Pubis",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pubis&oldid=1380884033",
+  "revid": 1380884033,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "b5e20e6dd6cc"
+ },
+ "wp:Pubofemoral_ligament": {
+  "id": "wp:Pubofemoral_ligament",
+  "titulo": "Pubofemoral ligament",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pubofemoral_ligament&oldid=1257178078",
+  "revid": 1257178078,
+  "actualizada": "2024-11-13",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "993119d9f171"
+ },
+ "wp:Pulmonary_valve": {
+  "id": "wp:Pulmonary_valve",
+  "titulo": "Pulmonary valve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pulmonary_valve&oldid=1266634880",
+  "revid": 1266634880,
+  "actualizada": "2025-01-01",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "1042b7cc57a1"
+ },
+ "wp:Quadriceps_femoris_muscle": {
+  "id": "wp:Quadriceps_femoris_muscle",
+  "titulo": "Quadriceps",
+  "url": "https://en.wikipedia.org/w/index.php?title=Quadriceps&oldid=1377970055",
+  "revid": 1377970055,
+  "actualizada": "2026-10-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "32dd754f05e0"
+ },
+ "wp:Radial_nerve": {
+  "id": "wp:Radial_nerve",
+  "titulo": "Radial nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Radial_nerve&oldid=1360731087",
+  "revid": 1360731087,
+  "actualizada": "2026-06-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "2cbfefc0f746"
+ },
+ "wp:Radius_(bone)": {
+  "id": "wp:Radius_(bone)",
+  "titulo": "Radius (bone)",
+  "url": "https://en.wikipedia.org/w/index.php?title=Radius_(bone)&oldid=1373353791",
+  "revid": 1373353791,
+  "actualizada": "2026-09-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "6df40f7c44c0"
+ },
+ "wp:Rectus_abdominis_muscle": {
+  "id": "wp:Rectus_abdominis_muscle",
+  "titulo": "Rectus abdominis muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Rectus_abdominis_muscle&oldid=1380878886",
+  "revid": 1380878886,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "02345f7d2ea0"
+ },
+ "wp:Rectus_femoris_muscle": {
+  "id": "wp:Rectus_femoris_muscle",
+  "titulo": "Rectus femoris muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Rectus_femoris_muscle&oldid=1378245670",
+  "revid": 1378245670,
+  "actualizada": "2026-10-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "a308596f1fe9"
+ },
+ "wp:Rectus_sheath": {
+  "id": "wp:Rectus_sheath",
+  "titulo": "Rectus sheath",
+  "url": "https://en.wikipedia.org/w/index.php?title=Rectus_sheath&oldid=1380892208",
+  "revid": 1380892208,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "521fcaf498d2"
+ },
+ "wp:Renal_artery": {
+  "id": "wp:Renal_artery",
+  "titulo": "Renal artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Renal_artery&oldid=1380889563",
+  "revid": 1380889563,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "d73b09a415b2"
+ },
+ "wp:Renal_cortex": {
+  "id": "wp:Renal_cortex",
+  "titulo": "Renal cortex",
+  "url": "https://en.wikipedia.org/w/index.php?title=Renal_cortex&oldid=1329656509",
+  "revid": 1329656509,
+  "actualizada": "2025-12-27",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "90b3ae61f700"
+ },
+ "wp:Renal_medulla": {
+  "id": "wp:Renal_medulla",
+  "titulo": "Renal medulla",
+  "url": "https://en.wikipedia.org/w/index.php?title=Renal_medulla&oldid=1380890418",
+  "revid": 1380890418,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "a0dee73a96bf"
+ },
+ "wp:Renal_pelvis": {
+  "id": "wp:Renal_pelvis",
+  "titulo": "Renal pelvis",
+  "url": "https://en.wikipedia.org/w/index.php?title=Renal_pelvis&oldid=1339796913",
+  "revid": 1339796913,
+  "actualizada": "2026-02-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "160b25e3282f"
+ },
+ "wp:Renal_vein": {
+  "id": "wp:Renal_vein",
+  "titulo": "Renal vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Renal_vein&oldid=1301190026",
+  "revid": 1301190026,
+  "actualizada": "2025-07-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "5700217396c0"
+ },
+ "wp:Respiratory_system": {
+  "id": "wp:Respiratory_system",
+  "titulo": "Respiratory system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Respiratory_system&oldid=1382186282",
+  "revid": 1382186282,
+  "actualizada": "2026-10-27",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "3e6d3252e8bc"
+ },
+ "wp:Rhomboid_major_muscle": {
+  "id": "wp:Rhomboid_major_muscle",
+  "titulo": "Rhomboid major muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Rhomboid_major_muscle&oldid=1349920065",
+  "revid": 1349920065,
+  "actualizada": "2026-04-19",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f805ff0fd9e7"
+ },
+ "wp:Rib": {
+  "id": "wp:Rib",
+  "titulo": "Rib",
+  "url": "https://en.wikipedia.org/w/index.php?title=Rib&oldid=1377870564",
+  "revid": 1377870564,
+  "actualizada": "2026-10-01",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "39b747e25b51"
+ },
+ "wp:Rib_cage": {
+  "id": "wp:Rib_cage",
+  "titulo": "Rib cage",
+  "url": "https://en.wikipedia.org/w/index.php?title=Rib_cage&oldid=1378585617",
+  "revid": 1378585617,
+  "actualizada": "2026-10-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "3d39a875654b"
+ },
+ "wp:Rotator_cuff": {
+  "id": "wp:Rotator_cuff",
+  "titulo": "Rotator cuff",
+  "url": "https://en.wikipedia.org/w/index.php?title=Rotator_cuff&oldid=1340745399",
+  "revid": 1340745399,
+  "actualizada": "2026-02-27",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "4aa9f1ca25c3"
+ },
+ "wp:Sacral_plexus": {
+  "id": "wp:Sacral_plexus",
+  "titulo": "Sacral plexus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sacral_plexus&oldid=1299980608",
+  "revid": 1299980608,
+  "actualizada": "2025-07-11",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "79d72038f1e8"
+ },
+ "wp:Sacroiliac_joint": {
+  "id": "wp:Sacroiliac_joint",
+  "titulo": "Sacroiliac joint",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sacroiliac_joint&oldid=1378543727",
+  "revid": 1378543727,
+  "actualizada": "2026-10-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "c53a25c7c072"
+ },
+ "wp:Sacrum": {
+  "id": "wp:Sacrum",
+  "titulo": "Sacrum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sacrum&oldid=1380889600",
+  "revid": 1380889600,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f893b1762352"
+ },
+ "wp:Sartorius_muscle": {
+  "id": "wp:Sartorius_muscle",
+  "titulo": "Sartorius muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sartorius_muscle&oldid=1383063554",
+  "revid": 1383063554,
+  "actualizada": "2026-10-31",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "333c89dd349a"
+ },
+ "wp:Scalene_muscles": {
+  "id": "wp:Scalene_muscles",
+  "titulo": "Scalene muscles",
+  "url": "https://en.wikipedia.org/w/index.php?title=Scalene_muscles&oldid=1326382532",
+  "revid": 1326382532,
+  "actualizada": "2025-12-08",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "87ee2a228132"
+ },
+ "wp:Scaphoid_bone": {
+  "id": "wp:Scaphoid_bone",
+  "titulo": "Scaphoid bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Scaphoid_bone&oldid=1369788418",
+  "revid": 1369788418,
+  "actualizada": "2026-08-17",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "3a1685d3898c"
+ },
+ "wp:Scapula": {
+  "id": "wp:Scapula",
+  "titulo": "Scapula",
+  "url": "https://en.wikipedia.org/w/index.php?title=Scapula&oldid=1382393488",
+  "revid": 1382393488,
+  "actualizada": "2026-10-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "799b0359e4bd"
+ },
+ "wp:Sciatic_nerve": {
+  "id": "wp:Sciatic_nerve",
+  "titulo": "Sciatic nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sciatic_nerve&oldid=1371477905",
+  "revid": 1371477905,
+  "actualizada": "2026-08-26",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "94d112275552"
+ },
+ "wp:Sense": {
+  "id": "wp:Sense",
+  "titulo": "Sense",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sense&oldid=1380569917",
+  "revid": 1380569917,
+  "actualizada": "2026-10-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "9a249d1659e1"
+ },
+ "wp:Sesamoid_bone": {
+  "id": "wp:Sesamoid_bone",
+  "titulo": "Sesamoid bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sesamoid_bone&oldid=1382340853",
+  "revid": 1382340853,
+  "actualizada": "2026-10-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "3ecae1112e4e"
+ },
+ "wp:Shoulder_girdle": {
+  "id": "wp:Shoulder_girdle",
+  "titulo": "Shoulder girdle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Shoulder_girdle&oldid=1358370327",
+  "revid": 1358370327,
+  "actualizada": "2026-06-08",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "1291f3e09243"
+ },
+ "wp:Shoulder_joint": {
+  "id": "wp:Shoulder_joint",
+  "titulo": "Shoulder joint",
+  "url": "https://en.wikipedia.org/w/index.php?title=Shoulder_joint&oldid=1382532996",
+  "revid": 1382532996,
+  "actualizada": "2026-10-29",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "e8fb9d5bd64b"
+ },
+ "wp:Skeletal_muscle": {
+  "id": "wp:Skeletal_muscle",
+  "titulo": "Skeletal muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Skeletal_muscle&oldid=1382941379",
+  "revid": 1382941379,
+  "actualizada": "2026-10-31",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "ae8a18169043"
+ },
+ "wp:Skull": {
+  "id": "wp:Skull",
+  "titulo": "Skull",
+  "url": "https://en.wikipedia.org/w/index.php?title=Skull&oldid=1384629110",
+  "revid": 1384629110,
+  "actualizada": "2026-11-09",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "350b77caddb2"
+ },
+ "wp:Soleus_muscle": {
+  "id": "wp:Soleus_muscle",
+  "titulo": "Soleus muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Soleus_muscle&oldid=1380892390",
+  "revid": 1380892390,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "d5fca8c60311"
+ },
+ "wp:Sphenoid_bone": {
+  "id": "wp:Sphenoid_bone",
+  "titulo": "Sphenoid bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sphenoid_bone&oldid=1381766223",
+  "revid": 1381766223,
+  "actualizada": "2026-10-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "9ae438c5a4b1"
+ },
+ "wp:Spinal_cord": {
+  "id": "wp:Spinal_cord",
+  "titulo": "Spinal cord",
+  "url": "https://en.wikipedia.org/w/index.php?title=Spinal_cord&oldid=1382907301",
+  "revid": 1382907301,
+  "actualizada": "2026-10-30",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f1987f60b4a4"
+ },
+ "wp:Spinothalamic_tract": {
+  "id": "wp:Spinothalamic_tract",
+  "titulo": "Spinothalamic tract",
+  "url": "https://en.wikipedia.org/w/index.php?title=Spinothalamic_tract&oldid=1355533176",
+  "revid": 1355533176,
+  "actualizada": "2026-05-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f3817ec18227"
+ },
+ "wp:Spleen": {
+  "id": "wp:Spleen",
+  "titulo": "Spleen",
+  "url": "https://en.wikipedia.org/w/index.php?title=Spleen&oldid=1384138456",
+  "revid": 1384138456,
+  "actualizada": "2026-11-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "adb5e4f5298a"
+ },
+ "wp:Splenius_capitis_muscle": {
+  "id": "wp:Splenius_capitis_muscle",
+  "titulo": "Splenius capitis muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Splenius_capitis_muscle&oldid=1350024993",
+  "revid": 1350024993,
+  "actualizada": "2026-04-19",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "06174b088127"
+ },
+ "wp:Standard_anatomical_position": {
+  "id": "wp:Standard_anatomical_position",
+  "titulo": "Standard anatomical position",
+  "url": "https://en.wikipedia.org/w/index.php?title=Standard_anatomical_position&oldid=1378750328",
+  "revid": 1378750328,
+  "actualizada": "2026-10-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "561bb5861c44"
+ },
+ "wp:Stapes": {
+  "id": "wp:Stapes",
+  "titulo": "Stapes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Stapes&oldid=1382108898",
+  "revid": 1382108898,
+  "actualizada": "2026-10-26",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "76087b497928"
+ },
+ "wp:Sternoclavicular_joint": {
+  "id": "wp:Sternoclavicular_joint",
+  "titulo": "Sternoclavicular joint",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sternoclavicular_joint&oldid=1301222744",
+  "revid": 1301222744,
+  "actualizada": "2025-07-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "8ac9aecb6f51"
+ },
+ "wp:Sternocleidomastoid_muscle": {
+  "id": "wp:Sternocleidomastoid_muscle",
+  "titulo": "Sternocleidomastoid muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sternocleidomastoid_muscle&oldid=1360739152",
+  "revid": 1360739152,
+  "actualizada": "2026-06-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f16729b7b48e"
+ },
+ "wp:Sternum": {
+  "id": "wp:Sternum",
+  "titulo": "Sternum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sternum&oldid=1367199442",
+  "revid": 1367199442,
+  "actualizada": "2026-08-01",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "233cb10ebca8"
+ },
+ "wp:Subscapular_nerves": {
+  "id": "wp:Subscapular_nerves",
+  "titulo": "Subscapular nerves",
+  "url": "https://en.wikipedia.org/w/index.php?title=Subscapular_nerves&oldid=1291872279",
+  "revid": 1291872279,
+  "actualizada": "2025-05-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "54eb179e45bf"
+ },
+ "wp:Subscapularis_muscle": {
+  "id": "wp:Subscapularis_muscle",
+  "titulo": "Subscapularis muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Subscapularis_muscle&oldid=1378347173",
+  "revid": 1378347173,
+  "actualizada": "2026-10-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "53e10e1c6f3b"
+ },
+ "wp:Suprahyoid_muscles": {
+  "id": "wp:Suprahyoid_muscles",
+  "titulo": "Suprahyoid muscles",
+  "url": "https://en.wikipedia.org/w/index.php?title=Suprahyoid_muscles&oldid=1251936769",
+  "revid": 1251936769,
+  "actualizada": "2024-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "cc101d0678b0"
+ },
+ "wp:Suprascapular_nerve": {
+  "id": "wp:Suprascapular_nerve",
+  "titulo": "Suprascapular nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Suprascapular_nerve&oldid=1314878072",
+  "revid": 1314878072,
+  "actualizada": "2025-10-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "0f3a627e3149"
+ },
+ "wp:Supraspinatus_muscle": {
+  "id": "wp:Supraspinatus_muscle",
+  "titulo": "Supraspinatus muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Supraspinatus_muscle&oldid=1379905252",
+  "revid": 1379905252,
+  "actualizada": "2026-10-12",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "b455b7d38fd6"
+ },
+ "wp:Suture_(anatomy)": {
+  "id": "wp:Suture_(anatomy)",
+  "titulo": "Suture (anatomy)",
+  "url": "https://en.wikipedia.org/w/index.php?title=Suture_(anatomy)&oldid=1279884411",
+  "revid": 1279884411,
+  "actualizada": "2025-03-11",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "8aeb58bed075"
+ },
+ "wp:Synovial_joint": {
+  "id": "wp:Synovial_joint",
+  "titulo": "Synovial joint",
+  "url": "https://en.wikipedia.org/w/index.php?title=Synovial_joint&oldid=1383852664",
+  "revid": 1383852664,
+  "actualizada": "2026-11-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "6c11ee8016ff"
+ },
+ "wp:Talus_bone": {
+  "id": "wp:Talus_bone",
+  "titulo": "Talus bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Talus_bone&oldid=1369787639",
+  "revid": 1369787639,
+  "actualizada": "2026-08-17",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "675c9d9d87b1"
+ },
+ "wp:Tarsus_(skeleton)": {
+  "id": "wp:Tarsus_(skeleton)",
+  "titulo": "Tarsus (skeleton)",
+  "url": "https://en.wikipedia.org/w/index.php?title=Tarsus_(skeleton)&oldid=1352882869",
+  "revid": 1352882869,
+  "actualizada": "2026-05-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "0ea99e953f30"
+ },
+ "wp:Temporal_bone": {
+  "id": "wp:Temporal_bone",
+  "titulo": "Temporal bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Temporal_bone&oldid=1363102419",
+  "revid": 1363102419,
+  "actualizada": "2026-07-08",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "32102971bfe6"
+ },
+ "wp:Temporomandibular_joint": {
+  "id": "wp:Temporomandibular_joint",
+  "titulo": "Temporomandibular joint",
+  "url": "https://en.wikipedia.org/w/index.php?title=Temporomandibular_joint&oldid=1382002225",
+  "revid": 1382002225,
+  "actualizada": "2026-10-26",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "7b23f332d987"
+ },
+ "wp:Tensor_fasciae_latae_muscle": {
+  "id": "wp:Tensor_fasciae_latae_muscle",
+  "titulo": "Tensor fasciae latae muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Tensor_fasciae_latae_muscle&oldid=1347097167",
+  "revid": 1347097167,
+  "actualizada": "2026-04-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "57dbf2d51062"
+ },
+ "wp:Teres_major_muscle": {
+  "id": "wp:Teres_major_muscle",
+  "titulo": "Teres major muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Teres_major_muscle&oldid=1360741033",
+  "revid": 1360741033,
+  "actualizada": "2026-06-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "cbd75a76bbc1"
+ },
+ "wp:Teres_minor_muscle": {
+  "id": "wp:Teres_minor_muscle",
+  "titulo": "Teres minor muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Teres_minor_muscle&oldid=1313769663",
+  "revid": 1313769663,
+  "actualizada": "2025-09-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "b3adc1600462"
+ },
+ "wp:Thalamus": {
+  "id": "wp:Thalamus",
+  "titulo": "Thalamus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Thalamus&oldid=1384274632",
+  "revid": 1384274632,
+  "actualizada": "2026-11-07",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "cc6e74a59f22"
+ },
+ "wp:Thoracic_diaphragm": {
+  "id": "wp:Thoracic_diaphragm",
+  "titulo": "Thoracic diaphragm",
+  "url": "https://en.wikipedia.org/w/index.php?title=Thoracic_diaphragm&oldid=1379575665",
+  "revid": 1379575665,
+  "actualizada": "2026-10-10",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "7d88f10a9a0f"
+ },
+ "wp:Thoracic_vertebrae": {
+  "id": "wp:Thoracic_vertebrae",
+  "titulo": "Thoracic vertebrae",
+  "url": "https://en.wikipedia.org/w/index.php?title=Thoracic_vertebrae&oldid=1380617422",
+  "revid": 1380617422,
+  "actualizada": "2026-10-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "8a6332057393"
+ },
+ "wp:Thymus": {
+  "id": "wp:Thymus",
+  "titulo": "Thymus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Thymus&oldid=1382487861",
+  "revid": 1382487861,
+  "actualizada": "2026-10-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "8c1ec7324059"
+ },
+ "wp:Tibia": {
+  "id": "wp:Tibia",
+  "titulo": "Tibia",
+  "url": "https://en.wikipedia.org/w/index.php?title=Tibia&oldid=1372908895",
+  "revid": 1372908895,
+  "actualizada": "2026-09-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "72ebe91040ba"
+ },
+ "wp:Tibial_nerve": {
+  "id": "wp:Tibial_nerve",
+  "titulo": "Tibial nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Tibial_nerve&oldid=1347308937",
+  "revid": 1347308937,
+  "actualizada": "2026-04-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "d4b810194ad1"
+ },
+ "wp:Tibialis_anterior_muscle": {
+  "id": "wp:Tibialis_anterior_muscle",
+  "titulo": "Tibialis anterior muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Tibialis_anterior_muscle&oldid=1380879440",
+  "revid": 1380879440,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "fa7c64242a10"
+ },
+ "wp:Transverse_abdominal_muscle": {
+  "id": "wp:Transverse_abdominal_muscle",
+  "titulo": "Transverse abdominal muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Transverse_abdominal_muscle&oldid=1380886702",
+  "revid": 1380886702,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "589e60f36ae2"
+ },
+ "wp:Transverse_acetabular_ligament": {
+  "id": "wp:Transverse_acetabular_ligament",
+  "titulo": "Transverse acetabular ligament",
+  "url": "https://en.wikipedia.org/w/index.php?title=Transverse_acetabular_ligament&oldid=1319231199",
+  "revid": 1319231199,
+  "actualizada": "2025-10-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "9c34daf5e931"
+ },
+ "wp:Trapezius": {
+  "id": "wp:Trapezius",
+  "titulo": "Trapezius",
+  "url": "https://en.wikipedia.org/w/index.php?title=Trapezius&oldid=1377970464",
+  "revid": 1377970464,
+  "actualizada": "2026-10-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f68559de3219"
+ },
+ "wp:Tricuspid_valve": {
+  "id": "wp:Tricuspid_valve",
+  "titulo": "Tricuspid valve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Tricuspid_valve&oldid=1292127022",
+  "revid": 1292127022,
+  "actualizada": "2025-05-25",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "8e720758c33b"
+ },
+ "wp:Ulna": {
+  "id": "wp:Ulna",
+  "titulo": "Ulna",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ulna&oldid=1380921236",
+  "revid": 1380921236,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "18c2d78cab26"
+ },
+ "wp:Ulnar_nerve": {
+  "id": "wp:Ulnar_nerve",
+  "titulo": "Ulnar nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ulnar_nerve&oldid=1365975930",
+  "revid": 1365975930,
+  "actualizada": "2026-07-25",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "b6c4999c1329"
+ },
+ "wp:Ureter": {
+  "id": "wp:Ureter",
+  "titulo": "Ureter",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ureter&oldid=1379893257",
+  "revid": 1379893257,
+  "actualizada": "2026-10-12",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "18cfed7f14bc"
+ },
+ "wp:Urinary_system": {
+  "id": "wp:Urinary_system",
+  "titulo": "Urinary system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Urinary_system&oldid=1343951353",
+  "revid": 1343951353,
+  "actualizada": "2026-03-17",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "50aaef2b8cea"
+ },
+ "wp:Vastus_intermedius_muscle": {
+  "id": "wp:Vastus_intermedius_muscle",
+  "titulo": "Vastus intermedius muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Vastus_intermedius_muscle&oldid=1338088416",
+  "revid": 1338088416,
+  "actualizada": "2026-02-13",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "2e8714933cf5"
+ },
+ "wp:Vastus_lateralis_muscle": {
+  "id": "wp:Vastus_lateralis_muscle",
+  "titulo": "Vastus lateralis muscle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Vastus_lateralis_muscle&oldid=1282030801",
+  "revid": 1282030801,
+  "actualizada": "2025-03-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "332a61eebace"
+ },
+ "wp:Vastus_medialis": {
+  "id": "wp:Vastus_medialis",
+  "titulo": "Vastus medialis",
+  "url": "https://en.wikipedia.org/w/index.php?title=Vastus_medialis&oldid=1336718053",
+  "revid": 1336718053,
+  "actualizada": "2026-02-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "b46e013c0777"
+ },
+ "wp:Ventricle_(heart)": {
+  "id": "wp:Ventricle_(heart)",
+  "titulo": "Ventricle (heart)",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ventricle_(heart)&oldid=1380881026",
+  "revid": 1380881026,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "3593b1148670"
+ },
+ "wp:Ventricular_system": {
+  "id": "wp:Ventricular_system",
+  "titulo": "Ventricular system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ventricular_system&oldid=1371408000",
+  "revid": 1371408000,
+  "actualizada": "2026-08-26",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "b1b92b646b26"
+ },
+ "wp:Vertebra": {
+  "id": "wp:Vertebra",
+  "titulo": "Vertebra",
+  "url": "https://en.wikipedia.org/w/index.php?title=Vertebra&oldid=1380894547",
+  "revid": 1380894547,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f31b5eca8f6d"
+ },
+ "wp:Vertebral_column": {
+  "id": "wp:Vertebral_column",
+  "titulo": "Spinal column",
+  "url": "https://en.wikipedia.org/w/index.php?title=Spinal_column&oldid=1376818199",
+  "revid": 1376818199,
+  "actualizada": "2026-09-26",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "71d541ccb743"
+ },
+ "wp:Vomer": {
+  "id": "wp:Vomer",
+  "titulo": "Vomer",
+  "url": "https://en.wikipedia.org/w/index.php?title=Vomer&oldid=1383506812",
+  "revid": 1383506812,
+  "actualizada": "2026-11-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "67c42b40e170"
+ },
+ "wp:Zona_orbicularis": {
+  "id": "wp:Zona_orbicularis",
+  "titulo": "Zona orbicularis",
+  "url": "https://en.wikipedia.org/w/index.php?title=Zona_orbicularis&oldid=1314601790",
+  "revid": 1314601790,
+  "actualizada": "2025-10-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "5ca9de56b5d4"
+ },
+ "wp:Zygomatic_bone": {
+  "id": "wp:Zygomatic_bone",
+  "titulo": "Zygomatic bone",
+  "url": "https://en.wikipedia.org/w/index.php?title=Zygomatic_bone&oldid=1384569521",
+  "revid": 1384569521,
+  "actualizada": "2026-11-08",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "4f3d707dbb40"
+ },
+ "wpes:Cúbito": {
+  "id": "wpes:Cúbito",
+  "titulo": "Cúbito",
+  "url": "https://es.wikipedia.org/w/index.php?title=C%C3%BAbito&oldid=172187629",
+  "revid": 172187629,
+  "actualizada": "2026-02-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "04de99974963"
+ },
+ "wpes:Cuerdas_vocales": {
+  "id": "wpes:Cuerdas_vocales",
+  "titulo": "Cuerdas vocales",
+  "url": "https://es.wikipedia.org/w/index.php?title=Cuerdas_vocales&oldid=173234946",
+  "revid": 173234946,
+  "actualizada": "2026-04-30",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "c232b55c228c"
+ },
+ "wpes:Escápula": {
+  "id": "wpes:Escápula",
+  "titulo": "Escápula",
+  "url": "https://es.wikipedia.org/w/index.php?title=Esc%C3%A1pula&oldid=174756729",
+  "revid": 174756729,
+  "actualizada": "2026-08-08",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "f18b7f6999e8"
+ },
+ "wpes:Molar": {
+  "id": "wpes:Molar",
+  "titulo": "Diente molar",
+  "url": "https://es.wikipedia.org/w/index.php?title=Diente_molar&oldid=164363353",
+  "revid": 164363353,
+  "actualizada": "2024-12-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "9d114cded4f8"
+ },
+ "wpes:Músculo_gastrocnemio": {
+  "id": "wpes:Músculo_gastrocnemio",
+  "titulo": "Músculo gastrocnemio",
+  "url": "https://es.wikipedia.org/w/index.php?title=M%C3%BAsculo_gastrocnemio&oldid=174914170",
+  "revid": 174914170,
+  "actualizada": "2026-08-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "64c4b342ffce"
+ },
+ "wpes:Peroné": {
+  "id": "wpes:Peroné",
+  "titulo": "Peroné",
+  "url": "https://es.wikipedia.org/w/index.php?title=Peron%C3%A9&oldid=174999043",
+  "revid": 174999043,
+  "actualizada": "2026-08-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "eee2f1694b81"
+ },
+ "wpes:Prominencia_laríngea": {
+  "id": "wpes:Prominencia_laríngea",
+  "titulo": "Nuez de Adán",
+  "url": "https://es.wikipedia.org/w/index.php?title=Nuez_de_Ad%C3%A1n&oldid=175625291",
+  "revid": 175625291,
+  "actualizada": "2026-10-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "5f90fa26e45d"
+ }
+}

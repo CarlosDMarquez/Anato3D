@@ -1,0 +1,296 @@
+// Lección «Vísceras del cuello: laringe, faringe, tráquea y tiroides». Formato y evidencias: ../formato.js.
+import { leccion, W, T, ES, GUIA, MODELO } from '../formato.js';
+
+const LAR = 'neck/viscera/larynx/organ';
+const CAR = 'neck/viscera/larynx/laryngealcartilages';
+const MUS = 'neck/viscera/larynx/muscles';
+const LIG = 'neck/viscera/larynx/ligaments-folds';
+const FAR = 'neck/viscera/pharynx';
+const TIR = 'neck/viscera/thyroid-gland';
+const PAR = 'neck/viscera/parathyroid-glands';
+const TRA = 'thorax/organs/tracheobronchial-tree';
+const nucleo = (nombre, piezas, tipo, lado = 'impar', extra = {}) => ({ nombre, piezas, lado, papel: 'nucleo', tipo, ...extra });
+const contexto = (nombre, piezas, tipo, lado = 'impar') => ({ nombre, piezas, lado, papel: 'contexto', tipo });
+
+const CARTILAGOS = ['cartilago-tiroides', 'cricoides', 'epiglotis', 'aritenoides', 'corniculados'];
+const MUSCULOS = ['cricoaritenoideo-posterior', 'cricoaritenoideo-lateral', 'cricotiroideo'];
+const FARINGE = ['nasofaringe', 'orofaringe', 'laringofaringe'];
+const PARATIROIDES = ['paratiroides-superiores', 'paratiroides-inferiores'];
+
+export default leccion({
+  id: 'cue-visceras',
+  version: 1,
+  titulo: 'Vísceras del cuello: laringe, faringe, tráquea y tiroides',
+  fuentesTerminologia: [ES('Prominencia_laríngea', 'popularmente conocida como nuez o manzana de Adán'), ES('Cuerdas_vocales', 'Las cuerdas vocales (en terminología anatómica, pliegues vocales)')],
+  resumen: 'Los dos tubos del cuello, el aéreo delante y el digestivo detrás: los cartílagos de la laringe, con la nuez, y sus músculos (quién abre y quién cierra la glotis entre las cuerdas vocales, y qué nervios los mueven), las tres partes de la faringe, la tráquea y el comienzo del esófago, y el tiroides con las paratiroides y el nervio laríngeo recurrente.',
+  lugares: [['cuello', 'visceras-cuello']],
+  sistemas: ['respiratorio', 'digestivo', 'endocrino'],
+  formato: 'topografia',
+  temas: ['organos'],
+  nivel: 2,
+  minutos: 20,
+  requisitos: ['sis-respiratorio', 'sis-endocrino'],
+  siguiente: ['cue-vasos', 'cue-musculos', 'tor-mediastino'],
+  objetivos: [
+    'Situar la laringe, la faringe, la tráquea, el esófago y el tiroides en el cuello y decir para qué sirve cada uno.',
+    'Describir los cartílagos de la laringe y reconocer el cricoides como el único anillo completo.',
+    'Explicar qué músculos de la laringe abren y cierran la glotis y qué nervios los controlan.',
+    'Distinguir las tres partes de la faringe y seguir la vía digestiva hasta el esófago.',
+    'Situar el tiroides y las paratiroides y relacionarlos con sus arterias y con el nervio laríngeo recurrente.',
+  ],
+  estructuras: {
+    'cartilago-tiroides': nucleo('Cartílago tiroides', ['Thyroid_cartilage'], 'cartilago'),
+    cricoides: nucleo('Cartílago cricoides', ['Cricoid_cartilage'], 'cartilago'),
+    epiglotis: nucleo('Epiglotis', ['Epiglottis'], 'cartilago'),
+    aritenoides: nucleo('Cartílagos aritenoides', ['Arytenoid_cartilage'], 'cartilago', 'ambos'),
+    corniculados: nucleo('Cartílagos corniculados', ['Corniculate_cartilage'], 'cartilago', 'ambos'),
+    'cricoaritenoideo-posterior': nucleo('Músculos cricoaritenoideos posteriores', ['Posterior_crico_arytenoid_muscle'], 'musculo', 'ambos'),
+    'cricoaritenoideo-lateral': nucleo('Músculos cricoaritenoideos laterales', ['Lateral_crico_arytenoid_muscle'], 'musculo', 'ambos'),
+    cricotiroideo: nucleo('Músculos cricotiroideos', ['Straight_part_of_cricothyroid_muscle', 'Oblique_part_of_cricothyroid_muscle'], 'musculo', 'ambos'),
+    nasofaringe: nucleo('Nasofaringe', ['Nasopharynx'], 'organo'),
+    orofaringe: nucleo('Orofaringe', ['Oropharynx'], 'organo'),
+    laringofaringe: nucleo('Laringofaringe', ['Laryngopharynx'], 'organo'),
+    traquea: nucleo('Tráquea', ['Trachea'], 'organo'),
+    esofago: nucleo('Esófago', ['Oesophagus'], 'organo'),
+    tiroides: nucleo('Glándula tiroides', ['Thyroid_gland'], 'glandula', 'impar', { confusiones: ['Timo', 'Glándula submandibular'] }),
+    'paratiroides-superiores': nucleo('Glándulas paratiroides superiores', ['Superior_parathyroid_gland'], 'glandula', 'ambos'),
+    'paratiroides-inferiores': nucleo('Glándulas paratiroides inferiores', ['Inferior_parathyroid_gland'], 'glandula', 'ambos'),
+    'arteria-tiroidea-inferior': nucleo('Arterias tiroideas inferiores', ['Inferior_thyroid_artery'], 'arteria', 'ambos'),
+    tiroaritenoideo: contexto('Músculos tiroaritenoideos', ['External_part_of_thyro_arytenoid_muscle', 'Thyro_epiglottic_part_of_thyro_arytenoid_muscle'], 'musculo', 'ambos'),
+    'ligamento-cricotiroideo': contexto('Ligamento cricotiroideo mediano', ['Median_cricothyroid_ligament'], 'ligamento'),
+    constrictores: contexto('Músculos constrictores de la faringe', ['Superior_pharyngeal_constrictor', 'Middle_pharyngeal_constrictor', 'Inferior_pharyngeal_constrictor'], 'musculo', 'ambos'),
+    'paladar-blando': contexto('Paladar blando', ['Soft_palate'], 'organo'),
+    hioides: contexto('Hueso hioides', ['Hyoid_Bone'], 'hueso'),
+    infrahioideos: contexto('Músculos esternohioideos y esternotiroideos', ['Sternohyoid_muscle', 'Sternothyroid_muscle'], 'musculo', 'ambos'),
+    'tronco-tirocervical': contexto('Troncos tirocervicales', ['Thyrocervical_trunk'], 'arteria', 'ambos'),
+    carotidas: contexto('Arterias carótidas comunes', ['Right_common_carotid_artery', 'Left_common_carotid_artery'], 'arteria'),
+    yugulares: contexto('Venas yugulares internas', ['Internal_jugular_vein'], 'vena', 'ambos'),
+    vagos: contexto('Nervios vagos', ['Vagus_nerve_X'], 'nervio', 'ambos'),
+  },
+  pasos: [
+    {
+      id: 'orientacion', tipo: 'orientacion', titulo: 'Dos tubos, uno delante del otro',
+      texto: [
+        ['En el cuello, la vía aérea (laringe y tráquea) va delante y la digestiva (faringe y esófago), detrás.', T(LAR, 'Posterior to the larynx is the oesophagus.'), T(FAR, 'The pharynx is a muscular tube that connects the oral and nasal cavity to the larynx and oesophagus.'), W('Esophagus', 'The upper esophagus lies at the back of the mediastinum behind the trachea')],
+        ['La laringe cuelga del hioides, entre C3 y C6, y sirve para la fonación, el reflejo de la tos y la protección de las vías respiratorias bajas.', T(LAR, 'The larynx is located in the anterior compartment of the neck, suspended from the hyoid bone, and spanning between C3 and C6.'), T(LAR, 'It is a component of the respiratory tract, and has several important functions, including phonation, the cough reflex, and protection of the lower respiratory tract.')],
+        ['El tiroides, en forma de mariposa, regula el ritmo del metabolismo; en su cara posterior están las paratiroides, que suben el calcio de la sangre.', T(TIR, 'It plays a key role in regulating the metabolic rate of the body.'), T(TIR, 'this produces a butterfly-shape appearance.'), T(PAR, 'The parathyroid glands are usually located on the posterior aspect of the thyroid gland.'), T(PAR, 'They are responsible for the production of parathyroid hormone (PTH), which acts to increase the level of serum calcium.')],
+        ['Míralas de frente, de lado y por detrás.', GUIA],
+      ],
+      vista: { ver: ['cartilago-tiroides', 'cricoides', 'traquea', 'tiroides'], contexto: ['hioides', 'esofago'], camara: 'anterolateral' },
+      actividad: { tipo: 'vistas', texto: 'Recorre las vísceras del cuello.', vistas: [{ nombre: 'De frente', camara: 'anterior' }, { nombre: 'De lado', camara: 'lateral' }, { nombre: 'Por detrás', camara: 'posterior' }] },
+      comprobar: 'fun-laringe',
+    },
+    {
+      id: 'cartilagos', tipo: 'explicacion', titulo: 'El esqueleto de la laringe',
+      texto: [
+        ['La laringe tiene nueve cartílagos: tres impares (tiroides, cricoides y epiglotis) y tres pares (aritenoides, corniculados y cuneiformes).', T(CAR, 'There are nine cartilages located within the larynx; three unpaired, and six paired.'), T(CAR, 'The three unpaired cartilages are the epiglottis, thyroid and cricoid cartilages.'), T(CAR, 'There are three paired cartilages – the arytenoid, corniculate and cuneiform.')],
+        ['Las dos láminas del tiroides se unen delante en la prominencia laríngea (la nuez); sus cuernos inferiores se articulan con el cricoides.', T(CAR, 'It is composed of two sheets (laminae), which join anteriorly to form the laryngeal prominence (Adam’s apple).'), T(CAR, 'while the inferior horns articulate with the cricoid cartilage.')],
+        ['El cricoides, ancho por detrás y estrecho por delante como un anillo de sello, es el único anillo completo de cartílago de la laringe y la tráquea; marca el borde inferior de la laringe en C6.', T(CAR, 'consisting of a broad sheet posteriorly and a much narrower arch anteriorly (said to resemble a signet ring in shape).'), T(CAR, 'The cricoid is the only complete circle of cartilage in the larynx or trachea.'), T(CAR, 'marking the inferior border of the larynx at the level of C6.')],
+        ['La epiglotis, una hoja de cartílago elástico, se abate al tragar y cierra la laringe; los aritenoides se apoyan en el cricoides y sujetan el ligamento vocal.', T(CAR, 'The epiglottis is a leaf shaped plate of elastic cartilage which marks the entrance to the larynx.'), T(CAR, 'During swallowing, the epiglottis flattens and moves posteriorly to close off the larynx and prevent aspiration.'), T(CAR, 'The arytenoid cartilages are pyramidal shaped structures that sit on the cricoid cartilage.'), T(CAR, 'Vocal process – provides attachment for the vocal ligament.')],
+      ],
+      detalle: [
+        ['Presionando el cricoides se cierra el esófago, que está detrás, y se evita que suba el contenido del estómago durante una intubación urgente (maniobra de Sellick).', T(CAR, 'pressure can be applied to the cricoid to occlude the oesophagus, and thus prevent regurgitation of gastric contents (known as cricoid pressure or Sellick’s manoeuvre).')],
+        ['Bajo el tiroides se palpa una depresión, el ligamento cricotiroideo: si la intubación falla, ahí se abre una vía aérea de urgencia (cricotiroidotomía).', T(LIG, 'A cricothyroidotomy is an emergency procedure to provide a temporary airway.'), T(LIG, 'and intubation has been unsuccessful.'), T(LIG, 'the thyroid cartilage is palpated in the neck – below which there is a depression representing the cricothyroid ligament. A small incision is made in the midline of this ligament')],
+        ['Los corniculados son pequeños y se articulan con la punta de los aritenoides.', T(CAR, 'The corniculate cartilages are minor cartilaginous structures. They articulate with the apices of the arytenoid cartilages.')],
+        ['El modelo no tiene los cartílagos cuneiformes.', MODELO],
+      ],
+      vista: { ver: CARTILAGOS, contexto: ['hioides', 'ligamento-cricotiroideo', 'traquea'], camara: 'anterolateral' },
+      actividad: { tipo: 'localizar', estructura: 'cricoides', texto: 'Toca el único anillo completo de cartílago.' },
+      comprobar: 'rel-cricoides',
+    },
+    {
+      id: 'musculos', tipo: 'relaciones', titulo: 'Abrir y cerrar la glotis',
+      texto: [
+        ['Los músculos intrínsecos cambian la forma de la hendidura glótica, el espacio entre los pliegues vocales, y la longitud y la tensión de esos pliegues.', T(MUS, 'They control the shape of the rima glottidis (opening between the vocal folds and the arytenoid cartilages), and the length and tension of the vocal folds.')],
+        ['Los cricoaritenoideos posteriores son los únicos que separan los pliegues vocales y abren la glotis; los laterales son los principales que los juntan.', T(MUS, 'The posterior cricoarytenoid muscles are the sole abductors of the vocal folds, and thus the only muscle capable of widening the rima glottidis.'), T(MUS, 'The lateral cricoarytenoid muscles are the major adductors of the vocal folds.')],
+        ['El cricotiroideo estira y tensa los ligamentos vocales; el tiroaritenoideo los relaja, para una voz más suave.', T(MUS, 'The cricothyroid muscle stretches and tenses the vocal ligaments'), T(MUS, 'The thyroarytenoid muscle acts to relax the vocal ligament, allowing for a softer voice.')],
+        ['Todos dependen del vago: el cricotiroideo, del nervio laríngeo superior, y los demás, del laríngeo recurrente.', T(MUS, 'All the intrinsic muscles of the larynx (except the cricothyroid) are innervated by the inferior laryngeal nerve'), T(MUS, 'the terminal branch of the recurrent laryngeal nerve, itself a branch of the vagus nerve.'), T(MUS, 'The cricothyroid is innervated by the external branch of the superior laryngeal nerve – again derived from the vagus nerve.')],
+      ],
+      detalle: [
+        ['Los pliegues vocales, blancos y casi sin vasos, llevan el ligamento vocal (el borde libre del ligamento cricotiroideo) y el músculo vocal; encima están los pliegues vestibulares o cuerdas falsas, fijos, que protegen la laringe.', T(LIG, 'The vocal folds are relatively avascular, and appear white in colour.'), T(LIG, 'Vocal ligament – Lies at the free upper edge of the cricothryoid ligament.'), T(LIG, 'Vocalis muscle – Exceptionally fine muscle fibres that lie lateral to the vocal ligaments.'), T(LIG, 'The vestibular folds (false vocal cords) lie superiorly to the true vocal cords.'), T(LIG, 'They are fixed folds, which act to provide protection to the larynx.')],
+        ['Si se lesiona un nervio laríngeo recurrente se paraliza un pliegue vocal y la voz puede quedar ronca; si se lesionan los dos, cuesta respirar y no se puede hablar.', T(LAR, 'In unilateral RLN palsy, one vocal cord is paralysed.'), T(LAR, 'although the patient may experience hoarseness of voice.'), T(LAR, 'In cases of bilateral palsy, both vocal cords are paralysed in a position between adduction and abduction. Breathing is impaired, and phonation cannot occur.')],
+        ['Los músculos aritenoideos transverso y oblicuo juntan los aritenoides y cierran la parte posterior de la glotis.', T(MUS, 'The transverse and oblique arytenoids muscles adduct the arytenoid cartilages, closing the posterior portion of rima glottidis.')],
+        ['Desde fuera, los suprahioideos elevan la laringe al tragar y los infrahioideos la bajan.', T(MUS, 'As a general rule, the suprahyoid muscles and the stylopharyngeus elevate the larynx, whilst the infrahyoid muscles depress the larynx.')],
+        ['El modelo no tiene los pliegues vocales ni los nervios laríngeos.', MODELO],
+      ],
+      vista: { ver: MUSCULOS, contexto: ['cricoides', 'aritenoides', 'tiroaritenoideo'], fantasma: ['cartilago-tiroides'], camara: 'posterolateral' },
+      actividad: { tipo: 'comparar', estructuras: MUSCULOS, texto: 'Alterna los tres músculos: el posterior abre la glotis, el lateral la cierra y el cricotiroideo tensa los ligamentos vocales.' },
+      comprobar: 'comp-abductor',
+    },
+    {
+      id: 'faringe', tipo: 'exploracion', titulo: 'La faringe',
+      texto: [
+        ['La faringe es un tubo muscular que une las cavidades nasal y oral con la laringe y el esófago; va de la base del cráneo al borde inferior del cricoides (C6).', T(FAR, 'The pharynx is a muscular tube that connects the oral and nasal cavity to the larynx and oesophagus.'), T(FAR, 'It begins at the base of the skull and ends at the inferior border of the cricoid cartilage (C6).')],
+        ['Tiene tres partes: la nasofaringe, hasta el paladar blando; la orofaringe, hasta el borde superior de la epiglotis, y la laringofaringe, detrás de la laringe, que sigue en el esófago.', T(FAR, 'The nasopharynx is found between the base of the skull and the soft palate.'), T(FAR, 'The oropharynx is the middle part of the pharynx, located between the soft palate and the superior border of the epiglottis.'), T(FAR, 'It is found posterior to the larynx and communicates with it via the laryngeal inlet'), T(FAR, 'It is continuous inferiorly with the oesophagus.')],
+        ['En sus paredes están los músculos constrictores superior, medio e inferior.', T(FAR, 'Superior constrictor muscle'), T(FAR, 'The laryngopharynx contains the middle and inferior pharyngeal constrictors.')],
+      ],
+      detalle: [
+        ['En la nasofaringe están las amígdalas adenoides; si crecen mucho pueden tapar la trompa de Eustaquio, que se abre cerca.', T(FAR, 'The posterosuperior nasopharynx contains the adenoid tonsils'), T(FAR, 'When enlarged, the adenoids can obstruct the opening of the Eustachian tube – which is located close to the adenoid tonsils in the nasopharynx.')],
+        ['El anillo de Waldeyer es el tejido linfoide de la naso y la orofaringe: amígdalas palatinas, adenoides y lingual.', T(FAR, 'Waldeyer’s ring is the ring of lymphoid tissue in the naso- and oropharynx formed by the paired palatine tonsils, the adenoid tonsils and lingual tonsil.')],
+      ],
+      vista: { ver: FARINGE, contexto: ['paladar-blando', 'epiglotis', 'cartilago-tiroides', 'traquea'], fantasma: ['constrictores'], camara: 'lateral' },
+      actividad: { tipo: 'comparar', estructuras: FARINGE, texto: 'Alterna las tres partes de la faringe, de arriba abajo.' },
+      comprobar: 'rel-laringofaringe',
+    },
+    {
+      id: 'traquea', tipo: 'relaciones', titulo: 'La tráquea y el esófago',
+      texto: [
+        ['La tráquea sigue a la laringe desde el borde inferior del cricoides y baja al mediastino superior, donde se divide en los dos bronquios principales a la altura del ángulo esternal.', T(TRA, 'It arises at the lower border of cricoid cartilage in the neck, as a continuation of the larynx.'), T(TRA, 'It travels inferiorly into the superior mediastinum, bifurcating at the level of the sternal angle (forming the right and left main bronchi).')],
+        ['La mantienen abierta anillos de cartílago en forma de C, cuyos extremos libres une el músculo traqueal.', T(TRA, 'The trachea, like all of the larger respiratory airways, is held open by cartilage – here in C-shaped rings.'), T(TRA, 'The free ends of these rings are supported by the trachealis muscle.')],
+        ['El esófago, de unos 25 cm, empieza hacia C6, detrás del cricoides, y baja por detrás de la tráquea.', W('Esophagus', 'The esophagus is usually about 25 cm (10 in) in length'), W('Esophagus', 'the esophagus generally starts around the level of the sixth cervical vertebra behind the cricoid cartilage of the trachea'), W('Esophagus', 'The upper esophagus lies at the back of the mediastinum behind the trachea')],
+      ],
+      detalle: [
+        ['La parte baja del constrictor inferior de la faringe forma el esfínter esofágico superior, o cricofaríngeo.', W('Esophagus', 'The upper esophageal sphincter is an anatomical sphincter, which is formed by the lower portion of the inferior pharyngeal constrictor, also known as the cricopharyngeal sphincter')],
+      ],
+      vista: { ver: ['traquea'], contexto: ['esofago', 'cricoides', 'cartilago-tiroides'], fantasma: ['constrictores'], camara: 'lateral' },
+      actividad: { tipo: 'vistas', texto: 'Mira la tráquea con el esófago detrás.', vistas: [{ nombre: 'De lado', camara: 'lateral' }, { nombre: 'Por detrás', camara: 'posterior' }, { nombre: 'De frente', camara: 'anterior' }] },
+      comprobar: 'rel-esofago',
+    },
+    {
+      id: 'tiroides', tipo: 'exploracion', titulo: 'El tiroides y las paratiroides',
+      texto: [
+        ['El tiroides está delante del cuello, de C5 a T1: dos lóbulos unidos por un istmo que abrazan el cricoides y los primeros anillos de la tráquea.', T(TIR, 'The thyroid gland is located in the anterior neck and spans the C5-T1 vertebrae. It consists of two lobes (left and right), which are connected by a central isthmus anteriorly'), T(TIR, 'The lobes of the thyroid gland are wrapped around the cricoid cartilage and superior rings of the trachea.')],
+        ['Delante tiene los músculos infrahioideos y a los lados, la vaina carotídea, con la carótida común, la yugular interna y el vago.', T(TIR, 'Anterior – infrahyoid muscles, namely the sternothyroid, superior belly of the omohyoid and sternohyoid'), T(TIR, 'Lateral – carotid sheath, containing the common carotid artey, internal jugular vein and vagus nerve')],
+        ['Lo irrigan la arteria tiroidea superior, primera rama de la carótida externa, y la inferior, que sale del tronco tirocervical.', T(TIR, 'Superior thyroid artery – arises as the first branch of the external carotid artery.'), T(TIR, 'Inferior thyroid artery – arises from the thyrocervical trunk (a branch of the subclavian artery).')],
+        ['Las paratiroides suelen ser cuatro, en la cara posterior del tiroides: las superiores, a media altura del borde posterior; las inferiores, cerca de los polos inferiores.', T(PAR, 'Most individuals have four parathyroid glands, although variation in number (from two to six) is common:'), T(PAR, 'They are located at the middle of the posterior border of each thyroid lobe'), T(PAR, 'the inferior parathyroid glands are usually found near the inferior poles of the thyroid gland.')],
+      ],
+      detalle: [
+        ['Los nervios laríngeos recurrentes suben entre la tráquea y el esófago y pasan bajo el tiroides: en su cirugía hay que cuidar no lesionarlos, sobre todo junto a la arteria tiroidea inferior.', T(TIR, 'Each nerve then travels back up the neck, running between the trachea and oesophagus in the tracheoesophageal groove. It then passes underneath the thyroid gland to innervate the larynx.'), T(TIR, 'Care must be taken not to damage them during thyroid surgery.'), T(LAR, 'Iatrogenic (particularly during thyroid surgery due to the close relationship with the inferior thyroid artery).')],
+        ['Las paratiroides reciben sangre sobre todo de la arteria tiroidea inferior.', T(PAR, 'Arterial supply is chiefly via the inferior thyroid artery')],
+        ['El tiroides se forma junto a la base de la lengua y baja al cuello; si el conducto que deja no desaparece, puede dar un quiste en la línea media que sube al sacar la lengua.', T(TIR, 'In the embryo, the thyroid gland begins development near the base of the tongue'), T(TIR, 'It descends during development and reaches its destination in the anterior neck by week 7.'), T(TIR, 'If it fails to regress, the duct can give rise to cysts or fistulae.'), T(TIR, 'It typically presents as a midline lump in the anterior neck which rises on tongue protrusion.')],
+        ['Sus hormonas no dependen de sus nervios: las regula la hipófisis.', T(TIR, 'the release of thyroid hormones is regulated by the pituitary gland.')],
+        ['El modelo no tiene la arteria tiroidea superior ni los nervios laríngeos recurrentes.', MODELO],
+      ],
+      vista: { ver: ['tiroides', ...PARATIROIDES], contexto: ['arteria-tiroidea-inferior', 'tronco-tirocervical', 'traquea', 'cricoides', 'cartilago-tiroides'], fantasma: ['infrahioideos', 'carotidas', 'yugulares', 'vagos'], camara: 'posterolateral' },
+      actividad: { tipo: 'comparar', estructuras: PARATIROIDES, texto: 'Alterna las paratiroides superiores e inferiores en la cara posterior del tiroides.' },
+      comprobar: 'fun-paratiroides',
+    },
+    {
+      id: 'sintesis', tipo: 'sintesis', titulo: 'En resumen',
+      texto: [
+        ['Laringe de C3 a C6, colgada del hioides: tiroides, cricoides (el único anillo completo) y epiglotis, más los aritenoides, que mueven los pliegues vocales.', T(LAR, 'suspended from the hyoid bone, and spanning between C3 and C6.'), T(CAR, 'The cricoid is the only complete circle of cartilage in the larynx or trachea.'), T(CAR, 'Vocal process – provides attachment for the vocal ligament.')],
+        ['Solo los cricoaritenoideos posteriores abren la glotis; todos los músculos intrínsecos salvo el cricotiroideo dependen del laríngeo recurrente.', T(MUS, 'the only muscle capable of widening the rima glottidis.'), T(MUS, 'All the intrinsic muscles of the larynx (except the cricothyroid) are innervated by the inferior laryngeal nerve')],
+        ['Faringe en tres partes hasta C6, donde siguen la tráquea delante y el esófago detrás; el tiroides abraza el cricoides y la tráquea, con las paratiroides detrás.', T(FAR, 'ends at the inferior border of the cricoid cartilage (C6).'), T(TRA, 'It arises at the lower border of cricoid cartilage in the neck'), T(TIR, 'The lobes of the thyroid gland are wrapped around the cricoid cartilage and superior rings of the trachea.'), T(PAR, 'usually located on the posterior aspect of the thyroid gland.')],
+      ],
+    },
+  ],
+  preguntas: [
+    {
+      id: 'fun-laringe', tipo: 'funcion', objetivo: 0, paso: 'orientacion', estructuras: ['cartilago-tiroides', 'cricoides'],
+      enunciado: '¿Para qué sirve la laringe?',
+      correcta: 'Para la fonación, el reflejo de la tos y proteger las vías respiratorias bajas',
+      distractores: ['Para fabricar hormonas que regulan el metabolismo', 'Para llevar el alimento de la boca al esófago', 'Para regular el calcio de la sangre'],
+      explicacion: 'Es parte de la vía aérea. Las hormonas del metabolismo son del tiroides, el calcio lo regulan las paratiroides y el alimento pasa por la faringe.',
+      evidencia: [T(LAR, 'has several important functions, including phonation, the cough reflex, and protection of the lower respiratory tract.')],
+    },
+    {
+      id: 'fun-tiroides', tipo: 'funcion', objetivo: 0, paso: 'orientacion', estructuras: ['tiroides'],
+      enunciado: '¿Qué regula sobre todo la glándula tiroides?',
+      correcta: 'El ritmo del metabolismo del cuerpo',
+      distractores: ['El calcio de la sangre', 'La glucosa de la sangre', 'La tensión de los pliegues vocales'],
+      explicacion: 'El tiroides regula el metabolismo; el calcio lo suben las paratiroides y la glucosa la regula el páncreas.',
+      evidencia: [T(TIR, 'It plays a key role in regulating the metabolic rate of the body.')],
+    },
+    { id: 'id-cricoides', tipo: 'identificar', estructura: 'cricoides', objetivo: 1, paso: 'cartilagos' },
+    { id: 'id-epiglotis', tipo: 'identificar', estructura: 'epiglotis', objetivo: 1, paso: 'cartilagos' },
+    {
+      id: 'rel-cricoides', tipo: 'relacion', objetivo: 1, paso: 'cartilagos', estructuras: ['cricoides'],
+      enunciado: '¿Qué tiene de especial el cartílago cricoides?',
+      correcta: 'Es el único anillo completo de cartílago de la laringe y la tráquea',
+      distractores: ['Es el único cartílago par de la laringe', 'Forma la prominencia laríngea (la nuez)', 'Se abate al tragar y cierra la laringe'],
+      explicacion: 'El cricoides rodea entera la vía aérea; la nuez es del tiroides y la que se abate al tragar es la epiglotis.',
+      evidencia: [T(CAR, 'The cricoid is the only complete circle of cartilage in the larynx or trachea.')],
+    },
+    {
+      id: 'fun-epiglotis', tipo: 'funcion', objetivo: 1, paso: 'cartilagos', estructuras: ['epiglotis'],
+      enunciado: '¿Qué cartílago cierra la entrada de la laringe al tragar?',
+      correcta: 'La epiglotis',
+      distractores: ['El cricoides', 'El tiroides', 'Los aritenoides'],
+      explicacion: 'Al tragar, la epiglotis se aplana y se va hacia atrás, cierra la laringe y evita que el alimento pase a la vía aérea.',
+      evidencia: [T(CAR, 'During swallowing, the epiglottis flattens and moves posteriorly to close off the larynx and prevent aspiration.')],
+    },
+    { id: 'loc-cricoides', tipo: 'localizar', estructura: 'cricoides', candidatas: ['cartilago-tiroides', 'epiglotis'], objetivo: 1, paso: 'cartilagos' },
+    {
+      id: 'comp-abductor', tipo: 'comparacion', objetivo: 2, paso: 'musculos', estructuras: MUSCULOS,
+      enunciado: '¿Qué músculos son los únicos que abren la glotis?',
+      correcta: 'Los cricoaritenoideos posteriores',
+      distractores: ['Los cricoaritenoideos laterales', 'Los cricotiroideos', 'Los tiroaritenoideos'],
+      explicacion: 'Los posteriores separan los pliegues vocales; los laterales los juntan, el cricotiroideo los tensa y el tiroaritenoideo los relaja.',
+      evidencia: [T(MUS, 'The posterior cricoarytenoid muscles are the sole abductors of the vocal folds, and thus the only muscle capable of widening the rima glottidis.')],
+    },
+    {
+      id: 'rel-recurrente', tipo: 'relacion', objetivo: 2, paso: 'musculos', estructuras: ['cricotiroideo'],
+      enunciado: '¿Qué músculo intrínseco de la laringe no depende del nervio laríngeo recurrente?',
+      correcta: 'El cricotiroideo',
+      distractores: ['El cricoaritenoideo posterior', 'El cricoaritenoideo lateral', 'El tiroaritenoideo'],
+      explicacion: 'El cricotiroideo lo mueve la rama externa del laríngeo superior; todos los demás, el laríngeo recurrente. Los dos nervios son ramas del vago.',
+      evidencia: [T(MUS, 'The cricothyroid is innervated by the external branch of the superior laryngeal nerve – again derived from the vagus nerve.')],
+    },
+    {
+      id: 'fun-tiroaritenoideo', tipo: 'funcion', objetivo: 2, paso: 'musculos', estructuras: ['tiroaritenoideo'],
+      enunciado: '¿Qué hace el músculo tiroaritenoideo?',
+      correcta: 'Relaja el ligamento vocal, para una voz más suave',
+      distractores: ['Estira y tensa el ligamento vocal', 'Separa los pliegues vocales y abre la glotis', 'Eleva la laringe al tragar'],
+      explicacion: 'Lo contrario del cricotiroideo, que tensa los ligamentos vocales; la glotis solo la abren los cricoaritenoideos posteriores.',
+      evidencia: [T(MUS, 'The thyroarytenoid muscle acts to relax the vocal ligament, allowing for a softer voice.')],
+    },
+    { id: 'id-cricoaritenoideo-posterior', tipo: 'identificar', estructura: 'cricoaritenoideo-posterior', objetivo: 2, paso: 'musculos' },
+    {
+      id: 'sec-faringe', tipo: 'secuencia', objetivo: 3, paso: 'faringe',
+      enunciado: 'Ordena de arriba abajo las partes de la faringe y el tubo que sigue.',
+      orden: ['Nasofaringe', 'Orofaringe', 'Laringofaringe', 'Esófago'],
+      explicacion: 'La nasofaringe llega al paladar blando; la orofaringe, a la epiglotis, y la laringofaringe sigue en el esófago.',
+      evidencia: [T(FAR, 'The pharynx is comprised of three parts (superior to inferior):'), T(FAR, 'It is continuous inferiorly with the oesophagus.')],
+    },
+    {
+      id: 'rel-laringofaringe', tipo: 'relacion', objetivo: 3, paso: 'faringe', estructuras: ['laringofaringe', 'esofago'],
+      enunciado: '¿Con qué se continúa por abajo la laringofaringe?',
+      correcta: 'Con el esófago',
+      distractores: ['Con la tráquea', 'Con la cavidad nasal', 'Con la orofaringe'],
+      explicacion: 'Está detrás de la laringe, con la que se comunica por su entrada, y por abajo sigue en el esófago; la tráquea continúa la laringe.',
+      evidencia: [T(FAR, 'It is continuous inferiorly with the oesophagus.')],
+    },
+    { id: 'id-orofaringe', tipo: 'identificar', estructura: 'orofaringe', objetivo: 3, paso: 'faringe' },
+    {
+      id: 'rel-esofago', tipo: 'relacion', objetivo: 3, paso: 'traquea', estructuras: ['esofago', 'cricoides'],
+      enunciado: '¿Dónde empieza el esófago?',
+      correcta: 'Hacia C6, detrás del cricoides',
+      distractores: ['En T4, a la altura del ángulo esternal', 'En la base del cráneo', 'En C3, detrás del hioides'],
+      explicacion: 'Empieza donde acaba la faringe, a la altura de C6 y detrás del cricoides; en el ángulo esternal se divide la tráquea.',
+      evidencia: [W('Esophagus', 'the esophagus generally starts around the level of the sixth cervical vertebra behind the cricoid cartilage of the trachea')],
+    },
+    {
+      id: 'rel-anillos', tipo: 'relacion', objetivo: 0, paso: 'traquea', estructuras: ['traquea'],
+      enunciado: '¿Qué mantiene abierta la tráquea?',
+      correcta: 'Anillos de cartílago en forma de C',
+      distractores: ['Anillos de hueso completos', 'Solo el músculo traqueal', 'Los músculos constrictores de la faringe'],
+      explicacion: 'Son anillos de cartílago abiertos en forma de C; el músculo traqueal une sus extremos libres. El único anillo completo es el cricoides.',
+      evidencia: [T(TRA, 'The trachea, like all of the larger respiratory airways, is held open by cartilage – here in C-shaped rings.')],
+    },
+    {
+      id: 'fun-paratiroides', tipo: 'funcion', objetivo: 4, paso: 'tiroides', estructuras: PARATIROIDES,
+      enunciado: '¿Qué hace la hormona de las paratiroides (PTH)?',
+      correcta: 'Sube el calcio de la sangre',
+      distractores: ['Baja la glucosa de la sangre', 'Acelera el metabolismo de todo el cuerpo', 'Contrae los músculos de la laringe'],
+      explicacion: 'La PTH aumenta el calcio de la sangre; el metabolismo lo regula el tiroides.',
+      evidencia: [T(PAR, 'They are responsible for the production of parathyroid hormone (PTH), which acts to increase the level of serum calcium.')],
+    },
+    {
+      id: 'rel-paratiroides', tipo: 'relacion', objetivo: 4, paso: 'tiroides', estructuras: [...PARATIROIDES, 'tiroides'],
+      enunciado: '¿Dónde están normalmente las paratiroides?',
+      correcta: 'En la cara posterior del tiroides',
+      distractores: ['Dentro del istmo del tiroides, por delante', 'Junto al hioides', 'Detrás de la tráquea, bajo el cricoides'],
+      explicacion: 'Suelen ser cuatro, por fuera del tiroides pero en su cara posterior: las superiores a media altura y las inferiores cerca de los polos inferiores.',
+      evidencia: [T(PAR, 'The parathyroid glands are usually located on the posterior aspect of the thyroid gland.')],
+    },
+    {
+      id: 'rel-tiroidea-inferior', tipo: 'relacion', objetivo: 4, paso: 'tiroides', estructuras: ['arteria-tiroidea-inferior', 'tronco-tirocervical'],
+      enunciado: '¿De dónde sale la arteria tiroidea inferior?',
+      correcta: 'Del tronco tirocervical, rama de la subclavia',
+      distractores: ['De la carótida externa, como primera rama', 'Del tronco braquiocefálico', 'De la carótida interna'],
+      explicacion: 'La tiroidea inferior sale del tronco tirocervical; la superior es la primera rama de la carótida externa.',
+      evidencia: [T(TIR, 'Inferior thyroid artery – arises from the thyrocervical trunk (a branch of the subclavian artery).'), T(TIR, 'Superior thyroid artery – arises as the first branch of the external carotid artery.')],
+    },
+    { id: 'id-tiroides', tipo: 'identificar', estructura: 'tiroides', objetivo: 4, paso: 'tiroides' },
+  ],
+});

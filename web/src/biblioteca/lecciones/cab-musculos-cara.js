@@ -1,0 +1,241 @@
+// Lección «Músculos de la expresión facial». Formato y evidencias: ../formato.js.
+import { leccion, T, GUIA, MODELO } from '../formato.js';
+
+const FAC = 'head/muscles/facial-expression';
+const NVF = 'head/cranial-nerves/facial-nerve';
+const musculo = (nombre, piezas) => ({ nombre, piezas, lado: 'ambos', papel: 'nucleo', tipo: 'musculo' });
+const contexto = (nombre, piezas, tipo, lado = 'ambos') => ({ nombre, piezas, lado, papel: 'contexto', tipo });
+
+const ORBITARIO = ['orbicular-ojo', 'corrugador'];
+const NASAL = ['nasal', 'procer', 'depresor-septo'];
+const ORAL = ['orbicular-boca', 'grupo-superior', 'grupo-inferior'];
+const HUESOS = ['huesos-pares', 'mandibula-frontal'];
+
+export default leccion({
+  id: 'cab-musculos-cara',
+  version: 1,
+  titulo: 'Músculos de la expresión facial',
+  resumen: 'Los músculos que mueven la piel de la cara, en sus tres grupos (orbitario, nasal y oral): qué hace cada uno, por qué los inerva a todos el nervio facial, qué rama llega a cada uno y qué pasa cuando ese nervio se paraliza.',
+  lugares: [['cabeza', 'cara']],
+  sistemas: ['muscular', 'nervioso'],
+  formato: 'estructuras',
+  temas: ['musculos', 'nervios'],
+  nivel: 2,
+  minutos: 16,
+  requisitos: ['cab-cara-huesos'],
+  siguiente: ['cab-masticacion', 'cab-nervios-craneales', 'cab-ojo'],
+  objetivos: [
+    'Explicar qué tienen en común los músculos de la expresión facial: dónde se insertan, de dónde vienen y qué nervio los mueve.',
+    'Nombrar los músculos del grupo orbitario y explicar por qué su parálisis pone en riesgo la córnea.',
+    'Nombrar los músculos del grupo nasal y su acción sobre la nariz y las cejas.',
+    'Distinguir el orbicular de la boca, el buccinador y los músculos menores que mueven los labios.',
+    'Asociar las cinco ramas terminales del nervio facial con los músculos que inervan.',
+  ],
+  estructuras: {
+    'orbicular-ojo': musculo('Orbicular del ojo', ['Orbital_part_of_orbicularis_oculi', 'Palpebral_part_of_orbicularis_oculi']),
+    corrugador: musculo('Corrugador del supercilio', ['Corrugator_supercilii']),
+    nasal: musculo('Músculo nasal', ['Nasalis_muscle']),
+    procer: musculo('Prócer', ['Procerus_muscle']),
+    'depresor-septo': musculo('Depresor del tabique nasal', ['Depressor_septi_nasi']),
+    'orbicular-boca': musculo('Orbicular de la boca', ['Orbicularis_oris_muscle']),
+    'grupo-superior': musculo('Músculos menores del labio superior', ['Risorius_muscle', 'Zygomaticus_major_muscle', 'Zygomaticus_minor_muscle', 'Levator_labii_superioris', 'Levator_nasolabialis', 'Levator_anguli_oris']),
+    'grupo-inferior': musculo('Músculos menores del labio inferior', ['Depressor_anguli_oris', 'Depressor_labii_inferioris', 'Mentalis_muscle']),
+    'nervio-facial': { nombre: 'Nervio facial (VII)', piezas: ['Facial_nerve_VII'], lado: 'ambos', papel: 'nucleo', tipo: 'nervio' },
+    frontal: contexto('Músculo frontal', ['Frontalis_muscle'], 'musculo'),
+    platisma: contexto('Platisma', ['Platysma'], 'musculo'),
+    parotida: contexto('Glándula parótida', ['Parotid_gland'], 'glandula'),
+    'huesos-pares': contexto('Maxilares, cigomáticos y nasales', ['Maxilla', 'Zygomatic_Bone', 'Nasal_Bone'], 'hueso'),
+    'mandibula-frontal': contexto('Mandíbula y hueso frontal', ['Mandible', 'Frontal_Bone'], 'hueso', 'impar'),
+  },
+  pasos: [
+    {
+      id: 'orientacion', tipo: 'orientacion', titulo: 'Músculos que mueven la piel',
+      texto: [
+        ['Los músculos de la expresión facial están en el tejido subcutáneo de la cara: nacen de hueso o de fascia, se insertan en la piel y, al contraerse, tiran de ella.', T(FAC, 'The muscles of facial expression are located within the subcutaneous tissue of the face. They originate from bone or fascia and insert onto the skin. As they contract, the muscles pull on the skin to exert their effects.')],
+        ['Todos se forman a partir del segundo arco faríngeo y, al migrar, se llevan su nervio: por eso los inerva a todos el nervio facial.', T(FAC, 'These muscles all develop from the second pharyngeal arch. As they migrate from the arch, they take their nerve supply with them.'), T(FAC, 'As such, they are all innervated by branches of the facial nerve.')],
+        ['Se reúnen en tres grupos: orbitario, nasal y oral.', T(FAC, 'The facial muscles can broadly be categorised into three groups – orbital, nasal and oral.')],
+        ['Míralos de frente y de lado.', GUIA],
+      ],
+      vista: { ver: [...ORBITARIO, ...NASAL, ...ORAL], contexto: HUESOS, camara: 'anterior' },
+      actividad: { tipo: 'vistas', texto: 'Recorre los tres grupos.', vistas: [{ nombre: 'De frente', camara: 'anterior' }, { nombre: 'Tres cuartos', camara: 'anterolateral' }, { nombre: 'De lado', camara: 'lateral' }] },
+      comprobar: 'rel-nervio-facial',
+    },
+    {
+      id: 'orbitario', tipo: 'exploracion', titulo: 'El grupo orbitario',
+      texto: [
+        ['El orbicular del ojo rodea la órbita y entra en los párpados: su parte palpebral los cierra suavemente, la orbitaria los cierra con fuerza y la lagrimal ayuda a drenar las lágrimas.', T(FAC, 'The orbicularis oculi muscle surrounds the eye socket and extends into the eyelid.'), T(FAC, 'Palpebral part – gently closes the eyelids.'), T(FAC, 'Lacrimal part – involved in the drainage of tears.'), T(FAC, 'Orbital part – tightly closes the eyelids.')],
+        ['El corrugador del supercilio, más pequeño y por detrás del orbicular, junta las cejas y marca arrugas verticales sobre la raíz de la nariz al fruncir el ceño.', T(FAC, 'The corrugator supercilii is a much smaller muscle and is located posteriorly to the orbicularis oculi.'), T(FAC, 'Draws the eyebrows together, creating vertical wrinkles on the bridge of the nose (associated with frowning).')],
+        ['Son los únicos músculos que cierran los párpados: si el facial se lesiona, el ojo no se cierra y la córnea se seca (queratitis por exposición).', T(FAC, 'As they are the only muscles that can close the eyelids, this has some serious clinical consequences.'), T(FAC, 'The eye cannot shut – this can cause the cornea to dry out. This is known as exposure keratitis.')],
+      ],
+      detalle: [
+        ['Además cae el párpado inferior (ectropión) y la lágrima se acumula en él sin repartirse por el ojo, lo que puede ulcerar la córnea.', T(FAC, 'The lower eyelid droops, called ectropion. Lacrimal fluid pools in the lower eyelid and cannot be spread across the surface of the eye.'), T(FAC, 'This can result in a failure to remove debris, and ulceration of the corneal surface.')],
+        ['Para explorar el nervio facial se pide levantar las cejas y cerrar los párpados.', T(FAC, 'The test for facial nerve palsy involves raising the eyebrows and closing the eyelids.')],
+        ['El modelo separa el orbicular del ojo en sus partes orbitaria y palpebral, sin la lagrimal.', MODELO],
+      ],
+      vista: { ver: ORBITARIO, contexto: HUESOS, camara: 'anterior' },
+      actividad: { tipo: 'comparar', estructuras: ORBITARIO, texto: 'Alterna los dos músculos orbitarios.' },
+      comprobar: 'rel-cornea',
+    },
+    {
+      id: 'nasal', tipo: 'exploracion', titulo: 'El grupo nasal',
+      texto: [
+        ['El nasal, el mayor del grupo, tiene una parte transversa, que comprime el orificio de la nariz, y otra alar, que lo ensancha.', T(FAC, 'The nasalis is the largest of the nasal muscles and is comprised of two parts: transverse and alar.'), T(FAC, 'Transverse part – compresses the nasal opening.'), T(FAC, 'Alar part – widens the nasal opening.')],
+        ['El prócer, el más alto y superficial, baja las cejas y marca arrugas transversales sobre la nariz, también al fruncir el ceño.', T(FAC, 'The procerus is the most superior of the nasal muscles. It lies superficially to the other muscles of facial expression.'), T(FAC, 'Pulls the eyebrows downward to produce transverse wrinkles over the nose (associated with frowning)')],
+        ['El depresor del tabique nasal tira del tabique hacia abajo y ayuda a la parte alar a abrir las narinas.', T(FAC, 'The depressor septi nasi muscle assists the alar part of the nasalis in opening the nostrils.'), T(FAC, 'Pulls the nasal septum inferiorly to widen the nasal opening.')],
+        ['Los tres los inervan ramas bucales del facial.', T(FAC, 'Innervation – Buccal branches of the facial nerve.')],
+      ],
+      vista: { ver: NASAL, contexto: [...HUESOS, 'orbicular-ojo'], camara: 'anterior' },
+      actividad: { tipo: 'comparar', estructuras: NASAL, texto: 'Alterna los tres músculos de la nariz.' },
+      comprobar: 'comp-fruncir',
+    },
+    {
+      id: 'oral', tipo: 'exploracion', titulo: 'El grupo oral',
+      texto: [
+        ['Los músculos orales mueven la boca y los labios: hacen falta para cantar y silbar y dan énfasis a lo que decimos.', T(FAC, 'The oral muscles of facial expression are responsible for the movements of the mouth and lips. They are required in singing and whistling and add emphasis to vocal communication.')],
+        ['El orbicular de la boca es el esfínter de los labios: los cierra y estrecha la boca.', T(FAC, 'The orbicularis oris is the main sphincter muscle of the lips.'), T(FAC, 'Action – Closes the lips to narrow the oral opening.')],
+        ['El buccinador, fino, cuadrado y profundo, entre el maxilar y la mandíbula, aprieta la mejilla contra los dientes para que no se acumule la comida.', T(FAC, 'The buccinator is a thin, square-shaped muscle. It is located between the mandible and maxilla, deep to the other muscles of the face.'), T(FAC, 'Actions – Pulls the cheek inwards against the teeth, preventing accumulation of food in that area.')],
+        ['Los menores forman un grupo superior (risorio, cigomáticos mayor y menor, elevadores del labio superior y del ángulo de la boca) y otro inferior (depresores del ángulo de la boca y del labio inferior, y mentoniano).', T(FAC, 'The upper group contains the risorius, zygomaticus major, zygomaticus minor, levator labii superioris, levator labii superioris alaeque nasi and levator anguli oris.'), T(FAC, 'The lower group contains the depressor anguli oris, depressor labii inferioris and the mentalis.')],
+      ],
+      detalle: [
+        ['Si el facial falla, cuesta comer porque la comida se queda entre los dientes y la mejilla, y al sonreír la boca se va hacia el lado sano.', T(FAC, 'The patient may present with difficulty eating, with food collecting between the teeth and cheeks.'), T(FAC, 'the tissue around the mouth and cheeks sags, and is drawn across to the opposite side while smiling.')],
+        ['El modelo no tiene el buccinador.', MODELO],
+      ],
+      vista: { ver: ORAL, contexto: HUESOS, camara: 'anterior' },
+      actividad: { tipo: 'comparar', estructuras: ORAL, texto: 'Alterna el orbicular de la boca y los dos grupos de músculos menores.' },
+      comprobar: 'comp-grupos-labios',
+    },
+    {
+      id: 'facial', tipo: 'relaciones', titulo: 'Las cinco ramas del nervio facial',
+      texto: [
+        ['El nervio facial sale del cráneo por el agujero estilomastoideo y entra en la parótida, que no inerva; dentro se divide en cinco ramas: temporal, cigomática, bucal, marginal de la mandíbula y cervical.', T(NVF, 'The facial nerve then exits the facial canal (and the cranium) via the stylomastoid foramen.'), T(NVF, 'continues anteriorly and inferiorly into the parotid gland (note – the facial nerve does not contribute towards the innervation of the parotid gland'), T(NVF, 'Within the parotid gland, the nerve terminates by splitting into five branches: Temporal branch Zygomatic branch Buccal branch Marginal mandibular branch Cervical branch')],
+        ['La temporal llega al frontal, al orbicular del ojo y al corrugador; la cigomática, al orbicular del ojo; la bucal, al orbicular de la boca, al buccinador y al cigomático; la marginal, a los depresores y al mentoniano, y la cervical, al platisma.', T(NVF, 'Temporal – frontalis, orbicularis oculi and corrugator supercilii.'), T(NVF, 'Zygomatic – orbicularis oculi.'), T(NVF, 'Buccal – orbicularis oris, buccinator and zygomaticus.'), T(NVF, 'Marginal mandibular – depressor labii inferioris, depressor anguli oris and mentalis.'), T(NVF, 'Cervical – platysma.')],
+        ['Si se lesiona fuera del cráneo solo falla la parte motora, y los músculos de la expresión facial se paralizan o se debilitan mucho; sin causa conocida, se llama parálisis de Bell.', T(NVF, 'Only the motor function of the facial nerve is affected, therefore resulting in paralysis or severe weakness of the muscles of facial expression.'), T(NVF, 'Idiopathic – If no definitive cause can be found then the disease is termed Bell’s palsy.')],
+      ],
+      detalle: [
+        ['Antes de la parótida da ramas a los músculos del oído externo y al vientre occipital del occipitofrontal, al vientre posterior del digástrico y al estilohioideo.', T(NVF, 'Posterior auricular nerve – ascends in front of the mastoid process and innervates the muscles of the outer ear. It also supplies the occipital part of the occipitofrontalis muscle.'), T(NVF, 'Nerve to the posterior belly of the digastric muscle'), T(NVF, 'Nerve to the stylohyoid muscle')],
+        ['La parótida la inerva el glosofaríngeo.', T(NVF, 'which is innervated by the glossopharyngeal nerve).')],
+        ['El modelo tiene el nervio facial, pero no sus cinco ramas terminales por separado.', MODELO],
+      ],
+      vista: { ver: ['nervio-facial'], contexto: ['frontal', 'platisma', 'orbicular-ojo', 'orbicular-boca', ...HUESOS], fantasma: ['parotida'], camara: 'lateral' },
+      actividad: { tipo: 'vistas', texto: 'Sigue el nervio facial hasta la parótida.', vistas: [{ nombre: 'De lado', camara: 'lateral' }, { nombre: 'Tres cuartos', camara: 'anterolateral' }, { nombre: 'De frente', camara: 'anterior' }] },
+      comprobar: 'rel-ramas',
+    },
+    {
+      id: 'sintesis', tipo: 'sintesis', titulo: 'En resumen',
+      texto: [
+        ['Músculos en la piel, del segundo arco faríngeo, todos del nervio facial.', T(FAC, 'insert onto the skin.'), T(FAC, 'These muscles all develop from the second pharyngeal arch.'), T(FAC, 'they are all innervated by branches of the facial nerve.')],
+        ['Orbitario: orbicular del ojo y corrugador, los únicos que cierran los párpados. Nasal: nasal, prócer y depresor del tabique. Oral: orbicular de la boca, buccinador y los menores de los labios.', T(FAC, 'As they are the only muscles that can close the eyelids'), T(FAC, 'The group consists of the orbicularis oris, buccinator, and various smaller muscles.')],
+        ['Ramas del facial en la parótida, de arriba abajo: temporal, cigomática, bucal, marginal de la mandíbula y cervical.', T(NVF, 'Within the parotid gland, the nerve terminates by splitting into five branches: Temporal branch Zygomatic branch Buccal branch Marginal mandibular branch Cervical branch')],
+      ],
+    },
+  ],
+  preguntas: [
+    {
+      id: 'rel-nervio-facial', tipo: 'relacion', objetivo: 0, paso: 'orientacion', estructuras: ['orbicular-ojo', 'orbicular-boca'],
+      enunciado: '¿Por qué todos los músculos de la expresión facial los inerva el nervio facial?',
+      correcta: 'Porque todos vienen del segundo arco faríngeo y se llevan su nervio al migrar',
+      distractores: ['Porque todos nacen del hueso temporal', 'Porque todos están dentro de la parótida', 'Porque todos se insertan en hueso'],
+      explicacion: 'Cada arco faríngeo tiene su nervio; los músculos del segundo arco lo arrastran consigo y por eso dependen todos del facial.',
+      evidencia: [T(FAC, 'These muscles all develop from the second pharyngeal arch. As they migrate from the arch, they take their nerve supply with them.')],
+    },
+    {
+      id: 'comp-insercion', tipo: 'comparacion', objetivo: 0, paso: 'orientacion', estructuras: ['orbicular-boca'],
+      enunciado: '¿Qué tienen de particular los músculos de la expresión facial?',
+      correcta: 'Se insertan en la piel y, al contraerse, tiran de ella',
+      distractores: ['No nacen ni de hueso ni de fascia', 'Los mueve el sistema nervioso autónomo', 'Cruzan siempre una articulación entre dos huesos'],
+      explicacion: 'Nacen de hueso o de fascia, pero acaban en la piel; por eso su contracción cambia la expresión.',
+      evidencia: [T(FAC, 'They originate from bone or fascia and insert onto the skin. As they contract, the muscles pull on the skin to exert their effects.')],
+    },
+    {
+      id: 'rel-cornea', tipo: 'relacion', objetivo: 1, paso: 'orbitario', estructuras: ORBITARIO,
+      enunciado: '¿Por qué la parálisis del nervio facial puede dañar la córnea?',
+      correcta: 'Porque el ojo no se cierra y la córnea se seca',
+      distractores: ['Porque el facial lleva la sensibilidad de la córnea', 'Porque el párpado superior cae y tapa el ojo', 'Porque se paralizan los músculos que mueven el globo ocular'],
+      explicacion: 'Los músculos orbitarios son los únicos que cierran los párpados; sin ellos la córnea queda expuesta y se seca.',
+      evidencia: [T(FAC, 'The eye cannot shut – this can cause the cornea to dry out. This is known as exposure keratitis.')],
+    },
+    {
+      id: 'fun-orbicular-ojo', tipo: 'funcion', objetivo: 1, paso: 'orbitario', estructuras: ['orbicular-ojo'],
+      enunciado: '¿Qué parte del orbicular del ojo cierra los párpados con fuerza?',
+      correcta: 'La orbitaria',
+      distractores: ['La palpebral', 'La lagrimal', 'Las tres por igual'],
+      explicacion: 'La palpebral los cierra suavemente y la lagrimal ayuda a drenar las lágrimas.',
+      evidencia: [T(FAC, 'Orbital part – tightly closes the eyelids.'), T(FAC, 'Palpebral part – gently closes the eyelids.')],
+    },
+    { id: 'id-orbicular-ojo', tipo: 'identificar', estructura: 'orbicular-ojo', objetivo: 1, paso: 'orbitario' },
+    { id: 'loc-corrugador', tipo: 'localizar', estructura: 'corrugador', candidatas: ['orbicular-ojo', 'procer'], objetivo: 1, paso: 'orbitario' },
+    {
+      id: 'comp-fruncir', tipo: 'comparacion', objetivo: 2, paso: 'nasal', estructuras: ['corrugador', 'procer'],
+      enunciado: 'Al fruncir el ceño, ¿qué arrugas marca cada músculo?',
+      correcta: 'El corrugador, verticales sobre la raíz de la nariz; el prócer, transversales sobre la nariz',
+      distractores: ['El corrugador, transversales; el prócer, verticales', 'Los dos marcan arrugas horizontales en la frente', 'Ninguno: el ceño lo fruncen los orbiculares'],
+      explicacion: 'El corrugador junta las cejas (arrugas verticales); el prócer las baja (arrugas transversales).',
+      evidencia: [T(FAC, 'Draws the eyebrows together, creating vertical wrinkles on the bridge of the nose (associated with frowning).'), T(FAC, 'Pulls the eyebrows downward to produce transverse wrinkles over the nose (associated with frowning)')],
+    },
+    {
+      id: 'fun-nasal', tipo: 'funcion', objetivo: 2, paso: 'nasal', estructuras: ['nasal'],
+      enunciado: '¿Qué hace la parte alar del músculo nasal?',
+      correcta: 'Ensancha el orificio de la nariz',
+      distractores: ['Comprime el orificio de la nariz', 'Baja las cejas', 'Cierra los labios'],
+      explicacion: 'La parte alar lo ensancha y la transversa lo comprime; bajar las cejas es del prócer.',
+      evidencia: [T(FAC, 'Alar part – widens the nasal opening.')],
+    },
+    { id: 'id-procer', tipo: 'identificar', estructura: 'procer', objetivo: 2, paso: 'nasal' },
+    {
+      id: 'fun-orbicular-boca', tipo: 'funcion', objetivo: 3, paso: 'oral', estructuras: ['orbicular-boca'],
+      enunciado: '¿Qué hace el orbicular de la boca?',
+      correcta: 'Cierra los labios y estrecha la boca',
+      distractores: ['Aprieta la mejilla contra los dientes', 'Tira de la comisura hacia arriba al sonreír', 'Baja el labio inferior'],
+      explicacion: 'Es el esfínter de los labios; apretar la mejilla es del buccinador y los demás movimientos, de los músculos menores.',
+      evidencia: [T(FAC, 'The orbicularis oris is the main sphincter muscle of the lips.'), T(FAC, 'Action – Closes the lips to narrow the oral opening.')],
+    },
+    {
+      id: 'fun-buccinador', tipo: 'funcion', objetivo: 3, paso: 'oral', estructuras: ['orbicular-boca'],
+      enunciado: '¿Qué hace el buccinador?',
+      correcta: 'Aprieta la mejilla contra los dientes para que no se acumule la comida',
+      distractores: ['Cierra los labios', 'Eleva el ángulo de la boca', 'Arruga la piel del cuello'],
+      explicacion: 'Por eso, si el facial falla, la comida se queda entre los dientes y la mejilla.',
+      evidencia: [T(FAC, 'Actions – Pulls the cheek inwards against the teeth, preventing accumulation of food in that area.')],
+    },
+    {
+      id: 'comp-grupos-labios', tipo: 'comparacion', objetivo: 3, paso: 'oral', estructuras: ['grupo-superior', 'grupo-inferior'],
+      enunciado: '¿Cuál de estos músculos es del grupo inferior de los músculos menores de los labios?',
+      correcta: 'El depresor del ángulo de la boca',
+      distractores: ['El cigomático mayor', 'El risorio', 'El elevador del ángulo de la boca'],
+      explicacion: 'El grupo inferior son los dos depresores y el mentoniano; el resto pertenece al superior.',
+      evidencia: [T(FAC, 'The lower group contains the depressor anguli oris, depressor labii inferioris and the mentalis.')],
+    },
+    { id: 'id-orbicular-boca', tipo: 'identificar', estructura: 'orbicular-boca', objetivo: 3, paso: 'oral' },
+    {
+      id: 'rel-ramas', tipo: 'relacion', objetivo: 4, paso: 'facial', estructuras: ['nervio-facial', 'platisma'],
+      enunciado: '¿Qué rama del nervio facial inerva el platisma?',
+      correcta: 'La cervical',
+      distractores: ['La marginal de la mandíbula', 'La bucal', 'La temporal'],
+      explicacion: 'La cervical baja al cuello; la marginal va a los depresores y al mentoniano, la bucal a la boca y la temporal a la frente y el ojo.',
+      evidencia: [T(NVF, 'Cervical – platysma.')],
+    },
+    {
+      id: 'sec-ramas', tipo: 'secuencia', objetivo: 4, paso: 'facial',
+      enunciado: 'Ordena de arriba abajo las cinco ramas terminales del nervio facial.',
+      orden: ['Temporal', 'Cigomática', 'Bucal', 'Marginal de la mandíbula', 'Cervical'],
+      explicacion: 'Salen en abanico desde la parótida: de la frente al cuello.',
+      evidencia: [T(NVF, 'Within the parotid gland, the nerve terminates by splitting into five branches: Temporal branch Zygomatic branch Buccal branch Marginal mandibular branch Cervical branch')],
+    },
+    {
+      id: 'rel-parotida', tipo: 'relacion', objetivo: 4, paso: 'facial', estructuras: ['nervio-facial', 'parotida'],
+      enunciado: '¿Dónde se divide el nervio facial en sus cinco ramas terminales?',
+      correcta: 'Dentro de la glándula parótida',
+      distractores: ['En el conducto auditivo interno', 'En el agujero estilomastoideo', 'En el seno cavernoso'],
+      explicacion: 'Sale por el agujero estilomastoideo, entra en la parótida (que no inerva) y allí se divide.',
+      evidencia: [T(NVF, 'Within the parotid gland, the nerve terminates by splitting into five branches')],
+    },
+    {
+      id: 'rel-bell', tipo: 'relacion', objetivo: 4, paso: 'facial', estructuras: ['nervio-facial'],
+      enunciado: '¿Qué es la parálisis de Bell?',
+      correcta: 'Una parálisis del nervio facial sin causa conocida',
+      distractores: ['Una lesión del trigémino que quita la sensibilidad de la cara', 'Una parálisis de los músculos de la masticación', 'Una caída del párpado por lesión del oculomotor'],
+      explicacion: 'Cuando el facial se paraliza y no se encuentra la causa, se habla de parálisis de Bell.',
+      evidencia: [T(NVF, 'Idiopathic – If no definitive cause can be found then the disease is termed Bell’s palsy.')],
+    },
+  ],
+});

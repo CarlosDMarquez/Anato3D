@@ -20,6 +20,10 @@ const UI = {
   fadeOthers: 'layers-2', focus: 'crosshair', chevron: 'chevron-right', expand: 'chevron-up',
   rotate: 'rotate-3d', info: 'info', study: 'graduation-cap', check: 'check', wrong: 'x', restart: 'rotate-ccw',
   heart: 'heart',
+  // Biblioteca de estudio
+  star: 'star', clock: 'clock', filter: 'funnel', book: 'book-open', route: 'route', target: 'target', play: 'play',
+  repeat: 'repeat', pointer: 'mouse-pointer-click', arrowUp: 'arrow-up', arrowDown: 'arrow-down', sort: 'arrow-up-down',
+  compare: 'columns-2', layers: 'layers', plus: 'plus', compass: 'compass', quote: 'quote', timer: 'timer',
 };
 
 function pick(set, map) {

@@ -619,8 +619,12 @@ export class Viewer extends EventTarget {
       if (!meshes.length) return;
       const groups = [];
       for (let p = node.parent; p && p !== root; p = p.parent) groups.push(p.name);
+      // El nombre del GLB, no el de three.js: si un grupo se llama igual que la pieza que contiene (la sínfisis del
+      // pubis, las arterias y venas pulmonares, varios núcleos del encéfalo…), GLTFLoader renombra la pieza «X_1», y
+      // entonces no la encontraban el índice, el buscador ni la biblioteca, que usan el nombre del GLB.
+      const nombre = extras.name ?? node.name;
       const part = {
-        id: node.name,
+        id: nombre,
         node,
         meshes,
         extras,
@@ -631,8 +635,8 @@ export class Viewer extends EventTarget {
         layer: extras.layer ?? 1,
         major: !!extras.major,
         sheet: !!extras.sheet,
-        side: sideOf(node.name),
-        info: resolvePart(node.name, extras),
+        side: sideOf(nombre),
+        info: resolvePart(nombre, extras),
         visible: true,
         ghost: false,
       };
@@ -763,25 +767,39 @@ export class Viewer extends EventTarget {
     return box.isEmpty() ? null : box.getCenter(new THREE.Vector3());
   }
 
-  // Encuadra una o varias partes con una transición suave.
-  focus(parts) {
+  // Encuadra una o varias partes con una transición suave. `dir` (opcional, [x, y, z]): desde dónde mirarlas; si no,
+  // desde donde está la cámara.
+  focus(parts, dir = null) {
     const box = new THREE.Box3();
     for (const p of [].concat(parts)) for (const m of p.meshes) box.expandByObject(m);
     if (box.isEmpty()) return;
     const sphere = box.getBoundingSphere(new THREE.Sphere());
-    const radius = Math.max(sphere.radius, 0.07);
+    // Radio mínimo: las piezas diminutas (huesecillos, nervios finos) se acercan sin pasar del límite de la cámara.
+    const radius = Math.max(sphere.radius, 0.025);
     // Encaja la esfera en el hueco libre (entre barras y, en móvil, encima de la ficha).
     const H = this.container.clientHeight;
-    const { top, bottom } = this.insets;
+    const W = this.container.clientWidth || 1;
+    const { top, bottom, right = 0 } = this.insets;
     const avail = Math.max(H - top - bottom, H * 0.25);
+    const availW = Math.max(W - right, W * 0.4);          // a la derecha puede haber un panel abierto (Estudiar)
     const vHalf = THREE.MathUtils.degToRad(this.camera.fov / 2);
     const hHalf = Math.atan(Math.tan(vHalf) * this.camera.aspect);
-    const dist = Math.max((radius / Math.sin(vHalf)) * (H / avail), radius / Math.sin(hHalf)) * 1.2;
-    const dir = this.camera.position.clone().sub(this.controls.target).normalize();
+    const dist = Math.max((radius / Math.sin(vHalf)) * (H / avail), (radius / Math.sin(hHalf)) * (W / availW)) * 1.2;
+    const mira = dir ? new THREE.Vector3(...dir).normalize() : this.camera.position.clone().sub(this.controls.target).normalize();
     const perPx = (2 * dist * Math.tan(vHalf)) / H;
-    const up = new THREE.Vector3(0, 1, 0).applyQuaternion(this.camera.quaternion);
+    // «Arriba» en pantalla al terminar: con una dirección nueva, la cámara mira con camera.up = Y (lookAt), así que es el
+    // eje Y proyectado sobre el plano de la pantalla; también mirando desde arriba o desde abajo, donde las direcciones
+    // llevan un poco de Z para que esa proyección no se anule. Sin dirección nueva, la orientación no cambia.
+    let up = new THREE.Vector3(0, 1, 0).applyQuaternion(this.camera.quaternion);
+    if (dir) {
+      const Y = new THREE.Vector3(0, 1, 0);
+      const proyectado = Y.clone().addScaledVector(mira, -Y.dot(mira));
+      if (proyectado.lengthSq() > 1e-12) up = proyectado.normalize();
+    }
     const target = sphere.center.clone().addScaledVector(up, -(H / 2 - (top + avail / 2)) * perPx);
-    this.#animateTo(target, target.clone().add(dir.multiplyScalar(dist)));
+    // Con un panel a la derecha, lo encuadrado queda centrado en el hueco libre de la izquierda.
+    if (W - availW > 0) target.addScaledVector(new THREE.Vector3().crossVectors(up, mira).normalize(), ((W - availW) / 2) * perPx);
+    this.#animateTo(target, target.clone().add(mira.multiplyScalar(dist)));
   }
 
   // Vista inicial: el cuerpo entero cabe en el hueco libre entre la barra superior y la barra de sistemas.

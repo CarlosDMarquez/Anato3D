@@ -1,0 +1,242 @@
+// Lección «Suelo pélvico y periné». Formato y evidencias: ../formato.js.
+import { leccion, T, GUIA, MODELO } from '../formato.js';
+
+const SUE = 'pelvis/muscles/pelvic-floor';
+const PER = 'pelvis/areas/perineum';
+const nucleo = (nombre, piezas, tipo = 'musculo', lado = 'ambos') => ({ nombre, piezas, lado, papel: 'nucleo', tipo });
+const contexto = (nombre, piezas, tipo, lado = 'ambos') => ({ nombre, piezas, lado, papel: 'contexto', tipo });
+
+const ELEVADOR = ['pubococcigeo', 'iliococcigeo'];
+const SUELO = [...ELEVADOR, 'coccigeo'];
+const SUPERFICIALES = ['bulboesponjoso', 'isquiocavernoso', 'transverso-superficial'];
+const PELVIS = ['coxales', 'sacro-coccix', 'sinfisis'];
+
+export default leccion({
+  id: 'pel-suelo',
+  version: 1,
+  titulo: 'Suelo pélvico y periné',
+  resumen: 'El embudo muscular que cierra la pelvis por abajo (el elevador del ano y el coccígeo), cómo ayuda a la continencia, y el periné que queda debajo: sus límites, los triángulos urogenital y anal, el cuerpo perineal y el nervio pudendo.',
+  lugares: [['pelvis', 'suelo-pelvico'], ['pelvis', 'perine']],
+  sistemas: ['muscular'],
+  formato: 'estructuras',
+  temas: ['musculos'],
+  nivel: 2,
+  minutos: 18,
+  requisitos: ['pel-pelvis-osea'],
+  siguiente: ['sis-reproductor-femenino', 'sis-reproductor-masculino', 'sis-urinario'],
+  objetivos: [
+    'Situar el suelo pélvico y el periné y decir qué funciones tiene el suelo pélvico.',
+    'Nombrar los músculos del elevador del ano y el coccígeo y describir su forma de embudo.',
+    'Explicar cómo ayuda el suelo pélvico a la continencia urinaria y fecal.',
+    'Describir los límites del periné y distinguir sus triángulos urogenital y anal con su contenido.',
+    'Relacionar el cuerpo perineal y el nervio pudendo con los músculos del periné.',
+  ],
+  estructuras: {
+    pubococcigeo: nucleo('Pubococcígeo', ['Pubococcygeus_muscle']),
+    iliococcigeo: nucleo('Iliococcígeo', ['Iliococcygeus_muscle']),
+    coccigeo: nucleo('Coccígeo', ['Coccygeus_muscle']),
+    'esfinter-anal-externo': nucleo('Esfínter anal externo', ['External_anal_sphincter']),
+    'esfinter-uretral-externo': nucleo('Esfínter externo de la uretra', ['External_urethral_sphincter'], 'musculo', 'impar'),
+    bulboesponjoso: nucleo('Bulboesponjoso', ['Bulbospongiosus_muscle']),
+    isquiocavernoso: nucleo('Isquiocavernoso', ['Ischiocavernosus_muscle']),
+    'transverso-superficial': nucleo('Transverso superficial del periné', ['Superficial_transverse_perineal_muscle']),
+    'cuerpo-perineal': nucleo('Cuerpo perineal', ['Perineal_body'], 'tendon', 'impar'),
+    pudendo: nucleo('Nervio pudendo', ['Pudendal_nerve'], 'nervio'),
+    'transverso-profundo': contexto('Transverso profundo del periné', ['Deep_transverse_perineal_muscle'], 'musculo'),
+    // En el modelo masculino la membrana perineal es una sola pieza; en el femenino, dos (izquierda y derecha).
+    'membrana-perineal': { ...contexto('Membrana perineal', ['Perineal_membrane'], 'fascia', 'impar'), modelos: ['male'] },
+    'membrana-perineal-f': { ...contexto('Membrana perineal', ['Perineal_membrane'], 'fascia'), modelos: ['female'] },
+    'arco-tendinoso': contexto('Arco tendinoso del elevador del ano', ['Tendinous_arch_of_levator_ani'], 'tendon'),
+    'obturador-interno': contexto('Obturador interno', ['Obturator_internus'], 'musculo'),
+    piriforme: contexto('Piriforme', ['Piriformis_muscle'], 'musculo'),
+    'ligamento-sacrotuberoso': contexto('Ligamento sacrotuberoso', ['Sacrotuberous_ligament'], 'ligamento'),
+    'pudenda-interna': contexto('Arteria pudenda interna', ['Internal_pudendal_artery'], 'arteria'),
+    vejiga: contexto('Vejiga urinaria', ['Urinary_bladder'], 'organo', 'impar'),
+    coxales: contexto('Huesos coxales', ['Hip_Bone'], 'hueso'),
+    'sacro-coccix': contexto('Sacro y cóccix', ['Sacrum', 'Coccyx'], 'hueso', 'impar'),
+    sinfisis: contexto('Sínfisis del pubis', ['Pubic_symphysis'], 'cartilago', 'impar'),
+  },
+  pasos: [
+    {
+      id: 'orientacion', tipo: 'orientacion', titulo: 'El suelo de la pelvis',
+      texto: [
+        ['La vejiga, el recto, los órganos genitales pélvicos y el final de la uretra están en la cavidad pélvica, y los músculos del suelo pélvico, o diafragma pélvico, la cierran por abajo.', T(SUE, 'The pelvic viscera (bladder, rectum, pelvic genital organs and terminal part of the urethra) reside within the pelvic cavity (or the true pelvis).'), T(SUE, 'the muscles that make up the inferior lining of the cavity – the pelvic floor muscles. The pelvic floor is also known as the pelvic diaphragm.')],
+        ['Tiene forma de embudo, se fija a las paredes de la pelvis menor y separa la cavidad pélvica del periné, que queda debajo.', T(SUE, 'The pelvic floor is a funnel-shaped structure. It attaches to the walls of the lesser pelvis, separating the pelvic cavity from the perineum inferiorly')],
+        ['Con su contracción tónica sostiene las vísceras, resiste las subidas de presión al toser o levantar peso y ayuda a la continencia; se relaja para orinar y defecar.', T(SUE, 'Support of abdominopelvic viscera – through their tonic contraction.'), T(SUE, 'Resistance to increases in intra-pelvic/abdominal pressure – during activities such as coughing or lifting heavy objects.'), T(SUE, 'Urinary and faecal continence – the muscle fibres have a sphincter action on the rectum and urethra. They relax to allow urination and defecation.')],
+        ['Míralo desde arriba, como si estuvieras dentro de la pelvis, y desde abajo.', GUIA],
+      ],
+      vista: { ver: SUELO, contexto: [...PELVIS, 'obturador-interno'], camara: 'superior' },
+      actividad: { tipo: 'vistas', texto: 'Recorre el embudo del suelo pélvico.', vistas: [{ nombre: 'Desde arriba', camara: 'superior' }, { nombre: 'Desde abajo', camara: 'inferior' }, { nombre: 'De lado', camara: 'lateral' }] },
+      comprobar: 'fun-suelo',
+    },
+    {
+      id: 'elevador', tipo: 'exploracion', titulo: 'El elevador del ano y el coccígeo',
+      texto: [
+        ['Forman el suelo pélvico el elevador del ano, su parte más grande, el coccígeo y las fascias que los cubren.', T(SUE, 'Levator ani muscles (largest component). Coccygeus muscle. Fascia coverings of the muscles.')],
+        ['El elevador del ano es una lámina ancha de tres músculos pares: el puborrectal, el pubococcígeo y el iliococcígeo.', T(SUE, 'The levator ani is a broad sheet of muscle. It is composed of three separate paired muscles; pubococcygeus, puborectalis and iliococcygeus.')],
+        ['El pubococcígeo, la mayor parte, nace del pubis y se une al del otro lado en la línea media; el iliococcígeo, fino y posterolateral, nace de la espina ciática y del arco tendinoso de la fascia del obturador interno y llega al cóccix.', T(SUE, 'The pubococcygeus forms the bulk of the levator ani complex.'), T(SUE, 'Originates from the posterior surface of the pubis. It blends with the contralateral muscle in the midline of the pelvic floor.'), T(SUE, 'The iliococcygeus is a thin muscle which forms the posterolateral part of the levator ani muscle group.'), T(SUE, 'Originates from the ischial spines and the posterior tendinous arch of the internal obturator fascia. It inserts onto the coccyx, perineal body and anococcygeal ligament.')],
+        ['Detrás está el coccígeo, pequeño y triangular, de la espina ciática al sacro y el cóccix; lo inervan ramos anteriores de S4 y S5.', T(SUE, 'The coccygeus is a small triangular muscle located posterior to the levator ani muscle group.'), T(SUE, 'Originates from the ischial spines and inserts onto the inferior end of the sacrum and coccyx.'), T(SUE, 'Innervation: Anterior rami of S4 and S5.')],
+      ],
+      detalle: [
+        ['Las paredes laterales de la cavidad pélvica las forman el obturador interno y el piriforme, que también forma la pared posterior.', T(SUE, 'the lateral walls include the obturator internus and the piriformis muscle, with the latter also forming the posterior wall')],
+        ['El elevador del ano lo inervan el nervio del elevador del ano y ramas del pudendo.', T(SUE, 'Innervation: Nerve to levator ani and branches of the pudendal nerve.')],
+        ['El modelo no tiene el puborrectal como pieza propia.', MODELO],
+      ],
+      vista: { ver: SUELO, contexto: [...PELVIS, 'arco-tendinoso'], fantasma: ['obturador-interno', 'piriforme'], camara: 'superior' },
+      actividad: { tipo: 'comparar', estructuras: SUELO, texto: 'Alterna los tres músculos, de delante atrás.' },
+      comprobar: 'comp-partes-elevador',
+    },
+    {
+      id: 'continencia', tipo: 'relaciones', titulo: 'Dos hiatos y la continencia',
+      texto: [
+        ['Para orinar y defecar, el suelo pélvico tiene dos huecos: el hiato urogenital, delante, para la uretra (y la vagina en la mujer), y el hiato rectal, en el centro, para el conducto anal.', T(SUE, 'In order to allow for urination and defecation, there are a few gaps in the pelvic floor.'), T(SUE, 'Urogenital hiatus – an anteriorly situated gap, which allows passage of the urethra (and the vagina in females).'), T(SUE, 'Rectal hiatus – a centrally positioned gap, which allows passage of the anal canal.')],
+        ['El puborrectal, el más importante para la continencia fecal, forma un asa en U alrededor del conducto anal: su contracción tónica lo dobla hacia delante y crea el ángulo anorrectal; al defecar se relaja a voluntad.', T(SUE, 'The puborectalis is the most important of the levator ani group for maintaining faecal continence.'), T(SUE, 'It forms a U-shaped sling around the anal canal'), T(SUE, 'Tonic contraction bends the anal canal anteriorly. This creates the anorectal angle which contributes to faecal continence. It is voluntarily inhibited during defecation.')],
+        ['Otras fibras suyas rodean la uretra (y la vagina) y ayudan a no perder orina, sobre todo cuando sube de golpe la presión del abdomen, como al estornudar.', T(SUE, 'Some fibres of the puborectalis muscle (pre-rectal fibres) form another U-shaped sling that flank the urethra in the male and the urethra and vagina in the female'), T(SUE, 'These fibres are very important in preserving urinary continence, especially during abrupt increase of the intra-abdominal pressure i.e. during sneezing.')],
+      ],
+      detalle: [
+        ['El modelo no tiene el recto ni el conducto anal.', MODELO],
+      ],
+      vista: { ver: ['pubococcigeo'], contexto: ['iliococcigeo', 'esfinter-uretral-externo', 'esfinter-anal-externo', 'vejiga', ...PELVIS], camara: 'superior' },
+      actividad: { tipo: 'vistas', texto: 'Busca los huecos del embudo por donde salen la uretra y el conducto anal.', vistas: [{ nombre: 'Desde arriba', camara: 'superior' }, { nombre: 'Desde abajo', camara: 'inferior' }] },
+      comprobar: 'rel-puborrectal',
+    },
+    {
+      id: 'perine', tipo: 'explicacion', titulo: 'El periné y sus dos triángulos',
+      texto: [
+        ['El periné está entre los muslos, debajo del suelo pélvico: es la parte más baja de la salida de la pelvis.', T(PER, 'It is located between the thighs, and represents the most inferior part of the pelvic outlet. The perineum is separated from the pelvic cavity superiorly by the pelvic floor.')],
+        ['Tiene forma de rombo: delante, la sínfisis del pubis; detrás, la punta del cóccix; a los lados, las ramas inferiores del pubis y el isquion y los ligamentos sacrotuberosos.', T(PER, 'in anatomical terms, the perineum is a diamond-shaped structure.'), T(PER, 'Anterior – pubic symphysis.'), T(PER, 'Posterior – tip of the coccyx.'), T(PER, 'Laterally – inferior pubic rami and inferior ischial rami, and the sacrotuberous ligament.')],
+        ['Una línea entre las tuberosidades isquiáticas lo divide en el triángulo urogenital, delante, y el anal, detrás.', T(PER, 'The perineum can be subdivided by a theoretical line drawn transversely between the ischial tuberosities. This split forms the anterior urogenital triangle and the posterior anal triangle.')],
+        ['En el anal están el ano, el esfínter anal externo, voluntario, y las dos fosas isquioanales, cuya grasa deja dilatarse al conducto anal.', T(PER, 'Anal aperture – the opening of the anus.'), T(PER, 'External anal sphincter muscle – voluntary muscle responsible for opening and closing the anus.'), T(PER, 'These fossae contain fat and connective tissue, which allow for expansion of the anal canal during defecation.')],
+      ],
+      vista: { ver: ['esfinter-anal-externo'], contexto: [...PELVIS, 'ligamento-sacrotuberoso'], fantasma: ELEVADOR, camara: 'inferior' },
+      actividad: { tipo: 'vistas', texto: 'Dibuja con la vista el rombo del periné entre el pubis, el cóccix y las tuberosidades.', vistas: [{ nombre: 'Desde abajo', camara: 'inferior' }, { nombre: 'De frente', camara: 'anterior' }] },
+      comprobar: 'rel-triangulos',
+    },
+    {
+      id: 'urogenital', tipo: 'exploracion', titulo: 'El triángulo urogenital y el cuerpo perineal',
+      texto: [
+        ['El triángulo urogenital tiene una capa más de fascia fuerte, la membrana perineal, que atraviesa la uretra (y la vagina) y ancla los músculos de los genitales externos.', T(PER, 'Unlike the anal triangle, the urogenital triangle has an additional layer of strong deep fascia; the perineal membrane.'), T(PER, 'Perineal membrane – a layer of tough fascia, which is perforated by the urethra (and the vagina in the female). The role of the membrane is to provide attachment for the muscles of the external genitalia.')],
+        ['Encima, en la bolsa profunda, están parte de la uretra y su esfínter externo; debajo, en la superficial, los tejidos eréctiles y los músculos isquiocavernoso, bulboesponjoso y transverso superficial.', T(PER, 'It contains part of the urethra, external urethral sphincter'), T(PER, 'It contains the erectile tissues that form the penis and clitoris, and three muscles – the ischiocavernosus, bulbospongiosus and superficial transverse perineal muscles.')],
+        ['En el centro del periné, el cuerpo perineal, una masa fibromuscular, ancla el elevador del ano, el bulboesponjoso, los transversos y los esfínteres.', T(PER, 'The perineal body is an irregular fibromuscular mass. It is located at the junction of the urogenital and anal triangles – the central point of the perineum.'), T(PER, 'Levator ani (part of the pelvic floor). Bulbospongiosus muscle. Superficial and deep transverse perineal muscles. External anal sphincter muscle. External urethral sphincter muscle fibres.')],
+        ['El nervio pudendo inerva todo el periné; corre con los vasos pudendos internos por el canal de Alcock.', T(PER, 'the pudendal nerve, which supplies the whole perineum with somatic fibres.'), T(PER, 'along with the internal pudendal artery and vein) travel along the inner surface of the ischial tuberosities, through a “canal” formed by a thickening of the obturator fascia (Alcock’s canal).')],
+      ],
+      detalle: [
+        ['En el parto, el cuerpo perineal puede estirarse o desgarrarse y favorecer el prolapso de las vísceras pélvicas; una episiotomía, un corte controlado, evita que se desgarre sin control.', T(PER, 'Childbirth can lead to damage (stretching/tearing) of the perineal body, thus leading to possible prolapse of pelvic viscera.'), T(PER, 'This may be avoided by an episiotomy (a surgical cut in the perineum).'), T(PER, 'but prevents uncontrolled tearing of the perineal body.')],
+        ['En la mujer, el cuerpo perineal queda entre la vagina y el esfínter anal externo; en el hombre, entre el bulbo del pene y el ano.', T(PER, 'In women, it acts as a tear resistant body between the vagina and the external anal sphincter'), T(PER, 'In the male, it lies between the bulb of penis and the anus.')],
+      ],
+      vista: { ver: [...SUPERFICIALES, 'cuerpo-perineal'], contexto: ['esfinter-anal-externo', 'esfinter-uretral-externo', 'transverso-profundo', 'membrana-perineal', 'membrana-perineal-f', 'pudendo', 'pudenda-interna', 'coxales', 'sinfisis'], camara: 'inferior' },
+      actividad: { tipo: 'comparar', estructuras: SUPERFICIALES, texto: 'Alterna los tres músculos de la bolsa superficial.' },
+      comprobar: 'rel-cuerpo-perineal',
+    },
+    {
+      id: 'sintesis', tipo: 'sintesis', titulo: 'En resumen',
+      texto: [
+        ['Suelo pélvico: un embudo formado por el elevador del ano (puborrectal, pubococcígeo e iliococcígeo) y el coccígeo, que sostiene las vísceras y ayuda a la continencia.', T(SUE, 'It is composed of three separate paired muscles; pubococcygeus, puborectalis and iliococcygeus.'), T(SUE, 'The coccygeus is a small triangular muscle located posterior to the levator ani muscle group.'), T(SUE, 'Support of abdominopelvic viscera – through their tonic contraction.')],
+        ['El puborrectal crea el ángulo anorrectal; sus fibras prerrectales protegen la continencia urinaria al estornudar.', T(SUE, 'This creates the anorectal angle which contributes to faecal continence.'), T(SUE, 'These fibres are very important in preserving urinary continence')],
+        ['Periné: un rombo dividido entre las tuberosidades isquiáticas en los triángulos urogenital y anal, con el cuerpo perineal en el centro y el nervio pudendo para todo él.', T(PER, 'This split forms the anterior urogenital triangle and the posterior anal triangle.'), T(PER, 'the central point of the perineum.'), T(PER, 'the pudendal nerve, which supplies the whole perineum with somatic fibres.')],
+      ],
+    },
+  ],
+  preguntas: [
+    {
+      id: 'fun-suelo', tipo: 'funcion', objetivo: 0, paso: 'orientacion', estructuras: SUELO,
+      enunciado: '¿Cuál de estas es una función del suelo pélvico?',
+      correcta: 'Sostener las vísceras abdominales y pélvicas con su contracción tónica',
+      distractores: ['Mover la articulación de la cadera', 'Fabricar la orina', 'Flexionar la columna lumbar'],
+      explicacion: 'Además de sostener las vísceras, resiste las subidas de presión y ayuda a la continencia; se relaja para orinar y defecar.',
+      evidencia: [T(SUE, 'Support of abdominopelvic viscera – through their tonic contraction.')],
+    },
+    {
+      id: 'comp-partes-elevador', tipo: 'comparacion', objetivo: 1, paso: 'elevador', estructuras: SUELO,
+      enunciado: '¿Qué músculo forma la mayor parte del elevador del ano?',
+      correcta: 'El pubococcígeo',
+      distractores: ['El iliococcígeo', 'El coccígeo', 'El obturador interno'],
+      explicacion: 'El pubococcígeo es el grueso del elevador; el iliococcígeo es fino y posterolateral, y el coccígeo queda detrás, fuera del elevador.',
+      evidencia: [T(SUE, 'The pubococcygeus forms the bulk of the levator ani complex.')],
+    },
+    { id: 'id-pubococcigeo', tipo: 'identificar', estructura: 'pubococcigeo', objetivo: 1, paso: 'elevador' },
+    {
+      id: 'rel-coccigeo', tipo: 'relacion', objetivo: 1, paso: 'elevador', estructuras: ['coccigeo', 'sacro-coccix'],
+      enunciado: '¿Dónde está el músculo coccígeo?',
+      correcta: 'Detrás del elevador del ano, de la espina ciática al sacro y el cóccix',
+      distractores: ['Delante del pubis, alrededor de la uretra', 'En la pared lateral, sobre el obturador interno', 'Debajo de la membrana perineal'],
+      explicacion: 'Es pequeño y triangular, y cierra la parte posterior del suelo pélvico.',
+      evidencia: [T(SUE, 'The coccygeus is a small triangular muscle located posterior to the levator ani muscle group.'), T(SUE, 'Originates from the ischial spines and inserts onto the inferior end of the sacrum and coccyx.')],
+    },
+    { id: 'loc-iliococcigeo', tipo: 'localizar', estructura: 'iliococcigeo', candidatas: ['pubococcigeo', 'coccigeo'], objetivo: 1, paso: 'elevador' },
+    {
+      id: 'rel-puborrectal', tipo: 'relacion', objetivo: 2, paso: 'continencia', estructuras: ['pubococcigeo'],
+      enunciado: '¿Cómo ayuda el puborrectal a la continencia fecal?',
+      correcta: 'Su asa tira del conducto anal hacia delante y crea el ángulo anorrectal',
+      distractores: ['Cierra el hiato urogenital', 'Flexiona el cóccix', 'Contrae la pared de la vejiga'],
+      explicacion: 'Rodea el conducto anal en U; al contraerse de forma tónica lo dobla hacia delante, y al defecar se relaja.',
+      evidencia: [T(SUE, 'Tonic contraction bends the anal canal anteriorly. This creates the anorectal angle which contributes to faecal continence.')],
+    },
+    {
+      id: 'rel-hiatos', tipo: 'relacion', objetivo: 2, paso: 'continencia', estructuras: ['pubococcigeo'],
+      enunciado: '¿Qué pasa por el hiato urogenital del suelo pélvico?',
+      correcta: 'La uretra, y en la mujer también la vagina',
+      distractores: ['El conducto anal', 'El nervio pudendo', 'Los vasos ilíacos internos'],
+      explicacion: 'El hiato urogenital está delante; el conducto anal pasa por el hiato rectal, en el centro.',
+      evidencia: [T(SUE, 'Urogenital hiatus – an anteriorly situated gap, which allows passage of the urethra (and the vagina in females).')],
+    },
+    {
+      id: 'rel-estornudo', tipo: 'relacion', objetivo: 2, paso: 'continencia', estructuras: ['pubococcigeo'],
+      enunciado: '¿Cuándo son especialmente importantes las fibras prerrectales del puborrectal?',
+      correcta: 'Cuando sube de golpe la presión abdominal, como al estornudar, para no perder orina',
+      distractores: ['Al defecar, para abrir el ano', 'Al caminar, para mover la cadera', 'Al inspirar, para bajar el diafragma'],
+      explicacion: 'Rodean la uretra (y la vagina) y la cierran cuando la presión del abdomen sube de repente.',
+      evidencia: [T(SUE, 'These fibres are very important in preserving urinary continence, especially during abrupt increase of the intra-abdominal pressure i.e. during sneezing.')],
+    },
+    {
+      id: 'rel-triangulos', tipo: 'relacion', objetivo: 3, paso: 'perine', estructuras: ['esfinter-anal-externo'],
+      enunciado: '¿Qué línea separa los triángulos urogenital y anal del periné?',
+      correcta: 'La que une las dos tuberosidades isquiáticas',
+      distractores: ['La que une las dos espinas ilíacas anterosuperiores', 'La que va de la sínfisis del pubis al cóccix', 'La que une las dos espinas ciáticas'],
+      explicacion: 'Esa línea transversal deja delante el triángulo urogenital y detrás el anal.',
+      evidencia: [T(PER, 'The perineum can be subdivided by a theoretical line drawn transversely between the ischial tuberosities.')],
+    },
+    {
+      id: 'comp-triangulo-anal', tipo: 'comparacion', objetivo: 3, paso: 'perine', estructuras: ['esfinter-anal-externo'],
+      enunciado: '¿Qué contiene el triángulo anal?',
+      correcta: 'El ano, el esfínter anal externo y las fosas isquioanales',
+      distractores: ['La membrana perineal y el esfínter externo de la uretra', 'Los tejidos eréctiles y el bulboesponjoso', 'Las glándulas vestibulares mayores'],
+      explicacion: 'Lo demás pertenece al triángulo urogenital, que además tiene la membrana perineal.',
+      evidencia: [T(PER, 'The main contents of the anal triangle are:'), T(PER, 'External anal sphincter muscle – voluntary muscle responsible for opening and closing the anus.')],
+    },
+    { id: 'id-esfinter-anal', tipo: 'identificar', estructura: 'esfinter-anal-externo', objetivo: 3, paso: 'perine' },
+    {
+      id: 'comp-bolsas', tipo: 'comparacion', objetivo: 3, paso: 'urogenital', estructuras: SUPERFICIALES,
+      enunciado: '¿Qué separa la bolsa perineal profunda de la superficial?',
+      correcta: 'La membrana perineal',
+      distractores: ['El cuerpo perineal', 'El elevador del ano', 'El ligamento sacrotuberoso'],
+      explicacion: 'La bolsa profunda queda encima de la membrana perineal y la superficial, debajo.',
+      evidencia: [T(PER, 'Deep perineal pouch – a potential space between the deep fascia of the pelvic floor (superiorly) and the perineal membrane (inferiorly).'), T(PER, 'Superficial perineal pouch – a potential space between the perineal membrane (superiorly) and the superficial perineal fascia (inferiorly).')],
+    },
+    {
+      id: 'rel-cuerpo-perineal', tipo: 'relacion', objetivo: 4, paso: 'urogenital', estructuras: ['cuerpo-perineal'],
+      enunciado: '¿Qué es el cuerpo perineal?',
+      correcta: 'Una masa fibromuscular en el centro del periné donde se anclan músculos del suelo pélvico y del periné',
+      distractores: ['Una glándula del triángulo urogenital', 'El tendón del obturador interno', 'Otro nombre de la membrana perineal'],
+      explicacion: 'Está entre los dos triángulos y en él se fijan el elevador del ano, el bulboesponjoso, los transversos y los esfínteres.',
+      evidencia: [T(PER, 'The perineal body is an irregular fibromuscular mass. It is located at the junction of the urogenital and anal triangles – the central point of the perineum.')],
+    },
+    {
+      id: 'rel-pudendo', tipo: 'relacion', objetivo: 4, paso: 'urogenital', estructuras: ['pudendo'],
+      enunciado: '¿Qué nervio da la inervación somática de todo el periné?',
+      correcta: 'El pudendo',
+      distractores: ['El obturador', 'El ciático', 'El femoral'],
+      explicacion: 'El pudendo corre con los vasos pudendos internos por el canal de Alcock y da ramas a los dos triángulos.',
+      evidencia: [T(PER, 'the pudendal nerve, which supplies the whole perineum with somatic fibres.')],
+    },
+    {
+      id: 'rel-episiotomia', tipo: 'relacion', objetivo: 4, paso: 'urogenital', estructuras: ['cuerpo-perineal'],
+      enunciado: '¿Para qué se hace una episiotomía en el parto?',
+      correcta: 'Para evitar que el cuerpo perineal se desgarre sin control',
+      distractores: ['Para relajar el elevador del ano', 'Para cortar el nervio pudendo y quitar el dolor', 'Para abrir el hiato rectal'],
+      explicacion: 'Un corte controlado evita el desgarro incontrolado del cuerpo perineal, que podría favorecer el prolapso de las vísceras.',
+      evidencia: [T(PER, 'but prevents uncontrolled tearing of the perineal body.')],
+    },
+    { id: 'id-bulboesponjoso', tipo: 'identificar', estructura: 'bulboesponjoso', objetivo: 4, paso: 'urogenital' },
+  ],
+});

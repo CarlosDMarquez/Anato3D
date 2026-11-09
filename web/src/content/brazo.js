@@ -307,19 +307,27 @@ const ESTRUCTURAS = [
 ];
 
 // Lección guiada: un paso por grupo de estructuras. El texto resume lo que dicen las fichas y sus fuentes.
+// Pasos de la lección. `tipo` (biblioteca de estudio, src/biblioteca/formato.js): orientación, explicación, relaciones o
+// síntesis. La orientación y la síntesis se añadieron el 2026-11-09 al pasar el módulo a la biblioteca.
 const LECCION = [
-  { id: 'humero', titulo: 'El húmero', fichas: ['humero'], fuentes: ['tma_humero'],
+  { id: 'orientacion', tipo: 'orientacion', titulo: 'El brazo y sus dos compartimentos', fichas: ['humero', 'biceps-braquial', 'braquial', 'coracobraquial', 'triceps-braquial'],
+    fuentes: ['tma_brazo'],
+    texto: 'El brazo va de la articulación del hombro a la del codo. Tiene cuatro músculos: tres en el compartimento anterior (bíceps braquial, braquial y coracobraquial) y uno en el posterior (tríceps braquial). Gira el modelo para ver los tres anteriores delante del húmero y el tríceps detrás.' },
+  { id: 'humero', tipo: 'explicacion', titulo: 'El húmero', fichas: ['humero'], fuentes: ['tma_humero'],
     texto: 'El único hueso del brazo. Fíjate en el surco del nervio radial, en su cara posterior, y en los epicóndilos medial y lateral, junto al codo.' },
-  { id: 'anterior', titulo: 'Compartimento anterior', fichas: ['biceps-braquial', 'coracobraquial', 'braquial'], fuentes: ['tma_brazo'],
+  { id: 'anterior', tipo: 'explicacion', titulo: 'Compartimento anterior', fichas: ['biceps-braquial', 'coracobraquial', 'braquial'], fuentes: ['tma_brazo'],
     texto: 'Tres músculos: bíceps braquial, coracobraquial y braquial. Los tres los inerva el nervio musculocutáneo, y los irrigan ramas musculares de la arteria braquial.' },
-  { id: 'posterior', titulo: 'Compartimento posterior', fichas: ['triceps-braquial', 'anconeo'], fuentes: ['tma_brazo', 'tma_antebrazo_post'],
+  { id: 'posterior', tipo: 'explicacion', titulo: 'Compartimento posterior', fichas: ['triceps-braquial', 'anconeo'], fuentes: ['tma_brazo', 'tma_antebrazo_post'],
     texto: 'Un solo músculo, el tríceps braquial, con tres cabezas. Lo inerva el nervio radial y lo irriga la arteria braquial profunda. En el codo, el ancóneo se confunde con sus fibras.' },
-  { id: 'nervios', titulo: 'Los nervios del brazo', fichas: ['nervio-musculocutaneo', 'nervio-radial', 'nervio-mediano', 'nervio-ulnar'],
+  { id: 'nervios', tipo: 'relaciones', titulo: 'Los nervios del brazo', fichas: ['nervio-musculocutaneo', 'nervio-radial', 'nervio-mediano', 'nervio-ulnar'],
     fuentes: ['tma_musculocutaneo', 'tma_radial', 'tma_mediano', 'tma_ulnar'],
     texto: 'El musculocutáneo inerva el compartimento anterior y el radial, el posterior. El mediano y el ulnar atraviesan el brazo camino del antebrazo y la mano.' },
-  { id: 'vasos', titulo: 'Arterias y venas', fichas: ['arteria-braquial', 'arteria-braquial-profunda', 'venas-braquiales', 'vena-cefalica', 'vena-basilica'],
+  { id: 'vasos', tipo: 'relaciones', titulo: 'Arterias y venas', fichas: ['arteria-braquial', 'arteria-braquial-profunda', 'venas-braquiales', 'vena-cefalica', 'vena-basilica'],
     fuentes: ['tma_arterias', 'tma_venas'],
     texto: 'La arteria braquial continúa a la axilar e irriga el brazo; su rama, la braquial profunda, acompaña al nervio radial. Las venas braquiales acompañan a la arteria; la cefálica y la basílica son superficiales.' },
+  { id: 'sintesis', tipo: 'sintesis', titulo: 'En resumen', fichas: ['biceps-braquial', 'braquial', 'coracobraquial', 'triceps-braquial', 'nervio-musculocutaneo', 'nervio-radial'],
+    fuentes: ['tma_brazo'],
+    texto: 'Delante, tres músculos que flexionan: el bíceps y el braquial, el codo; el coracobraquial, el hombro. Los inerva el nervio musculocutáneo. Detrás, el tríceps braquial, el gran extensor del codo, inervado por el nervio radial. El mediano y el ulnar solo cruzan el brazo, camino del antebrazo y la mano.' },
 ];
 
 // Banco de preguntas de texto. La respuesta correcta sale de la ficha y de su fuente; los distractores son datos de
@@ -381,7 +389,7 @@ const PREGUNTAS = [
 
 export const MODULO_BRAZO = {
   id: 'brazo',
-  version: '2026-11-03',        // cambiarla cuando cambie el contenido evaluable (el progreso guarda con cuál se hizo)
+  version: '2026-11-09',        // cambiarla cuando cambie el contenido evaluable (el progreso guarda con cuál se hizo)
   titulo: 'El brazo: compartimentos anterior y posterior',
   region: 'Miembro superior › Brazo',
   publico: 'Estudiantes universitarios de anatomía básica (supuesto inicial, por validar)',

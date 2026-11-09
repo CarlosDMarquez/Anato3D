@@ -1,0 +1,303 @@
+// Lección «Plexo braquial y nervios del miembro superior». Formato y evidencias: ../formato.js.
+import { leccion, T, GUIA, MODELO } from '../formato.js';
+
+const BP = 'upper-limb/nerves/brachial-plexus';
+const RAD = 'upper-limb/nerves/radial-nerve';
+const AX = 'upper-limb/nerves/axillary-nerve';
+const MC = 'upper-limb/nerves/musculocutaneous-nerve';
+const MED = 'upper-limb/nerves/median-nerve';
+const ULN = 'upper-limb/nerves/ulnar-nerve';
+const nervio = (nombre, piezas) => ({ nombre, piezas, lado: 'bilateral', papel: 'nucleo', tipo: 'nervio' });
+const contexto = (nombre, piezas, tipo) => ({ nombre, piezas, lado: 'bilateral', papel: 'contexto', tipo });
+
+const TRONCOS = ['tronco-superior', 'tronco-medio', 'tronco-inferior'];
+const PLEXO = ['raices', ...TRONCOS, 'divisiones-anteriores', 'divisiones-posteriores', 'fasciculo-posterior'];
+const TERMINALES = ['musculocutaneo', 'axilar', 'radial', 'mediano', 'ulnar'];
+const HUESOS = ['clavicula', 'escapula', 'humero', 'radio', 'ulna'];
+
+export default leccion({
+  id: 'ms-nervios',
+  version: 1,
+  titulo: 'Plexo braquial y nervios del miembro superior',
+  resumen: 'Cómo se forma el plexo braquial (raíces, troncos, divisiones, fascículos y ramas) y el trayecto de sus cinco nervios terminales —musculocutáneo, axilar, radial, mediano y ulnar—, con los músculos y la piel de cada uno y lo que falla cuando se lesionan en sus puntos vulnerables.',
+  lugares: [['miembro-superior', 'axila'], ['miembro-superior', 'brazo'], ['miembro-superior', 'antebrazo'], ['miembro-superior', 'mano']],
+  sistemas: ['nervioso'],
+  formato: 'trayectos',
+  temas: ['nervios'],
+  nivel: 2,
+  minutos: 20,
+  requisitos: ['sis-nervioso', 'ms-hombro-musculos'],
+  siguiente: ['comp-miembro-superior', 'ms-axila', 'mi-nervios'],
+  objetivos: [
+    'Describir cómo se forma el plexo braquial: raíces, troncos, divisiones, fascículos y ramas.',
+    'Seguir el trayecto de los cinco nervios terminales del plexo desde la axila.',
+    'Relacionar cada nervio terminal con los músculos que inerva y la piel que recoge.',
+    'Predecir qué falla cuando un nervio se lesiona en su punto vulnerable.',
+  ],
+  estructuras: {
+    raices: nervio('Raíces del plexo braquial', ['Roots_of_brachial_plexus']),
+    'tronco-superior': nervio('Tronco superior del plexo braquial', ['Superior_trunk_of_brachial_plexus']),
+    'tronco-medio': nervio('Tronco medio del plexo braquial', ['Middle_trunk_of_brachial_plexus']),
+    'tronco-inferior': nervio('Tronco inferior del plexo braquial', ['Inferior_trunk_of_brachial_plexus']),
+    'divisiones-anteriores': nervio('Divisiones anteriores del plexo braquial', ['Anterior_division_of_superior_trunk_of_brachial_plexus', 'Anterior_division_of_middle_trunk_of_brachial_plexus', 'Anterior_division_of_inferior_trunk_of_brachial_plexus']),
+    'divisiones-posteriores': nervio('Divisiones posteriores del plexo braquial', ['Posterior_division_of_superior_trunk_of_brachial_plexus', 'Posterior_division_of_middle_trunk_of_brachial_plexus', 'Posterior_division_of_inferior_trunk_of_brachial_plexus']),
+    'fasciculo-posterior': nervio('Fascículo posterior del plexo braquial', ['Posterior_cord_of_brachial_plexus']),
+    musculocutaneo: nervio('Nervio musculocutáneo', ['Musculocutaneous_nerve']),
+    axilar: nervio('Nervio axilar', ['Axillary_nerve', 'Muscular_branches_of_axillary_nerve']),
+    radial: nervio('Nervio radial', ['Radial_nerve']),
+    mediano: nervio('Nervio mediano', ['Median_nerve']),
+    ulnar: nervio('Nervio ulnar (cubital)', ['Ulnar_nerve']),
+    'ramas-radial': contexto('Ramas profunda y superficial del nervio radial', ['Deep_branch_of_radial_nerve', 'Superficial_branch_of_radial_nerve', 'Posterior_interosseous_nerve_of_forearm'], 'nervio'),
+    'cutaneo-antebraquial-lateral': contexto('Nervio cutáneo antebraquial lateral', ['Lateral_antebrachial_cutaneous_nerve'], 'nervio'),
+    'escaleno-anterior': contexto('Músculo escaleno anterior', ['Scalenus_anterior_muscle'], 'musculo'),
+    'escaleno-medio': contexto('Músculo escaleno medio', ['Scalenus_medius_muscle'], 'musculo'),
+    'arteria-axilar': contexto('Arteria axilar', ['Axillary_artery'], 'arteria'),
+    'arteria-braquial': contexto('Arteria braquial', ['Brachial_artery'], 'arteria'),
+    coracobraquial: contexto('Músculo coracobraquial', ['Coracobrachialis_muscle'], 'musculo'),
+    triceps: contexto('Músculo tríceps braquial', ['Long_head_of_triceps_brachii', 'Lateral_head_of_triceps_brachii', 'Medial_head_of_triceps_brachii'], 'musculo'),
+    supinador: contexto('Músculo supinador', ['Supinator'], 'musculo'),
+    retinaculo: contexto('Retináculo de los flexores', ['Flexor_retinaculum_of_wrist'], 'ligamento'),
+    clavicula: contexto('Clavícula', ['Clavicle'], 'hueso'),
+    escapula: contexto('Escápula', ['Scapula'], 'hueso'),
+    humero: contexto('Húmero', ['Humerus'], 'hueso'),
+    radio: contexto('Radio', ['Radius'], 'hueso'),
+    ulna: contexto('Ulna', ['Ulna'], 'hueso'),
+  },
+  pasos: [
+    {
+      id: 'orientacion', tipo: 'orientacion', titulo: 'El plexo braquial',
+      texto: [
+        ['El plexo braquial es una red de fibras nerviosas que inerva la piel y los músculos del miembro superior.', T(BP, 'The brachial plexus is a network of nerve fibres that supplies the skin and musculature of the upper limb.')],
+        ['Lo forman los ramos anteriores de los nervios espinales C5 a T1, y va de la raíz del cuello a la axila.', T(BP, 'It is formed by the anterior rami of spinal nerves C5-T1 and extends from the root of the neck into the axilla.')],
+        ['Se describe en cinco partes, de dentro afuera: raíces, troncos, divisiones, fascículos y ramas.', T(BP, 'For descriptive purposes, the brachial plexus is divided into five parts:'), T(BP, 'Read That Damn Cadaver Book.')],
+        ['Sigue el plexo desde el cuello hasta la mano.', GUIA],
+      ],
+      vista: { ver: [...PLEXO, ...TERMINALES], contexto: HUESOS, camara: 'anterior', lado: 'R' },
+      actividad: { tipo: 'vistas', texto: 'Recorre el plexo y sus nervios.', vistas: [{ nombre: 'De frente', camara: 'anterior' }, { nombre: 'Por detrás', camara: 'posterior' }] },
+      comprobar: 'rel-raices',
+    },
+    {
+      id: 'troncos', tipo: 'explicacion', titulo: 'Raíces y troncos',
+      texto: [
+        ['Las raíces pasan entre los escalenos anterior y medio para llegar a la base del cuello.', T(BP, 'After their formation, these nerves pass between the anterior and middle scalene muscles to enter the base of the neck.')],
+        ['Allí se unen en tres troncos: el superior (C5 y C6), el medio (C7) y el inferior (C8 y T1).', T(BP, 'At the base of the neck, the roots of the brachial plexus converge to form three trunks.'), T(BP, 'Superior trunk – a combination of C5 and C6 roots.'), T(BP, 'Middle trunk – continuation of C7.'), T(BP, 'Inferior trunk – combination of C8 and T1 roots.')],
+        ['Los troncos van hacia fuera y cruzan el triángulo posterior del cuello.', T(BP, 'The trunks traverse laterally, crossing the posterior triangle of the neck.')],
+      ],
+      vista: { ver: ['raices', ...TRONCOS], contexto: ['escaleno-anterior', 'escaleno-medio', 'clavicula'], camara: 'anterior', lado: 'R' },
+      actividad: { tipo: 'comparar', estructuras: TRONCOS, texto: 'Alterna los tres troncos, de arriba abajo: superior, medio e inferior.' },
+      comprobar: 'rel-tronco-inferior',
+    },
+    {
+      id: 'fasciculos', tipo: 'explicacion', titulo: 'Divisiones y fascículos',
+      texto: [
+        ['Cada tronco se divide en una división anterior y otra posterior, que pasan a la axila y se recombinan en fascículos.', T(BP, 'Each trunk divides into two branches within the posterior triangle of the neck.'), T(BP, 'Thus, they are known as the anterior and posterior divisions.'), T(BP, 'These divisions leave the posterior triangle and pass into the axilla. They recombine into the cords of the brachial plexus.')],
+        ['Los tres fascículos se nombran por su posición respecto a la arteria axilar.', T(BP, 'they combine together to form three cords, named by their position relative to the axillary artery.')],
+        ['El posterior une las tres divisiones posteriores; el lateral, las anteriores de los troncos superior y medio, y el medial, la anterior del inferior.', T(BP, 'The posterior cord is formed by:'), T(BP, 'The posterior division of the inferior trunk'), T(BP, 'The lateral cord is formed by:'), T(BP, 'The anterior division of the middle trunk'), T(BP, 'The medial cord is formed by:'), T(BP, 'The anterior division of the inferior trunk.')],
+      ],
+      detalle: [
+        ['En el modelo, de los tres fascículos solo el posterior es una pieza propia; el lateral y el medial no están separados.', MODELO],
+      ],
+      vista: { ver: ['divisiones-anteriores', 'divisiones-posteriores', 'fasciculo-posterior'], contexto: ['arteria-axilar', 'clavicula', ...TRONCOS], camara: 'anterior', lado: 'R' },
+      actividad: { tipo: 'comparar', estructuras: ['divisiones-anteriores', 'divisiones-posteriores'], texto: 'Alterna las divisiones anteriores y las posteriores; mira cómo las posteriores se juntan en el fascículo posterior.' },
+      comprobar: 'rel-fasciculo-posterior',
+    },
+    {
+      id: 'musculocutaneo-axilar', tipo: 'exploracion', titulo: 'Musculocutáneo y axilar',
+      texto: [
+        ['El musculocutáneo continúa el fascículo lateral, atraviesa el coracobraquial y acaba como nervio cutáneo lateral del antebrazo.', T(BP, 'The musculocutaneous nerve is a continuation of the lateral cord of the brachial plexus.'), T(MC, 'It pierces the coracobrachialis muscle, travels down the flexor compartment of the arm, and provides branches to the biceps brachii and brachialis before becoming the lateral cutaneous nerve of the forearm.')],
+        ['El axilar sale del fascículo posterior (C5 y C6) y deja la axila por el espacio cuadrangular.', T(BP, 'The axillary nerve arises from the posterior cord of the brachial plexus.'), T(AX, 'It is a direct continuation of the posterior cord from the brachial plexus – and therefore contains fibres from the C5 and C6 nerve roots.'), T(AX, 'It exits the axilla at the inferior border of subscapularis via the quadrangular space')],
+        ['Una de sus ramas rodea el cuello quirúrgico del húmero hasta la parte anterior del deltoides.', T(AX, 'Anterior terminal branch – winds around the surgical neck of the humerus and provides motor innervation to the anterior aspect of the deltoid muscle.')],
+      ],
+      vista: { ver: ['musculocutaneo', 'axilar'], contexto: ['coracobraquial', 'cutaneo-antebraquial-lateral', 'humero', 'escapula', 'clavicula'], camara: 'anterolateral', lado: 'R' },
+      actividad: { tipo: 'comparar', estructuras: ['musculocutaneo', 'axilar'], texto: 'Alterna: el musculocutáneo baja por delante, a través del coracobraquial; el axilar se va hacia atrás, alrededor del cuello del húmero.' },
+      comprobar: 'rel-coracobraquial',
+    },
+    {
+      id: 'radial', tipo: 'exploracion', titulo: 'El nervio radial',
+      texto: [
+        ['El radial continúa el fascículo posterior y nace en la axila, por detrás de la arteria axilar.', T(RAD, 'The radial nerve is the terminal continuation of the posterior cord of the brachial plexus.'), T(RAD, 'The nerve arises in the axilla region, where it is situated posteriorly to the axillary artery.')],
+        ['Baja por el surco radial del húmero, rodeándolo por fuera, y entra en el antebrazo por delante del epicóndilo lateral.', T(RAD, 'The radial nerve then descends down the arm, travelling in a shallow depression within the surface of the humerus, known as the radial groove.'), T(RAD, 'As it descends, the radial nerve wraps around the humerus laterally'), T(RAD, 'To enter the forearm, the radial nerve travels anterior to the lateral epicondyle of the humerus, through the cubital fossa.')],
+        ['Su rama profunda atraviesa el supinador y pasa a llamarse nervio interóseo posterior.', T(RAD, 'The deep branch of the radial nerve pierces the supinator muscle, and is renamed the posterior interosseous nerve.')],
+      ],
+      vista: { ver: ['radial'], contexto: ['ramas-radial', 'supinador', 'humero', 'radio', 'ulna'], fantasma: ['triceps'], camara: 'posterior', lado: 'R' },
+      actividad: { tipo: 'vistas', texto: 'Sigue el radial alrededor del húmero.', vistas: [{ nombre: 'Por detrás', camara: 'posterior' }, { nombre: 'Por fuera', camara: 'lateral' }, { nombre: 'De frente', camara: 'anterior' }] },
+      comprobar: 'rel-interoseo-posterior',
+    },
+    {
+      id: 'mediano-ulnar', tipo: 'exploracion', titulo: 'Mediano y ulnar',
+      texto: [
+        ['El mediano une una raíz del fascículo lateral y otra del medial; baja junto a la arteria braquial y la cruza a mitad del brazo.', T(BP, 'The median nerve is formed by the union of a lateral root from the lateral cord and a medial root from the medial cord of the brachial plexus.'), T(MED, 'initially lateral to the brachial artery.'), T(MED, 'Halfway down the arm, the nerve crosses over the brachial artery, and becomes situated medially.')],
+        ['Entra en el antebrazo por la fosa cubital, entre las dos cabezas del pronador redondo, y en la mano por el túnel carpiano.', T(MED, 'The median nerve enters the anterior compartment of the forearm via the cubital fossa.'), T(MED, 'In the forearm, the nerve travels between the two heads of pronator teres'), T(MED, 'the median nerve enters the hand via the carpal tunnel')],
+        ['El ulnar continúa el fascículo medial (C8 y T1), pasa por detrás del codo, entre el epicóndilo medial y el olécranon, y entra en la mano por el canal ulnar.', T(ULN, 'It is a continuation of the medial cord and contains fibres from spinal roots C8 and T1.'), T(ULN, 'It passes posterior to the elbow through the ulnar tunnel (small space between the medial epicondyle and olecranon).'), T(ULN, 'It enters the hand via the ulnar canal')],
+      ],
+      vista: { ver: ['mediano', 'ulnar'], contexto: ['arteria-braquial', 'retinaculo', 'humero', 'radio', 'ulna'], camara: 'anterior', lado: 'R' },
+      actividad: { tipo: 'comparar', estructuras: ['mediano', 'ulnar'], texto: 'Alterna: el mediano baja por el centro y cruza la arteria braquial; el ulnar se va hacia dentro y pasa por detrás del codo.' },
+      comprobar: 'rel-ulnar-codo',
+    },
+    {
+      id: 'territorios', tipo: 'funcion', titulo: 'Qué inerva cada nervio',
+      texto: [
+        ['Musculocutáneo: coracobraquial, bíceps y braquial. Axilar: deltoides y redondo menor.', T(BP, 'Motor Functions: Innervates the brachialis, biceps brachii and coracobrachialis muscles.'), T(BP, 'Motor Functions: Innervates the teres minor and deltoid muscles.')],
+        ['Radial: tríceps y músculos posteriores del antebrazo; recoge la piel de detrás del brazo y del antebrazo y la posterolateral de la mano.', T(BP, 'Motor Functions: Innervates the triceps brachii, and the muscles in the posterior compartment of the forearm'), T(BP, 'Sensory Functions: Innervates the posterior aspect of the arm and forearm, and the posterolateral aspect of the hand.')],
+        ['Mediano: casi todos los flexores del antebrazo, la eminencia tenar y los dos lumbricales laterales. Ulnar: el resto de la mano, el flexor ulnar del carpo y la mitad medial del flexor profundo.', T(BP, 'Motor Functions: Innervates most of the flexor muscles in the forearm, the thenar muscles, and the two lateral lumbricals associated with the index and middle fingers.'), T(BP, 'Motor Functions: Innervates the muscles of the hand (apart from the thenar muscles and two lateral lumbricals), flexor carpi ulnaris and medial half of flexor digitorum profundus.')],
+      ],
+      detalle: [
+        ['En la cara palmar, el mediano recoge tres dedos y medio laterales; el ulnar, uno y medio mediales, por las dos caras.', T(BP, 'which innervates the lateral three and a half fingers on the anterior (palmar) surface of the hand.'), T(BP, 'Sensory Functions: Innervates the anterior and posterior surfaces of the medial one and half fingers, and associated palm area.')],
+      ],
+      vista: { ver: TERMINALES, contexto: ['coracobraquial', 'triceps', ...HUESOS], camara: 'anterolateral', lado: 'R' },
+      comprobar: 'fun-musculocutaneo',
+    },
+    {
+      id: 'lesiones', tipo: 'relaciones', titulo: 'Dónde se lesionan',
+      texto: [
+        ['El radial va pegado al surco del húmero: una fractura de la diáfisis lo daña con facilidad, y la muñeca cae porque nada se opone a los flexores.', T(RAD, 'The radial nerve is tightly bound within the spiral groove of the humerus.'), T(RAD, 'Thus, it is most susceptible to damage with a fracture of the humeral shaft.'), T(RAD, 'Unopposed flexion of wrist occurs, known as wrist-drop.')],
+        ['El axilar se lesiona en fracturas del cuello quirúrgico y luxaciones del hombro: el brazo no se separa más de 15 grados.', T(AX, 'Common mechanisms of injury include fracture of the humeral surgical neck, shoulder dislocation or iatrogenic injury during shoulder surgery.'), T(AX, 'rendering the patient unable to abduct the affected limb beyond 15 degrees.')],
+        ['El ulnar sufre en los traumatismos del epicóndilo medial; el mediano se comprime en el túnel carpiano.', T(ULN, 'Mechanism of injury: Trauma at the level of the medial epicondyle'), T(MED, 'Compression of the median nerve within the carpal tunnel can cause carpal tunnel syndrome (CTS).')],
+      ],
+      detalle: [
+        ['En el túnel carpiano la palma suele respetarse, porque la rama cutánea palmar no pasa por el túnel.', T(MED, 'Importantly, the palm is usually spared – as the palmar cutaneous branch does not travel through the carpal tunnel.')],
+        ['La parálisis de Erb daña las raíces superiores (C5 y C6), casi siempre por estiramiento en un parto difícil: el brazo cuelga rotado hacia dentro y el antebrazo en pronación.', T(BP, 'refers to damage to the upper roots of the brachial plexus (typically C5-6). It most commonly occurs as a result of a stretching injury during a difficult vaginal delivery.'), T(BP, 'The affected limb hangs limply, medially rotated by the unopposed action of pectoralis major. The forearm is pronated due to the loss of biceps brachii.')],
+      ],
+      vista: { ver: ['radial', 'axilar', 'ulnar', 'mediano'], contexto: ['humero', 'radio', 'ulna', 'retinaculo'], camara: 'posterior', lado: 'R' },
+      actividad: { tipo: 'localizar', estructura: 'radial', texto: 'Toca el nervio que va pegado al húmero por detrás, en el surco radial.' },
+      comprobar: 'rel-radial-surco',
+    },
+    {
+      id: 'sintesis', tipo: 'sintesis', titulo: 'En resumen',
+      texto: [
+        ['Los ramos anteriores de C5 a T1 forman raíces, troncos, divisiones y fascículos, que dan cinco nervios terminales.', T(BP, 'It is formed by the anterior rami of spinal nerves C5-T1'), T(BP, 'the three cords give rise to five major branches.')],
+        ['Del fascículo posterior salen el axilar y el radial; del lateral, el musculocutáneo; del medial, el ulnar, y de los dos últimos, el mediano.', T(BP, 'The axillary nerve arises from the posterior cord of the brachial plexus.'), T(BP, 'The radial nerve is a continuation of the posterior cord of the brachial plexus.'), T(BP, 'The musculocutaneous nerve is a continuation of the lateral cord of the brachial plexus.'), T(BP, 'The ulnar nerve is a continuation of the medial cord of the brachial plexus.'), T(BP, 'a lateral root from the lateral cord and a medial root from the medial cord')],
+        ['Puntos vulnerables: el radial en el surco del húmero, el axilar en el cuello quirúrgico, el ulnar en el codo y el mediano en el túnel carpiano.', T(RAD, 'it is most susceptible to damage with a fracture of the humeral shaft'), T(AX, 'fracture of the humeral surgical neck'), T(ULN, 'Trauma at the level of the medial epicondyle'), T(MED, 'Compression of the median nerve within the carpal tunnel')],
+      ],
+    },
+  ],
+  preguntas: [
+    {
+      id: 'rel-raices', tipo: 'relacion', objetivo: 0, paso: 'orientacion', estructuras: ['raices'],
+      enunciado: '¿Qué ramos forman el plexo braquial?',
+      correcta: 'Los ramos anteriores de C5 a T1',
+      distractores: ['Los ramos posteriores de C5 a T1', 'Los ramos anteriores de C1 a C4', 'Los ramos anteriores de L1 a L4'],
+      explicacion: 'Los ramos anteriores de C5 a T1 forman las raíces del plexo; los posteriores inervan los músculos y la piel de la espalda.',
+      evidencia: [T(BP, 'The anterior rami of spinal nerves C5-T1 form the roots of the brachial plexus, whilst the posterior rami supply the intrinsic muscles and overlying skin of the back.')],
+    },
+    {
+      id: 'sec-plexo', tipo: 'secuencia', objetivo: 0, paso: 'orientacion',
+      enunciado: 'Ordena las partes del plexo braquial desde la médula hacia el brazo.',
+      orden: ['Raíces', 'Troncos', 'Divisiones', 'Fascículos', 'Ramas'],
+      explicacion: 'Raíces en el cuello, troncos en la base del cuello, divisiones en el triángulo posterior, fascículos en la axila y ramas hacia el miembro.',
+      evidencia: [T(BP, 'For descriptive purposes, the brachial plexus is divided into five parts:'), T(BP, 'Read That Damn Cadaver Book.')],
+    },
+    {
+      id: 'rel-tronco-inferior', tipo: 'relacion', objetivo: 0, paso: 'troncos', estructuras: ['tronco-inferior'],
+      enunciado: '¿Qué raíces forman el tronco inferior del plexo braquial?',
+      correcta: 'C8 y T1',
+      distractores: ['C5 y C6', 'Solo C7', 'C4 y C5'],
+      explicacion: 'El superior une C5 y C6, el medio continúa C7 y el inferior une C8 y T1.',
+      evidencia: [T(BP, 'Inferior trunk – combination of C8 and T1 roots.')],
+    },
+    { id: 'id-tronco-superior', tipo: 'identificar', estructura: 'tronco-superior', objetivo: 0, paso: 'troncos' },
+    { id: 'id-fasciculo-posterior', tipo: 'identificar', estructura: 'fasciculo-posterior', objetivo: 0, paso: 'fasciculos' },
+    {
+      id: 'rel-fasciculo-posterior', tipo: 'relacion', objetivo: 0, paso: 'fasciculos', estructuras: ['fasciculo-posterior'],
+      enunciado: '¿Qué divisiones forman el fascículo posterior del plexo braquial?',
+      correcta: 'Las tres divisiones posteriores',
+      distractores: ['Las tres divisiones anteriores', 'Solo la división anterior del tronco inferior', 'Las divisiones anteriores de los troncos superior y medio'],
+      explicacion: 'El posterior une las tres posteriores; el lateral, las anteriores de los troncos superior y medio, y el medial, la anterior del inferior.',
+      evidencia: [T(BP, 'The posterior division of the superior trunk'), T(BP, 'The posterior division of the middle trunk'), T(BP, 'The posterior division of the inferior trunk')],
+    },
+    { id: 'id-musculocutaneo', tipo: 'identificar', estructura: 'musculocutaneo', objetivo: 1, paso: 'musculocutaneo-axilar' },
+    { id: 'id-axilar', tipo: 'identificar', estructura: 'axilar', objetivo: 1, paso: 'musculocutaneo-axilar' },
+    {
+      id: 'rel-coracobraquial', tipo: 'relacion', objetivo: 1, paso: 'musculocutaneo-axilar', estructuras: ['musculocutaneo'],
+      enunciado: '¿Qué músculo atraviesa el nervio musculocutáneo?',
+      correcta: 'El coracobraquial',
+      distractores: ['El supinador', 'El pronador redondo', 'El flexor ulnar del carpo'],
+      explicacion: 'El supinador lo atraviesa la rama profunda del radial; entre las cabezas del pronador redondo pasa el mediano, y entre las del flexor ulnar del carpo, el ulnar.',
+      evidencia: [T(MC, 'It leaves the axilla and pierces the coracobrachialis muscle near its point of insertion on the humerus.')],
+    },
+    { id: 'id-radial', tipo: 'identificar', estructura: 'radial', objetivo: 1, paso: 'radial' },
+    {
+      id: 'rel-interoseo-posterior', tipo: 'relacion', objetivo: 1, paso: 'radial', estructuras: ['radial', 'supinador'],
+      enunciado: '¿Cómo se llama la rama profunda del radial después de atravesar el supinador?',
+      correcta: 'Nervio interóseo posterior',
+      distractores: ['Nervio interóseo anterior', 'Nervio cutáneo antebraquial lateral', 'Rama superficial del radial'],
+      explicacion: 'El interóseo anterior es rama del mediano; el cutáneo antebraquial lateral continúa el musculocutáneo; la rama superficial del radial es la sensitiva.',
+      evidencia: [T(RAD, 'The deep branch of the radial nerve pierces the supinator muscle, and is renamed the posterior interosseous nerve.')],
+    },
+    { id: 'loc-radial', tipo: 'localizar', estructura: 'radial', candidatas: ['mediano', 'ulnar'], objetivo: 1, paso: 'lesiones' },
+    { id: 'id-mediano', tipo: 'identificar', estructura: 'mediano', objetivo: 1, paso: 'mediano-ulnar' },
+    { id: 'id-ulnar', tipo: 'identificar', estructura: 'ulnar', objetivo: 1, paso: 'mediano-ulnar' },
+    {
+      id: 'rel-ulnar-codo', tipo: 'relacion', objetivo: 1, paso: 'mediano-ulnar', estructuras: ['ulnar'],
+      enunciado: '¿Por dónde pasa el nervio ulnar en el codo?',
+      correcta: 'Por detrás, entre el epicóndilo medial y el olécranon',
+      distractores: ['Por delante del epicóndilo lateral', 'Por la fosa cubital, junto a la arteria braquial', 'A través del músculo supinador'],
+      explicacion: 'Por delante del epicóndilo lateral pasa el radial; por la fosa cubital, el mediano; por el supinador, la rama profunda del radial.',
+      evidencia: [T(ULN, 'It passes posterior to the elbow through the ulnar tunnel (small space between the medial epicondyle and olecranon).')],
+    },
+    {
+      id: 'fun-musculocutaneo', tipo: 'funcion', objetivo: 2, paso: 'territorios', estructuras: ['musculocutaneo'],
+      enunciado: '¿Qué músculos inerva el nervio musculocutáneo?',
+      correcta: 'El coracobraquial, el bíceps y el braquial',
+      distractores: ['El deltoides y el redondo menor', 'El tríceps y los músculos posteriores del antebrazo', 'Los músculos de la eminencia tenar'],
+      explicacion: 'El deltoides y el redondo menor son del axilar; el tríceps y los posteriores del antebrazo, del radial; la eminencia tenar, del mediano.',
+      evidencia: [T(BP, 'Motor Functions: Innervates the brachialis, biceps brachii and coracobrachialis muscles.')],
+    },
+    {
+      id: 'fun-radial', tipo: 'funcion', objetivo: 2, paso: 'territorios', estructuras: ['radial'],
+      enunciado: '¿Qué nervio inerva el tríceps y los músculos posteriores del antebrazo?',
+      correcta: 'El radial',
+      distractores: ['El mediano', 'El ulnar', 'El musculocutáneo'],
+      explicacion: 'El radial, que continúa el fascículo posterior, inerva los extensores del brazo y del antebrazo.',
+      evidencia: [T(BP, 'Motor Functions: Innervates the triceps brachii, and the muscles in the posterior compartment of the forearm')],
+    },
+    {
+      id: 'fun-ulnar', tipo: 'funcion', objetivo: 2, paso: 'territorios', estructuras: ['ulnar'],
+      enunciado: '¿Qué nervio inerva la mayoría de los músculos propios de la mano?',
+      correcta: 'El ulnar',
+      distractores: ['El mediano', 'El radial', 'El axilar'],
+      explicacion: 'El ulnar inerva los músculos de la mano salvo los tenares y los dos lumbricales laterales, que son del mediano.',
+      evidencia: [T(BP, 'Innervates the muscles of the hand (apart from the thenar muscles and two lateral lumbricals)')],
+    },
+    {
+      id: 'fun-mediano', tipo: 'funcion', objetivo: 2, paso: 'territorios', estructuras: ['mediano'],
+      enunciado: '¿Qué músculos de la mano inerva el nervio mediano?',
+      correcta: 'Los tenares y los dos lumbricales laterales',
+      distractores: ['Los hipotenares', 'Todos los interóseos', 'Ninguno: solo inerva el antebrazo'],
+      explicacion: 'El mediano inerva la eminencia tenar y los lumbricales del índice y el medio; el resto de la mano es del ulnar.',
+      evidencia: [T(BP, 'the thenar muscles, and the two lateral lumbricals associated with the index and middle fingers.')],
+    },
+    {
+      id: 'rel-radial-surco', tipo: 'relacion', objetivo: 3, paso: 'lesiones', estructuras: ['radial', 'humero'],
+      enunciado: 'Una fractura de la diáfisis del húmero deja la muñeca caída. ¿Qué nervio se ha lesionado?',
+      correcta: 'El radial, en el surco del húmero',
+      distractores: ['El axilar, en el cuello quirúrgico', 'El ulnar, detrás del epicóndilo medial', 'El mediano, en el túnel carpiano'],
+      explicacion: 'El radial va pegado al surco del húmero; sin los extensores, nada se opone a la flexión de la muñeca.',
+      evidencia: [T(RAD, 'Thus, it is most susceptible to damage with a fracture of the humeral shaft.'), T(RAD, 'Unopposed flexion of wrist occurs, known as wrist-drop.')],
+    },
+    {
+      id: 'rel-axilar-cuello', tipo: 'relacion', objetivo: 3, paso: 'lesiones', estructuras: ['axilar'],
+      enunciado: 'Tras una fractura del cuello quirúrgico del húmero, el paciente no separa el brazo más de 15 grados. ¿Qué nervio está lesionado?',
+      correcta: 'El axilar',
+      distractores: ['El radial', 'El musculocutáneo', 'El ulnar'],
+      explicacion: 'El axilar rodea el cuello quirúrgico e inerva el deltoides y el redondo menor.',
+      evidencia: [T(AX, 'Common mechanisms of injury include fracture of the humeral surgical neck'), T(AX, 'rendering the patient unable to abduct the affected limb beyond 15 degrees.')],
+    },
+    {
+      id: 'rel-tunel-carpiano', tipo: 'relacion', objetivo: 3, paso: 'lesiones', estructuras: ['mediano', 'retinaculo'],
+      enunciado: '¿Por qué en el síndrome del túnel carpiano la sensibilidad de la palma suele respetarse?',
+      correcta: 'Porque la rama cutánea palmar del mediano no pasa por el túnel',
+      distractores: ['Porque la palma la inerva el radial', 'Porque el mediano no recoge la piel de la mano', 'Porque el túnel solo contiene tendones'],
+      explicacion: 'El mediano se comprime dentro del túnel, pero su rama palmar lo cruza por encima.',
+      evidencia: [T(MED, 'Importantly, the palm is usually spared – as the palmar cutaneous branch does not travel through the carpal tunnel.')],
+    },
+    {
+      id: 'rel-erb', tipo: 'relacion', objetivo: 3, paso: 'lesiones', estructuras: ['tronco-superior'],
+      enunciado: '¿Qué raíces daña la parálisis de Erb?',
+      correcta: 'Las superiores, típicamente C5 y C6',
+      distractores: ['Las inferiores, C8 y T1', 'Solo C7', 'Las raíces lumbares'],
+      explicacion: 'La parálisis de Erb afecta a las raíces superiores; la de Klumpke, a las inferiores (C8 y T1).',
+      evidencia: [T(BP, 'refers to damage to the upper roots of the brachial plexus (typically C5-6).'), T(BP, 'refers to damage to the lower roots of the brachial plexus (typically C8-T1).')],
+    },
+  ],
+});
