@@ -93,9 +93,15 @@ export function colaRepaso(m, ids, ahora = Date.now()) {
     });
 }
 
+/**
+ * Estructuras que pueden volver al repaso: las evaluables y las de contexto (estas entran si se falla una pregunta de
+ * texto que las tiene como ficha principal). El botón «Repasar (n)» y el repaso usan esta misma lista.
+ */
+export const repasables = (mod) => [...mod.nucleo, ...(mod.contexto ?? [])];
+
 /** Resumen para la portada del módulo: rendimiento reciente y dominio a largo plazo, por separado. */
 export function resumen(m, mod, ahora = Date.now()) {
-  const ids = mod.nucleo;
+  const ids = mod.nucleo;                                    // el dominio y lo visto se cuentan sobre lo evaluable
   const ultimo = [...m.intentos].reverse().find((i) => i.tipo === 'evaluacion') ?? null;
   return {
     leccion: m.leccion,
@@ -103,7 +109,7 @@ export function resumen(m, mod, ahora = Date.now()) {
     dominadas: ids.filter((id) => (m.estructuras[id]?.caja ?? 0) >= CAJA_DOMINIO).length,  // dominio a largo plazo
     vistas: ids.filter((id) => m.estructuras[id]).length,
     total: ids.length,
-    pendientes: colaRepaso(m, ids, ahora).length,
+    pendientes: colaRepaso(m, repasables(mod), ahora).length,
   };
 }
 

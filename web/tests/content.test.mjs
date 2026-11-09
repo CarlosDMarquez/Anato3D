@@ -1,10 +1,11 @@
 // Pruebas del esquema de contenido (src/content/schema.js) y del módulo del brazo: `npm test`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { revisarFicha } from '../src/content/schema.js';
+import { revisarFicha, revisarModulo } from '../src/content/schema.js';
 import { FUENTES } from '../src/content/fuentes.js';
 import { MODULO_BRAZO } from '../src/content/brazo.js';
-import { fichaDePieza } from '../src/content/index.js';
+import { MODULO_ANTEBRAZO } from '../src/content/antebrazo.js';
+import { fichaDePieza, MODULOS } from '../src/content/index.js';
 
 const base = {
   id: 'prueba', tipo: 'nervio', nombre: 'Nervio de prueba', latin: 'Nervus probationis', region: 'Brazo', lado: 'bilateral',
@@ -36,13 +37,37 @@ test('aplicabilidad: pieza en un modelo no declarado', () => {
 test('«revisado» exige revisor y fecha', () => assert.match(revisar({ revision: { estado: 'revisado' } }).join(), /sin revisor ni fecha/));
 test('relación con una ficha inexistente', () => assert.match(revisar({ relaciones: [{ texto: 'x', con: 'nada', fuente: 'ta2' }] }).join(), /no existe: nada/));
 
-test('módulo del brazo: núcleo y contexto tienen ficha, y ninguna figura como revisada', () => {
-  const ids = new Set(MODULO_BRAZO.estructuras.map((f) => f.id));
-  for (const id of [...MODULO_BRAZO.nucleo, ...MODULO_BRAZO.contexto]) assert.ok(ids.has(id), id);
-  assert.ok(MODULO_BRAZO.estructuras.every((f) => f.revision.estado === 'borrador' && !f.revision.revisor));
+test('módulos: núcleo y contexto tienen ficha, y ninguna figura como revisada', () => {
+  assert.ok(MODULOS.includes(MODULO_BRAZO));
+  for (const mod of MODULOS) {
+    const ids = new Set(mod.estructuras.map((f) => f.id));
+    for (const id of [...mod.nucleo, ...mod.contexto]) assert.ok(ids.has(id), `${mod.id}: ${id}`);
+    assert.ok(mod.estructuras.every((f) => f.revision.estado === 'borrador' && !f.revision.revisor), mod.id);
+  }
+});
+test('módulos: cada id de ficha y cada pieza pertenecen a un solo módulo', () => {
+  const ids = new Map(), piezas = new Map();
+  for (const mod of MODULOS) {
+    for (const f of mod.estructuras) {
+      assert.ok(!ids.has(f.id), `ficha ${f.id} en ${ids.get(f.id)} y en ${mod.id}`);
+      ids.set(f.id, mod.id);
+      for (const p of f.piezas) {
+        assert.ok(!piezas.has(p), `pieza ${p} en ${piezas.get(p)} y en ${mod.id}/${f.id}`);
+        piezas.set(p, `${mod.id}/${f.id}`);
+      }
+    }
+  }
+});
+test('revisarModulo: los módulos no tienen errores; una estructura de contexto sin distractores suficientes es un error', () => {
+  for (const mod of MODULOS) assert.deepEqual(revisarModulo(mod, { fuentes: FUENTES }), [], mod.id);
+  const sinExtra = { ...MODULO_ANTEBRAZO, distractoresExtra: { radio: ['Húmero', 'Escafoides', 'Semilunar'], ulna: ['Húmero', 'Escafoides', 'Semilunar'] } };
+  const errores = revisarModulo(sinExtra, { fuentes: FUENTES }).map((x) => x.texto).join('\n');
+  for (const id of ['arteria-radial', 'arteria-ulnar', 'nervio-interoseo-anterior']) assert.match(errores, new RegExp(`${id}: menos de 3 distractores`));
 });
 test('fichaDePieza: por nombre de malla, con lado y por modelo', () => {
   assert.equal(fichaDePieza('Long_head_of_biceps_brachii_L').ficha.id, 'biceps-braquial');
   assert.equal(fichaDePieza('Radial_nerve_R', 'female').ficha.id, 'nervio-radial');
   assert.equal(fichaDePieza('Femur_L'), null);
+  assert.equal(fichaDePieza('Radial_artery_L').modulo.id, 'antebrazo');
+  assert.equal(fichaDePieza('Humero_ulnar_head_of_flexor_digitorum_superficialis_R', 'female').ficha.id, 'flexor-superficial-dedos');
 });

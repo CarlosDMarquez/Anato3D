@@ -79,7 +79,7 @@ export function createStudy({ body, modulos, storage, api, toast }) {
       const go = b.dataset.go;
       if (go === 'leccion') { vista = { tipo: 'leccion', m, paso: pm.leccion.completada ? 0 : pm.leccion.paso }; mostrarPaso(); }
       if (go === 'evaluacion') empezar(m, 'evaluacion', evaluacion(m));
-      if (go === 'repaso') empezar(m, 'repaso', repaso(m, P.colaRepaso(pm, [...m.nucleo, ...m.contexto])));
+      if (go === 'repaso') empezar(m, 'repaso', repaso(m, P.colaRepaso(pm, P.repasables(m))));
       if (go === 'reiniciar') { P.reiniciarLeccion(pm); guardar(); toast(t('estudio.reiniciada')); render(); }
       if (go === 'borrar') { b.closest('[data-mod]').querySelector('.mod-confirm').hidden = false; focus('.mod-confirm .danger'); }
       if (go === 'borrar-no') { b.closest('.mod-confirm').hidden = true; }

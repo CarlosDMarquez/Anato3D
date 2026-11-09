@@ -1,7 +1,8 @@
 // Módulos de estudio y búsqueda de la ficha de módulo de una pieza del modelo.
 import { MODULO_BRAZO } from './brazo.js';
+import { MODULO_ANTEBRAZO } from './antebrazo.js';
 
-export const MODULOS = [MODULO_BRAZO];
+export const MODULOS = [MODULO_BRAZO, MODULO_ANTEBRAZO];
 
 const PORPIEZA = new Map();       // nombre base de la malla → { modulo, ficha }
 export const FICHA_POR_ID = new Map();

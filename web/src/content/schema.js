@@ -125,12 +125,17 @@ export function revisarModulo(mod, { fuentes }) {
     if (!p.fichas?.length || p.fichas.some((id) => !ids.has(id))) err(`pregunta «${p.id}»: fichas inexistentes`);
     if (!fuentes[p.fuente]) err(`pregunta «${p.id}»: sin fuente válida`);
   }
-  // Cada estructura evaluable necesita al menos dos nombres distintos con los que confundirla.
-  for (const id of mod.nucleo) {
+  // Cada estructura que se puede preguntar por identificación necesita al menos tres nombres distintos con los que
+  // confundirla: las evaluables y también las de contexto, porque el repaso pregunta por ellas cuando se falla una
+  // pregunta de texto que las tiene como ficha principal.
+  const grupo = (t) => ({ arteria: 'vaso', vena: 'vaso' })[t] ?? t;
+  for (const id of [...mod.nucleo, ...(mod.contexto ?? [])]) {
     const f = mod.estructuras.find((g) => g.id === id);
-    const grupo = (t) => ({ arteria: 'vaso', vena: 'vaso' })[t] ?? t;
-    const otros = mod.estructuras.filter((g) => g.id !== id && grupo(g.tipo) === grupo(f.tipo)).length + (mod.distractoresExtra?.[id]?.length ?? 0);
-    if (otros < 3) err(`${id}: menos de 3 distractores para la pregunta de identificación`);
+    if (!f) continue;                     // check-cards ya avisa de las que no tienen ficha
+    const mismos = mod.estructuras.filter((g) => g.id !== id && grupo(g.tipo) === grupo(f.tipo)).map((g) => g.nombre);
+    const otros = new Set([...mismos, ...(mod.distractoresExtra?.[id] ?? [])]);
+    otros.delete(f.nombre);
+    if (otros.size < 3) err(`${id}: menos de 3 distractores para la pregunta de identificación`);
   }
   return out;
 }

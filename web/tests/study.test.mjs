@@ -4,6 +4,8 @@ import assert from 'node:assert/strict';
 import * as P from '../src/study/progress.js';
 import { evaluacion, repaso, preguntaIdentificar, corregir, rngConSemilla, NO_LO_SE } from '../src/study/quiz.js';
 import { MODULO_BRAZO as M } from '../src/content/brazo.js';
+import { MODULO_ANTEBRAZO } from '../src/content/antebrazo.js';
+import { MODULOS } from '../src/content/index.js';
 
 const DIA = 24 * 3600 * 1000;
 const memoria = (inicial = {}) => {
@@ -64,6 +66,15 @@ test('resumen: rendimiento reciente y dominio a largo plazo, por separado', () =
   assert.equal(r.total, M.nucleo.length);
 });
 
+test('repaso pendiente: cuenta también la estructura de contexto fallada (si no, el botón quedaría desactivado)', () => {
+  const m = P.modulo(P.vacio(), M);
+  P.anotar(m, 'arteria-braquial-profunda', 'fallo', 0);    // contexto: entra al fallar una pregunta de texto sobre ella
+  const r = P.resumen(m, M, 0);
+  assert.equal(r.pendientes, 1);
+  assert.equal(r.vistas, 0);                                 // lo visto y el dominio siguen contando solo lo evaluable
+  assert.deepEqual(P.colaRepaso(m, P.repasables(M), 0), ['arteria-braquial-profunda']);
+});
+
 test('reiniciar la lección no borra evaluaciones; borrar el módulo no toca otros módulos', () => {
   const d = P.vacio();
   const m = P.modulo(d, M);
@@ -97,6 +108,23 @@ test('identificar: cuatro opciones distintas, una correcta, del mismo grupo (o h
   assert.ok(nervio.opciones.every((o) => o.texto.startsWith('Nervio')));
   const hueso = preguntaIdentificar(M, 'humero', rng);
   assert.ok(hueso.opciones.every((o) => ['Húmero', 'Radio', 'Ulna', 'Escápula', 'Clavícula'].includes(o.texto)));
+});
+
+test('identificar en todos los módulos: cuatro opciones distintas para cada estructura que puede salir (núcleo y contexto)', () => {
+  const rng = rngConSemilla(11);
+  for (const mod of MODULOS) {
+    for (const id of [...mod.nucleo, ...mod.contexto]) {
+      for (let vez = 0; vez < 5; vez++) {
+        const q = preguntaIdentificar(mod, id, rng);
+        assert.equal(new Set(q.opciones.map((o) => o.texto)).size, 4, `${mod.id}: ${id}`);
+        assert.equal(q.opciones.filter((o) => o.correcta).length, 1, `${mod.id}: ${id}`);
+      }
+    }
+  }
+  // La arteria radial entra al repaso si se falla la pregunta del pulso radial: su identificación también tiene 4.
+  const rp = repaso(MODULO_ANTEBRAZO, ['arteria-radial'], { rng: rngConSemilla(5) });
+  assert.equal(rp[0].tipo, 'identificar');
+  assert.equal(rp[0].opciones.length, 4);
 });
 
 test('evaluación: una identificación por estructura evaluable y 4 de texto; repaso solo de la cola', () => {

@@ -1,15 +1,16 @@
-// Catálogo de fuentes del contenido de estudio. Cada página se leyó el 2026-11-02 y su contenido se comprobó frente a lo
-// que dice cada ficha (las fichas no copian texto: lo resumen en español). Fecha «actualizada»: la que muestra la página.
+// Catálogo de fuentes del contenido de estudio. Cada página se leyó el día que indica «consultada» (2026-11-02 para el
+// módulo del brazo, 2026-11-08 para el del antebrazo) y su contenido se comprobó frente a lo que dice cada ficha (las fichas
+// no copian texto: lo resumen en español). Fecha «actualizada»: la que muestra la página.
 //
 // No se usa OpenStax «Anatomy and Physiology 2e» aunque se consultó: su página indica que el libro no puede usarse con
 // IA generativa sin permiso escrito de OpenStax, y su licencia (CC BY-NC-SA) no permite el uso comercial.
 
-const TMA = (titulo, ruta, actualizada) => ({
+const TMA = (titulo, ruta, actualizada, consultada = '2026-11-02') => ({
   tipo: 'contenido',
   texto: `TeachMeAnatomy: «${titulo}» (Dr Oliver Jones, TeachMeSeries Ltd)`,
   url: `https://teachmeanatomy.info/${ruta}`,
   actualizada,
-  consultada: '2026-11-02',
+  consultada,
 });
 
 export const FUENTES = {
@@ -29,6 +30,16 @@ export const FUENTES = {
   tma_arterias: TMA('Arterial Supply to the Upper Limb', 'upper-limb/vessels/arteries/', '2025-11-06'),
   tma_venas: TMA('Venous Drainage of the Upper Limb', 'upper-limb/vessels/veins/', '2025-11-06'),
   tma_humero: TMA('The Humerus', 'upper-limb/bones/humerus/', '2026-05-22'),
+  // Módulo del antebrazo (2026-11-08); usa además tma_arterias y tma_mediano, que se volvieron a leer ese día (misma versión).
+  tma_antebrazo_ant: TMA('Muscles in the Anterior Compartment of the Forearm', 'upper-limb/muscles/anterior-forearm/', '2025-12-15', '2026-11-08'),
+  tma_radio: TMA('The Radius', 'upper-limb/bones/radius/', '2025-11-06', '2026-11-08'),
+  tma_ulna: TMA('The Ulna', 'upper-limb/bones/ulna/', '2026-10-11', '2026-11-08'),
+  wp_interoseo_anterior: {
+    tipo: 'contenido',
+    texto: 'Wikipedia (en inglés): «Anterior interosseous nerve»',
+    url: 'https://en.wikipedia.org/wiki/Anterior_interosseous_nerve',
+    consultada: '2026-11-08',
+  },
   // Sinónimos en español (2026-11-08): cada uno, con la página que lo da por nombre de la misma estructura.
   decs_nervio_cubital: {
     tipo: 'terminologia',
