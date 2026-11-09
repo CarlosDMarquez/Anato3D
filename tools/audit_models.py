@@ -6,7 +6,8 @@ Uso (desde la raíz del proyecto):
   Modelo femenino: A3D_MODEL=female y Anato3D_Female_30_Fase2.blend.
 
 Qué mide, por objeto:
-  - piel: vértices que salen de la piel (confirmado por paridad, como en anato3d_fit) y cuánto salen;
+  - piel: vértices que salen de la piel (confirmado por paridad, como en anato3d_fit) y cuánto salen; como en todas
+    las medidas por objeto, solo cuentan los vértices de alguna cara (los sueltos no se ven);
   - hueso: en las vísceras, proporción de vértices dentro de algún hueso;
   - malla: caras de área nula, mallas vacías y mallas cerradas con las caras invertidas (volumen negativo);
   - nombres: sin nombre en español o con restos de latín;
@@ -97,10 +98,17 @@ def parity_inside(tree, p, dirs=DIRS, need=None):
         odd += n % 2
     return odd >= (need or (len(dirs) * 2 + 2) // 3)
 
-def verts_world(o):
+def verts_world(o, con_caras=False):
     m = np.array(o.matrix_world)
     co = np.empty(len(o.data.vertices) * 3); o.data.vertices.foreach_get('co', co)
-    return co.reshape(-1, 3) @ m[:3, :3].T + m[:3, 3]
+    V = co.reshape(-1, 3) @ m[:3, :3].T + m[:3, 3]
+    if con_caras:
+        # Solo los vértices de alguna cara. Los sueltos (460 en 62 piezas del hombre, heredados de Z-Anatomy: la duramadre
+        # espinal, el hígado, las escápulas…) no se dibujan ni se exportan. Uno del cuerpo del esternón, 2 cm por delante
+        # del hueso, salía «7 mm fuera de la piel» al ajustar la piel a los músculos (2026-11-08).
+        lv = np.empty(len(o.data.loops), dtype=np.int64); o.data.loops.foreach_get('vertex_index', lv)
+        V = V[np.unique(lv)]
+    return V
 
 # ── Por objeto ──────────────────────────────────────────────────────────────
 report = {'objects': [], 'clashes': [], 'levels': {}, 'duplicates': []}
@@ -108,7 +116,7 @@ objs = [o for o in bpy.data.objects if o.type == 'MESH' and (o.get('system') in 
 closed = {}
 for i, o in enumerate(objs):
     sysname = o.get('system')
-    V = verts_world(o)
+    V = verts_world(o, con_caras=True)
     r = {'name': o.name, 'system': sysname, 'tissue': o.get('tissue'), 'verts': len(V), 'faces': len(o.data.polygons)}
     if not len(V):
         r['empty'] = True; report['objects'].append(r); continue

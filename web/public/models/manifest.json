@@ -1,11 +1,12 @@
 {
- "release": "20261108T221604-898b4f1",
- "generated": "2026-11-08T22:16:04+00:00",
+ "release": "20261109T035801-af87149",
+ "generated": "2026-11-09T03:58:01+00:00",
  "note": "Versión de los modelos de la web: un archivo solo es de esta versión si su SHA-256 coincide.",
  "builds": {
   "male": {
-   "date": "2026-11-08T22:00:47+00:00",
+   "date": "2026-11-09T03:58:01+00:00",
    "systems": [
+    "base",
     "muscular",
     "connective",
     "vascular",
@@ -13,25 +14,12 @@
     "visceral"
    ],
    "git": {
-    "commit": "898b4f1",
+    "commit": "af87149",
     "uncommitted_changes": [
-     "M tools/anato3d_fit.py",
-     " M tools/build_muscular.py",
-     " M tools/huesos_invertidos.py",
-     " M web/scripts/paquete-revision.mjs",
-     " M web/src/content/brazo.js",
-     " M web/src/content/fuentes.js",
-     " M web/src/content/index.js",
-     " M web/src/content/schema.js",
-     " M web/src/data/anatomia.js",
-     " M web/src/data/fuentes.js",
-     " M web/src/data/resolve.js",
-     " M web/src/i18n/contenido.js",
-     " M web/src/i18n/textos.js",
-     " M web/src/main.js",
-     " M web/src/styles.css",
-     " M web/src/ui/info.js",
-     "?? web/scripts/recorrido.js"
+     "M tools/audit_models.py",
+     " M tools/fix_neck.py",
+     " M web/src/realism.js",
+     "?? tools/piel_musculos.py"
     ]
    },
    "tools": {
@@ -57,19 +45,19 @@
      "sha256": "6ae4927d488b410e6d7e785eaa32e06678f8845a01cb996a1f5af630ca45b7e0"
     },
     "Anato3D_Male_30_Fase2.blend": {
-     "bytes": 73171104,
-     "sha256": "918e671ec3980f89ba00879e70f305eeee2edbd374595f7a24231e1aa41fef71"
+     "bytes": 73341320,
+     "sha256": "0543734c67199c11c20a40c97cf564fff3c8d2481525efb554116a7567078c85"
     },
     "Anato3D_Male_30_Fase2_musculature.npz": {
      "bytes": 1128121,
      "sha256": "f50459187fac1ef0154d57193e482b1758cb80d6a3823e55cfa42790caa5e9ba"
     }
    },
-   "checks": "validate_models: 24 archivos correctos; check-cards: todo correcto",
+   "checks": "validate_models: 28 archivos correctos; check-cards: todo correcto",
    "audit": {
     "file": "build/audit.json",
-    "sha256": "d474e1f81b9d6381239cc88ccbcd828364f5146a0b07f1e0d0bea1b916c4b622",
-    "modified": "2026-11-08T21:44:53+00:00",
+    "sha256": "3ac9e27ed797ce04e7018a75d10198276b3eb216ee593dfa61f02489355cc52a",
+    "modified": "2026-11-09T03:11:56+00:00",
     "note": "Auditoría más reciente de build/; no se ejecuta en cada construcción, así que puede no corresponder a estos archivos."
    }
   },
@@ -246,16 +234,16 @@
    "sha256": "901efe1d5d82f206d4fa46f620bbaca60fd99d5fc60642a55357d985ce2a8bec"
   },
   "male-arterial.glb": {
-   "bytes": 2797696,
-   "sha256": "c475e132430f8f68360994bbed5bac3b571b1e7f31ff43f28021e1b98409ade4"
+   "bytes": 2797740,
+   "sha256": "216112e0a65a4ed9c905002150b2171ba44ab95336515454186c8f023921276e"
   },
   "male-arterial.json": {
    "bytes": 1481,
    "sha256": "edc0e504d68f34a55325a5d35fbad4963a8dc4d5fafb78a8196c4edd71bace50"
   },
   "male-connective.glb": {
-   "bytes": 2076624,
-   "sha256": "69fb71ef8447f9883c4ab29b6ce244cd288ba5ba63dfc2ccdf7c8dbd42e1c011"
+   "bytes": 2076800,
+   "sha256": "3e11a6ecdad110d58e314eab53d6fd4f7c45fac34a975918002df2541ba04e1f"
   },
   "male-connective.json": {
    "bytes": 11757,
@@ -286,40 +274,40 @@
    "sha256": "ba2aa4c00a30b294aed9db9b5ca3181541b1e5b02b7bf6f4694944ff8042fbc8"
   },
   "male-integumentary.glb": {
-   "bytes": 173668,
-   "sha256": "bf7a3bcff4dcb4d4637f97e4d98b140e9ae15771e33b4f84097f3e9b421c4e65"
+   "bytes": 173676,
+   "sha256": "f3d52f146c660e4a1a34a65eb589f4c01dcda42de30d2d98cebc3f6f8444af7e"
   },
   "male-integumentary.json": {
    "bytes": 14,
    "sha256": "d181e80bc5b8ca0ab05e7a561e6b29e9a739ca90f42cd59341294bada853440e"
   },
   "male-lymphatic.glb": {
-   "bytes": 822688,
-   "sha256": "c76a41be57106f0180d72b3110087521ae66fa9f567e60ce9ad41c38459dbc17"
+   "bytes": 822680,
+   "sha256": "52175cbfa10c5f9ddd05c4f20b70b630849d9a0c844c2c5632d58a9aedeac91f"
   },
   "male-lymphatic.json": {
    "bytes": 1075,
    "sha256": "bcf82a8254e81b4fdab3709d9e83a4771f7ac885e9d82577786a5c8ec107c966"
   },
   "male-muscular.glb": {
-   "bytes": 3016104,
-   "sha256": "d749646d9dc4868f7099533447d85cb6df00abc5a041e8ec1850ebfa83a003ca"
+   "bytes": 3016400,
+   "sha256": "58118efb33c781f277b328c89ca5e306d3d4b52c9f415dbe13032fc89115412e"
   },
   "male-muscular.json": {
    "bytes": 5651,
    "sha256": "e1f26e777954db211aed9c2c786745f5dbaf56afd57f87ddbab279af71633872"
   },
   "male-nervous.glb": {
-   "bytes": 3399556,
-   "sha256": "a08ca42c37a219b7bed8d8e8dc02fd8b4dacf6369e055140c3b9bb45bad78ebe"
+   "bytes": 3399112,
+   "sha256": "eea6232a59b89e7459d830ff5ffe5d7411995c63b2dd592c1feacee972793d84"
   },
   "male-nervous.json": {
    "bytes": 17108,
    "sha256": "53b09ba8f6c7f2dbc90cf0cbbcd35312994df6500424207d415feed0b7fae9a9"
   },
   "male-respiratory.glb": {
-   "bytes": 624408,
-   "sha256": "4f7ac86f1a377594c22a961bf4a36a237070b4991e39f4b318fe542c252563dd"
+   "bytes": 624412,
+   "sha256": "482628edfb1aef6ba1f9c329f6099c14d6e6093d3fcc64ed96c037a1622b58e6"
   },
   "male-respiratory.json": {
    "bytes": 481,
@@ -334,20 +322,20 @@
    "sha256": "88fd4c0a654050aded8b7059fec9c128a02cd9836565d99cfec018d3c705b689"
   },
   "male-venous.glb": {
-   "bytes": 1353744,
-   "sha256": "9112aa66b7f411e95c9bdfb422b5209b4614d9534b1bfd3f529395b1f47a3912"
+   "bytes": 1353280,
+   "sha256": "248054618cfb85c37fa57b1002d1a6b9e076322eaee9c4bc3cd5d26494d78599"
   },
   "male-venous.json": {
    "bytes": 1378,
    "sha256": "620c4f4f46de46d25adeaddbf0d11ec992c70524d05c0304d391c76f4ba63814"
   },
   "male.glb": {
-   "bytes": 11580556,
-   "sha256": "49e874e8e68686c614082517e3e15dddf68e2e51c6ea876d5ba6be52c21c302a"
+   "bytes": 11582712,
+   "sha256": "d362cde7b9965eea2a99f5035d9a189d116cea3e07016c3650450f4a5e207373"
   },
   "male.ligero.glb": {
-   "bytes": 7525112,
-   "sha256": "9f0da46953b6659ba9ec4878a03ccf9fdda1cb737fe22ebfb704fed723c6a99e"
+   "bytes": 7527268,
+   "sha256": "b499c86abeee97cc7b5a66a5514d675ba6f1770686a1e585421908ca9ce6accc"
   }
  }
 }

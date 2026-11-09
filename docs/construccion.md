@@ -54,6 +54,9 @@ npm --prefix web run build                           # web de producción en web
 
 - **`base`** (`zsh tools/build_all.sh base`) vuelve a ejecutar `tools/fix_neck.py`: regenera `male.glb` y `female.glb` y también reescribe las Fase 2 (`Anato3D_*_30_Fase2.blend`) y los campos `.npz` que están en git. No va por defecto. Después hay que reconstruir los sistemas de los dos modelos.
   - Desde el 2026-11-07 incluye `tools/huesos_invertidos.py` (las 111 piezas del esqueleto que estaban del revés, con su AO copiado de la pareja derecha o rehorneado). Tarda unos 4 minutos en lugar de 1, por los horneados de Cycles, y es determinista: dos ejecuciones dan las mismas cifras.
+  - Desde el 2026-11-08 incluye `tools/piel_musculos.py` (paso 3c4): la piel masculina del cuello, el tronco y el miembro superior se ajusta a los músculos de Z-Anatomy, colocados como en `build_muscular.py`, con un grosor realista por zona y nunca a menos de 3 mm, salvo en los pliegues donde el brazo toca el tronco. Ningún músculo ni hueso de esas zonas queda a la vista. Añade aproximadamente minuto y medio. La piel cambia, así que **después hay que reconstruir todos los sistemas masculinos**: los músculos ya no se aplastan contra ella.
+    - La cabeza, las manos, el periné, el miembro inferior y el bajo vientre junto al periné quedan exactamente donde estaban. De esa piel sale la piel genital, que así no cambia.
+    - La piel femenina sale idéntica, también en el color: su tono toma los pliegues y relieves de la piel masculina de antes de este paso.
   - Al reconstruir un sistema con la Fase 2 nueva, algunas piezas junto a aristas de hueso pueden moverse hasta ~1,4 mm. El ajuste las aparta del hueso con la cara más cercana, y en las aristas la que gana depende del orden de las caras. Probado con el vascular femenino: 21 de 672 piezas, sin cambios en la auditoría (ninguna dentro del hueso, lo mismo fuera de la piel). Los sistemas publicados se hicieron con la Fase 2 anterior y no se reconstruyeron.
 - **Tiempos** en este Mac: vascular unos 40 s; nervioso unos 2,5 min; visceral unos 7 min. Los dos modelos completos, unos 26 min (medido el 2026-11-01).
 - **`ligera`** (`zsh tools/build_all.sh ligera`): los modelos base de las pantallas táctiles, `male.ligero.glb` y `female.ligero.glb` (`tools/base_ligera.py`: las mismas mallas con las texturas grandes a la mitad). Salen de los publicados; con `base` se hacen también, de los nuevos. Unos 10 s.
@@ -104,7 +107,8 @@ Aún no lo lee la app. Para publicar habrá que comprobar que el manifiesto coin
 - **`validate_models.py`:**
   - no decodifica la geometría Draco, que la decodifica la app al cargar;
   - comprueba estructura, piezas y cambios frente a lo publicado, no la anatomía.
-- **Auditoría geométrica:** `tools/audit_models.py` no forma parte de la construcción, y sus resultados no llevan el hash de los modelos que miden.
+- **Auditoría geométrica:** `tools/audit_models.py` no forma parte de la construcción, y sus resultados no llevan el hash de los modelos que miden. Desde el 2026-11-08 solo mide los vértices de alguna cara: los sueltos no se dibujan ni se exportan. En el hombre hay 460, repartidos en 62 piezas heredadas de Z-Anatomy.
+- **Piel masculina donde el brazo toca el tronco:** el brazo cuelga pegado al costado y allí la piel del brazo y la del tronco se cortan. Ya pasaba en la piel de MakeHuman. No se ve desde fuera y no confunde las pruebas de dentro y fuera (detalle en `tools/piel_musculos.py`).
 - **Plataforma y CI:** solo probado en este Mac y no hay integración continua.
 - **Reproducibilidad (2026-11-02):**
   - el sistema vascular masculino se reconstruyó y salió **idéntico byte a byte** al publicado;

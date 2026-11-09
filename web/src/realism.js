@@ -21,6 +21,7 @@ const NOISE_GLSL = /* glsl */ `
   uniform vec4 uTisA;   // escala del dibujo (1/m), variación de color, altura del relieve (m), variación de rugosidad
   uniform vec4 uTisB;   // tinte de las zonas oscuras (rgb), cantidad de motas
   uniform vec4 uTisSSS; // color de la luz dispersada (rgb), cuánto envuelve la luz
+  uniform vec4 uTisSkin; // solo piel (patrón 5): rojeces, palidez, variación de brillo (grasa), sin uso
   // Ruido precalculado en una textura 3D periódica (ver makeNoiseTexture): r y g, ruido suave con 16 nodos por
   // repetición; b y a, celdas de Worley (distancia al centro más cercano y diferencia con el segundo) con 8 celdas.
   // Calcularlo en el shader (27 vecinos por celda, fbm de 4 octavas) bajaba la app de 51 a 2 fps.
@@ -39,9 +40,10 @@ const NOISE_GLSL = /* glsl */ `
   }`;
 
 // Patrones: 0 motas suaves · 1 lobulillos (hígado, pulmón, glándulas, grasa) · 2 fibras (tendón, nervio; usa aFib)
-//           3 poros (hueso, piel) · 4 vasos finos (serosas: intestino, corteza cerebral)
+//           3 poros (hueso) · 4 vasos finos (serosas: intestino, corteza cerebral) · 5 piel
 const PATTERN_GLSL = /* glsl */ `
-  float tnH = 0.0, tnShade = 1.0, tnDark = 0.0;
+  float tnH = 0.0, tnShade = 1.0, tnDark = 0.0, tnOil = 0.0;
+  vec3 tnTint = vec3(1.0);
   {
     float s = uTisA.x;
     vec3 p = vTisPos * s;
@@ -77,8 +79,33 @@ const PATTERN_GLSL = /* glsl */ `
       tnH = -vessel * 0.5 + 0.2 * tnNoise(p * 2.0);
       tnDark = vessel * tnFade;
       tnShade = mix(1.0, 0.92 + 0.16 * tnNoise(p * 0.5), tnFade);
+    #elif TN_PATTERN == 5
+      // Piel. Con un solo color, liso y un brillo uniforme parecía de vinilo. A escala de milímetros: poros (celdas de
+      // ~0,45 mm) y la red de surcos finos de la piel (~1,5 mm, dos familias cruzadas), que rompen el brillo; cada uno se
+      // desvanece al alejarse a su propia escala. A escala de centímetros: rojeces, zonas algo más pálidas y zonas con
+      // más o menos grasa (brillo). (Unas motas de pecas o folículos se probaron y parecían suciedad: no van.)
+      vec2 c = tnCells(p);
+      float pit = 1.0 - smoothstep(0.0, 0.32, c.x);
+      vec3 q = vTisPos * 700.0;
+      float gFade = 1.0 - smoothstep(0.35, 1.1, length(fwidth(q)));
+      // (Finos y poco hondos: más marcados, la piel parecía cuero cuarteado.)
+      float g1 = 1.0 - smoothstep(0.0, 0.14, abs(tnNoise(q * vec3(1.0, 0.3, 0.6)) - 0.5));
+      float g2 = 1.0 - smoothstep(0.0, 0.14, abs(tnNoise2(q * vec3(0.35, 1.0, 0.8) + 4.7) - 0.5));
+      float groove = max(g1, g2) * 0.4;
+      // Y un relieve suave de 2–5 mm, que todavía se ve con el cuerpo entero en pantalla y rompe los brillos anchos.
+      vec3 qm = vTisPos * 230.0;
+      float mFade = 1.0 - smoothstep(0.35, 1.1, length(fwidth(qm)));
+      tnH = -pit * 0.55 * tnFade + (-groove * 0.6 + 0.35 * tnNoise(q * 0.45)) * gFade + (tnFbm(qm) - 0.5) * 1.6 * mFade;
+      tnShade = mix(1.0, 1.0 - 0.07 * pit, tnFade) * mix(1.0, 1.0 - 0.02 * groove, gFade);
+      float r1 = tnFbm(vTisPos * 9.0 + 1.7), r2 = tnFbm(vTisPos * 40.0 + 6.1);
+      float red = (r1 - 0.5) * 1.1 + (r2 - 0.5) * 0.7;
+      float pale = tnFbm(vTisPos * 14.0 + 9.3) - 0.5;
+      tnTint = vec3(1.0 + uTisSkin.x * red, 1.0 - 0.35 * uTisSkin.x * red, 1.0 - 0.55 * uTisSkin.x * red) * (1.0 + uTisSkin.y * pale);
+      tnOil = (r2 - 0.5) * uTisSkin.z;
     #endif
-    tnH *= tnFade;
+    #if TN_PATTERN != 5
+      tnH *= tnFade;                 // (la piel desvanece cada escala de relieve por su cuenta)
+    #endif
     tnShade *= mix(1.0 - uTisA.y, 1.0 + uTisA.y, m);
   }`;
 
@@ -93,13 +120,13 @@ function patchTissue(shader, pattern, fiberMode, fat) {
   shader.fragmentShader = shader.fragmentShader
     .replace('#include <common>', `#include <common>\n#define TN_PATTERN ${pattern}\n${fibDecl}\n${NOISE_GLSL}${fat ? '\nvarying float vFat;\nuniform vec3 uTisFat;' : ''}`)
     .replace('#include <map_fragment>', `#include <map_fragment>\n${PATTERN_GLSL}
-      diffuseColor.rgb *= tnShade;
+      diffuseColor.rgb *= tnShade * tnTint;
       diffuseColor.rgb = mix(diffuseColor.rgb, diffuseColor.rgb * uTisB.rgb, tnDark * uTisB.a);
       ${fat ? `// Grasa lobulada: el borde se deshace con ruido.
       float tnFat = smoothstep(0.3, 0.8, vFat + (tnNoise(vTisPos * 260.0) - 0.5) * 0.5) * 0.92;
       diffuseColor.rgb = mix(diffuseColor.rgb, uTisFat * (0.9 + 0.2 * tnNoise(vTisPos * 900.0)), tnFat);` : 'float tnFat = 0.0;'}`)
     .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
-      roughnessFactor = clamp(roughnessFactor + uTisA.w * (tnShade - 1.0) * -2.0 + uTisA.w * tnDark, 0.04, 1.0);
+      roughnessFactor = clamp(roughnessFactor + uTisA.w * (tnShade - 1.0) * -2.0 + uTisA.w * tnDark + tnOil, 0.04, 1.0);
       roughnessFactor = mix(roughnessFactor, 0.32, tnFat);`)
     .replace('#include <normal_fragment_maps>', `#include <normal_fragment_maps>
       if (uTisA.z > 0.0) normal = tnBump(-vViewPosition, normal, tnH * uTisA.z, faceDirection);`)
@@ -212,7 +239,9 @@ const P = {
   node: { rough: 0.45, cc: 0.15, ccr: 0.32, spec: 0.45, pat: 0, s: 400, alb: 0.06, bump: 0.00003, rv: 0.08, sss: [0.45, 0.6, 0.3, 0.45] },
   glossy: { rough: 0.3, cc: 0.3, ccr: 0.15, spec: 0.55, pat: 0, s: 300, alb: 0.04, bump: 0.00002, rv: 0.06, sss: [0.6, 0.6, 0.65, 0.45] },
   membrane: { rough: 0.35, cc: 0.2, ccr: 0.25, spec: 0.5, pat: 0, s: 200, alb: 0.04, bump: 0, rv: 0.05, sss: [0.7, 0.7, 0.75, 0.4] },
-  skin: { rough: 0.52, cc: 0, sheen: 0.3, sheenRough: 0.55, sheenColor: '#e8a48e', spec: 0.32, env: 0.7, pat: 3, s: 2200, alb: 0.05, bump: 0.000015, rv: 0.1, sss: [0.9, 0.32, 0.22, 0.55] },
+  // Piel (patrón 5): skin = rojeces, palidez y variación de brillo por grasa. Luz dispersada más cálida y envolvente que en
+  // los demás tejidos: en la piel, la zona de sombra se ve rojiza, no gris.
+  skin: { rough: 0.5, cc: 0, sheen: 0.22, sheenRough: 0.5, sheenColor: '#e8a48e', spec: 0.42, env: 0.65, pat: 5, s: 2200, alb: 0.06, bump: 0.00004, rv: 0.12, skin: [0.18, 0.1, 0.15, 0], sss: [1.0, 0.45, 0.35, 0.8] },
 };
 
 // Material de Blender/Z-Anatomy → perfil (en orden; gana el primero que coincida).
@@ -284,8 +313,10 @@ export function applyProfile(mat, name, addPatch, fiberMode) {
       uTisA: { value: new THREE.Vector4(p.s, p.alb, p.bump, p.rv) },
       uTisB: { value: new THREE.Vector4(dark.r, dark.g, dark.b, p.dark?.[1] ?? 0) },
       uTisSSS: { value: new THREE.Vector4(...p.sss) },
+      uTisSkin: { value: new THREE.Vector4(...(p.skin ?? [0, 0, 0, 0])) },
       uTisFat: { value: new THREE.Color(p.fat ?? '#ffffff') },
     };
+    mat.userData.tejido = uniforms;          // para ajustar el perfil a mano desde la consola (en desarrollo)
     const pattern = p.pat;
     const mode = pattern === 2 ? fiberMode : fiberMode === 'shared' ? 'shared' : 'none';
     NOISE.value ??= makeNoiseTexture();

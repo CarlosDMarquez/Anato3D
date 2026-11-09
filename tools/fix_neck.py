@@ -18,6 +18,8 @@ Qué hace:
      abultamientos anchos y unidos (sin bultos sueltos ni surcos entre ellos); la nuca se alisa.
   3c2–3. La piel se infla sobre el deltoides de Z-Anatomy, y la complexión musculosa (tools/musculature.py) engrosa
      hombros, brazos y tórax; el campo en el volumen queda en Anato3D_Male_30_Fase2_musculature.npz.
+  3c4. La piel del cuello, el tronco y el miembro superior se ajusta a los músculos ya engrosados, con un grosor
+     realista por zona y nunca a menos de 3 mm (tools/piel_musculos.py): sin hombreras ni músculos que asomen.
   4. Lo mismo para la piel femenina (misma malla base de MakeHuman), escalado a su estatura; el esqueleto masculino se
      lleva a ella (tools/female.py) y la pelvis toma la forma femenina (tools/female_pelvis.py; el campo para los demás
      tejidos queda en Anato3D_Female_30_Fase2_pelvis.npz). La región de la vulva se guarda en la piel (atributo «vulva»)
@@ -456,6 +458,21 @@ print('complexión, campo:', field.report)
 field.save(os.path.join(ROOT, f'{MALE}_musculature.npz'))
 set_world(skin, W + bulk)
 
+# 3c4. Piel ajustada a los músculos (tools/piel_musculos.py, 2026-11-08). Los pasos 3c2–3c3 inflaban la piel por su cuenta:
+#      37 mm de mediana entre piel y músculo en los hombros (hasta 55) y 27 en el pecho, frente a 5–10 normales (hombros
+#      como hombreras, pecho como hundido), mientras el trapecio, el dorsal ancho o el esternocleidomastoideo llegaban a
+#      la piel. Ahora la piel del cuello, el tronco y el miembro superior va a un grosor realista sobre los músculos de
+#      Z-Anatomy colocados como en build_muscular.py (con el campo de la complexión, que no cambia) y nunca a menos de 3 mm.
+import skin_regions
+from piel_musculos import tejido, ajustar
+# El tono de la piel femenina toma del hombre, por índice de vértice, los pliegues y relieves (su curvatura): se calcula
+# antes de este paso, que solo cambia el modelo masculino. Con la curvatura de la piel ya ajustada, el color de la piel
+# femenina cambiaba hasta un 6 % en el tronco sin que cambiara su forma.
+FEMALE_TONE_BASE = male_layers(skin, objs, world)
+TV, TT, n_musc = tejido(objs, world, field, ZA)
+print(f'piel sobre los músculos: {n_musc} músculos y cartílagos de Z-Anatomy, {len(TV)} vértices de tejido')
+ajustar(skin, skin_regions.label(skin, objs), TV, TT, world, set_world)
+
 # 3d. Tono de la piel por vértice (tools/skin_tone.py): sin él, un solo color la hacía parecer un maniquí.
 MALE_TONE = male_layers(skin, objs, world)
 apply_layers(skin, MALE_TONE)
@@ -542,7 +559,7 @@ print('pelvis femenina, campo:', pel_report, '; huesos movidos hasta (mm):', {n:
 for key in pel_before:
     print(f'  {key}: {pel_before[key]:.1f} → {pel_after[key]:.1f}')
 subdivide(fskin)
-assert len(fskin.data.vertices) == len(MALE_TONE['pliegues'][0]), 'la piel femenina no comparte la topología subdividida'
+assert len(fskin.data.vertices) == len(FEMALE_TONE_BASE['pliegues'][0]), 'la piel femenina no comparte la topología subdividida'
 # Ningún hueso a menos de 3 mm de la piel femenina, como en la masculina (las mismas funciones, sobre su piel).
 skin, objs = fskin, {o.name: o for o in bpy.data.objects}
 cover(['Mandible', 'Hyoid_Bone'] + NAPE)
@@ -598,7 +615,7 @@ def close_mouth(skin, over=0.00015, reach=0.005):
     print(f'boca: pliegue bajo el labio alisado en {(mask > 0.01).sum()} vértices (hasta {np.linalg.norm(W - W0, axis=1).max() * 1000:.1f} mm)')
     set_world(skin, W)
 close_mouth(fskin)
-apply_layers(fskin, female_layers(fskin, MALE_TONE, world))
+apply_layers(fskin, female_layers(fskin, FEMALE_TONE_BASE, world))
 # Región de la vulva (tools/female_perineum.py): se guarda en la piel (atributo de cara «vulva») para que
 # build_female_skin.py modele la vulva con el mismo borde. La piel de la Fase 2 queda entera (los sistemas la usan para
 # saber qué está dentro del cuerpo); solo al exportar se recorta.
