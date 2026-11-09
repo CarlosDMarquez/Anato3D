@@ -15,6 +15,38 @@ export const TEXTOS = {
   'inicio.continuar': { es: 'Continuar', en: 'Continue', de: 'Fortsetzen', fr: 'Continuer', it: 'Continua' },
   'inicio.configuracion': { es: 'Configuración', en: 'Settings', de: 'Einstellungen', fr: 'Paramètres', it: 'Impostazioni' },
   'inicio.creditos': { es: 'Créditos', en: 'Credits', de: 'Credits', fr: 'Crédits', it: 'Crediti' },
+  'inicio.donar': { es: 'Donar', en: 'Donate', de: 'Spenden', fr: 'Faire un don', it: 'Dona' },
+
+  // ── Donar (pantalla de inicio; el enlace de PayPal.Me está en donar.js) ──
+  'donar.titulo': {
+    es: 'Ayuda a mantener Anato3D', en: 'Help keep Anato3D going', de: 'Unterstütze Anato3D',
+    fr: 'Aidez à faire vivre Anato3D', it: 'Aiuta a mantenere Anato3D',
+  },
+  'donar.texto': {
+    es: 'Anato3D es gratis y sin anuncios. Si te resulta útil, una donación ayuda a mantenerlo en línea y a seguir mejorándolo.',
+    en: 'Anato3D is free and ad-free. If you find it useful, a donation helps keep it online and keep improving it.',
+    de: 'Anato3D ist kostenlos und werbefrei. Wenn es dir nützt, hilft eine Spende, es online zu halten und weiter zu verbessern.',
+    fr: 'Anato3D est gratuit et sans publicité. S’il vous est utile, un don aide à le garder en ligne et à continuer de l’améliorer.',
+    it: 'Anato3D è gratuito e senza pubblicità. Se ti è utile, una donazione aiuta a mantenerlo online e a continuare a migliorarlo.',
+  },
+  'donar.boton': { es: 'Donar con PayPal', en: 'Donate with PayPal', de: 'Mit PayPal spenden', fr: 'Faire un don avec PayPal', it: 'Dona con PayPal' },
+  'donar.boton.aria': {
+    es: 'Donar con PayPal (se abre en una pestaña nueva)', en: 'Donate with PayPal (opens in a new tab)',
+    de: 'Mit PayPal spenden (öffnet sich in einem neuen Tab)', fr: 'Faire un don avec PayPal (s’ouvre dans un nouvel onglet)',
+    it: 'Dona con PayPal (si apre in una nuova scheda)',
+  },
+  'donar.nota': {
+    es: 'Se abre PayPal en una pestaña nueva, donde eliges el importe. Anato3D no ve ni guarda tus datos de pago.',
+    en: 'PayPal opens in a new tab, where you choose the amount. Anato3D never sees or stores your payment details.',
+    de: 'PayPal öffnet sich in einem neuen Tab; dort wählst du den Betrag. Anato3D sieht und speichert deine Zahlungsdaten nicht.',
+    fr: 'PayPal s’ouvre dans un nouvel onglet, où vous choisissez le montant. Anato3D ne voit ni ne conserve vos données de paiement.',
+    it: 'PayPal si apre in una nuova scheda, dove scegli l’importo. Anato3D non vede né conserva i tuoi dati di pagamento.',
+  },
+  'donar.compartir': {
+    es: '¿No puedes donar? Compartir Anato3D también ayuda.', en: 'Can’t donate? Sharing Anato3D helps too.',
+    de: 'Du kannst nicht spenden? Anato3D weiterzuempfehlen hilft auch.', fr: 'Vous ne pouvez pas faire de don ? Partager Anato3D aide aussi.',
+    it: 'Non puoi donare? Anche condividere Anato3D aiuta.',
+  },
 
   // ── Comunes ──
   'comun.cerrar': { es: 'Cerrar', en: 'Close', de: 'Schließen', fr: 'Fermer', it: 'Chiudi' },

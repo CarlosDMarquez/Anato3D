@@ -152,6 +152,7 @@
             <button class="start-item primary" type="button" data-start="iniciar" data-t="inicio.iniciar">Iniciar</button>
             <button class="start-item" type="button" data-start="configuracion" data-t="inicio.configuracion">Configuración</button>
             <button class="start-item" type="button" data-start="creditos" data-t="inicio.creditos">Créditos</button>
+            <button class="start-item" type="button" data-start="donar" data-t="inicio.donar">Donar</button>
           </nav>
           <div id="start-configuracion" class="start-view" hidden>
             <button class="start-back" type="button" data-icon="chevron" data-volver><span data-t="comun.volver">Volver</span></button>
@@ -162,6 +163,18 @@
             <button class="start-back" type="button" data-icon="chevron" data-volver><span data-t="comun.volver">Volver</span></button>
             <h2 tabindex="-1" data-t="inicio.creditos">Créditos</h2>
             <div class="start-credits"></div>
+          </div>
+          <!-- Donar (src/donar.js): el enlace de PayPal.Me lo pone start.js; sin enlace, la opción no sale en la web publicada. -->
+          <div id="start-donar" class="start-view" hidden>
+            <button class="start-back" type="button" data-icon="chevron" data-volver><span data-t="comun.volver">Volver</span></button>
+            <h2 tabindex="-1" data-t="donar.titulo">Ayuda a mantener Anato3D</h2>
+            <div class="start-donar">
+              <p data-t="donar.texto">Anato3D es gratis y sin anuncios. Si te resulta útil, una donación ayuda a mantenerlo en línea y a seguir mejorándolo.</p>
+              <a class="donar-boton" data-icon="heart" target="_blank" rel="noopener noreferrer" data-t-aria="donar.boton.aria"><span data-t="donar.boton">Donar con PayPal</span></a>
+              <p class="small muted" data-t="donar.nota">Se abre PayPal en una pestaña nueva, donde eliges el importe. Anato3D no ve ni guarda tus datos de pago.</p>
+              <p class="small muted" data-t="donar.compartir">¿No puedes donar? Compartir Anato3D también ayuda.</p>
+              <p class="small donar-falta" hidden>Falta el enlace de PayPal.Me: ponlo en <code>web/src/donar.js</code>. Este aviso solo sale en desarrollo; en la web publicada, sin enlace, la opción «Donar» no aparece.</p>
+            </div>
           </div>
         </div>
         <p class="start-credit"><img src="/neurofuture.png" width="800" height="127" alt="NeuroFuture · Conciencia Cerebral Mexicali" /></p>

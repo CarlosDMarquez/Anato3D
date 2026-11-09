@@ -379,6 +379,17 @@ body.saliendo .start { opacity: 0; }
 .start .switch { padding: 12px 0; font-size: 15px; }
 .start .setting-note { font-size: 12.5px; }
 .start-credits p { margin: 0 0 12px; font-size: 13.5px; line-height: 1.65; }
+/* Donar: el texto, el botón de PayPal (el color de acento de la app) y dos notas pequeñas. */
+.start-donar p { margin: 0 0 12px; font-size: 15px; line-height: 1.65; color: var(--text-2); }
+.start-donar p.small { font-size: 12.5px; line-height: 1.6; color: var(--muted); }
+.donar-boton { display: inline-flex; align-items: center; gap: 9px; margin: 6px 0 18px; padding: 11px 20px 11px 17px; border-radius: 10px; background: var(--accent); color: #04111f; font-size: 15px; font-weight: 600; text-decoration: none; box-shadow: 0 6px 22px rgba(77, 163, 255, 0.22); transition: filter 0.15s, transform 0.15s, box-shadow 0.15s; }
+.donar-boton:hover { filter: brightness(1.08); box-shadow: 0 8px 26px rgba(77, 163, 255, 0.32); }
+.donar-boton:active { transform: translateY(1px); }
+.donar-boton:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+.donar-boton .ui-icon { width: 17px; height: 17px; flex: none; }
+.donar-boton[aria-disabled="true"] { opacity: 0.45; box-shadow: none; filter: none; cursor: not-allowed; }
+.start-donar p.donar-falta { padding: 8px 11px; border-left: 2px solid #e9a23b; background: rgba(233, 162, 59, 0.08); color: #f0c27a; }
+.donar-falta code { font-size: 11.5px; }
 .start-credit { margin: 0; }
 .start-credit img { display: block; width: clamp(200px, 16vw, 280px); height: auto; }
 /* El esqueleto se corta abajo: el corte se funde con el negro. */
@@ -393,8 +404,10 @@ body.saliendo .start { opacity: 0; }
   .start-item { padding: 6px 0; font-size: 19px; }
   .start-veil { left: 0; bottom: calc(44% - 2px); height: 18%; }  /* 2 px más: la última fila del lienzo */
   .start-credit img { width: 150px; }
-  /* Configuración y Créditos ocupan toda la pantalla, para leerlos sin estrecheces. */
+  /* Configuración, Créditos y Donar ocupan toda la pantalla, para leerlos sin estrecheces; sin el velo del esqueleto,
+     que si no oscurece el texto que queda a su altura. */
   .start.con-vista { top: 0; padding-top: calc(28px + env(safe-area-inset-top)); background: #000; }
+  .start.con-vista .start-veil { display: none; }
 }
 
 /* ── Idiomas (i18n/) ───────────────────────────

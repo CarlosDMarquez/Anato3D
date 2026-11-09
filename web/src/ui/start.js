@@ -1,16 +1,23 @@
-// Pantalla de inicio: el nombre, el menú (Iniciar, Configuración, Créditos) y el crédito de NeuroFuture; a la derecha,
+// Pantalla de inicio: el nombre, el menú (Iniciar, Configuración, Créditos, Donar) y el crédito de NeuroFuture; a la derecha,
 // el visor con el esqueleto (Viewer.setShowcase). La abre la clase `inicio` del <body>, presente desde la primera
 // pintura; «Iniciar» la funde a negro, la quita y llama a `onIniciar`. Desde la app se vuelve con `abrir()`, y la
 // primera opción pasa a ser «Continuar».
 //
 // Configuración muestra copias de los ajustes del panel «Ajustes» (idioma y casillas): los originales siguen mandando
 // (un cambio aquí los cambia y les manda su evento, y sus manejadores hacen el trabajo). Créditos copia los de «Ayuda».
+// Donar enlaza a la página de PayPal.Me de donar.js; sin enlace, solo aparece en desarrollo y con un aviso.
 import { t } from '../i18n/idioma.js';
+import { enlaceDonar, estadoDonar } from '../donar.js';
 
 const SALIDA_MS = 250;   // la transición de opacidad de .start y #stage con body.saliendo (styles.css)
 
 export function createStart({ root, ajustes, creditos, onIniciar }) {
   const menu = root.querySelector('.start-menu');
+  const donar = estadoDonar();
+  if (donar === 'oculta') {                              // antes de contar las opciones: las flechas no pasan por ella
+    menu.querySelector('[data-start="donar"]')?.remove();
+    root.querySelector('#start-donar')?.remove();
+  }
   const items = [...menu.querySelectorAll('.start-item')];
   const vistas = Object.fromEntries([...root.querySelectorAll('.start-view')].map((v) => [v.id.replace('start-', ''), v]));
   let abierta = document.body.classList.contains('inicio');
@@ -34,8 +41,16 @@ export function createStart({ root, ajustes, creditos, onIniciar }) {
   });
   vistas.configuracion.querySelector('.start-settings').append(...copias);
   vistas.creditos.querySelector('.start-credits').append(...[...creditos.children].map((el) => el.cloneNode(true)));
+  if (vistas.donar) {
+    const boton = vistas.donar.querySelector('.donar-boton');
+    if (donar === 'activa') boton.href = enlaceDonar();
+    else {                                               // desarrollo sin enlace: el botón no lleva a ninguna parte
+      boton.setAttribute('aria-disabled', 'true');
+      vistas.donar.querySelector('.donar-falta').hidden = false;
+    }
+  }
 
-  // Una vista (Configuración, Créditos) o, con null, el menú; el foco va a su título o a la opción de la que se vino.
+  // Una vista (Configuración, Créditos, Donar) o, con null, el menú; el foco va a su título o a la opción de la que se vino.
   function mostrar(nombre) {
     menu.hidden = Boolean(nombre);
     for (const [k, v] of Object.entries(vistas)) v.hidden = k !== nombre;
@@ -89,7 +104,7 @@ export function createStart({ root, ajustes, creditos, onIniciar }) {
   });
   root.querySelectorAll('[data-volver]').forEach((b) => b.addEventListener('click', () => mostrar(null)));
 
-  // Flechas arriba y abajo: recorren el menú; Escape: vuelve de Configuración o Créditos.
+  // Flechas arriba y abajo: recorren el menú; Escape: vuelve de Configuración, Créditos o Donar.
   window.addEventListener('keydown', (e) => {
     if (!abierta) return;
     if (e.key === 'Escape' && menu.hidden) {

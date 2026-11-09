@@ -19,6 +19,7 @@ const UI = {
   help: 'circle-question-mark', close: 'x', hide: 'eye-off', show: 'eye', isolate: 'scan', fade: 'blend',
   fadeOthers: 'layers-2', focus: 'crosshair', chevron: 'chevron-right', expand: 'chevron-up',
   rotate: 'rotate-3d', info: 'info', study: 'graduation-cap', check: 'check', wrong: 'x', restart: 'rotate-ccw',
+  heart: 'heart',
 };
 
 function pick(set, map) {
