@@ -109,4 +109,5 @@ Aún no lo lee la app. Para publicar habrá que comprobar que el manifiesto coin
 - **Reproducibilidad (2026-11-02):**
   - el sistema vascular masculino se reconstruyó y salió **idéntico byte a byte** al publicado;
   - al republicar vascular y nervioso de los dos modelos para corregir tres nombres, solo cambiaron esos nombres, **salvo la cámara anterior del ojo** del nervioso masculino: 1.751 → 1.753 y 1.754 vértices. Ese paso no es del todo determinista en esas dos mallas; el femenino salió idéntico;
+  - comprobado de nuevo el 2026-11-08, tras reconstruir los 12 sistemas: dos construcciones seguidas del nervioso masculino salieron **idénticas** (580 mallas, ninguna con vértices distintos). La variación de la cámara anterior no se repitió;
   - no se ha comprobado con todos los sistemas ni en otro equipo.
