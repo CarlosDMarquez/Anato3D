@@ -589,3 +589,124 @@ export function fuentesPiel(key) {
     nota: CONSULTA,
   };
 }
+
+// Fichas de los vasos, el corazón y el sistema nervioso (vasos.js, nervios.js): páginas de Wikipedia que dicen cada
+// frase, comprobadas el 8 de noviembre de 2026 (docs/fuentes/vasos-nervios-2026-11-08.md). Las tablas entre las marcas
+// las escribe el script de esa comprobación; se pueden editar a mano.
+// <vasos-nervios>
+const VASO_TIPO = {
+  artery: ['Artery'], pulmonary_artery: ['Pulmonary_artery'], vein: ['Vein'], pulmonary_vein: ['Pulmonary_vein'], heart: ['Heart'],
+  valve: ['Heart_valve', 'Heart_sounds'],
+};
+const VASOS_P = {
+  Ascending_aorta: ['Ascending_aorta', 'Aorta'], Aortic_arch: ['Aortic_arch', 'Aorta'], Thoracic_aorta: ['Thoracic_aorta', 'Aorta'],
+  Abdominal_aorta: ['Abdominal_aorta', 'Aorta', 'Abdominal_aortic_aneurysm'], Pulmonary_trunk: ['Pulmonary_artery'],
+  Brachiocephalic_trunk: ['Brachiocephalic_artery'], Right_common_carotid_artery: ['Common_carotid_artery'],
+  Left_common_carotid_artery: ['Common_carotid_artery'], Internal_carotid_artery: ['Internal_carotid_artery', 'Carotid_artery_stenosis'],
+  Basilar_artery: ['Basilar_artery'], Subclavian_artery: ['Subclavian_artery'], Brachial_artery: ['Brachial_artery', 'Sphygmomanometer'],
+  Radial_artery: ['Radial_artery', 'Pulse'], Femoral_artery: ['Femoral_artery', 'Cardiac_catheterization'], Popliteal_artery: ['Popliteal_artery'],
+  Dorsalis_pedis_artery: ['Dorsalis_pedis_artery'], Right_coronary_artery: ['Right_coronary_artery'],
+  Left_coronary_artery: ['Left_coronary_artery', 'Coronary_arteries'], Anterior_interventricular_artery: ['Left_anterior_descending_artery'],
+  Superior_vena_cava: ['Superior_vena_cava'], Inferior_vena_cava_abdominal_part: ['Inferior_vena_cava', 'Aortocaval_compression_syndrome'],
+  Inferior_vena_cava_thoracic_part: ['Inferior_vena_cava', 'Aortocaval_compression_syndrome'], Internal_jugular_vein: ['Internal_jugular_vein'],
+  External_jugular_vein: ['External_jugular_vein'], Median_cubital_vein: ['Median_cubital_vein'], Cephalic_vein: ['Cephalic_vein'],
+  Basilic_vein: ['Basilic_vein'], Great_saphenous_vein: ['Great_saphenous_vein'], Small_saphenous_vein: ['Small_saphenous_vein'],
+  Femoral_vein: ['Femoral_vein'], Hepatic_portal_vein: ['Portal_vein'], Ovarian_artery: ['Ovarian_artery'],
+  Uterine_artery: ['Uterine_artery', 'Vaginal_artery', 'Hysterectomy'], Vaginal_branches_of_uterine_artery: ['Vaginal_artery'],
+  Tubal_branch_of_uterine_artery: ['Uterine_artery', 'Ovarian_artery'], Ovarian_branch_of_uterine_artery: ['Uterine_artery', 'Ovarian_artery'],
+  Left_ovarian_vein: ['Ovarian_vein'], Right_ovarian_vein: ['Ovarian_vein'], Uterine_venous_plexus: ['Uterine_venous_plexus'],
+  Uterine_veins: ['Uterine_vein'], Coronary_sinus: ['Coronary_sinus'], Superior_sagittal_sinus: ['Superior_sagittal_sinus'],
+  Right_atrium: ['Atrium_(heart)', 'Sinoatrial_node'], Left_atrium: ['Atrium_(heart)'], Right_ventricle: ['Ventricle_(heart)'],
+  Left_ventricle: ['Ventricle_(heart)'], Anterior_cerebral_artery: ['Anterior_cerebral_artery'], Coeliac_trunk: ['Celiac_artery'],
+  Common_hepatic_artery: ['Common_hepatic_artery'], Common_iliac_artery: ['Common_iliac_artery'],
+  External_carotid_artery: ['External_carotid_artery'], External_iliac_artery: ['External_iliac_artery'], Facial_artery: ['Facial_artery'],
+  Inferior_mesenteric_artery: ['Inferior_mesenteric_artery'], Internal_iliac_artery: ['Internal_iliac_artery', 'Common_iliac_artery'],
+  Renal_artery: ['Renal_artery'], Middle_cerebral_artery_M1_segment: ['Middle_cerebral_artery'], Splenic_artery: ['Splenic_artery'],
+  Superficial_temporal_artery: ['Superficial_temporal_artery'], Superior_mesenteric_artery: ['Superior_mesenteric_artery'],
+  Anterior_tibial_artery: ['Anterior_tibial_artery', 'Dorsalis_pedis_artery'], Deep_femoral_artery: ['Deep_femoral_artery'],
+  Fibular_artery: ['Fibular_artery'], Posterior_tibial_artery: ['Posterior_tibial_artery'], Posterior_cerebral_artery: ['Posterior_cerebral_artery'],
+  Vertebral_artery: ['Vertebral_artery'], Axillary_artery: ['Axillary_artery'], Internal_thoracic_artery: ['Internal_thoracic_artery'],
+  Deep_palmar_arch: ['Deep_palmar_arch'], Superficial_palmar_arch: ['Superficial_palmar_arch'], Ulnar_artery: ['Ulnar_artery'],
+  Circumflex_artery_of_heart: ['Circumflex_branch_of_left_coronary_artery'],
+  Anterior_communicating_artery: ['Anterior_communicating_artery', 'Posterior_communicating_artery'],
+  Posterior_communicating_artery: ['Posterior_communicating_artery'], Ophthalmic_artery: ['Ophthalmic_artery'],
+  Middle_meningeal_artery: ['Middle_meningeal_artery'], Maxillary_artery: ['Maxillary_artery'], Left_gastric_artery: ['Left_gastric_artery'],
+  Gastroduodenal_artery: ['Gastroduodenal_artery'], Testicular_artery: ['Testicular_artery'],
+  Inferior_epigastric_artery: ['Inferior_epigastric_artery'], Deep_brachial_artery: ['Deep_artery_of_arm'], Plantar_arch: ['Plantar_arch'],
+  Great_cardiac_vein: ['Great_cardiac_vein'], Middle_cardiac_vein: ['Middle_cardiac_vein'], Sigmoid_sinus: ['Sigmoid_sinus', 'Transverse_sinuses'],
+  Transverse_sinus: ['Transverse_sinuses'], Cavernous_sinus: ['Cavernous_sinus'], Straight_sinus: ['Straight_sinus'],
+  Dorsal_venous_arch_of_foot: ['Dorsal_venous_arch_of_the_foot'], Popliteal_vein: ['Popliteal_vein'], Azygos_vein: ['Azygos_vein'],
+  Hemi_azygos_vein: ['Hemiazygos_vein'], Common_iliac_vein: ['Common_iliac_vein'], External_iliac_vein: ['External_iliac_vein'],
+  Internal_iliac_vein: ['Internal_iliac_vein'], Hepatic_veins: ['Hepatic_veins'], Inferior_mesenteric_vein: ['Inferior_mesenteric_vein'],
+  Superior_mesenteric_vein: ['Superior_mesenteric_vein'], Splenic_vein: ['Splenic_vein'], Left_brachiocephalic_vein: ['Brachiocephalic_vein'],
+  Right_brachiocephalic_vein: ['Brachiocephalic_vein'], Left_renal_vein: ['Renal_vein', 'Superior_mesenteric_artery', 'Ovarian_vein'],
+  Right_renal_vein: ['Renal_vein'], Subclavian_vein: ['Subclavian_vein'], Axillary_vein: ['Axillary_vein', 'Brachial_veins'],
+  Brachial_veins: ['Brachial_veins'], Dorsal_venous_network_of_hand: ['Dorsal_venous_network_of_hand'], Facial_vein: ['Facial_vein'],
+  Retromandibular_vein: ['Retromandibular_vein'],
+};
+const NERV_TEJIDO = {
+  cortex: ['Cerebral_cortex'], cerebellum: ['Cerebellum'], brainstem: ['Brainstem'], white_matter: ['White_matter', 'Myelin'],
+  nucleus: ['Nucleus_(neuroanatomy)'], csf: ['Ventricular_system'], meninges: ['Meninges'], nerve: ['Nerve'], ganglion: ['Ganglion'],
+};
+const NERV_P = {
+  Olfactory_nerve_I: ['Olfactory_nerve', 'Anosmia'], Optic_nerve_II: ['Optic_nerve', 'Papilledema'],
+  Oculomotor_nerve_III: ['Oculomotor_nerve_palsy', 'Oculomotor_nerve'], Trochlear_nerve_IV: ['Trochlear_nerve'],
+  Trigeminal_nerve_V: ['Trigeminal_nerve', 'Trigeminal_neuralgia'], Abducens_nerve_VI: ['Abducens_nerve', 'Sixth_nerve_palsy'],
+  Facial_nerve_VII: ['Facial_nerve', "Bell's_palsy"], Vestibulocochlear_nerve_VIII: ['Vestibulocochlear_nerve', 'Vestibular_schwannoma'],
+  Glossopharyngeal_nerve_IX: ['Glossopharyngeal_nerve'], Vagus_nerve_X: ['Vagus_nerve', 'Vagal_maneuver'], Accessory_nerve_XI: ['Accessory_nerve'],
+  Hypoglossal_nerve_XII: ['Hypoglossal_nerve'], Medulla_oblongata: ['Medulla_oblongata', 'Pyramidal_tracts'], Pons: ['Pons'], Midbrain: ['Midbrain'],
+  Thalamus: ['Thalamus'], Hypothalamus: ['Hypothalamus'], Hippocampus: ['Hippocampus'], Amygdaloid_body: ['Amygdala'],
+  Corpus_callosum: ['Corpus_callosum', 'Corpus_callosotomy'], Caudate_nucleus: ['Caudate_nucleus', "Huntington's_disease"], Putamen: ['Putamen'],
+  Globus_pallidus: ['Globus_pallidus'], Lateral_ventricle: ['Lateral_ventricles', 'Cerebrospinal_fluid'], Third_ventricle: ['Third_ventricle'],
+  Fourth_ventricle: ['Fourth_ventricle'], Aqueduct_of_midbrain: ['Cerebral_aqueduct', 'Hydrocephalus'],
+  Precentral_gyrus: ['Precentral_gyrus', 'Primary_motor_cortex', 'Cortical_homunculus'],
+  Postcentral_gyrus: ['Postcentral_gyrus', 'Primary_somatosensory_cortex'], Central_sulcus: ['Central_sulcus'],
+  Calcarine_sulcus: ['Calcarine_sulcus'], Triangular_part_of_inferior_frontal_gyrus: ["Broca's_area", 'Expressive_aphasia'],
+  Opercular_part_of_inferior_frontal_gyrus: ["Broca's_area", 'Expressive_aphasia'], Transverse_temporal_gyri: ['Transverse_temporal_gyrus'],
+  Supramarginal_gyrus: ['Supramarginal_gyrus'], Angular_gyrus: ['Angular_gyrus'], Optic_chiasm: ['Optic_chiasm', 'Bitemporal_hemianopsia'],
+  Red_nucleus: ['Red_nucleus'], Superior_colliculus: ['Superior_colliculus'], Inferior_colliculus: ['Inferior_colliculus'],
+  Lateral_corticospinal_tract: ['Lateral_corticospinal_tract', 'Corticospinal_tract'], Spinal_dura: ['Dura_mater', 'Epidural_administration'],
+  Falx_cerebri: ['Falx_cerebri'], Tentorium_cerebelli: ['Dura_mater'], Cauda_equina: ['Cauda_equina'], Sciatic_nerve: ['Sciatic_nerve'],
+  Median_nerve: ['Median_nerve', 'Carpal_tunnel_syndrome'], Ulnar_nerve: ['Ulnar_nerve', 'Median_nerve'], Radial_nerve: ['Radial_nerve'],
+  Axillary_nerve: ['Axillary_nerve'], Musculocutaneous_nerve: ['Musculocutaneous_nerve'], Femoral_nerve: ['Femoral_nerve'],
+  Common_fibular_nerve: ['Common_fibular_nerve'], Tibial_nerve: ['Tibial_nerve'], Long_thoracic_nerve: ['Long_thoracic_nerve'],
+  Intercostal_nerves: ['Intercostal_nerves'], Sympathetic_trunk: ['Sympathetic_trunk', 'Sympathetic_nervous_system'],
+  Roots_of_brachial_plexus: ['Brachial_plexus'], Pudendal_nerve: ['Pudendal_nerve'], Saphenous_nerve: ['Saphenous_nerve'],
+  Sural_nerve: ['Sural_nerve'], Cornea: ['Cornea'], Lens: ['Lens_(vertebrate_anatomy)', 'Cataract', 'Presbyopia'],
+  Retina: ['Retina', 'Retinal_detachment'], Iris: ['Iris_(anatomy)'], Sclera: ['Sclera'], Vitreous_body: ['Vitreous_body', 'Floater'],
+  Cochlea: ['Cochlea', 'Cochlear_implant'], Tympanic_membrane: ['Eardrum', 'Perforated_eardrum'], Auditory_tube: ['Eustachian_tube'],
+  Lacrimal_gland: ['Lacrimal_gland'], Vestibule: ['Vestibule_of_the_ear', 'Vestibular_system'], Optic_tract: ['Optic_tract'],
+  Ophthalmic_nerve: ['Ophthalmic_nerve'], Maxillary_nerve: ['Maxillary_nerve'], Lingual_nerve: ['Lingual_nerve'],
+  Inferior_alveolar_nerve: ['Inferior_alveolar_nerve'], Mental_nerve: ['Mental_nerve'], Chorda_tympani: ['Chorda_tympani'],
+  Cochlear_nerve: ['Cochlear_nerve'], Vestibular_nerve: ['Vestibular_nerve'], Superior_trunk_of_brachial_plexus: ['Upper_trunk', 'Brachial_plexus'],
+  Middle_trunk_of_brachial_plexus: ['Brachial_plexus'], Inferior_trunk_of_brachial_plexus: ['Brachial_plexus'],
+  Posterior_cord_of_brachial_plexus: ['Posterior_cord', 'Deep_branch_of_radial_nerve', 'Upper_subscapular_nerve', 'Lower_subscapular_nerve', 'Thoracodorsal_nerve', 'Axillary_nerve', 'Brachial_plexus'],
+  Suprascapular_nerve: ['Suprascapular_nerve'], Dorsal_scapular_nerve: ['Dorsal_scapular_nerve'], Thoracodorsal_nerve: ['Thoracodorsal_nerve'],
+  Lateral_pectoral_nerve: ['Lateral_pectoral_nerve'], Medial_pectoral_nerve: ['Medial_pectoral_nerve'],
+  Superior_subscapular_nerve: ['Upper_subscapular_nerve'], Inferior_subscapular_nerve: ['Lower_subscapular_nerve'],
+  Medial_antebrachial_cutaneous_nerve: ['Medial_cutaneous_nerve_of_forearm'], Medial_brachial_cutaneous_nerve: ['Medial_cutaneous_nerve_of_arm'],
+  Lateral_antebrachial_cutaneous_nerve: ['Lateral_cutaneous_nerve_of_forearm'],
+  Posterior_antebrachial_cutaneous_nerve: ['Posterior_cutaneous_nerve_of_forearm'],
+  Posterior_interosseous_nerve_of_forearm: ['Posterior_interosseous_nerve'], Anterior_interosseous_nerve_of_forearm: ['Anterior_interosseous_nerve'],
+  Superficial_branch_of_radial_nerve: ['Superficial_branch_of_radial_nerve'],
+  Deep_branch_of_radial_nerve: ['Deep_branch_of_radial_nerve', 'Posterior_interosseous_nerve'],
+  Deep_branch_of_ulnar_nerve: ['Deep_branch_of_ulnar_nerve'], Obturator_nerve: ['Obturator_nerve'], Genitofemoral_nerve: ['Genitofemoral_nerve'],
+  Ilio_inguinal_nerve: ['Ilioinguinal_nerve'], Iliohypogastric_nerve: ['Iliohypogastric_nerve'],
+  Lateral_femoral_cutaneous_nerve: ['Lateral_cutaneous_nerve_of_thigh'], Posterior_femoral_cutaneous_nerve: ['Posterior_cutaneous_nerve_of_thigh'],
+  Superior_gluteal_nerve: ['Superior_gluteal_nerve'], Deep_fibular_nerve: ['Deep_fibular_nerve'],
+  Superficial_fibular_nerve: ['Superficial_fibular_nerve'], Medial_plantar_nerve: ['Medial_plantar_nerve'],
+  Lateral_plantar_nerve: ['Lateral_plantar_nerve'], Medial_sural_cutaneous_nerve: ['Medial_sural_cutaneous_nerve'],
+  Anterior_root_of_spinal_nerve: ['Ventral_root_of_spinal_nerve'], Posterior_root_of_spinal_nerve: ['Dorsal_root_of_spinal_nerve'],
+  Stria_terminalis: ['Stria_terminalis'],
+};
+// </vasos-nervios>
+const NOTA_VN = 'Consultadas el 8 de noviembre de 2026: cada frase de la descripción, de la función y de los puntos clave está en alguna de estas páginas; la etimología se genera del nombre latino.';
+const listaVN = (paginas) => (paginas.length ? { lista: paginas.map((w) => ({ papel: 'Ficha', ...WIKI(w) })), nota: NOTA_VN } : null);
+// Vasos: las páginas de la ficha propia y, si se ve su texto (sin ficha propia, o puntos clave del tipo), las del tipo de vaso.
+export function fuentesVaso(key, tipo, conTipo) {
+  return listaVN([...new Set([...(VASOS_P[key] ?? []), ...(conTipo ? VASO_TIPO[tipo] ?? [] : [])])]);
+}
+// Sistema nervioso: las páginas de la ficha propia o, sin ella, las de la descripción de su tejido.
+export function fuentesNervio(key, tejido) {
+  return listaVN(key ? NERV_P[key] ?? [] : NERV_TEJIDO[tejido] ?? []);
+}

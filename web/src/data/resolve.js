@@ -38,7 +38,11 @@ export function resolvePart(name, extras = {}) {
   const nameKey = String(extras.name_en ?? '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '');
   const extra = !extras.name_la && LATIN_EXTRA[nameKey];
   const info = resolveBySystem(name, extra ? { ...extras, name_la: extra[0] } : extras);
-  if (extra) info.fuentes ??= fuentesLatin(nameKey);
+  // La fuente del nombre latino se suma a las de la ficha (vísceras, vasos y nervios también tienen las suyas).
+  if (extra) {
+    const latin = fuentesLatin(nameKey);
+    info.fuentes = info.fuentes ? { ...info.fuentes, lista: [...latin.lista, ...info.fuentes.lista] } : latin;
+  }
   return info;
 }
 

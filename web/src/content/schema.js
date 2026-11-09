@@ -50,7 +50,7 @@ export const ESTADOS = {
 
 // Textos genéricos de las fichas antiguas (data/*.js): una ficha de módulo no puede usarlos.
 export const GENERICOS = [
-  /^Vaso que lleva la sangre desde el corazón/, /^Vaso que devuelve la sangre/, /^Haz de fibras nerviosas que conecta/,
+  /^Vaso que lleva la sangre desde el corazón/, /^Vaso que devuelve la sangre/, /^Haz de fibras nerviosas (\(axones\) )?que conecta/,
   /^Banda de tejido conectivo fibroso denso que une hueso con hueso/, /^Grupo de nodos linfáticos/,
 ];
 
