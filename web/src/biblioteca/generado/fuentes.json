@@ -1561,6 +1561,16 @@
   "fecha": "2026-11-09",
   "huella": "f60ed42df6db"
  },
+ "wp:Choana": {
+  "id": "wp:Choana",
+  "titulo": "Choana",
+  "url": "https://en.wikipedia.org/w/index.php?title=Choana&oldid=1381765335",
+  "revid": 1381765335,
+  "actualizada": "2026-10-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "2a1df1655b2b"
+ },
  "wp:Circle_of_Willis": {
   "id": "wp:Circle_of_Willis",
   "titulo": "Circle of Willis",
@@ -2111,6 +2121,16 @@
   "fecha": "2026-11-09",
   "huella": "41f18a91dea9"
  },
+ "wp:Human_nose": {
+  "id": "wp:Human_nose",
+  "titulo": "Human nose",
+  "url": "https://en.wikipedia.org/w/index.php?title=Human_nose&oldid=1383144836",
+  "revid": 1383144836,
+  "actualizada": "2026-11-01",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "1521f9a985f0"
+ },
  "wp:Human_skeleton": {
   "id": "wp:Human_skeleton",
   "titulo": "Human skeleton",
@@ -2331,6 +2351,16 @@
   "fecha": "2026-11-09",
   "huella": "7570ea04b0c9"
  },
+ "wp:Kiesselbach's_plexus": {
+  "id": "wp:Kiesselbach's_plexus",
+  "titulo": "Kiesselbach's plexus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Kiesselbach's_plexus&oldid=1383350757",
+  "revid": 1383350757,
+  "actualizada": "2026-11-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "9a9638386486"
+ },
  "wp:Knee": {
   "id": "wp:Knee",
   "titulo": "Knee",
@@ -2480,6 +2510,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "c9822ae4525e"
+ },
+ "wp:Major_alar_cartilage": {
+  "id": "wp:Major_alar_cartilage",
+  "titulo": "Major alar cartilage",
+  "url": "https://en.wikipedia.org/w/index.php?title=Major_alar_cartilage&oldid=1192300331",
+  "revid": 1192300331,
+  "actualizada": "2023-12-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "427a5e07ae5e"
  },
  "wp:Male_reproductive_system": {
   "id": "wp:Male_reproductive_system",
@@ -2681,6 +2721,56 @@
   "fecha": "2026-11-09",
   "huella": "ee50709e87cd"
  },
+ "wp:Nasal_cavity": {
+  "id": "wp:Nasal_cavity",
+  "titulo": "Nasal cavity",
+  "url": "https://en.wikipedia.org/w/index.php?title=Nasal_cavity&oldid=1373200185",
+  "revid": 1373200185,
+  "actualizada": "2026-09-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "0fd61d21cd88"
+ },
+ "wp:Nasal_concha": {
+  "id": "wp:Nasal_concha",
+  "titulo": "Nasal concha",
+  "url": "https://en.wikipedia.org/w/index.php?title=Nasal_concha&oldid=1383115783",
+  "revid": 1383115783,
+  "actualizada": "2026-11-01",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "c402ad969072"
+ },
+ "wp:Nasal_septum": {
+  "id": "wp:Nasal_septum",
+  "titulo": "Nasal septum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Nasal_septum&oldid=1359971509",
+  "revid": 1359971509,
+  "actualizada": "2026-06-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "1b15b0dc4def"
+ },
+ "wp:Nasolacrimal_duct": {
+  "id": "wp:Nasolacrimal_duct",
+  "titulo": "Nasolacrimal duct",
+  "url": "https://en.wikipedia.org/w/index.php?title=Nasolacrimal_duct&oldid=1380880083",
+  "revid": 1380880083,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "66ed76ec4302"
+ },
+ "wp:Nasopharynx": {
+  "id": "wp:Nasopharynx",
+  "titulo": "Pharynx",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pharynx&oldid=1380894654",
+  "revid": 1380894654,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "05aa2dac4857"
+ },
  "wp:Navicular_bone": {
   "id": "wp:Navicular_bone",
   "titulo": "Navicular bone",
@@ -2740,6 +2830,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "d7c079655b0c"
+ },
+ "wp:Olfactory_nerve": {
+  "id": "wp:Olfactory_nerve",
+  "titulo": "Olfactory nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Olfactory_nerve&oldid=1345741982",
+  "revid": 1345741982,
+  "actualizada": "2026-03-27",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "b3b57bbe2ccf"
  },
  "wp:Omohyoid_muscle": {
   "id": "wp:Omohyoid_muscle",
@@ -3210,6 +3310,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "9a249d1659e1"
+ },
+ "wp:Septal_nasal_cartilage": {
+  "id": "wp:Septal_nasal_cartilage",
+  "titulo": "Septal nasal cartilage",
+  "url": "https://en.wikipedia.org/w/index.php?title=Septal_nasal_cartilage&oldid=1375983161",
+  "revid": 1375983161,
+  "actualizada": "2026-09-21",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-09",
+  "huella": "dd1046cee8e6"
  },
  "wp:Sesamoid_bone": {
   "id": "wp:Sesamoid_bone",

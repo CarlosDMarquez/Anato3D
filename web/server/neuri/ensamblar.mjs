@@ -27,7 +27,7 @@ const grupo = (t) => GRUPO[t] ?? t;
  * evidencias: Map «E3» → entrada del corpus ({ citas: [{ f, c }], … }); inventario: cargarInventario(); fuentes: meta de
  * cada fuente citada (f → { titulo, url, licencia, revid, fecha }).
  */
-export function ensamblarLeccion({ plan, borrador, evidencias, inventario, idioma = 'es', id, modo = 'redactar', base = null, modeloIA = null, fecha = new Date().toISOString().slice(0, 10), fuentes = {}, terminologia = [] }) {
+export function ensamblarLeccion({ plan, borrador, evidencias, inventario, idioma = 'es', id, modo = 'redactar', base = null, modeloIA = null, fecha = new Date().toISOString().slice(0, 10), fuentes = {}, terminologia = [], instrucciones = null }) {
   const quitado = [];
   // ── Estructuras (del plan, con los datos del inventario) ──
   const porClave = new Map();
@@ -204,7 +204,7 @@ export function ensamblarLeccion({ plan, borrador, evidencias, inventario, idiom
     },
   });
   L.fuentesUsadas = fuentesUsadas;
-  L.origen = { neuri: true, modo, base, fecha, modelo: modeloIA };
+  L.origen = { neuri: true, modo, base, fecha, modelo: modeloIA, instrucciones };
   return { L, quitado };
 }
 
@@ -244,8 +244,11 @@ export function afirmaciones(L) {
   });
   for (const q of L.preguntas) {
     if (!q.evidencia?.length) continue;
-    const afirma = q.tipo === 'secuencia' ? `${q.enunciado} Orden correcto: ${q.orden.join(' → ')}.` : `${q.enunciado} Respuesta correcta: ${q.correcta}. ${q.explicacion}`;
-    out.push({ n: out.length + 1, donde: { pregunta: q.id }, texto: afirma, citas: q.evidencia.filter((e) => e.c).map((e) => e.c) });
+    // Con las opciones incorrectas: la comprobación mira también que ninguna sea correcta (pregunta ambigua).
+    const afirma = q.tipo === 'secuencia'
+      ? `${q.enunciado} Orden correcto: ${q.orden.join(' → ')}. ${q.explicacion}`
+      : `${q.enunciado} Respuesta correcta: ${q.correcta}. Opciones incorrectas: ${q.distractores.join('; ')}. Explicación: ${q.explicacion}`;
+    out.push({ n: out.length + 1, donde: { pregunta: q.id }, pregunta: true, texto: afirma, citas: q.evidencia.filter((e) => e.c).map((e) => e.c) });
   }
   return out;
 }

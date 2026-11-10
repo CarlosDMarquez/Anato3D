@@ -26,6 +26,7 @@ const UI = {
   compare: 'columns-2', layers: 'layers', plus: 'plus', compass: 'compass', quote: 'quote', timer: 'timer',
   // Neuri, el pet de la biblioteca
   send: 'send-horizontal', sparkles: 'sparkles', newChat: 'message-square-plus',
+  download: 'download', upload: 'upload', pencil: 'pencil', trash: 'trash', flag: 'flag', archive: 'archive',
 };
 
 function pick(set, map) {

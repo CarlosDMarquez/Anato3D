@@ -28,7 +28,10 @@ const PRECIOS = {
   'claude-sonnet-5-5': [2, 10, 0.2, 2.5],
 };
 
-/** Error de Neuri con un código para la app (sin-ia, ocupado, conexion, ia, rechazo, incompleta, formato, cancelada). */
+/**
+ * Error de Neuri con un código para la app: sin-ia (sin clave o rechazada), sin-saldo, ocupado, tiempo, conexion, ia,
+ * rechazo, incompleta, formato o cancelada.
+ */
 export class ErrorNeuri extends Error {
   constructor(codigo, status = 502, detalle = '') {
     super(detalle || codigo);
@@ -50,7 +53,7 @@ export const crearCliente = (clave) => (clave ? new Anthropic({ apiKey: clave, m
  * Pide a Claude una salida con el esquema dado y la devuelve ya leída: { datos, uso, modelo }.
  * `sistema`: [texto fijo (en caché), texto que cambia]. `flujo`: en streaming (respuestas largas).
  */
-export async function llamar(api, { modelo, sistema, mensajes, esquema, esfuerzo = 'low', maxTokens = 2048, flujo = false, registro = console, etiqueta = '', signal = null }) {
+export async function llamar(api, { modelo, sistema, mensajes, esquema, esfuerzo = 'low', maxTokens = 2048, flujo = false, registro = console, etiqueta = '', signal = null, plazoMs = null, trabajo = null }) {
   const params = {
     model: modelo,
     max_tokens: maxTokens,
@@ -61,9 +64,11 @@ export async function llamar(api, { modelo, sistema, mensajes, esquema, esfuerzo
     messages: mensajes,
     output_config: { effort: esfuerzo, format: { type: 'json_schema', schema: esquema } },
   };
-  // `signal`: si la persona cancela (cierra la conexión), la llamada se corta y no se sigue gastando.
-  const opciones = signal ? { signal } : undefined;
+  // `signal`: si la persona cancela (cierra la conexión), la llamada se corta y no se sigue gastando. `plazoMs`: lo más
+  // que puede tardar cada intento (el SDK reintenta una vez si falla la red o la API está saturada).
+  const opciones = signal || plazoMs ? { ...(signal ? { signal } : {}), ...(plazoMs ? { timeout: plazoMs } : {}) } : undefined;
   let resp;
+  const inicio = Date.now();
   try {
     if (signal?.aborted) throw new ErrorNeuri('cancelada', 499);
     if (CON_RESPALDO.has(modelo)) {
@@ -77,7 +82,9 @@ export async function llamar(api, { modelo, sistema, mensajes, esquema, esfuerzo
   }
   const u = resp.usage ?? {};
   const c = coste(modelo, u);
-  registro.info?.(`[pet] ${etiqueta ? `${etiqueta} · ` : ''}${resp.model ?? modelo}: entrada ${u.input_tokens ?? 0}, caché leída ${u.cache_read_input_tokens ?? 0}, caché escrita ${u.cache_creation_input_tokens ?? 0}, salida ${u.output_tokens ?? 0}${c !== null ? ` (≈ ${c.toFixed(4)} US$)` : ''}`);
+  // El registro técnico: modo, modelo, tokens, coste aproximado, duración y el trabajo al que pertenece; nunca lo que se
+  // escribe ni lo que responde.
+  registro.info?.(`[pet] ${etiqueta ? `${etiqueta} · ` : ''}${resp.model ?? modelo}: entrada ${u.input_tokens ?? 0}, caché leída ${u.cache_read_input_tokens ?? 0}, caché escrita ${u.cache_creation_input_tokens ?? 0}, salida ${u.output_tokens ?? 0}${c !== null ? ` (≈ ${c.toFixed(4)} US$)` : ''} · ${((Date.now() - inicio) / 1000).toFixed(1)} s${trabajo ? ` · trabajo ${trabajo}` : ''}`);
   if (resp.stop_reason === 'refusal') throw new ErrorNeuri('rechazo');
   if (resp.stop_reason === 'max_tokens') throw new ErrorNeuri('incompleta');
   const bloque = resp.content?.find((b) => b.type === 'text');
@@ -95,9 +102,18 @@ function clasificar(err, registro) {
     return new ErrorNeuri('sin-ia', 503);
   }
   if (err instanceof Anthropic.RateLimitError) return new ErrorNeuri('ocupado', 429);
+  // Sin saldo en la cuenta: no se reintenta (la app lo dice y usa el buscador).
+  if (err instanceof Anthropic.APIError && /credit balance|billing|insufficient.*(credit|funds)/i.test(err.message ?? '')) {
+    registro.error?.('[pet] La cuenta de Anthropic no tiene saldo: Neuri responde con el buscador.');
+    return new ErrorNeuri('sin-saldo', 503);
+  }
   if (err instanceof Anthropic.BadRequestError) {
     registro.error?.(`[pet] La API no acepta la petición (400): ${err.message}`);
     return new ErrorNeuri('ia', 502);
+  }
+  if (err instanceof Anthropic.APIConnectionTimeoutError) {
+    registro.error?.('[pet] La API de Anthropic tardó demasiado.');
+    return new ErrorNeuri('tiempo', 504);
   }
   if (err instanceof Anthropic.APIConnectionError) {
     registro.error?.('[pet] Sin conexión con la API de Anthropic.');

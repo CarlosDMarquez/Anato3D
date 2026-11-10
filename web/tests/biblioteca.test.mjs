@@ -8,8 +8,9 @@ import { crearBuscador, normalizar, distancia } from '../src/biblioteca/buscar.j
 import * as F from '../src/biblioteca/filtros.js';
 import * as P from '../src/biblioteca/progreso.js';
 import { instanciar, corregir, evaluacionDe, disponibleEn, porObjetivo, preguntaDeItem, rngConSemilla, NO_LO_SE } from '../src/biblioteca/evaluar.js';
-import { proponer, itemsDePractica } from '../src/biblioteca/sesion.js';
-import { revisarLeccion, todasLasEvidencias, frases } from '../src/biblioteca/formato.js';
+import { proponer, itemsDePractica, alternativaDe, sinRepetirRecientes } from '../src/biblioteca/sesion.js';
+import { calcularMapa, cuando } from '../src/biblioteca/mapa.js';
+import { revisarLeccion, todasLasEvidencias, frases, estructurasDePregunta } from '../src/biblioteca/formato.js';
 import { deModulo } from '../src/biblioteca/modulos.js';
 import { RECORRIDOS, leccionesDeRecorrido } from '../src/biblioteca/recorridos.js';
 import { MODULOS } from '../src/content/index.js';
@@ -169,16 +170,29 @@ test('filtros de progreso, repaso pendiente y favoritas', () => {
 });
 
 // ── Progreso ──
-test('progreso v2: guardar y cargar; dañado u otra versión: vacío sin tocar lo guardado', () => {
+test('progreso v2: guardar y cargar; dañado u otra versión: vacío, y lo guardado se aparta antes de escribir encima', () => {
   const st = memoria();
   const d = P.cargar(st);
   P.verPaso(d, HOMBRO, 1, 5);
   assert.equal(P.guardar(st, d), true);
   assert.deepEqual(P.cargar(st).lecciones['ms-hombro-musculos'].vistos, ['deltoides']);
-  assert.deepEqual(P.cargar(memoria({ [P.CLAVE]: '{roto' })), P.vacio());
+  const roto = memoria({ [P.CLAVE]: '{roto' });
+  const dr = P.cargar(roto, { ahora: 77 });
+  assert.deepEqual({ ...dr, apartado: undefined }, { ...P.vacio(), apartado: undefined });
+  assert.equal(dr.apartado, 77);
+  assert.deepEqual(JSON.parse(roto.datos[P.CLAVE_APARTADO]), { texto: '{roto', fecha: 77 });
+  assert.equal(P.guardar(roto, dr), true, 'ya está a salvo: se puede escribir');
   const otra = memoria({ [P.CLAVE]: JSON.stringify({ version: 99 }) });
-  assert.deepEqual(P.cargar(otra), P.vacio());
-  assert.match(otra.datos[P.CLAVE], /"version":99/);
+  const d99 = P.cargar(otra);
+  assert.deepEqual(d99.lecciones, {});
+  assert.match(otra.datos[P.CLAVE], /"version":99/, 'cargar no toca lo guardado');
+  assert.match(JSON.parse(otra.datos[P.CLAVE_APARTADO]).texto, /"version":99/);
+  // Si no se puede apartar, no se escribe encima.
+  const sinApartar = memoria({ [P.CLAVE]: '{roto' });
+  sinApartar.setItem = () => { throw new Error('lleno'); };
+  const ds = P.cargar(sinApartar);
+  assert.equal(ds.sinApartar, true);
+  assert.equal(P.guardar(sinApartar, ds), false);
   const bloqueado = { getItem: () => { throw new Error('x'); }, setItem: () => { throw new Error('x'); } };
   assert.deepEqual(P.cargar(bloqueado), P.vacio());
   assert.equal(P.guardar(bloqueado, P.vacio()), false);
@@ -343,6 +357,126 @@ test('prácticas: errores primero lo que sigue en caja 0; por lecciones solo esa
   P.anotar(d, 'antebrazo/c', 'acierto', 0);
   assert.deepEqual(itemsDePractica(d, 'errores'), ['brazo/a', 'antebrazo/c']);
   assert.deepEqual(itemsDePractica(d, 'region', { lecciones: ['antebrazo'] }), ['antebrazo/c']);
+});
+
+test('filtros nuevos: tipo de estructura (del núcleo), idioma y procedencia; solo se ofrecen los que dan algo', () => {
+  const L = CATALOGO.lecciones;
+  const ctx = { estado: () => ({ estado: 'sin-empezar', pendientes: 0 }), favorita: () => false };
+  const huesos = F.filtrar(L, { ...F.vacios(), estructura: 'huesos' }, ctx);
+  assert.ok(huesos.length > 5 && huesos.every((x) => x.estructuras.some((e) => e.papel === 'nucleo' && ['hueso', 'diente', 'cartilago'].includes(e.tipo))));
+  assert.ok(!huesos.some((x) => x.id === 'ms-hombro-musculos'), 'el hombro (músculos) no tiene huesos en su núcleo');
+  const ingles = F.filtrar(L, { ...F.vacios(), idioma: 'en' }, ctx);
+  assert.deepEqual(ingles.map((x) => x.id).sort(), ['antebrazo', 'brazo']);
+  const propia = { ...L[0], id: 'neuri-x-0000', propia: true };
+  assert.deepEqual(F.filtrar([...L, propia], { ...F.vacios(), procedencia: 'propias' }, ctx).map((x) => x.id), ['neuri-x-0000']);
+  assert.equal(F.filtrar([...L, propia], { ...F.vacios(), procedencia: 'biblioteca' }, ctx).length, L.length);
+  assert.deepEqual(F.valoresPresentes(L, 'procedencia'), ['biblioteca'], 'sin lecciones propias, el filtro no se ofrece');
+  assert.deepEqual(F.valoresPresentes(L, 'idioma').sort(), ['de', 'en', 'es', 'fr', 'it']);
+  assert.ok(F.valoresPresentes(L, 'estructura').includes('nervios'));
+  const act = F.activos({ ...F.vacios(), estructura: 'huesos', idioma: 'en', procedencia: 'propias' }, (k) => `T:${k}`, (id) => `I:${id}`);
+  assert.deepEqual(act.map((a) => [a.clave, a.nombre]), [['estructura', 'T:filtro.grupo.huesos'], ['idioma', 'I:en'], ['procedencia', 'T:filtro.proc.propias']]);
+});
+
+test('intentos: fecha, versión, tarea, habilidad, objetivo, estructura y lo elegido al fallar; los técnicos no cuentan', () => {
+  const d = P.vacio();
+  const i = P.registrarIntento(d, { leccion: 'brazo', version: 'v3', pregunta: 'identificar:humero', tipo: 'identificar', objetivo: 0, estructura: 'humero', resultado: 'fallo', elegida: 'Radio', modo: 'evaluacion' }, 100);
+  assert.deepEqual(i, { f: 100, l: 'brazo', v: 'v3', q: 'identificar:humero', t: 'identificar', h: 'reconocer', o: 0, e: 'humero', r: 'fallo', x: 'Radio', d: false, m: 'evaluacion' });
+  assert.equal(P.registrarIntento(d, { leccion: 'brazo', pregunta: 'f1', tipo: 'funcion', resultado: 'acierto', elegida: 'X' }, 101).x, null, 'lo elegido solo se guarda al fallar');
+  for (let k = 0; k < P.MAX_INTENTOS + 5; k++) P.registrarIntento(d, { leccion: 'brazo', pregunta: 'f', tipo: 'funcion', resultado: 'acierto' }, 200 + k);
+  assert.equal(d.intentos.length, P.MAX_INTENTOS);
+  // Guardar y cargar conserva intentos y preferencias (campos nuevos de la versión 2).
+  const st = memoria();
+  d.preferencias = P.limpiarPreferencias({ nivel: 2, minutos: 20, intereses: ['cabeza', 'nervioso', 'MAL id'] });
+  P.guardar(st, d);
+  const c = P.cargar(st);
+  assert.equal(c.intentos.length, P.MAX_INTENTOS);
+  assert.deepEqual(c.preferencias, { nivel: 2, minutos: 20, intereses: ['cabeza', 'nervioso'] });
+  assert.equal(P.limpiarPreferencias({ nivel: 9, minutos: 7, intereses: [] }), null);
+});
+
+test('aplazar y retomar repasos sin perder cuándo tocaban; lo recién fallado no se repite tal cual', () => {
+  const d = P.vacio();
+  P.anotar(d, 'brazo/a', 'fallo', 0);
+  P.anotar(d, 'brazo/b', 'fallo', 0);
+  assert.deepEqual(P.vencidas(d, { ahora: 10 }), ['brazo/a', 'brazo/b']);
+  const r = P.aplazar(d, ['brazo/a'], 1, 10);
+  assert.deepEqual(r, { n: 1, hasta: 10 + DIA });
+  assert.deepEqual(P.vencidas(d, { ahora: 20 }), ['brazo/b'], 'lo aplazado no se propone');
+  assert.deepEqual(P.falladas(d, { ahora: 20 }), ['brazo/b']);
+  assert.deepEqual(P.vencidas(d, { ahora: 20 + DIA }), ['brazo/a', 'brazo/b'], 'pasado el plazo, vuelve');
+  assert.deepEqual(P.aplazados(d, 20).map((x) => x.id), ['brazo/a']);
+  assert.equal(P.retomar(d, null, 20), 1);
+  assert.deepEqual(P.vencidas(d, { ahora: 20 }), ['brazo/a', 'brazo/b']);
+  assert.equal(d.items['brazo/a'].proximo, 0, 'cuándo tocaba no cambia');
+  // Recién fallada: otra pregunta sobre lo mismo (de otro tipo si la hay), o se deja para luego.
+  const B = LECCIONES.get('brazo');
+  const q = B.preguntas.find((x) => x.tipo === 'identificar' && B.preguntas.some((y) => y !== x && (y.estructura === x.estructura || estructurasDePregunta(y).includes(x.estructura))));
+  const id = P.itemId(B.id, q.id);
+  const e = P.vacio();
+  P.anotar(e, id, 'fallo', 1000);
+  P.registrarIntento(e, { leccion: B.id, pregunta: q.id, tipo: q.tipo, estructura: q.estructura, resultado: 'fallo' }, 1000);
+  assert.equal(P.recienFallada(e, id, 1000 + 60_000), true);
+  assert.equal(P.recienFallada(e, id, 1000 + P.RECIENTE_MS + 1), false);
+  const alt = alternativaDe(B, q.id, { data: e, ahora: 2000 });
+  const qa = B.preguntas.find((x) => P.itemId(B.id, x.id) === alt);
+  assert.ok(qa && qa.id !== q.id && (qa.estructura === q.estructura || estructurasDePregunta(qa).includes(q.estructura)));
+  assert.notEqual(qa.tipo, 'identificar', 'mejor otro tipo de tarea');
+  const r2 = sinRepetirRecientes([id], { data: e, lecciones: LECCIONES, ahora: 2000 });
+  assert.deepEqual(r2, { items: [alt], esperan: 0 });
+  const sinOtra = { ...B, preguntas: [q] };
+  const r3 = sinRepetirRecientes([id], { data: e, lecciones: new Map([[B.id, sinOtra]]), ahora: 2000 });
+  assert.deepEqual(r3, { items: [], esperan: 1 });
+  assert.deepEqual(sinRepetirRecientes([id], { data: e, lecciones: LECCIONES, ahora: 1000 + P.RECIENTE_MS + 1 }).items, [id], 'pasado un rato, ya se puede repetir');
+});
+
+test('mapa de aprendizaje: habilidades (sin datos, practicando, demostrada, consolidada), lecciones y dificultades con su motivo', () => {
+  const d = P.vacio();
+  const ahora = 50 * DIA;
+  const cat = CATALOGO.lecciones;
+  let m = calcularMapa(d, { catalogo: cat, ahora });
+  assert.ok(m.habilidades.every((h) => h.estado === 'sin-datos'));
+  assert.deepEqual(m.lecciones, { visitadas: 0, completadas: 0, demostradas: 0, dominadas: 0 });
+  // Reconocer: 4 bien de 5 en los últimos → demostrada; con 3 preguntas consolidadas por el repaso → consolidada.
+  const reg = (q, r, f, extra = {}) => P.registrarIntento(d, { leccion: 'brazo', pregunta: q, tipo: 'identificar', estructura: q, resultado: r, modo: 'repaso', elegida: r === 'fallo' ? 'Radio' : null, ...extra }, f);
+  ['a', 'b', 'c', 'd'].forEach((q, k) => reg(q, 'acierto', ahora - 5 * DIA + k));
+  reg('e', 'fallo', ahora - DIA);
+  m = calcularMapa(d, { catalogo: cat, ahora });
+  assert.equal(m.habilidades.find((h) => h.id === 'reconocer').estado, 'demostrada');
+  for (const q of ['a', 'b', 'c']) d.items[`brazo/${q}`] = { caja: 3, aciertos: 3, fallos: 0, dudas: 0, ultimo: 1, proximo: ahora + DIA };
+  d.items['brazo/e'] = { caja: 0, aciertos: 0, fallos: 1, dudas: 0, ultimo: ahora - DIA, proximo: ahora - DIA };
+  m = calcularMapa(d, { catalogo: cat, ahora });
+  assert.equal(m.habilidades.find((h) => h.id === 'reconocer').estado, 'consolidada');
+  assert.equal(m.habilidades.find((h) => h.id === 'explicar').estado, 'sin-datos', 'lo no comprobado no se da por sabido');
+  // Una sola respuesta bien no basta.
+  const otra = P.vacio();
+  P.registrarIntento(otra, { leccion: 'brazo', pregunta: 'x', tipo: 'funcion', resultado: 'acierto', modo: 'evaluacion' }, ahora);
+  assert.equal(calcularMapa(otra, { catalogo: cat, ahora }).habilidades.find((h) => h.id === 'explicar').estado, 'practicando');
+  // Las comprobaciones dentro de la lección y lo técnico no cuentan; lo de lecciones que ya no existen, tampoco.
+  P.registrarIntento(d, { leccion: 'brazo', pregunta: 'z', tipo: 'comparacion', resultado: 'fallo', modo: 'leccion' }, ahora);
+  P.registrarIntento(d, { leccion: 'brazo', pregunta: 'y', tipo: 'localizar', resultado: 'tecnico', modo: 'evaluacion' }, ahora);
+  P.registrarIntento(d, { leccion: 'no-existe', pregunta: 'w', tipo: 'localizar', resultado: 'fallo', modo: 'evaluacion' }, ahora);
+  m = calcularMapa(d, { catalogo: cat, ahora });
+  assert.equal(m.habilidades.find((h) => h.id === 'comparar').estado, 'sin-datos');
+  assert.equal(m.habilidades.find((h) => h.id === 'localizar').estado, 'sin-datos');
+  assert.equal(m.tecnicos, 1);
+  // Dificultades: lo fallado sin consolidar, con lo que se eligió (el motivo) y si está aplazado.
+  assert.deepEqual(m.dificultades.map((x) => [x.item, x.motivo, x.elegida]), [['brazo/e', 'confusion', 'Radio']]);
+  P.aplazar(d, ['brazo/e'], 2, ahora);
+  assert.equal(calcularMapa(d, { catalogo: cat, ahora }).dificultades[0].aplazado, ahora + 2 * DIA);
+  assert.equal(calcularMapa(d, { catalogo: cat, ahora }).repasos.aplazados.length, 1);
+  // Cuándo: hoy, ayer o un día (por el calendario local).
+  const hoy = new Date(2026, 10, 9, 10).getTime();
+  assert.deepEqual([cuando(hoy - 3600e3, hoy), cuando(new Date(2026, 10, 8, 23).getTime(), hoy), cuando(new Date(2026, 10, 5).getTime(), hoy)], ['hoy', 'ayer', 'dia']);
+});
+
+test('sesión con preferencias: primero lo de sus intereses y lo más cercano a su nivel', () => {
+  const d = P.vacio();
+  const sin = proponer({ minutos: 45, catalogo: CATALOGO.lecciones, data: d, ahora: 1 });
+  d.preferencias = P.limpiarPreferencias({ intereses: ['miembro-inferior'], nivel: 1 });
+  const con = proponer({ minutos: 45, catalogo: CATALOGO.lecciones, data: d, ahora: 1 });
+  const lugar = (id) => CATALOGO.lecciones.find((L) => L.id === id).lugares.map(([r]) => r);
+  assert.ok(lugar(con.find((b) => b.tipo === 'leccion').id).includes('miembro-inferior') || !CATALOGO.lecciones.some((L) => L.lugares.some(([r]) => r === 'miembro-inferior') && !(L.requisitos ?? []).length));
+  assert.notDeepEqual(sin, con);
 });
 
 test('las frases de los módulos antiguos se leen como una sola frase con sus fuentes', () => {

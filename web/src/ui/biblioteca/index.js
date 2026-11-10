@@ -12,10 +12,12 @@
 //   api.piezas()                         estructuras del modelo actual (para buscarlas) → [{ clave, nombre, latin, en, … }]
 //   api.verEstructura(clave)             muestra una estructura del modelo (desde el buscador)
 //   api.ajustar()                        el panel cambió de tamaño (en el móvil, el visor deja sitio)
+//   api.abrirPanel()                     abre el panel «Estudiar» (un aviso lleva a una vista con el panel cerrado)
 import * as P from '../../biblioteca/progreso.js';
 import * as F from '../../biblioteca/filtros.js';
 import { deModulo } from '../../biblioteca/modulos.js';
 import { crearBuscador } from '../../biblioteca/buscar.js';
+import { huella, retirada } from '../../biblioteca/evaluar.js';
 import { RECORRIDOS, leccionesDeRecorrido } from '../../biblioteca/recorridos.js';
 import { MODULOS } from '../../content/index.js';
 import { sinonimosDePieza } from '../../content/index.js';
@@ -25,11 +27,17 @@ import { renderResultados, renderRecorrido, renderInfo, renderSesion } from './e
 import { renderLeccion } from './leccion.js';
 import { renderPreguntas, renderResultado, teclaPreguntas } from './preguntas.js';
 import { crearNeuri } from './pet.js';
-import { cargarPropias, entradaCatalogo, guardarPropia, borrarPropia } from '../../biblioteca/propias.js';
+import * as PR from '../../biblioteca/propias.js';
+import { renderMisLecciones } from './mis-lecciones.js';
+import { renderMapa } from './mapa.js';
+import { renderExamen } from './examen.js';
+import { renderDatos } from './privacidad.js';
+import { crearRegistroEventos } from '../../biblioteca/eventos.js';
+import { enviarPendientes } from '../../biblioteca/reportes.js';
 
 const ARCHIVOS = import.meta.glob('../../biblioteca/lecciones/*.js');
 // Vistas que necesitan sitio (catálogo) y vistas que dejan el modelo a la vista (lección y preguntas).
-const ANCHAS = new Set(['portada', 'resultados', 'recorrido', 'info', 'sesion', 'neuri']);
+const ANCHAS = new Set(['portada', 'resultados', 'recorrido', 'info', 'sesion', 'neuri', 'propias', 'mapa', 'examen', 'datos']);
 
 export function createBiblioteca({ panel, body, storage, api, toast }) {
   const antiguas = new Map(MODULOS.map(deModulo).filter(Boolean).map((L) => [L.id, L]));
@@ -47,12 +55,34 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     esPropia: (id) => ctx.propias.some((L) => L.id === id),
     /** Guarda una lección de Neuri en «Mis lecciones» y la añade al catálogo. Devuelve { ok, error? }. */
     guardarPropia(L) {
-      const r = guardarPropia(storage, L);
+      const r = PR.guardarPropia(storage, L);
       if (r.ok) actualizarPropias();
       return r;
     },
+    renombrarPropia(id, titulo) {
+      const r = PR.renombrarPropia(storage, id, titulo);
+      if (r.ok) actualizarPropias();
+      return r;
+    },
+    importarPropias(texto) {
+      const r = PR.importarPropias(storage, texto);
+      if (r.ok) actualizarPropias();
+      return r;
+    },
+    exportarPropias: () => PR.exportarPropias(storage),
+    estadoPropias: () => PR.estadoPropias(storage),
+    apartadasPropias: () => PR.apartadas(storage),
+    descartarApartadas: () => PR.descartarApartadas(storage),
+    /** Va a una vista aunque el panel esté cerrado (desde un aviso): lo abre en ella. */
+    mostrar(vista) {
+      if (panel.classList.contains('open')) return ir(vista);
+      if (ctx.vista.tipo !== vista.tipo || ctx.vista.id !== vista.id) { ctx.pila.push(ctx.vista); ctx.vista = vista; }
+      api.abrirPanel?.();
+    },
+    /** La lista de «Mis lecciones» (para liberar espacio o elegir una). */
+    verMisLecciones() { ctx.mostrar({ tipo: 'propias' }); },
     borrarPropia(id) {
-      const ok = borrarPropia(storage, id);
+      const ok = PR.borrarPropia(storage, id);
       P.borrarLeccion(ctx.data, id);
       ctx.data.favoritos = ctx.data.favoritos.filter((x) => x !== id);
       ctx.guardar();
@@ -60,8 +90,41 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
       return ok;
     },
   };
+  /** Tras leer el progreso: lo de preguntas corregidas o retiradas de las lecciones ya cargadas deja de contar. */
+  function depurarCargadas() {
+    let n = 0;
+    for (const L of ctx.lecciones.values()) n += P.depurar(ctx.data, L, huella, (q) => retirada(L.id, q));
+    if (n) ctx.guardar();
+  }
+  depurarCargadas();
+  // Estadísticas de uso (opcionales, desactivadas por defecto): eventos con forma controlada, solo en este navegador.
+  ctx.eventos = crearRegistroEventos({ almacen: storage });
+  ctx.evento = (tipo, props, opciones) => ctx.eventos.registrar(tipo, props, opciones);
+  ctx.alReportar = (r) => ctx.evento('problema_reportado', { categoria: r.categoria, vista: r.vista }, { clave: r.id });
+  /** Tras «Borrar mis datos»: el progreso y las lecciones propias en memoria también se olvidan. */
+  ctx.olvidarDatos = () => {
+    ctx.data = P.vacio();
+    actualizarPropias();
+    ctx.busqueda = { texto: '', filtros: F.vacios(), orden: 'relevancia' };
+  };
+  // Tiempo activo de una lección (solo con la página a la vista y con actividad en el último minuto).
+  try {
+    const actividad = () => ctx.crono?.actividad();
+    // (también en el modelo 3D: girarlo o tocarlo durante una lección es estudiar)
+    document.addEventListener('pointerdown', actividad, { passive: true });
+    document.addEventListener('keydown', actividad, { passive: true });
+    document.addEventListener('visibilitychange', () => ctx.crono?.visible(document.visibilityState === 'visible'));
+  } catch { /* sin documento */ }
   // Neuri, el pet que recomienda lecciones (pet.js): su lanzador vive en el panel y su conversación es la vista «neuri».
   ctx.neuri = crearNeuri(ctx, panel);
+  // Otra pestaña guardó o quitó lecciones propias: el catálogo y, si está a la vista, la sección de la portada.
+  try {
+    addEventListener('storage', (e) => {
+      if (e.key !== PR.CLAVE_PROPIAS) return;
+      actualizarPropias();
+      if (ctx.vista.tipo === 'portada' || ctx.vista.tipo === 'propias') ctx.repintarPropias?.();
+    });
+  } catch { /* sin ventana */ }
   // Si el progreso se migró desde la versión anterior, se guarda ya en el formato nuevo (la clave antigua no se toca).
   if (ctx.data.migracion && !storage?.getItem?.(P.CLAVE)) ctx.guardar();
 
@@ -75,10 +138,13 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
   function actualizarPropias() {
     if (!ctx.catalogoBase) return;
     for (const L of ctx.propias) ctx.lecciones.delete(L.id);
-    ctx.propias = cargarPropias(storage);
+    ctx.propias = PR.cargarPropias(storage);
     for (const L of ctx.propias) ctx.lecciones.set(L.id, L);
     const base = ctx.catalogoBase;
-    ctx.catalogo = { ...base, lecciones: [...base.lecciones, ...ctx.propias.map((L, i) => entradaCatalogo(L, 1000 + i))] };
+    // Requisitos y «siguiente» de las propias se conservan si apuntan a lecciones que existen.
+    const ids = new Set([...base.lecciones.map((L) => L.id), ...ctx.propias.map((L) => L.id)]);
+    // Las lecciones retiradas mientras se revisa un reporte no se ofrecen (src/biblioteca/retiradas.js).
+    ctx.catalogo = { ...base, lecciones: [...base.lecciones.filter((L) => !retirada(L.id)), ...ctx.propias.map((L, i) => PR.entradaCatalogo(L, 1000 + i, (id) => ids.has(id)))] };
     ctx.porId = new Map(ctx.catalogo.lecciones.map((L) => [L.id, L]));
     ctx.buscador = crearBuscador({ lecciones: ctx.catalogo.lecciones, recorridos: RECORRIDOS, estructuras: ctx.estructuras?.lista ?? [] });
   }
@@ -101,6 +167,8 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     if (!f) return null;
     const L = (await f()).default;
     ctx.lecciones.set(id, L);
+    // Preguntas corregidas o retiradas desde la última vez: sus fallos anteriores dejan de contar.
+    if (P.depurar(ctx.data, L, huella, (q) => retirada(L.id, q))) ctx.guardar();
     ctx.fuentes ??= (await import('../../biblioteca/generado/fuentes.json')).default;
     return L;
   }
@@ -145,6 +213,10 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     if (v.tipo === 'preguntas') return renderPreguntas(ctx);
     if (v.tipo === 'resultado') return renderResultado(ctx);
     if (v.tipo === 'neuri') return ctx.neuri.renderVista();
+    if (v.tipo === 'propias') return renderMisLecciones(ctx);
+    if (v.tipo === 'mapa') return renderMapa(ctx);
+    if (v.tipo === 'examen') return renderExamen(ctx);
+    if (v.tipo === 'datos') return renderDatos(ctx);
     return renderPortada(ctx);
   }
 
@@ -152,6 +224,8 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     abrir() {
       ctx.data = P.cargar(storage, { lecciones: antiguas });
       actualizarPropias();                                  // otra pestaña pudo crear o borrar lecciones propias
+      depurarCargadas();
+      enviarPendientes({ almacen: storage }).catch(() => {});   // reportes que no se pudieron enviar
       return render();
     },
     // Cambio de idioma o de modelo: rehace la vista actual (sin mover la cámara ni cambiar la pregunta).

@@ -7,7 +7,13 @@
 //     items: { [leccion/pregunta]: { caja, aciertos, fallos, dudas, ultimo, proximo } },
 //     favoritos: [ids de lección o de recorrido],
 //     sesiones: [{ fecha, tipo, aciertos, total }] (30 últimas),
+//     intentos: [{ f, l, v, q, t, h, o, e, r, x, d, m }] (los MAX_INTENTOS últimos; ver registrarIntento),
+//     preferencias: { nivel, minutos, intereses: [ids de región o sistema] } (todo opcional),
+//     examen: { temario, fecha, minutosDia, dias, temas: [{ texto, lecciones, elegidas, laguna }], creado, actualizado } | null,
 //     migracion: { desde: 1, fecha, lecciones } | null }
+//   y en cada ítem, además, `aplazado` (fecha hasta la que no se propone) cuando la persona aplaza un repaso.
+// Los campos nuevos (intentos, preferencias, aplazado) se añadieron sin cambiar de versión: una versión anterior de la
+// app los ignora y, al guardar, los conserva (guarda el objeto entero que leyó).
 //
 // Cada lección tiene un solo progreso, aunque esté en varios recorridos. Se distinguen cuatro cosas:
 //  - avance: los pasos vistos;
@@ -24,13 +30,21 @@
 export const VERSION = 2;
 export const CLAVE = 'anato3d.biblioteca';
 export const CLAVE_V1 = 'anato3d.progreso';
+/** Progreso guardado que no se pudo leer (dañado o de una versión más nueva): se aparta aquí antes de escribir. */
+export const CLAVE_APARTADO = 'anato3d.biblioteca.apartado';
 export const INTERVALOS_DIAS = [0, 1, 3, 7, 21];
 export const CAJA_DOMINIO = 3;
 export const UMBRAL_DEMOSTRADA = 0.8;
+export const MAX_INTENTOS = 600;
+/** Una pregunta fallada hace menos de esto no se repite tal cual (se practica otra del mismo objetivo o se espera). */
+export const RECIENTE_MS = 10 * 60 * 1000;
 const DIA = 24 * 3600 * 1000;
+/** Habilidad observable que comprueba cada tipo de pregunta (especificación, sección 10). */
+export const HABILIDAD = { identificar: 'reconocer', localizar: 'localizar', relacion: 'relacionar', secuencia: 'relacionar', funcion: 'explicar', comparacion: 'comparar' };
+export const HABILIDADES = ['reconocer', 'localizar', 'relacionar', 'explicar', 'comparar'];
 
 export function vacio() {
-  return { version: VERSION, lecciones: {}, items: {}, favoritos: [], sesiones: [], migracion: null };
+  return { version: VERSION, lecciones: {}, items: {}, favoritos: [], sesiones: [], intentos: [], preferencias: null, migracion: null };
 }
 
 function valido(d) {
@@ -39,16 +53,23 @@ function valido(d) {
 
 /**
  * Lee el progreso. Sin progreso nuevo y con uno de la versión 1, lo migra (`lecciones`: Map id → lección, para saber
- * los pasos de cada módulo). Datos dañados o de otra versión: empieza de cero sin tocar lo guardado.
+ * los pasos de cada módulo). Datos dañados o de otra versión: empieza de cero, y lo guardado se copia antes, tal cual,
+ * a CLAVE_APARTADO (así al guardar después no se pierde); `apartado` lo dice para avisar.
  */
 export function cargar(storage, { lecciones = new Map(), ahora = Date.now() } = {}) {
+  let raw = null;
   try {
-    const raw = storage?.getItem(CLAVE);
+    raw = storage?.getItem(CLAVE);
     if (raw) {
-      const d = JSON.parse(raw);
-      if (!valido(d)) return vacio();
+      let d = null;
+      try { d = JSON.parse(raw); } catch { d = null; }
+      if (!valido(d)) return apartarYEmpezar(storage, raw, ahora);
       d.favoritos ??= [];
       d.sesiones ??= [];
+      if (!Array.isArray(d.intentos)) d.intentos = [];
+      d.preferencias = limpiarPreferencias(d.preferencias);
+      // El plan de examen (src/biblioteca/examen.js): si no tiene la forma esperada, no se usa.
+      if (d.examen && !(typeof d.examen === 'object' && Array.isArray(d.examen.temas) && Array.isArray(d.examen.dias))) d.examen = null;
       return d;
     }
     const v1 = storage?.getItem(CLAVE_V1);
@@ -56,12 +77,26 @@ export function cargar(storage, { lecciones = new Map(), ahora = Date.now() } = 
       const d = migrarV1(JSON.parse(v1), lecciones, ahora);
       if (d) return d;
     }
-  } catch { /* dañado o almacenamiento bloqueado */ }
+  } catch { /* almacenamiento bloqueado */ }
   return vacio();
 }
 
-/** Guarda; false si el navegador no lo permite (modo privado, almacenamiento lleno o bloqueado). */
+function apartarYEmpezar(storage, raw, ahora) {
+  const d = vacio();
+  try {
+    const previo = storage.getItem(CLAVE_APARTADO);
+    if (!previo || JSON.parse(previo)?.texto !== raw) storage.setItem(CLAVE_APARTADO, JSON.stringify({ texto: raw, fecha: ahora }));
+    d.apartado = ahora;
+  } catch { d.apartado = null; d.sinApartar = true; }
+  return d;
+}
+
+/**
+ * Guarda; false si el navegador no lo permite (modo privado, almacenamiento lleno o bloqueado) o si el progreso que
+ * había no se pudo poner a salvo antes (`sinApartar`): entonces no se escribe encima.
+ */
 export function guardar(storage, data) {
+  if (data.sinApartar) return false;
   try {
     storage.setItem(CLAVE, JSON.stringify(data));
     return true;
@@ -152,9 +187,34 @@ export function borrarLeccion(data, id) {
 // ── Preguntas y repaso espaciado ──
 export const itemId = (leccionId, preguntaId) => `${leccionId}/${preguntaId}`;
 
-/** Anota una respuesta. resultado: 'acierto' | 'duda' | 'fallo'. */
-export function anotar(data, id, resultado, ahora = Date.now()) {
-  const e = (data.items[id] ??= { caja: 0, aciertos: 0, fallos: 0, dudas: 0, ultimo: null, proximo: null });
+/**
+ * Registra un intento (lo que pasó al responder una pregunta), además de anotarlo en su ítem con `anotar`:
+ *   f fecha · l lección · v versión del contenido · q pregunta · t tipo de tarea · h habilidad · o objetivo (índice)
+ *   e estructura de la pregunta (si es de una) · r resultado: acierto | duda | fallo | tecnico (no se pudo mostrar o
+ *     seleccionar: no cuenta como desconocimiento) · x lo elegido si falló (la estructura tocada, el texto de la opción
+ *     o «no-lo-se») · d dudó · m modo: evaluacion | repaso | practica | leccion
+ */
+export function registrarIntento(data, { leccion, version = null, pregunta, tipo, objetivo = null, estructura = null, resultado, elegida = null, dudo = false, modo = 'practica', huella = null, ayuda = null }, ahora = Date.now()) {
+  if (!Array.isArray(data.intentos)) data.intentos = [];
+  const i = { f: ahora, l: leccion, v: version, q: pregunta, t: tipo, h: HABILIDAD[tipo] ?? null, o: objetivo, e: estructura, r: resultado, x: resultado === 'fallo' ? elegida : null, d: !!dudo, m: modo };
+  if (huella) i.qh = huella;
+  if (ayuda) i.a = ayuda;
+  data.intentos.push(i);
+  if (data.intentos.length > MAX_INTENTOS) data.intentos.splice(0, data.intentos.length - MAX_INTENTOS);
+  return i;
+}
+
+const itemNuevo = () => ({ caja: 0, aciertos: 0, fallos: 0, dudas: 0, ultimo: null, proximo: null });
+
+/**
+ * Anota una respuesta. resultado: 'acierto' | 'duda' | 'fallo'. `huella`: la de la pregunta (evaluar.js); si la
+ * pregunta cambió desde la última vez (se corrigió), lo anterior no cuenta: el ítem empieza de nuevo.
+ */
+export function anotar(data, id, resultado, ahora = Date.now(), { huella = null } = {}) {
+  if (huella && data.items[id]?.qh && data.items[id].qh !== huella) data.items[id] = itemNuevo();
+  const e = (data.items[id] ??= itemNuevo());
+  if (huella) e.qh = huella;
+  delete e.huerfana;
   const tocaba = e.proximo == null || e.proximo <= ahora;
   if (resultado === 'acierto') {
     e.aciertos++;
@@ -187,17 +247,23 @@ export function registrarSesion(data, sesion) {
   if (data.sesiones.length > 30) data.sesiones.splice(0, data.sesiones.length - 30);
 }
 
-/** Preguntas vencidas, primero las de caja más baja, luego las de más fallos y las que más esperan. `filtro(id)`. */
-export function vencidas(data, { ahora = Date.now(), filtro = () => true } = {}) {
+/** ¿Está aplazado este ítem? (la persona pidió no repasarlo hasta una fecha). */
+export const aplazado = (e, ahora = Date.now()) => e?.aplazado != null && e.aplazado > ahora;
+
+/**
+ * Preguntas vencidas, primero las de caja más baja, luego las de más fallos y las que más esperan. `filtro(id)`. Lo
+ * aplazado no entra hasta su fecha (salvo `conAplazadas`).
+ */
+export function vencidas(data, { ahora = Date.now(), filtro = () => true, conAplazadas = false } = {}) {
   return Object.entries(data.items)
-    .filter(([id, e]) => e.proximo != null && e.proximo <= ahora && filtro(id))
+    .filter(([id, e]) => e.proximo != null && e.proximo <= ahora && !e.huerfana && (conAplazadas || !aplazado(e, ahora)) && filtro(id))
     .sort(([, x], [, y]) => x.caja - y.caja || y.fallos - x.fallos || x.proximo - y.proximo)
     .map(([id]) => id);
 }
 
 /** Preguntas falladas alguna vez (para «repasar mis errores»), primero las que siguen en la caja 0. */
-export function falladas(data, { filtro = () => true } = {}) {
-  return Object.entries(data.items).filter(([id, e]) => e.fallos > 0 && filtro(id))
+export function falladas(data, { filtro = () => true, ahora = Date.now() } = {}) {
+  return Object.entries(data.items).filter(([id, e]) => e.fallos > 0 && !e.huerfana && !aplazado(e, ahora) && filtro(id))
     .sort(([, x], [, y]) => x.caja - y.caja || y.fallos - x.fallos).map(([id]) => id);
 }
 
@@ -225,6 +291,72 @@ export function estadoLeccion(data, L, { ahora = Date.now(), idsPreguntas = null
     dominio: { en: enDominio, de: nPreg }, actividad: p?.actividad ?? null, paso: p?.paso ?? 0,
     cambiada: !!p && p.version != null && p.version !== L.version,
   };
+}
+
+/**
+ * Al cargar una lección: las preguntas que se corrigieron (otra huella) empiezan de nuevo, sin sus fallos; las que ya
+ * no existen o están retiradas quedan «huérfanas» (no se repasan ni cuentan; si vuelven, se recuperan). `huellaDe(q)`
+ * y `retirada(id)`: de evaluar.js. Devuelve cuántos ítems cambió.
+ */
+export function depurar(data, L, huellaDe, retirada = () => false) {
+  const preguntas = new Map((L.preguntas ?? []).map((q) => [q.id, q]));
+  let n = 0;
+  for (const [id, e] of Object.entries(data.items)) {
+    if (!id.startsWith(`${L.id}/`)) continue;
+    const q = preguntas.get(id.slice(L.id.length + 1));
+    if (!q || retirada(q.id)) { if (!e.huerfana) { e.huerfana = true; n++; } continue; }
+    if (e.huerfana) { delete e.huerfana; n++; }
+    const h = huellaDe(q);
+    if (e.qh && e.qh !== h) { data.items[id] = { ...itemNuevo(), qh: h }; n++; }
+  }
+  return n;
+}
+
+// ── Aplazar y retomar ──
+/** Aplaza unos ítems `dias` días (sin tocar su caja ni cuándo tocaban): no se proponen hasta entonces. */
+export function aplazar(data, ids, dias = 1, ahora = Date.now()) {
+  const hasta = ahora + Math.max(1, Math.min(30, Math.round(dias))) * DIA;
+  let n = 0;
+  for (const id of ids) { const e = data.items[id]; if (e) { e.aplazado = hasta; n++; } }
+  return { n, hasta };
+}
+
+/** Retoma lo aplazado (todo, o esos ítems): vuelve a proponerse según tocaba. */
+export function retomar(data, ids = null, ahora = Date.now()) {
+  let n = 0;
+  for (const [id, e] of Object.entries(data.items)) {
+    if ((!ids || ids.includes(id)) && aplazado(e, ahora)) { delete e.aplazado; n++; }
+  }
+  return n;
+}
+
+/** Lo aplazado ahora: [{ id, hasta }], lo que antes vuelve, primero. */
+export function aplazados(data, ahora = Date.now()) {
+  return Object.entries(data.items).filter(([, e]) => aplazado(e, ahora)).map(([id, e]) => ({ id, hasta: e.aplazado })).sort((a, b) => a.hasta - b.hasta);
+}
+
+/** ¿Se falló esta pregunta hace muy poco? (entonces no se repite tal cual). */
+export function recienFallada(data, id, ahora = Date.now()) {
+  const pregunta = id.slice(id.indexOf('/') + 1);
+  const leccion = id.slice(0, id.indexOf('/'));
+  for (let k = (data.intentos?.length ?? 0) - 1; k >= 0; k--) {
+    const i = data.intentos[k];
+    if (ahora - i.f > RECIENTE_MS) break;
+    if (i.l === leccion && i.q === pregunta) return i.r === 'fallo';
+  }
+  return false;
+}
+
+// ── Preferencias (opcionales) ──
+export const NIVELES_PREF = [1, 2, 3];
+export const MINUTOS_PREF = [10, 15, 20, 30, 45];
+/** Preferencias válidas (o null): nivel 1–3, minutos de una sesión y hasta 8 intereses (regiones o sistemas). */
+export function limpiarPreferencias(p) {
+  if (!p || typeof p !== 'object') return null;
+  const nivel = NIVELES_PREF.includes(p.nivel) ? p.nivel : null;
+  const minutos = MINUTOS_PREF.includes(p.minutos) ? p.minutos : null;
+  const intereses = Array.isArray(p.intereses) ? [...new Set(p.intereses.filter((x) => typeof x === 'string' && /^[a-z0-9-]{2,40}$/.test(x)))].slice(0, 8) : [];
+  return nivel || minutos || intereses.length ? { nivel, minutos, intereses } : null;
 }
 
 export function esFavorito(data, id) {

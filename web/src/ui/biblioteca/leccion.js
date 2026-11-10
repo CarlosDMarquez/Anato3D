@@ -6,8 +6,10 @@ import { mallas } from '../../biblioteca/formato.js';
 import { frases, evidencias } from '../../biblioteca/formato.js';
 import { instanciar, corregir, NO_LO_SE } from '../../biblioteca/evaluar.js';
 import { FUENTES } from '../../content/fuentes.js';
-import { t } from '../../i18n/idioma.js';
+import { t, idioma } from '../../i18n/idioma.js';
 import { tr, trCita } from '../../i18n/contenido.js';
+import { botonReportar, enlazarReportar } from './reportar.js';
+import { crearCronometro } from '../../biblioteca/eventos.js';
 import { esc, icono, fechaDia } from './comun.js';
 import { abrirLeccion, evaluarLeccion, siguienteDeSesion, avanzarSesion } from './explorar.js';
 
@@ -65,6 +67,17 @@ export async function renderLeccion(ctx) {
   if (vista.fin) return renderFin(ctx, L);
   const i = Math.max(0, Math.min(vista.paso ?? 0, L.pasos.length - 1));
   const s = L.pasos[i];
+  // Estadísticas (si se activaron): empezar o retomar la lección, una vez por apertura, y su tiempo activo.
+  if (!vista.registrada) {
+    vista.registrada = true;
+    const antes = ctx.data.lecciones[L.id]?.vistos?.length ?? 0;
+    const propia = !!L.origen?.neuri;
+    if (antes) ctx.evento?.('leccion_retomada', { leccion: L.id, version: L.version, paso: i, propia });
+    else ctx.evento?.('leccion_iniciada', { leccion: L.id, version: L.version, propia }, { clave: `${L.id}:${L.version}` });
+    if (propia) ctx.evento?.('leccion_personal_abierta', {});
+    vista.crono = crearCronometro();
+  }
+  ctx.crono = vista.crono;
   P.verPaso(ctx.data, L, i);
   ctx.guardar();
   const prog = ctx.data.lecciones[L.id];
@@ -103,6 +116,7 @@ export async function renderLeccion(ctx) {
     ${cq ? htmlComprobar(L, cq) : ''}
     ${v ? `<p class="bib-vista-acc"><button class="link" data-recuperar>${icono('restart')}${esc(t('bib.recuperarVista'))}</button></p>` : ''}
     ${htmlFuentes(ctx, todasEv, L)}
+    <p class="bib-rep-fila">${botonReportar()}</p>
     <div class="step-nav">
       <button class="btn" data-paso="anterior" ${i ? '' : 'disabled'}>${esc(t('estudio.anterior'))}</button>
       <button class="btn primary" data-paso="siguiente">${esc(t(ultimo ? 'estudio.terminar' : 'estudio.siguiente'))}</button>
@@ -114,7 +128,10 @@ export async function renderLeccion(ctx) {
     if (!v || fueraDeModelo) return;
     const r = await api.mostrar(L, v, opciones);
     if (ctx.vista !== vista) return;
-    if (!r.ok && r.faltan.length) avisar(t('bib.faltanEnModelo', { lista: r.faltan.map((id) => nombreE(L, id)).join(', ') }));
+    if (!r.ok && r.faltan.length) {
+      avisar(t('bib.faltanEnModelo', { lista: r.faltan.map((id) => nombreE(L, id)).join(', ') }));
+      ctx.evento?.('error_tecnico', { codigo: 'faltan-estructuras', donde: 'leccion' }, { clave: `${L.id}:${s.id}` });
+    }
   };
   mostrar();
 
@@ -126,6 +143,8 @@ export async function renderLeccion(ctx) {
     if (!ultimo) return irPaso(i + 1);
     P.completar(ctx.data, L);
     ctx.guardar();
+    ctx.evento?.('leccion_completada', { leccion: L.id, version: L.version, segundosActivos: vista.crono?.segundos() ?? 0, propia: !!L.origen?.neuri }, { clave: `${L.id}:${L.version}` });
+    ctx.crono = null;
     api.alTocar(null);
     ctx.ir({ ...vista, fin: true }, { reemplazar: true });
   });
@@ -133,6 +152,7 @@ export async function renderLeccion(ctx) {
   body.querySelector('[data-recuperar]')?.addEventListener('click', () => { avisar(''); mostrar(); });
   enlazarActividad(ctx, L, s, body, mostrar);
   if (cq) enlazarComprobar(ctx, L, s, cq, body);
+  enlazarReportar(body, () => ({ vista: 'leccion', leccion: L.id, version: L.version, paso: s.id, estructura: v?.ver?.[0] ?? null, idioma: idioma(), modelo: api.modelo() }), { alEnviar: ctx.alReportar });
   requestAnimationFrame(() => body.querySelector('.step-title')?.focus({ preventScroll: false }));
 
   function irPaso(k) {
@@ -216,6 +236,9 @@ function enlazarComprobar(ctx, L, s, cq, body) {
   body.querySelectorAll('[data-cq]').forEach((b) => b.addEventListener('click', () => {
     const opcion = Number(b.dataset.cq);
     cq.r = { opcion, resultado: corregir(cq.q, opcion) };
+    // Práctica dentro de la lección (con el contenido a la vista): se anota, pero no cuenta para el repaso ni el dominio.
+    P.registrarIntento(ctx.data, { leccion: L.id, version: L.version, pregunta: cq.q.id, tipo: cq.q.tipo, objetivo: cq.q.objetivo, resultado: cq.r.resultado, elegida: cq.q.opciones[opcion]?.texto ?? null, modo: 'leccion' });
+    ctx.guardar();
     const caja = body.querySelector('.bib-comprobar');
     caja.outerHTML = htmlComprobar(L, cq);
     body.querySelector('.bib-comprobar .q-result')?.focus?.();

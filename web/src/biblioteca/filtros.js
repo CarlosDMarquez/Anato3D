@@ -1,8 +1,36 @@
-// Filtros y orden de la biblioteca (región/subregión, sistema, tipo, objetivo, nivel, duración, progreso, repaso
-// pendiente y favoritas). Sin DOM: lo prueba `npm test`. Se combinan todos a la vez (y); cada uno admite un valor.
+// Filtros y orden de la biblioteca (región/subregión, sistema, tipo de lección, tipo de estructura, objetivo, nivel,
+// duración, idioma, procedencia, progreso, repaso pendiente y favoritas). Sin DOM: lo prueba `npm test`. Se combinan
+// todos a la vez (y); cada uno admite un valor.
 import { REGION_POR_ID, SUBREGION_POR_ID, SISTEMA_POR_ID, FORMATO_POR_ID, TEMA_POR_ID, NIVEL_POR_ID, DURACIONES } from './taxonomia.js';
 
-export const CLAVES = ['region', 'subregion', 'sistema', 'formato', 'tema', 'nivel', 'duracion', 'progreso', 'repaso', 'favoritas'];
+export const CLAVES = ['region', 'subregion', 'sistema', 'formato', 'estructura', 'tema', 'nivel', 'duracion', 'idioma', 'procedencia', 'progreso', 'repaso', 'favoritas'];
+/**
+ * Tipos de estructura para filtrar (los del formato agrupados como los busca un estudiante). Una lección entra si alguna
+ * estructura de su núcleo es de ese grupo (las de contexto no cuentan: no son lo que enseña).
+ */
+export const GRUPOS_ESTRUCTURA = [
+  { id: 'huesos', tipos: ['hueso', 'diente', 'cartilago'] },
+  { id: 'articulaciones', tipos: ['ligamento', 'capsula', 'bolsa'] },
+  { id: 'musculos', tipos: ['musculo', 'tendon', 'vaina', 'fascia'] },
+  { id: 'arterias', tipos: ['arteria'] },
+  { id: 'venas', tipos: ['vena'] },
+  { id: 'linfatico', tipos: ['nodo'] },
+  { id: 'nervios', tipos: ['nervio', 'ganglio', 'snc'] },
+  { id: 'organos', tipos: ['organo', 'glandula', 'corazon', 'piel'] },
+];
+const GRUPO_POR_ID = new Map(GRUPOS_ESTRUCTURA.map((g) => [g.id, g]));
+/** De dónde viene una lección: la biblioteca de Anato3D o «Mis lecciones» (creada o adaptada con Neuri, con IA). */
+export const PROCEDENCIAS = ['biblioteca', 'propias'];
+export const procedencia = (L) => (L.propia ? 'propias' : 'biblioteca');
+/** ¿Tiene la lección estructuras del núcleo de ese grupo? */
+export const tieneGrupo = (L, grupo) => (L.estructuras ?? []).some((e) => e.papel === 'nucleo' && GRUPO_POR_ID.get(grupo)?.tipos.includes(e.tipo));
+/** Los valores que tiene sentido ofrecer para un filtro en estas lecciones (para no enseñar filtros vacíos). */
+export function valoresPresentes(lecciones, clave) {
+  if (clave === 'estructura') return GRUPOS_ESTRUCTURA.map((g) => g.id).filter((g) => lecciones.some((L) => tieneGrupo(L, g)));
+  if (clave === 'idioma') return [...new Set(lecciones.flatMap((L) => L.idiomas ?? ['es']))];
+  if (clave === 'procedencia') return PROCEDENCIAS.filter((p) => lecciones.some((L) => procedencia(L) === p));
+  return [];
+}
 export const PROGRESOS = ['sin-empezar', 'en-curso', 'completada', 'demostrada', 'dominada'];
 export const ORDENES = ['relevancia', 'recomendado', 'duracion', 'reciente'];
 
@@ -23,6 +51,9 @@ export function pasa(L, f, ctx) {
   if (f.subregion && !L.lugares.some(([r, s]) => s === f.subregion || (!s && r === SUBREGION_POR_ID.get(f.subregion)?.region))) return false;
   if (f.sistema && !L.sistemas.includes(f.sistema)) return false;
   if (f.formato && L.formato !== f.formato) return false;
+  if (f.estructura && !tieneGrupo(L, f.estructura)) return false;
+  if (f.idioma && !(L.idiomas ?? ['es']).includes(f.idioma)) return false;
+  if (f.procedencia && procedencia(L) !== f.procedencia) return false;
   if (f.tema && !L.temas.includes(f.tema)) return false;
   if (f.nivel && L.nivel !== Number(f.nivel)) return false;
   if (f.duracion && !enDuracion(L.minutos, f.duracion)) return false;
@@ -37,9 +68,13 @@ export function pasa(L, f, ctx) {
 
 export const filtrar = (lecciones, f, ctx) => lecciones.filter((L) => pasa(L, f, ctx));
 
-/** Filtros activos con su nombre (para las fichas que se quitan una a una). `t`: traducción de la interfaz. */
-export function activos(f, t = (k) => k) {
+/**
+ * Filtros activos con su nombre (para las fichas que se quitan una a una). `t`: traducción de la interfaz;
+ * `nombreIdioma(id)`: el nombre de un idioma en el de la interfaz.
+ */
+export function activos(f, t = (k) => k, nombreIdioma = (id) => id) {
   const nombre = {
+    estructura: (v) => t(`filtro.grupo.${v}`), idioma: (v) => nombreIdioma(v), procedencia: (v) => t(`filtro.proc.${v}`),
     region: (v) => REGION_POR_ID.get(v)?.nombre, subregion: (v) => SUBREGION_POR_ID.get(v)?.nombre,
     sistema: (v) => SISTEMA_POR_ID.get(v)?.nombre, formato: (v) => FORMATO_POR_ID.get(v)?.nombre,
     tema: (v) => TEMA_POR_ID.get(v)?.nombre, nivel: (v) => NIVEL_POR_ID.get(Number(v))?.nombre,
@@ -60,8 +95,8 @@ export function quitar(f, clave) {
  * Sin resultados: qué filtro quitar para ampliar sin borrarlos todos. Devuelve [{ clave, nombre, n }] con cuántas
  * lecciones habría quitando cada uno, de más a menos (solo los que dan alguna).
  */
-export function ampliar(lecciones, f, ctx, t) {
-  return activos(f, t).map((a) => ({ ...a, n: filtrar(lecciones, quitar(f, a.clave), ctx).length }))
+export function ampliar(lecciones, f, ctx, t, nombreIdioma) {
+  return activos(f, t, nombreIdioma).map((a) => ({ ...a, n: filtrar(lecciones, quitar(f, a.clave), ctx).length }))
     .filter((x) => x.n > 0).sort((a, b) => b.n - a.n);
 }
 

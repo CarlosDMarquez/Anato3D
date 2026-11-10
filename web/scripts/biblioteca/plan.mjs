@@ -33,6 +33,7 @@ export const PLAN = [
   P('cab-masticacion', 'Músculos de la masticación y articulación temporomandibular', [['cabeza', 'cara']], ['muscular', 'articular'], 'estructuras', ['musculos', 'articulaciones', 'movimientos']),
   P('cab-ojo', 'Órbita, globo ocular y músculos extraoculares', [['cabeza', 'orbita-ojo']], ['sentidos', 'muscular', 'nervioso'], 'estructuras', ['musculos', 'organos']),
   P('cab-oido', 'Oído externo, medio e interno', [['cabeza', 'oido']], ['sentidos', 'oseo'], 'estructuras', ['organos', 'huesos']),
+  P('cab-nariz', 'La nariz y la cavidad nasal', [['cabeza', 'cavidad-nasal']], ['respiratorio', 'oseo', 'sentidos'], 'estructuras', ['organos', 'huesos']),
   P('cab-encefalo', 'Partes del encéfalo', [['cabeza', 'encefalo']], ['nervioso'], 'estructuras', ['organos']),
   P('cab-nervios-craneales', 'Los doce nervios craneales', [['cabeza', null]], ['nervioso'], 'trayectos', ['nervios']),
   P('cab-arterias-encefalo', 'Arterias del encéfalo', [['cabeza', 'encefalo']], ['cardiovascular'], 'trayectos', ['arterias-venas']),

@@ -6,11 +6,13 @@
 //   planificar  el alcance de una lección nueva o de una adaptación (tras pulsar «Planificar»)
 //   redactar    la lección a partir del plan y las evidencias (tras pulsar «Crear la lección»)
 //   adaptar     una lección existente según la petición (tras pulsar «Crear la adaptación»)
+//   trabajo     volver a conectarse a una creación en curso o terminada (tras recargar la página)
+//   cancelar    detener una creación en curso
 // Todo lo que llega de fuera (de la app o del modelo) se recorta y se comprueba aquí.
 
 export const VERSION = 2;
 export const IDIOMAS = ['es', 'en', 'de', 'fr', 'it'];
-export const MODOS = ['orientar', 'planificar', 'redactar', 'adaptar'];
+export const MODOS = ['orientar', 'planificar', 'redactar', 'adaptar', 'trabajo', 'cancelar'];
 
 export const LIMITES = {
   mensajes: 12,        // turnos de la conversación que se envían (los más recientes)
@@ -31,6 +33,8 @@ export const LIMITES = {
 };
 
 export const ID_PROPIA = /^neuri-[a-z0-9-]{3,80}$/;
+/** Identificador de un trabajo de creación: lo genera la app (UUID aleatorio). */
+export const ID_TRABAJO = /^[a-z0-9][a-z0-9-]{15,63}$/;
 const texto = (s, max) => (typeof s === 'string' ? s.replace(/\s+/g, ' ').trim().slice(0, max) : '');
 const textoONulo = (s, max) => texto(s, max) || null;
 const entero = (n, min, max) => (Number.isInteger(n) && n >= min && n <= max ? n : null);
@@ -76,6 +80,10 @@ export function limpiarSolicitud(s, idsLecciones = null) {
     supuestos: lista(s.supuestos, 6, (x) => texto(x, LIMITES.campo)),
     // Términos anatómicos en inglés para buscar estructuras y fuentes (no se enseñan): sirven en cualquier idioma.
     terminos: lista(s.terminos, 12, (x) => texto(x, 60)),
+    // La persona lo pidió expresamente («créame una lección…») y el alcance basta para planificar sin preguntar más:
+    // la app empieza sin pedir otra confirmación.
+    explicita: s.explicita === true,
+    suficiente: s.suficiente === true,
   };
 }
 
@@ -116,6 +124,10 @@ export function validarPeticion(cuerpo, ids) {
   if (cuerpo.v !== VERSION) return { ok: false, error: 'version' };
   const modo = cuerpo.modo ?? 'orientar';
   if (!MODOS.includes(modo)) return { ok: false, error: 'modo' };
+  const trabajo = typeof cuerpo.trabajo === 'string' && ID_TRABAJO.test(cuerpo.trabajo) ? cuerpo.trabajo : null;
+  if (cuerpo.trabajo != null && !trabajo) return { ok: false, error: 'trabajo' };
+  // Volver a un trabajo o cancelarlo: solo hace falta su identificador.
+  if (modo === 'trabajo' || modo === 'cancelar') return trabajo ? { ok: true, peticion: { modo, trabajo } } : { ok: false, error: 'trabajo' };
   const idioma = IDIOMAS.includes(cuerpo.idioma) ? cuerpo.idioma : 'es';
   const propias = lista(cuerpo.propias, LIMITES.propias, limpiarPropia);
   const idsLecciones = new Set([...ids.lecciones, ...propias.map((p) => p.id)]);
@@ -142,7 +154,7 @@ export function validarPeticion(cuerpo, ids) {
     repasos: soloValidos(p.repasos, idsLecciones, LIMITES.progreso),
     guardadas: soloValidos(p.guardadas, new Set([...idsLecciones, ...ids.recorridos]), LIMITES.progreso),
   };
-  const peticion = { modo, idioma, mensajes, progreso, propias, contexto: limpiarContexto(cuerpo.contexto) };
+  const peticion = { modo, idioma, mensajes, progreso, propias, contexto: limpiarContexto(cuerpo.contexto), trabajo };
 
   if (modo === 'planificar') {
     peticion.solicitud = limpiarSolicitud(cuerpo.solicitud, idsLecciones);

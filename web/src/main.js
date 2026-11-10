@@ -726,6 +726,8 @@ async function abrirEstudio() {
         piezas: piezasBuscables,
         verEstructura,
         ajustar: () => updateInsets(),
+        // Un aviso de la biblioteca (una lección de Neuri lista) abre el panel en la vista que toca.
+        abrirPanel: () => { if (!$('#panel-study').classList.contains('open')) togglePanel('study'); },
       },
     });
   }

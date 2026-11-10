@@ -9,8 +9,24 @@
 // salta (y la app lo explica), no se cuenta como fallo.
 import { distractoresIdentificar, estructurasDePregunta } from './formato.js';
 import { itemId } from './progreso.js';
+import { normalizar, distancia } from './buscar.js';
+import { RETIRADAS } from './retiradas.js';
 
 export const NO_LO_SE = 'no-lo-se';
+
+/**
+ * Huella de una pregunta: cambia si cambia lo que pregunta o su respuesta (enunciado, opciones, estructura, orden). Si
+ * una pregunta se corrige, sus fallos anteriores dejan de contar contra el estudiante (progreso.js, anotar).
+ */
+export function huella(q) {
+  const base = JSON.stringify([q.tipo, q.enunciado ?? null, q.correcta ?? null, [...(q.distractores ?? [])].sort(), q.estructura ?? null, q.orden ?? null, [...(q.candidatas ?? [])].sort()]);
+  let h = 5381;
+  for (let i = 0; i < base.length; i++) h = ((h * 33) ^ base.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
+
+/** ¿Está retirada esta pregunta (o su lección) mientras se revisa? (src/biblioteca/retiradas.js). */
+export const retirada = (leccionId, preguntaId = null) => RETIRADAS.lecciones.includes(leccionId) || (preguntaId != null && RETIRADAS.preguntas.includes(`${leccionId}/${preguntaId}`));
 
 export function rngConSemilla(semilla = 1) {
   let s = semilla >>> 0;
@@ -26,8 +42,9 @@ export function barajar(lista, rng = Math.random) {
   return a;
 }
 
-/** ¿Se puede hacer esta pregunta en este modelo? (todas sus estructuras existen en él). */
+/** ¿Se puede hacer esta pregunta en este modelo? (todas sus estructuras existen en él, y no está retirada). */
 export function disponibleEn(L, q, modelo) {
+  if (retirada(L.id, q.id)) return false;
   const modelos = (e) => L.estructuras[e]?.modelos ?? L.modelos;
   const ids = q.tipo === 'localizar' ? [q.estructura, ...(q.candidatas ?? [])] : estructurasDePregunta(q);
   if (q.tipo === 'identificar' || q.tipo === 'localizar') return ids.every((e) => modelos(e).includes(modelo));
@@ -36,7 +53,7 @@ export function disponibleEn(L, q, modelo) {
 
 /** La pregunta lista para mostrar. */
 export function instanciar(L, q, rng = Math.random) {
-  const base = { id: q.id, item: itemId(L.id, q.id), leccion: L.id, tipo: q.tipo, objetivo: q.objetivo, paso: q.paso, evidencia: q.evidencia ?? [] };
+  const base = { id: q.id, item: itemId(L.id, q.id), leccion: L.id, tipo: q.tipo, objetivo: q.objetivo, paso: q.paso, evidencia: q.evidencia ?? [], huella: huella(q) };
   if (q.tipo === 'identificar') {
     const e = L.estructuras[q.estructura];
     const distractores = barajar(distractoresIdentificar(L, q.estructura), rng).slice(0, 3);
@@ -117,4 +134,42 @@ export function preguntaDeItem(lecciones, id, { modelo = 'male', rng = Math.rand
   const q = L?.preguntas.find((x) => x.id === id.slice(i + 1));
   if (!q || !disponibleEn(L, q, modelo)) return null;
   return instanciar(L, q, rng);
+}
+
+// ── Respuesta breve: escribir el nombre de la estructura en lugar de elegirlo (recordar, no reconocer) ──
+// Solo para «identificar», donde la respuesta es un nombre que se puede comprobar con fiabilidad: el nombre de la
+// lección y sus sinónimos. Lo que se parece pero no coincide no se da por bueno ni por malo: se compara con la
+// respuesta de referencia y decide la persona (cuenta como «duda»: no sube en el repaso).
+const ARTICULOS = new Set(['el', 'la', 'los', 'las', 'lo', 'un', 'una', 'the', 'a', 'an', 'der', 'die', 'das', 'le', 'les', 'il', 'gli', 'l']);
+const GENERICAS = new Set(['musculo', 'muscle', 'muskel', 'muscolo', 'hueso', 'bone', 'knochen', 'os', 'osso', 'nervio', 'nerve', 'nerv', 'nerf', 'nervo',
+  'arteria', 'artery', 'arterie', 'artere', 'vena', 'vein', 'vene', 'veine', 'ligamento', 'ligament', 'band', 'ligamento', 'm', 'n', 'a', 'v', 'lig']);
+const palabrasDe = (s) => normalizar(s).replace(/[^a-z0-9 ]+/g, ' ').split(' ').filter((w) => w && !ARTICULOS.has(w));
+const forma = (s) => palabrasDe(s).join(' ');
+const sinGenerica = (s) => palabrasDe(s).filter((w) => !GENERICAS.has(w)).join(' ');
+
+/**
+ * Corrige una respuesta escrita. `aceptadas`: el nombre y sus sinónimos; `otras`: nombres de otras estructuras (para
+ * reconocer una confusión). Devuelve { resultado: 'acierto' | 'cercana' | 'ambigua' | 'fallo', confundida?, opciones? }:
+ * 'ambigua' cuando lo escrito vale igual para la respuesta y para otra estructura («radial»: ¿nervio o arteria?); no
+ * se corrige, se pide el nombre completo.
+ */
+export function corregirBreve(texto, { aceptadas = [], otras = [] } = {}) {
+  const r = forma(texto);
+  if (!r) return { resultado: 'fallo' };
+  const buenas = aceptadas.map(forma).filter(Boolean);
+  if (buenas.includes(r)) return { resultado: 'acierto' };
+  const sg = sinGenerica(texto);
+  // Otra estructura de la lección, escrita bien: una confusión (aunque se parezca).
+  const otra = otras.find((o) => forma(o) === r);
+  if (otra) return { resultado: 'fallo', confundida: otra };
+  const coinciden = (lista) => lista.filter((x) => sg && sinGenerica(x) === sg);
+  const otrasIguales = coinciden(otras);
+  if (otrasIguales.length) {
+    const buena = coinciden(aceptadas)[0];
+    return buena ? { resultado: 'ambigua', opciones: [buena, ...otrasIguales] } : { resultado: 'fallo', confundida: otrasIguales[0] };
+  }
+  // Erratas pequeñas o sin la palabra genérica («deltoides» por «músculo deltoides»): la persona compara y decide.
+  const tol = (n) => (n >= 12 ? 2 : n >= 5 ? 1 : 0);
+  const cerca = buenas.some((b) => distancia(r, b, 2) <= tol(b.length)) || aceptadas.some((a) => sinGenerica(a) && (sinGenerica(a) === sg || distancia(sinGenerica(a), sg, 2) <= tol(sinGenerica(a).length)));
+  return { resultado: cerca ? 'cercana' : 'fallo' };
 }

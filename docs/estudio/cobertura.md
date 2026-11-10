@@ -13,22 +13,22 @@ Generado por `node scripts/biblioteca.mjs` (no editar a mano). Cuenta las leccio
 
 ## Resumen
 
-- Lecciones disponibles: **70** de 70 previstas (100 %).
+- Lecciones disponibles: **71** de 71 previstas (100 %).
 - Módulos: **18** · Recorridos: **11**.
-- Estructuras de los modelos: **1718** (hombre 1688, mujer 1701); en el núcleo de alguna lección: **790** (46 %); con contexto: 935 (54 %).
-- Pasos: 487 · preguntas de evaluación: 1082 · citas comprobadas: 3019 en 276 páginas.
+- Estructuras de los modelos: **1718** (hombre 1688, mujer 1701); en el núcleo de alguna lección: **795** (46 %); con contexto: 942 (55 %).
+- Pasos: 495 · preguntas de evaluación: 1104 · citas comprobadas: 3068 en 286 páginas.
 
 ## Por región
 
 | Región › subregión | Lecciones disponibles | Previstas (hechas de total) | Estado | Estructuras | En el núcleo | Con contexto |
 | --- | ---: | ---: | --- | ---: | ---: | ---: |
-| **Cabeza** | **12** | 11 de 11 | disponible | 403 | 171 (42 %) | 194 |
+| **Cabeza** | **13** | 12 de 12 | disponible | 403 | 176 (44 %) | 201 |
 | Cabeza › Cráneo | 1 | 1 de 1 | disponible | 15 | 8 (53 %) | 9 |
 | Cabeza › Encéfalo y meninges | 2 | 2 de 2 | disponible | 199 | 68 (34 %) | 76 |
-| Cabeza › Cara | 3 | 3 de 3 | disponible | 109 | 44 (40 %) | 49 |
-| Cabeza › Órbita y ojo | 2 | 2 de 2 | disponible | 32 | 18 (56 %) | 23 |
+| Cabeza › Cara | 3 | 3 de 3 | disponible | 109 | 44 (40 %) | 51 |
+| Cabeza › Órbita y ojo | 2 | 2 de 2 | disponible | 32 | 19 (59 %) | 24 |
 | Cabeza › Oído | 2 | 2 de 2 | disponible | 11 | 9 (82 %) | 11 |
-| Cabeza › Nariz y cavidad nasal | 0 | 0 | sin lección propia | 6 | 1 (17 %) | 2 |
+| Cabeza › Nariz y cavidad nasal | 1 | 1 de 1 | disponible | 6 | 5 (83 %) | 6 |
 | Cabeza › Boca y cavidad oral | 2 | 1 de 1 | disponible | 29 | 24 (83 %) | 26 |
 | **Cuello** | **4** | 4 de 4 | disponible | 97 | 48 (49 %) | 57 |
 | Cuello › Músculos del cuello | 1 | 1 de 1 | disponible | 25 | 16 (64 %) | 16 |
@@ -76,26 +76,26 @@ Generado por `node scripts/biblioteca.mjs` (no editar a mano). Cuenta las leccio
 | Miembro inferior › Tobillo | 1 | 1 de 1 | disponible | 27 | 7 (26 %) | 13 |
 | Miembro inferior › Pie | 3 | 2 de 2 | disponible | 118 | 49 (42 %) | 55 |
 | Todo el cuerpo (sin región) | 10 | 10 de 10 | disponible | — | — | — |
-| **Total (lecciones únicas)** | **70** | 70 de 70 | disponible | 1718 | 790 | 935 |
+| **Total (lecciones únicas)** | **71** | 71 de 71 | disponible | 1718 | 795 | 942 |
 
 ## Por sistema
 
 | Sistema | Lecciones disponibles | Previstas (hechas de total) | Estado | Estructuras | En el núcleo | Con contexto |
 | --- | ---: | ---: | --- | ---: | ---: | ---: |
-| Sistema óseo | 16 | 16 de 16 | disponible | 133 | 133 (100 %) | 133 |
+| Sistema óseo | 17 | 17 de 17 | disponible | 133 | 133 (100 %) | 133 |
 | Articulaciones y ligamentos | 14 | 13 de 13 | disponible | 291 | 93 (32 %) | 137 |
 | Sistema muscular | 23 | 23 de 23 | disponible | 292 | 204 (70 %) | 226 |
 | Sistema nervioso | 16 | 14 de 14 | disponible | 296 | 123 (42 %) | 143 |
-| Sistema cardiovascular | 13 | 13 de 13 | disponible | 422 | 115 (27 %) | 146 |
+| Sistema cardiovascular | 13 | 13 de 13 | disponible | 422 | 115 (27 %) | 148 |
 | Sistema linfático | 4 | 4 de 4 | disponible | 98 | 12 (12 %) | 12 |
-| Sistema respiratorio | 5 | 5 de 5 | disponible | 44 | 20 (45 %) | 38 |
+| Sistema respiratorio | 6 | 6 de 6 | disponible | 44 | 24 (55 %) | 41 |
 | Sistema digestivo | 6 | 6 de 6 | disponible | 56 | 47 (84 %) | 50 |
 | Sistema urinario | 2 | 2 de 2 | disponible | 5 | 5 (100 %) | 5 |
 | Sistema reproductor masculino | 1 | 1 de 1 | disponible | 9 | 8 (89 %) | 9 |
 | Sistema reproductor femenino | 1 | 1 de 1 | disponible | 17 | 8 (47 %) | 10 |
 | Sistema endocrino | 3 | 3 de 3 | disponible | 7 | 7 (100 %) | 7 |
-| Sistema tegumentario | 1 | 1 de 1 | disponible | 26 | 4 (15 %) | 5 |
-| Órganos de los sentidos | 3 | 3 de 3 | disponible | 22 | 11 (50 %) | 14 |
+| Sistema tegumentario | 1 | 1 de 1 | disponible | 26 | 4 (15 %) | 6 |
+| Órganos de los sentidos | 4 | 4 de 4 | disponible | 22 | 12 (55 %) | 15 |
 
 ## Por recorrido
 
@@ -109,7 +109,7 @@ Generado por `node scripts/biblioteca.mjs` (no editar a mano). Cuenta las leccio
 | Articulaciones | 1 | 7 | 7 | 115 | disponible | — |
 | Arterias y venas | 1 | 7 | 7 | 114 | disponible | — |
 | Nervios y territorios | 1 | 5 | 5 | 93 | disponible | — |
-| Órganos y relaciones | 1 | 9 | 9 | 151 | disponible | — |
+| Órganos y relaciones | 1 | 10 | 10 | 167 | disponible | — |
 | Compartimentos de los miembros | 1 | 7 | 7 | 118 | disponible | — |
 | Estructuras que se confunden | 1 | 2 | 2 | 32 | disponible | — |
 
@@ -139,6 +139,7 @@ Generado por `node scripts/biblioteca.mjs` (no editar a mano). Cuenta las leccio
 | `cab-masticacion` Músculos de la masticación y articulación temporomandibular | Cabeza › Cara | muscular, articular | 2 | 16 | 7 | 13 | disponible |
 | `cab-ojo` Órbita, globo ocular y músculos extraoculares | Cabeza › Órbita y ojo | sentidos, muscular, nervioso | 2 | 22 | 8 | 20 | disponible |
 | `cab-oido` Oído externo, medio e interno | Cabeza › Oído | sentidos, oseo | 2 | 15 | 8 | 17 | disponible |
+| `cab-nariz` La nariz y la cavidad nasal | Cabeza › Nariz y cavidad nasal | respiratorio, oseo, sentidos | 2 | 16 | 8 | 22 | disponible |
 | `cab-encefalo` Partes del encéfalo | Cabeza › Encéfalo y meninges | nervioso | 2 | 18 | 8 | 26 | disponible |
 | `cab-nervios-craneales` Los doce nervios craneales | Cabeza | nervioso | 2 | 22 | 9 | 18 | disponible |
 | `cab-arterias-encefalo` Arterias del encéfalo | Cabeza › Encéfalo y meninges | cardiovascular | 3 | 16 | 7 | 13 | disponible |

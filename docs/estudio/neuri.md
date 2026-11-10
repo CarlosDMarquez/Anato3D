@@ -48,9 +48,11 @@ Gestos de Neuri: en reposo flota y parpadea; escucha mientras escribes; cuando p
    - corrigiendo, si hace falta.
 
    Se puede **cancelar**: el servidor corta la llamada en curso y no hace más, así que tampoco gasta más.
-4. **Lección disponible.** Solo cuando la app la ha guardado en «Mis lecciones» se dice «Lección guardada», con un informe (pasos, preguntas, citas comprobadas y lo que se quitó) y los botones «Abrir la lección» y «Ver la ficha».
+4. **Lección disponible.** Solo cuando la app la ha guardado en «Mis lecciones» se dice **«Lista para estudiar»**, con un informe (pasos, preguntas, citas comprobadas y lo que se quitó) y los botones «Abrir la lección» y «Ver la ficha». *[Histórico: hasta el 9 de noviembre decía «Lección guardada».]*
 
-Si algo falla, la tarjeta dice «No se creó «…»» con el motivo:
+**Si se pide claramente** («Créame una lección sobre…»), la creación empieza sin confirmaciones: Neuri planifica y redacta seguido, y la tarjeta muestra también las etapas «planificando» y «guardando». Las propuestas que hace Neuri por su cuenta siguen pidiendo «Planificar» y «Crear».
+
+Si algo falla, la tarjeta dice el motivo:
 - si es pasajero (la IA ocupada, sin conexión, cancelada), ofrece «Intentarlo de nuevo»;
 - si es del propio plan (pocas evidencias, una limitación), ofrece «Cambiar el plan», porque con el mismo plan saldría lo mismo.
 
@@ -90,6 +92,33 @@ Lo que decide el modelo y lo que pone la app están separados:
 
   La revisión siempre queda como «borrador», sin revisor.
 - **Explicaciones:** en Orientar, una explicación solo puede usar las evidencias que se le dan. Otra llamada comprueba que la respaldan. Si no (o si no se puede comprobar), la explicación se retira y la app enseña solo las frases de la biblioteca con sus citas.
+
+## Creaciones que no se pierden
+
+Desde el 9 de noviembre de 2026, cada creación o adaptación es un **trabajo**.
+
+**Cómo funciona:**
+- Tiene un identificador, un UUID que pone la app. Se guarda en el navegador (`anato3d.trabajos`) y en el servidor (`server/neuri/trabajos.mjs`).
+- **Se puede seguir usando la app mientras se prepara.** «Mis lecciones» muestra **En preparación** con sus etapas; al terminar, un aviso ofrece «Abrir la lección», también con el panel cerrado.
+- **Al recargar la página**, la app se vuelve a conectar al mismo trabajo (`modo: 'trabajo'`, sin coste). El servidor lo sigue o devuelve lo que ya tenía. Si ya no lo tiene (pasó más de media hora o se reinició), la tarjeta dice «interrumpida» y volver a empezar es decisión de la persona, porque cuesta dinero.
+- **Reintentar:**
+  - tras un corte de red, con el **mismo** identificador: no se repite ni se paga dos veces;
+  - tras otro final, un trabajo **nuevo** con el mismo plan, que sustituye al viejo en la conversación.
+- **Cancelar** corta la llamada en curso a Claude en el servidor. Cerrar la pestaña durante la redacción no la cancela: el trabajo sigue en el servidor y se recoge al volver, si no ha pasado más de media hora.
+
+**Si la lección no se puede guardar** («Mis lecciones» llena o el navegador sin espacio), queda **«Lista pero sin guardar»**, con «Volver a guardar» y «Descargar el borrador». Nunca se borra otra lección para hacerle sitio.
+
+**Límites:**
+- 8 creaciones a la vez en el servidor y 2 por dirección;
+- el servidor manda una señal de vida cada 15 s, y la app corta tras 60 s de silencio.
+
+## Robustez de la conversación
+
+- **Plazos que cubren toda la respuesta**, también el cuerpo, no solo las cabeceras: 12 s para comprobar si hay IA, 75 s para una respuesta y 150 s para planificar. Si se agota, se liberan los controles y responde el buscador.
+- **Cada pregunta se puede cancelar.** Una respuesta que llega tarde (de una pregunta cancelada o de una conversación anterior) se descarta. Para eso manda el orden de las peticiones, no la hora: dos sucesos en el mismo milisegundo no se pisan.
+- **Si la IA falla**, no se apaga para toda la sesión: se vuelve a probar a los 30 s tras una caída, a los 60 s sin clave, a los 5 min sin servidor y a los 10 min sin saldo. Mientras tanto responde el buscador, y un aviso dice por qué.
+- **Si falla también el buscador local**, queda un error con «Volver a preguntar»; la conversación no se rompe.
+- **El foco del teclado** no se pierde cuando una creación cambia de etapa, y los cambios se anuncian en una región `aria-live`.
 
 ## Sin IA
 
@@ -153,7 +182,7 @@ Ajustes:
 - **Reglas:** nada de consejos médicos personales (remite a un profesional y, en una urgencia, a los servicios de emergencia) y nada fuera de tema. Lo que escribe la persona no cambia el modo, los permisos ni el formato.
 - **Privacidad:**
   - no se guarda ni se registra lo que escribe nadie;
-  - a Anthropic se envían la conversación, los identificadores de las lecciones hechas y los resúmenes de «Mis lecciones», y la nota de la conversación lo explica;
+  - a Anthropic se envían la conversación; los identificadores de las lecciones empezadas, terminadas, con repasos pendientes y guardadas (nunca respuestas ni fechas); el título y el resumen de «Mis lecciones»; al planificar o redactar, el plan, y al adaptar una lección propia, la lección entera. «Mis datos y privacidad» lo explica así desde el 9 de noviembre *[Histórico: antes decía solo «qué lecciones has hecho»]*;
   - las lecciones propias solo están en el navegador (localStorage, como mucho 40 y 3 MB).
 
 ## Datos del servidor
@@ -169,7 +198,7 @@ La web publicada es estática. Para que Neuri use la IA hace falta una función 
 
 ## Pruebas
 
-- **`npm test`** (`tests/pet.test.mjs`, 36 pruebas sin red ni gasto):
+- **`npm test`** (148 pruebas en total; `tests/pet.test.mjs`, 63 sin red ni gasto; *[Histórico: eran 36 antes del 9 de noviembre]*):
   - las instrucciones y los esquemas;
   - la petición exacta a la API con el SDK real (también en streaming) y que Opus nunca se use;
   - orientar, con la limpieza, las explicaciones comprobadas y retiradas, los errores y los límites;
@@ -188,6 +217,7 @@ La web publicada es estática. Para que Neuri use la IA hace falta una función 
 
 - **Servidor:**
   - `server/pet.mjs`: los modos, la comprobación y los límites;
+  - `server/neuri/trabajos.mjs`: las creaciones como trabajos (reanudar, cancelar, conservar media hora);
   - `server/neuri/instrucciones.mjs`: la especificación, la app, los modos y los esquemas;
   - `server/neuri/modelo.mjs`: el modelo, las llamadas y los errores;
   - `server/neuri/inventario.mjs`: las estructuras y las candidatas;
@@ -198,6 +228,8 @@ La web publicada es estática. Para que Neuri use la IA hace falta una función 
   - `server/vite-pet.mjs` y `vite.config.js`: el montaje en `npm run dev` y `npm run preview`.
 - **App:**
   - `src/pet/protocolo.js`, `src/pet/conversacion.js` y `src/pet/local.js`: la lógica;
+  - `src/pet/trabajos.js` y `src/pet/red.js`: las creaciones en la app y los plazos que cubren toda la respuesta;
+  - `src/ui/biblioteca/preparacion.js` y `src/ui/biblioteca/mis-lecciones.js`: «En preparación» y «Mis lecciones»;
   - `src/biblioteca/propias.js`: «Mis lecciones»;
   - `src/ui/biblioteca/pet.js` y `src/ui/biblioteca/neuri-svg.js`: la interfaz y el personaje;
   - `src/i18n/textos-pet.js`: los textos en los cinco idiomas.

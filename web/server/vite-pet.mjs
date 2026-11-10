@@ -7,6 +7,7 @@ import path from 'node:path';
 import { loadEnv } from 'vite';
 import { crearManejador, elegirModelo } from './pet.mjs';
 import { cargarRecursos } from './neuri/recursos.mjs';
+import { crearManejadorReportes } from './reportes.mjs';
 
 export function petApi() {
   let raiz = process.cwd();
@@ -37,16 +38,23 @@ export function petApi() {
     return manejar;
   }
 
+  // Reportes de problemas: se añaden a server/datos/reportes.jsonl (se revisan con `npm run reportes`).
+  let reportes = null;
+  async function middlewareReportes(req, res) {
+    try {
+      reportes ??= crearManejadorReportes({ archivo: path.join(raiz, 'server/datos/reportes.jsonl') });
+      const body = req.method === 'POST' ? await leer(req, 16 * 1024) : undefined;
+      await enviarRespuesta(await reportes(peticionDeNode(req, res, body), { ip: req.socket?.remoteAddress ?? '' }), res);
+    } catch (err) {
+      console.error('[reportes] Error del servidor:', err);
+      if (!res.headersSent) { res.statusCode = 500; res.setHeader('content-type', 'application/json; charset=utf-8'); res.end('{"ok":false,"error":"servidor"}'); }
+    }
+  }
+
   async function middleware(req, res) {
     try {
-      const url = new URL(req.originalUrl ?? req.url, `http://${req.headers.host ?? 'localhost'}`);
-      const cabeceras = new Headers();
-      for (const [k, v] of Object.entries(req.headers)) {
-        if (Array.isArray(v)) v.forEach((x) => cabeceras.append(k, x));
-        else if (v != null) cabeceras.set(k, String(v));
-      }
       const body = req.method === 'POST' ? await leer(req, 300 * 1024) : undefined;
-      const respuesta = await preparar()(new Request(url, { method: req.method, headers: cabeceras, body }), { ip: req.socket?.remoteAddress ?? '' });
+      const respuesta = await preparar()(peticionDeNode(req, res, body), { ip: req.socket?.remoteAddress ?? '' });
       await enviarRespuesta(respuesta, res);
     } catch (err) {
       console.error('[pet] Error del servidor:', err);
@@ -60,9 +68,26 @@ export function petApi() {
   return {
     name: 'anato3d-pet',
     configResolved(config) { raiz = config.root; modo = config.mode; },
-    configureServer(server) { server.middlewares.use('/api/pet', middleware); },
-    configurePreviewServer(server) { server.middlewares.use('/api/pet', middleware); },
+    configureServer(server) { server.middlewares.use('/api/pet', middleware); server.middlewares.use('/api/reportes', middlewareReportes); },
+    configurePreviewServer(server) { server.middlewares.use('/api/pet', middleware); server.middlewares.use('/api/reportes', middlewareReportes); },
   };
+}
+
+/**
+ * La petición estándar (Request) de una de Node. Lleva una señal que se activa si la app se va antes de recibir la
+ * respuesta (cancelar, «nueva conversación», cerrar la página): así el servidor deja de llamar a Claude en las
+ * peticiones cortas. Las creaciones con identificador no la usan: siguen hasta que se cancelan (server/pet.mjs).
+ */
+export function peticionDeNode(req, res, body) {
+  const url = new URL(req.originalUrl ?? req.url, `http://${req.headers.host ?? 'localhost'}`);
+  const cabeceras = new Headers();
+  for (const [k, v] of Object.entries(req.headers)) {
+    if (Array.isArray(v)) v.forEach((x) => cabeceras.append(k, x));
+    else if (v != null) cabeceras.set(k, String(v));
+  }
+  const control = new AbortController();
+  res.on('close', () => { if (!res.writableEnded) control.abort(); });
+  return new Request(url, { method: req.method, headers: cabeceras, body, signal: control.signal });
 }
 
 /**

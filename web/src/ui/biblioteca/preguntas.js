@@ -3,8 +3,10 @@
 // lección al que volver. Las preguntas que no se pueden mostrar en este modelo se saltan y no cuentan.
 import * as P from '../../biblioteca/progreso.js';
 import { mallas } from '../../biblioteca/formato.js';
-import { corregir, porObjetivo, NO_LO_SE } from '../../biblioteca/evaluar.js';
-import { t, tn } from '../../i18n/idioma.js';
+import { corregir, corregirBreve, porObjetivo, NO_LO_SE } from '../../biblioteca/evaluar.js';
+import { sinonimosDePieza } from '../../content/index.js';
+import { t, tn, idioma } from '../../i18n/idioma.js';
+import { botonReportar, enlazarReportar } from './reportar.js';
 import { tr } from '../../i18n/contenido.js';
 import { esc, icono } from './comun.js';
 import { htmlFuentes, nombreE } from './leccion.js';
@@ -28,6 +30,10 @@ export async function renderPreguntas(ctx) {
   const L = leccionDe(ctx, q);
   if (!v.respuesta && !v.preparada) {
     v.preparada = true;
+    // Respuesta breve: en repasos y prácticas, una estructura que ya se reconoció alguna vez se pide escribiendo su
+    // nombre (recordar es más exigente que elegir). En las evaluaciones, siempre con opciones (corrección segura).
+    v.breve = q.tipo === 'identificar' && v.modo !== 'evaluacion' && (ctx.data.items[q.item]?.aciertos ?? 0) > 0;
+    v.cercana = null;
     v.cargando = q.tipo === 'identificar' || q.tipo === 'localizar';
     ctx.api.modoEvaluacion(true);
     pintar(ctx);
@@ -64,7 +70,7 @@ function pintar(ctx) {
   const hecho = !!v.respuesta;
   const aciertos = v.respuestas.filter((r) => r.resultado !== 'fallo' && !r.saltada).length;
   const enunciado = q.tipo === 'identificar' ? t('estudio.queEstructura') : q.tipo === 'localizar' ? t('bib.localizarPregunta', { nombre: nombreE(L, q.estructura) }) : tr(q.enunciado);
-  const pista = q.tipo === 'identificar' ? t(v.cargando ? 'estudio.preparando' : 'estudio.pista') : q.tipo === 'localizar' ? t(v.cargando ? 'estudio.preparando' : 'bib.localizarPista') : q.tipo === 'secuencia' ? t('bib.secuenciaPista') : '';
+  const pista = q.tipo === 'identificar' ? t(v.cargando ? 'estudio.preparando' : v.breve ? 'bib.breve.pista' : 'estudio.pista') : q.tipo === 'localizar' ? t(v.cargando ? 'estudio.preparando' : 'bib.localizarPista') : q.tipo === 'secuencia' ? t('bib.secuenciaPista') : '';
   body.innerHTML = `
     <button class="link back" data-salir>${icono('chevron')}<span>${esc(t(v.modo === 'evaluacion' ? 'estudio.salirEvaluacion' : 'estudio.salirRepaso'))}</span></button>
     <p class="bib-leccion-t">${esc(v.titulo)}</p>
@@ -74,20 +80,64 @@ function pintar(ctx) {
     ${v.saltada ? '' : cuerpo(L, q, v)}
     ${hecho || v.saltada ? '' : `<label class="q-doubt"><input type="checkbox" id="q-dude" /> ${esc(t('estudio.dudo'))}</label>`}
     <div class="q-feedback" aria-live="polite">${hecho ? feedback(ctx, L, q, v) : ''}</div>
-    ${v.saltada ? `<div class="step-nav"><button class="btn primary" data-siguiente>${esc(t(v.i === v.preguntas.length - 1 ? 'estudio.verResultado' : 'estudio.siguiente'))}</button></div>` : ''}`;
+    ${v.saltada ? `<div class="step-nav"><button class="btn primary" data-siguiente>${esc(t(v.i === v.preguntas.length - 1 ? 'estudio.verResultado' : 'estudio.siguiente'))}</button></div>` : ''}
+    <p class="bib-rep-fila">${botonReportar()}</p>`;
   body.querySelector('[data-salir]').addEventListener('click', () => salir(ctx));
+  enlazarReportar(body, () => ({ vista: 'pregunta', leccion: q.leccion, version: L?.version ?? null, paso: q.paso ?? null, pregunta: q.id, estructura: q.estructura ?? null, idioma: idioma(), modelo: ctx.api.modelo() }), { alEnviar: ctx.alReportar });
   body.querySelectorAll('[data-opt]').forEach((b) => b.addEventListener('click', () => responder(ctx, b.dataset.opt === NO_LO_SE ? NO_LO_SE : Number(b.dataset.opt))));
+  // Respuesta breve: comprobar lo escrito; si se parece pero no coincide, la persona lo compara con la referencia.
+  body.querySelector('.q-breve')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const texto = body.querySelector('#q-breve-in').value.trim();
+    if (!texto || v.cargando) return;
+    const nombre = nombreE(L, q.estructura);
+    const piezas = L.estructuras[q.estructura]?.piezas ?? [];
+    const aceptadas = [nombre, L.estructuras[q.estructura]?.nombre, ...piezas.flatMap((pz) => sinonimosDePieza(pz, ctx.api.modelo()))].filter(Boolean);
+    const otras = Object.keys(L.estructuras).filter((id) => id !== q.estructura).map((id) => nombreE(L, id));
+    const r = corregirBreve(texto, { aceptadas, otras });
+    if (r.resultado === 'ambigua') {
+      // Vale para dos estructuras: no se corrige; se pide el nombre completo.
+      const aviso = body.querySelector('.q-breve-aviso');
+      aviso.textContent = t('bib.breve.ambigua', { texto });   // sin decir cuáles: sería una pista
+      aviso.hidden = false;
+      body.querySelector('#q-breve-in').focus();
+      return;
+    }
+    if (r.resultado === 'cercana') { v.cercana = { texto }; pintar(ctx); return; }
+    responder(ctx, { texto }, { resultado: r.resultado, elegida: r.confundida ?? texto });
+  });
+  body.querySelector('[data-ver-opciones]')?.addEventListener('click', () => { v.breve = false; v.ayuda = 'opciones'; pintar(ctx); });
+  body.querySelector('[data-cercana-si]')?.addEventListener('click', () => responder(ctx, { texto: v.cercana.texto }, { resultado: 'duda', elegida: v.cercana.texto, autoevaluada: true }));
+  body.querySelector('[data-cercana-no]')?.addEventListener('click', () => responder(ctx, { texto: v.cercana.texto }, { resultado: 'fallo', elegida: v.cercana.texto, autoevaluada: true }));
   body.querySelectorAll('[data-sec]').forEach((b) => b.addEventListener('click', () => { v.orden = [...(v.orden ?? []), b.dataset.sec]; pintar(ctx); }));
   body.querySelector('[data-sec-deshacer]')?.addEventListener('click', () => { v.orden.pop(); pintar(ctx); });
   body.querySelector('[data-sec-ok]')?.addEventListener('click', () => responder(ctx, v.orden));
   body.querySelector('[data-siguiente]')?.addEventListener('click', () => siguiente(ctx));
   body.querySelector('[data-volver-paso]')?.addEventListener('click', () => volverAlPaso(ctx, q));
   body.querySelector('[data-ver3d]')?.addEventListener('click', () => ctx.api.resaltar(L, q.estructuras.length ? q.estructuras : [], { lado: v.lado ?? 'R' }));
-  requestAnimationFrame(() => body.querySelector(hecho ? '.q-result' : '.q-text')?.focus({ preventScroll: false }));
+  requestAnimationFrame(() => body.querySelector(hecho ? '.q-result' : v.cercana ? '.q-cercana' : v.breve && !v.cargando ? '#q-breve-in' : '.q-text')?.focus({ preventScroll: false }));
 }
 
 function cuerpo(L, q, v) {
   const hecho = !!v.respuesta;
+  if (q.tipo === 'identificar' && (v.breve || v.respuesta?.valor?.texto != null)) {
+    if (hecho) return `<p class="q-escrita">${esc(t('bib.breve.escribiste', { texto: v.respuesta.valor.texto }))}</p>`;
+    if (v.cercana) {
+      return `<div class="q-cercana" tabindex="-1" role="group" aria-label="${esc(t('bib.breve.comparar'))}">
+        <p>${esc(t('bib.breve.cercana', { texto: v.cercana.texto, referencia: nombreE(L, q.estructura) }))}</p>
+        <div class="bib-acciones"><button class="btn primary" type="button" data-cercana-si>${esc(t('bib.breve.siEra'))}</button>
+          <button class="btn" type="button" data-cercana-no>${esc(t('bib.breve.noEra'))}</button></div>
+        <p class="muted small">${esc(t('bib.breve.cercanaNota'))}</p></div>`;
+    }
+    return `<form class="q-breve" novalidate>
+      <label for="q-breve-in">${esc(t('bib.breve.escribe'))}</label>
+      <div class="q-breve-fila"><input id="q-breve-in" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="80" ${v.cargando ? 'disabled' : ''} />
+        <button class="btn primary" type="submit" ${v.cargando ? 'disabled' : ''}>${esc(t('bib.comprobar'))}</button></div>
+      <p class="q-breve-aviso" role="alert" hidden></p>
+      <p class="q-breve-acc"><button class="link" type="button" data-ver-opciones>${esc(t('bib.breve.verOpciones'))}</button>
+        <button class="link" type="button" data-opt="${NO_LO_SE}" ${v.cargando ? 'disabled' : ''}>${esc(t('estudio.noLoSe'))}</button></p>
+    </form>`;
+  }
   if (q.tipo === 'localizar') {
     return hecho ? '' : `<div class="q-opts"><button class="opt idk" data-opt="${NO_LO_SE}" ${v.cargando ? 'disabled' : ''}><kbd>5</kbd><span>${esc(t('estudio.noLoSe'))}</span></button></div>`;
   }
@@ -126,15 +176,27 @@ function feedback(ctx, L, q, v) {
     </div>`;
 }
 
-function responder(ctx, valor) {
+/**
+ * Responde. `valor`: la opción, NO_LO_SE, la estructura tocada, el orden o { texto } (respuesta breve, ya corregida:
+ * su `resultado` llega en las opciones, con lo que se escribió en `elegida`).
+ */
+function responder(ctx, valor, { resultado: corregido = null, elegida: escrita = null, autoevaluada = false } = {}) {
   const v = ctx.vista;
   if (v.tipo !== 'preguntas' || v.respuesta || v.cargando || v.saltada) return;
   const q = v.preguntas[v.i];
   const dude = !!ctx.body.querySelector('#q-dude')?.checked;
-  const resultado = corregir(q, valor, { dude });
-  v.respuesta = { valor, resultado };
+  let resultado = corregido ?? corregir(q, valor, { dude });
+  if (corregido === 'acierto' && dude) resultado = 'duda';
+  v.respuesta = { valor, resultado, autoevaluada };
   v.respuestas.push({ pregunta: q, resultado });
-  P.anotar(ctx.data, q.item, resultado);
+  P.anotar(ctx.data, q.item, resultado, Date.now(), { huella: q.huella });
+  // El intento, con lo que se eligió si falló (para explicar después la dificultad: «lo confundiste con…») y las
+  // ayudas (ver las opciones en lugar de escribir; compararse con la referencia).
+  const Lq = leccionDe(ctx, q);
+  const elegida = escrita ?? (valor === NO_LO_SE ? NO_LO_SE : q.tipo === 'localizar' ? valor : q.tipo === 'secuencia' ? (valor ?? []).join(' > ').slice(0, 300) : q.opciones?.[valor]?.texto ?? null);
+  const ayuda = [v.ayuda, autoevaluada && 'autoevaluada', valor?.texto != null && 'escrita'].filter(Boolean);
+  P.registrarIntento(ctx.data, { leccion: q.leccion, version: Lq?.version ?? null, pregunta: q.id, tipo: q.tipo, objetivo: q.objetivo, estructura: q.estructura ?? null, resultado, elegida, dudo: dude, modo: v.modo, huella: q.huella, ayuda: ayuda.length ? ayuda : null });
+  ctx.evento?.('actividad_respondida', { leccion: q.leccion, version: Lq?.version ?? null, tipo: q.tipo, resultado, modo: v.modo, escrita: valor?.texto != null });
   ctx.guardar();
   ctx.api.alTocar(null);
   ctx.api.modoEvaluacion(false);                       // ya respondida: el nombre puede verse
@@ -145,9 +207,15 @@ function responder(ctx, valor) {
 
 function siguiente(ctx) {
   const v = ctx.vista;
-  if (v.saltada) v.respuestas.push({ pregunta: v.preguntas[v.i], resultado: null, saltada: true });
+  if (v.saltada) {
+    // No se pudo mostrar en el modelo: no cuenta (ni como fallo ni en el repaso), pero queda anotado como técnico.
+    const q = v.preguntas[v.i];
+    v.respuestas.push({ pregunta: q, resultado: null, saltada: true });
+    P.registrarIntento(ctx.data, { leccion: q.leccion, version: leccionDe(ctx, q)?.version ?? null, pregunta: q.id, tipo: q.tipo, objetivo: q.objetivo, estructura: q.estructura ?? null, resultado: 'tecnico', modo: v.modo });
+    ctx.evento?.('error_tecnico', { codigo: 'pregunta-no-mostrable', donde: v.modo }, { clave: q.item });
+  }
   if (v.i < v.preguntas.length - 1) {
-    ctx.vista = { ...v, i: v.i + 1, respuesta: null, preparada: false, saltada: false, orden: null, lado: null };
+    ctx.vista = { ...v, i: v.i + 1, respuesta: null, preparada: false, saltada: false, orden: null, lado: null, breve: false, cercana: null, ayuda: null };
     return renderPreguntas(ctx);
   }
   ctx.api.alTocar(null);
@@ -160,7 +228,8 @@ function siguiente(ctx) {
     const L = ctx.lecciones.get(v.leccion);
     objetivos = porObjetivo(L, contadas);
     demostrada = P.registrarEvaluacion(ctx.data, L, { aciertos, total: contadas.length, porObjetivo: objetivos });
-  }
+    ctx.evento?.('evaluacion_terminada', { leccion: L.id, version: L.version, aciertos, total: contadas.length, demostrada });
+  } else ctx.evento?.('repaso_realizado', { modo: v.modo, aciertos, total: contadas.length });
   P.registrarSesion(ctx.data, { fecha: Date.now(), tipo: v.modo, aciertos, total: contadas.length });
   ctx.guardar();
   ctx.ir({ tipo: 'resultado', modo: v.modo, leccion: v.leccion, titulo: v.titulo, aciertos, total: contadas.length, saltadas: v.respuestas.length - contadas.length, objetivos, demostrada, fallos: contadas.filter((r) => r.resultado === 'fallo').map((r) => r.pregunta), vuelta: v.vuelta }, { reemplazar: true });
@@ -233,7 +302,7 @@ export function teclaPreguntas(ctx, e) {
   const v = ctx.vista;
   if (e.target.matches?.('input, textarea, select')) return false;
   const q = v.preguntas[v.i];
-  if (!v.respuesta && !v.cargando && !v.saltada && /^[1-5]$/.test(e.key)) {
+  if (!v.respuesta && !v.cargando && !v.saltada && !v.breve && /^[1-5]$/.test(e.key)) {
     const k = Number(e.key);
     if (k === 5) responder(ctx, NO_LO_SE);
     else if (q.opciones && k <= q.opciones.length) responder(ctx, k - 1);

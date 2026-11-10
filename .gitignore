@@ -10,3 +10,5 @@ __pycache__/
 # Claves y ajustes locales: la clave de la API de Anthropic va en web/.env.local
 .env.local
 .env.*.local
+# Reportes de problemas y decisiones de revisión del servidor de desarrollo (pueden llevar comentarios de personas)
+web/server/datos/

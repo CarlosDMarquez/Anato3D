@@ -12,20 +12,21 @@ const NOMBRE_FUENTE = (f) => (f.startsWith('wpes:') ? 'Wikipedia en español' : 
 /** El catálogo en texto: siempre igual para el mismo catálogo (orden de las lecciones y de sus campos). */
 export function textoCatalogo(catalogo) {
   const lecciones = [...catalogo.lecciones].sort((a, b) => a.id.localeCompare(b.id));
+  const disponibles = new Set(lecciones.map((L) => L.id));
   const bloques = lecciones.map((L) => {
+    const requisitos = (L.requisitos ?? []).filter((id) => disponibles.has(id));
     const lugar = L.lugares?.length ? L.lugares.map(nomLugar).join('; ') : 'Todo el cuerpo';
     const sistemas = L.sistemas.map((s) => SISTEMA_POR_ID.get(s)?.nombre ?? s).join(', ');
     const nucleo = (L.estructuras ?? []).filter((e) => e.papel === 'nucleo').map((e) => e.nombre);
     return [
       `### ${L.id} — ${L.titulo}`,
       `Lugar: ${lugar}. Sistemas: ${sistemas}. Nivel: ${NIVEL_POR_ID.get(L.nivel)?.nombre ?? L.nivel}. ${L.minutos} min. Formato: ${FORMATO_POR_ID.get(L.formato)?.nombre ?? L.formato}.`,
-      `Requisitos: ${L.requisitos?.length ? L.requisitos.join(', ') : 'ninguno'}.`,
+      `Requisitos: ${requisitos.length ? requisitos.join(', ') : 'ninguno'}.`,
       `Resumen: ${L.resumen}`,
       `Objetivos: ${(L.objetivos ?? []).join(' ')}`,
       nucleo.length ? `Estructuras que enseña: ${[...new Set(nucleo)].join(', ')}.` : '',
     ].filter(Boolean).join('\n');
   });
-  const disponibles = new Set(lecciones.map((L) => L.id));
   const recorridos = RECORRIDOS.map((R) => {
     const ids = leccionesDeRecorrido(R).filter((id) => disponibles.has(id));
     return `### ${R.id} — ${R.titulo}\n${R.descripcion} Requisitos: ${R.requisitos} Lecciones, en orden: ${ids.join(', ')}.`;

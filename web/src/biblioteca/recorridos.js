@@ -33,7 +33,7 @@ export const MODULOS_BIBLIOTECA = [
   { id: 'nervios', titulo: 'Nervios y sus territorios', lecciones: ['sis-nervioso', 'cab-nervios-craneales', 'esp-medula', 'ms-nervios', 'mi-nervios'] },
   {
     id: 'organos', titulo: 'Órganos y sus relaciones',
-    lecciones: ['cue-visceras', 'tor-corazon', 'tor-pulmones', 'tor-mediastino', 'abd-tubo-digestivo', 'abd-higado-pancreas', 'abd-rinones', 'sis-reproductor-masculino', 'sis-reproductor-femenino'],
+    lecciones: ['cab-nariz', 'cue-visceras', 'tor-corazon', 'tor-pulmones', 'tor-mediastino', 'abd-tubo-digestivo', 'abd-higado-pancreas', 'abd-rinones', 'sis-reproductor-masculino', 'sis-reproductor-femenino'],
   },
   {
     id: 'compartimentos', titulo: 'Compartimentos de los miembros',

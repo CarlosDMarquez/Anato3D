@@ -21,10 +21,12 @@ import { REGION_POR_ID, SUBREGION_POR_ID, SISTEMA_POR_ID, TEMA_POR_ID } from '..
 import { revisarLeccion, objetivoObservable, frases, evidencias } from '../src/biblioteca/formato.js';
 import { crearBuscador } from '../src/biblioteca/buscar.js';
 import { responderLocal, minutosPedidos, consultaDe } from '../src/pet/local.js';
-import { crearConversacion, CLAVE_SESION } from '../src/pet/conversacion.js';
-import { cargarPropias, guardarPropia, borrarPropia, entradaCatalogo, esPropiaValida, CLAVE_PROPIAS } from '../src/biblioteca/propias.js';
+import { crearConversacion, CLAVE_SESION, ESPERAS } from '../src/pet/conversacion.js';
+import { crearTrabajos, CLAVE_TRABAJOS, FINALES, MAX_TRABAJOS } from '../src/pet/trabajos.js';
+import { cargarPropias, guardarPropia, borrarPropia, renombrarPropia, entradaCatalogo, esPropiaValida, apartadas, estadoPropias, descartarApartadas, exportarPropias, importarPropias, CLAVE_PROPIAS, CLAVE_APARTADAS, MAX_PROPIAS, MAX_TITULO } from '../src/biblioteca/propias.js';
 import { t, tn, fijarIdioma } from '../src/i18n/idioma.js';
 import CARA from '../src/biblioteca/lecciones/cab-cara-huesos.js';
+import { RETIRADAS } from '../src/biblioteca/retiradas.js';
 
 const CATALOGO = JSON.parse(fs.readFileSync(new URL('../src/biblioteca/generado/catalogo.json', import.meta.url), 'utf8'));
 const IDS = { lecciones: new Set(CATALOGO.lecciones.map((L) => L.id)), recorridos: new Set(RECORRIDOS.map((R) => R.id)) };
@@ -212,6 +214,30 @@ test('modelos: Haiku 5.5 por defecto; Sonnet 5.5 con respaldo del servidor; Opus
   assert.match(sonnet.llamadas[0].cabeceras.get('anthropic-beta'), /server-side-fallback-2026-07-01/);
 });
 
+test('registro técnico: cada llamada anota modo, modelo, tokens, coste, duración y trabajo; nunca lo que se escribe', async () => {
+  const lineas = [];
+  const { cliente } = apiFalsa(() => respuestaApi(BIEN));
+  const registro = { info: (x) => lineas.push(x), error: (x) => lineas.push(x) };
+  await llamar(cliente, { modelo: 'claude-haiku-5-5', sistema: ['fijo'], mensajes: [{ role: 'user', content: 'Me llamo Ana y me duele el codo' }], esquema: { type: 'object' }, etiqueta: 'verificar', registro, trabajo: '0123456789abcdef0123' });
+  assert.equal(lineas.length, 1);
+  assert.match(lineas[0], /^\[pet\] verificar · claude-haiku-5-5: entrada 150, caché leída 24000, caché escrita 0, salida 90 \(≈ [\d.]+ US\$\) · \d+\.\d s · trabajo 0123456789abcdef0123$/);
+  assert.ok(!/Ana|codo/.test(lineas[0]));
+});
+
+test('retiradas: una lección retirada mientras se revisa un reporte no existe para Neuri (ni en el catálogo que ve Claude ni en lo que recomienda)', async () => {
+  RETIRADAS.lecciones.push('ms-codo');
+  try {
+    const { cliente, llamadas } = apiFalsa(() => respuestaApi({ ...BIEN, lecciones: [{ id: 'ms-codo', motivo: 'x' }, { id: 'ms-axila', motivo: 'y' }] }));
+    const d = await (await crearManejador({ catalogo: CATALOGO, cliente, registro: silencio })(peticion(conversacion('codo')))).json();
+    assert.deepEqual(d.lecciones.map((x) => x.id), ['ms-axila']);
+    const sistema = JSON.stringify(llamadas[0].cuerpo.system);
+    assert.ok(!sistema.includes('ms-codo'), 'Claude no la ve en el catálogo, ni como requisito de otra');
+    assert.ok(sistema.includes('### ms-axila'));
+  } finally {
+    RETIRADAS.lecciones.splice(RETIRADAS.lecciones.indexOf('ms-codo'), 1);
+  }
+});
+
 test('orientar: la respuesta se limpia (solo lo que existe, sesión de 2 o más, propuesta solo con solicitud válida)', async () => {
   const largo = 'a'.repeat(5000);
   const { cliente } = apiFalsa(() => respuestaApi({
@@ -284,7 +310,9 @@ test('peticiones que no se aceptan: método, origen, tamaño, formato, versión,
   const { cliente, llamadas } = apiFalsa(() => respuestaApi(BIEN));
   const manejar = crearManejador({ catalogo: CATALOGO, cliente, registro: silencio });
   const estado = async (req) => (await manejar(req)).status;
-  assert.deepEqual(await (await manejar(peticion(null, { metodo: 'GET' }))).json(), { ok: true, ia: true, crear: false, version: 2 });
+  const g = await (await manejar(peticion(null, { metodo: 'GET' }))).json();
+  assert.deepEqual([g.ok, g.ia, g.crear, g.version, g.estado], [true, true, false, 2, 'configurada'], 'configurada: hay clave, aún sin llamadas');
+  assert.match(g.instrucciones, /^\d{4}-\d{2}-\d{2}\.\d+$/);
   assert.equal(await estado(peticion(null, { metodo: 'PUT' })), 405);
   assert.equal(await estado(peticion(conversacion('hola'), { origen: 'https://otra-web.example' })), 403);
   assert.equal(await estado(peticion(null, { crudo: '{no es json' })), 400);
@@ -302,7 +330,8 @@ test('peticiones que no se aceptan: método, origen, tamaño, formato, versión,
   assert.equal((await r.json()).error, 'sin-recursos');
   assert.deepEqual(await eventos(await manejar(redactarPeticion())), [{ estado: 'error', error: 'sin-recursos' }]);
   const sinClave = crearManejador({ catalogo: CATALOGO, registro: silencio });
-  assert.deepEqual(await (await sinClave(peticion(null, { metodo: 'GET' }))).json(), { ok: true, ia: false, crear: false, version: 2 });
+  const gs = await (await sinClave(peticion(null, { metodo: 'GET' }))).json();
+  assert.deepEqual([gs.ia, gs.crear, gs.estado], [false, false, 'sin-clave']);
   assert.equal((await (await sinClave(peticion(conversacion('hola')))).json()).error, 'sin-ia');
 });
 
@@ -615,7 +644,7 @@ test('redactar: lo no respaldado se quita y, si son muchas, una corrección; si 
   const ev = await eventos(await crearManejador({ catalogo: CATALOGO, cliente: api, recursos: () => R, registro: silencio })(redactarPeticion()));
   assert.deepEqual(ev.map((e) => e.estado), ['fuentes', 'redactando', 'comprobando', 'corrigiendo', 'comprobando', 'lista']);
   assert.deepEqual(llamadas.map(tipoDe), ['redactar', 'verificar', 'redactar', 'verificar']);
-  assert.match(llamadas[2].messages.at(-1).content, /Afirmación sin respaldo/);
+  assert.match(llamadas[2].messages.at(-1).content, /sin-respaldo: «/, 'cada problema con su categoría (anexo C)');
   assert.equal(llamadas[2].messages.at(-2).role, 'assistant', 'la corrección ve su borrador anterior');
   // Pocas afirmaciones quitadas: se quitan sin corregir.
   const pocas = apiGuion((params) => (tipoDe(params) === 'verificar' ? veredictos(params, (n) => n === 1) : { tipo: 'leccion', mensaje: '', leccion: borradorNariz(enumEvidencias(params)) }));
@@ -776,9 +805,125 @@ test('el SDK real en streaming: la llamada larga se lee entera con la salida est
 test('GET dice si se pueden crear lecciones (IA y fuentes en el servidor)', async () => {
   const { api } = apiGuion(() => BIEN);
   const conR = crearManejador({ catalogo: CATALOGO, cliente: api, recursos: () => recursosFalsos(), registro: silencio });
-  assert.deepEqual(await (await conR(peticion(null, { metodo: 'GET' }))).json(), { ok: true, ia: true, crear: true, version: 2 });
+  const g = await (await conR(peticion(null, { metodo: 'GET' }))).json();
+  assert.deepEqual([g.ia, g.crear], [true, true]);
   const falla = crearManejador({ catalogo: CATALOGO, cliente: api, recursos: () => { throw new Error('sin build'); }, registro: silencio });
-  assert.deepEqual(await (await falla(peticion(null, { metodo: 'GET' }))).json(), { ok: true, ia: true, crear: false, version: 2 });
+  const gf = await (await falla(peticion(null, { metodo: 'GET' }))).json();
+  assert.deepEqual([gf.ia, gf.crear], [true, false]);
+});
+
+// ══ Trabajos de creación (sobreviven a recargar la página; no se duplican; solo «cancelar» los detiene) ══
+test('trabajos: con identificador, la creación sigue aunque la app se desconecte y se recupera sin repetirla', async () => {
+  const R = recursosFalsos();
+  const { api, llamadas } = guionCompleto();
+  const manejar = crearManejador({ catalogo: CATALOGO, cliente: api, recursos: () => R, registro: silencio });
+  const id = 'a1b2c3d4-e5f6-4789-8abc-def012345678';
+  // La app empieza el trabajo y se desconecta enseguida (recarga la página).
+  const res = await manejar(redactarPeticion(PLAN_NARIZ, { trabajo: id }), { ip: '9.9.9.9' });
+  const lector = res.body.getReader();
+  const primero = JSON.parse(new TextDecoder().decode((await lector.read()).value));
+  assert.deepEqual([primero.estado, primero.trabajo], ['fuentes', id]);
+  await lector.cancel();
+  await new Promise((r) => setTimeout(r, 30));
+  // Se vuelve a conectar: recibe lo que pasó y el final, sin que se haya vuelto a pedir nada a Claude.
+  const ev = await eventos(await manejar(peticion({ v: 2, modo: 'trabajo', trabajo: id })));
+  assert.deepEqual(ev.map((e) => e.estado), ['fuentes', 'redactando', 'comprobando', 'lista']);
+  assert.equal(ev.at(-1).leccion.titulo, 'Huesos de la nariz');
+  const llamadasAntes = llamadas.length;
+  // Pedir otra vez el mismo trabajo (un reintento de la app) no lo repite ni gasta el límite.
+  const otra = await eventos(await manejar(redactarPeticion(PLAN_NARIZ, { trabajo: id }), { ip: '9.9.9.9' }));
+  assert.equal(otra.at(-1).leccion.id, ev.at(-1).leccion.id, 'la misma lección, no otra');
+  assert.equal(llamadas.length, llamadasAntes);
+  // Un trabajo que no existe (caducado o inventado).
+  const r404 = await manejar(peticion({ v: 2, modo: 'trabajo', trabajo: 'ffffffff-ffff-4fff-8fff-ffffffffffff' }));
+  assert.equal(r404.status, 404);
+  assert.equal((await r404.json()).error, 'trabajo-desconocido');
+  // Identificador con otra forma: no se acepta.
+  assert.equal((await manejar(peticion({ v: 2, modo: 'trabajo', trabajo: '../../etc' }))).status, 400);
+});
+
+test('trabajos: «cancelar» corta la llamada en curso a Claude y el trabajo termina como cancelado', async () => {
+  const R = recursosFalsos();
+  let abortada = false;
+  const esperar = (p, opciones) => new Promise((_, rechazar) => {
+    opciones?.signal?.addEventListener('abort', () => { abortada = true; rechazar(Object.assign(new Error('Request was aborted.'), { name: 'AbortError' })); });
+  });
+  const messages = { create: esperar, stream: (p, o) => ({ finalMessage: () => esperar(p, o) }) };
+  const manejar = crearManejador({ catalogo: CATALOGO, cliente: { messages, beta: { messages } }, recursos: () => R, registro: silencio });
+  const id = 'b1b2c3d4-e5f6-4789-8abc-def012345678';
+  const res = await manejar(redactarPeticion(PLAN_NARIZ, { trabajo: id }));
+  const leidos = eventos(res);
+  await new Promise((r) => setTimeout(r, 20));
+  const c = await (await manejar(peticion({ v: 2, modo: 'cancelar', trabajo: id }))).json();
+  assert.equal(c.cancelado, true);
+  const ev = await leidos;
+  assert.deepEqual(ev.at(-1), { estado: 'error', error: 'cancelada', trabajo: id });
+  assert.equal(abortada, true);
+  assert.equal((await (await manejar(peticion({ v: 2, modo: 'cancelar', trabajo: id }))).json()).cancelado, false, 'ya no hay nada que cancelar');
+});
+
+test('trabajos: límites (en curso a la vez por dirección y en total) y señal de vida mientras trabaja', async () => {
+  const { crearRegistro } = await import('../server/neuri/trabajos.mjs');
+  const reg = crearRegistro({ maximo: 2, porIp: 1, latidoMs: 10 });
+  const nunca = () => new Promise(() => {});
+  assert.ok(reg.empezar('t1aaaaaaaaaaaaaaaa', 'ip1', nunca).trabajo);
+  assert.equal(reg.empezar('t2aaaaaaaaaaaaaaaa', 'ip1', nunca).motivo, 'limite');
+  assert.ok(reg.empezar('t3aaaaaaaaaaaaaaaa', 'ip2', nunca).trabajo);
+  assert.equal(reg.empezar('t4aaaaaaaaaaaaaaaa', 'ip3', nunca).motivo, 'ocupado');
+  const vistos = [];
+  reg.conectar('t1aaaaaaaaaaaaaaaa', (e) => vistos.push(e?.estado ?? null));
+  await new Promise((r) => setTimeout(r, 35));
+  assert.ok(vistos.filter((x) => x === 'latido').length >= 2, 'latidos para que la app sepa que sigue vivo');
+  reg.cancelar('t1aaaaaaaaaaaaaaaa');
+  reg.cancelar('t3aaaaaaaaaaaaaaaa');
+  assert.equal(reg.enCurso, 0);
+  assert.equal(reg.estado('t1aaaaaaaaaaaaaaaa').final, 'error');
+});
+
+test('trabajos sin clave: volver a conectarse dice que el servidor no lo tiene (no «sin IA») y cancelar no falla', async () => {
+  const manejar = crearManejador({ catalogo: CATALOGO, cliente: null, registro: silencio });
+  const id = '00000000-0000-4000-a000-0000000000aa';
+  const r = await manejar(peticion({ v: 2, modo: 'trabajo', trabajo: id }));
+  assert.deepEqual([r.status, (await r.json()).error], [404, 'trabajo-desconocido']);
+  const c = await manejar(peticion({ v: 2, modo: 'cancelar', trabajo: id }));
+  assert.deepEqual([c.status, await c.json()], [200, { ok: true, cancelado: false }]);
+  const o = await manejar(peticion(conversacion('hombro')));
+  assert.deepEqual([o.status, (await o.json()).error], [503, 'sin-ia']);
+});
+
+test('salud del servicio: configurada, comprobada tras una llamada buena y fallando tras una mala', async () => {
+  let fallar = false;
+  const { cliente } = apiFalsa(() => (fallar ? errorApi(529, 'overloaded_error') : respuestaApi(BIEN)));
+  const manejar = crearManejador({ catalogo: CATALOGO, cliente, registro: silencio });
+  const estado = async () => (await (await manejar(peticion(null, { metodo: 'GET' }))).json()).estado;
+  assert.equal(await estado(), 'configurada');
+  await manejar(peticion(conversacion('hombro')));
+  assert.equal(await estado(), 'comprobada');
+  fallar = true;
+  await manejar(peticion(conversacion('rodilla')));
+  assert.equal(await estado(), 'fallando');
+});
+
+test('errores de la API: sin saldo no se reintenta, y una llamada que tarda demasiado termina por plazo', async () => {
+  const sinSaldo = apiFalsa(() => ({ status: 400, cuerpo: { type: 'error', error: { type: 'invalid_request_error', message: 'Your credit balance is too low to access the Anthropic API.' } } }));
+  const r = await crearManejador({ catalogo: CATALOGO, cliente: sinSaldo.cliente, registro: silencio })(peticion(conversacion('corazón')));
+  assert.deepEqual([r.status, (await r.json()).error], [503, 'sin-saldo']);
+  assert.equal(sinSaldo.llamadas.length, 1, 'sin reintentos');
+  // Plazo: la API no contesta; el SDK corta a los `plazoMs`.
+  const fetch = (url, init) => new Promise((_, rechazar) => init.signal?.addEventListener('abort', () => rechazar(Object.assign(new Error('aborted'), { name: 'AbortError' }))));
+  const lenta = new Anthropic({ apiKey: 'sk-ant-prueba', fetch, maxRetries: 0 });
+  await assert.rejects(llamar(lenta, { modelo: 'claude-haiku-5-5', sistema: ['f', 'v'], mensajes: [{ role: 'user', content: 'x' }], esquema: { type: 'object' }, plazoMs: 40, registro: silencio }), (e) => e.codigo === 'tiempo');
+});
+
+test('la solicitud lleva si la persona pidió crear expresamente y si basta para empezar; la pregunta se comprueba con sus distractores', () => {
+  const s = limpiarSolicitud({ accion: 'crear', tema: 'Nariz', supuestos: [], explicita: true, suficiente: true });
+  assert.deepEqual([s.explicita, s.suficiente], [true, true]);
+  const s2 = limpiarSolicitud({ accion: 'crear', tema: 'Nariz', supuestos: [], explicita: 'si' });
+  assert.deepEqual([s2.explicita, s2.suficiente], [false, false], 'solo true de verdad');
+  const { L } = ensamblarNariz();
+  const q = afirmaciones(L).find((a) => a.pregunta);
+  assert.match(q.texto, /Opciones incorrectas: El paladar duro; El suelo de la órbita; El tabique cartilaginoso/);
+  assert.equal(L.origen.instrucciones, null, 'sin versión si no se pasa');
 });
 
 // ══ Sin IA (src/pet/local.js) ══
@@ -841,10 +986,20 @@ function fetchFalso(responder, { ia = true, crear = true } = {}) {
   };
   return { fetch: f, posts };
 }
-const conv = (fetch, almacen = memoria(), propias = () => []) => crearConversacion({
+const conv = (fetch, almacen = memoria(), propias = () => [], extra = {}) => crearConversacion({
   ids: IDS, fetch, almacen, local: (texto) => responderLocal(texto, entorno()),
-  progreso: () => ({ terminadas: ['brazo'], enCurso: [], repasos: [], guardadas: [] }), propias, idioma: () => 'es',
+  progreso: () => ({ terminadas: ['brazo'], enCurso: [], repasos: [], guardadas: [] }), propias, idioma: () => 'es', ...extra,
 });
+const esperar = (ms = 0) => new Promise((r) => setTimeout(r, ms));
+/** Espera a que se cumpla algo (lo que hace la app en segundo plano), como mucho `ms`. */
+async function hasta(cond, ms = 3000) {
+  const fin = Date.now() + ms;
+  while (!cond()) {
+    if (Date.now() > fin) throw new Error('No se cumplió a tiempo');
+    await esperar(2);
+  }
+}
+const PROPUESTA_NARIZ = { ...BIEN, tipo: 'propuesta', mensaje: 'Te preparo una lección nueva.', lecciones: [], solicitud: { accion: 'crear', tema: 'Huesos de la nariz', objetivo: 'Conocerlos', nivel: 1, minutos: 12, leccion_base: null, enfoque: '', supuestos: [], terminos: ['nasal bones'], explicita: true, suficiente: true } };
 /** Flujo NDJSON partido en trozos que no coinciden con las líneas. */
 function flujoTrozos(lista) {
   const texto = lista.map((e) => `${JSON.stringify(e)}\n`).join('');
@@ -891,11 +1046,11 @@ test('conversación: orientar (estado que se conserva), sin IA el buscador, y un
   assert.equal((await p1).origen, 'ia');
 });
 
-test('conversación: planificar y crear (estados en flujo, lección solo «guardada» cuando la app la guarda)', async () => {
+test('conversación: planificar (plan, limitación o error) y Neuri recuerda la propuesta y la lección creada', async () => {
   const { L } = ensamblarNariz();
   const { fetch, posts } = fetchFalso((cuerpo) => {
     if (cuerpo.modo === 'planificar') return { datos: { ok: true, tipo: 'plan', mensaje: 'Plan.', plan: PLAN_NARIZ, estructuras: { Nasal_Bone: { nombre: 'Hueso nasal', evidencias: 4 } }, paginas: [] } };
-    return { flujo: flujoTrozos([{ estado: 'fuentes' }, { estado: 'redactando', evidencias: 20 }, { estado: 'comprobando' }, { estado: 'lista', leccion: L, informe: { pasos: 4, preguntas: 4, citas: 9, quitadas: 0, avisos: [] }, mensaje: 'Borrador listo.' }]) };
+    return { datos: { ok: true, ...PROPUESTA_NARIZ } };
   });
   const c = conv(fetch);
   const sol = limpiarSolicitud({ accion: 'crear', tema: 'Huesos de la nariz', supuestos: [] });
@@ -904,92 +1059,540 @@ test('conversación: planificar y crear (estados en flujo, lección solo «guard
   assert.equal(posts[0].modo, 'planificar');
   assert.deepEqual(posts[0].solicitud, sol);
   assert.equal(mp.estructuras.Nasal_Bone.evidencias, 4);
-  const estados = [];
-  const fin = await c.crearLeccion(mp.plan, { alEstado: (e) => estados.push(e.estado) });
-  assert.deepEqual(estados, ['fuentes', 'redactando', 'comprobando', 'lista']);
-  assert.equal(posts[1].modo, 'redactar');
-  assert.deepEqual(posts[1].mensajes, []);
-  assert.equal(fin.leccion.id, L.id);
-  const m = c.mensajes.at(-1);
-  assert.equal(m.generacion.estado, 'lista');
-  assert.equal(m.generacion.leccionId, L.id);
-  assert.equal(m.texto, 'Borrador listo.');
-  assert.ok(!('leccion' in m.generacion), 'la lección no se guarda en la conversación');
-  c.confirmarGuardada(m, true);
-  assert.equal(m.generacion.estado, 'guardada');
-  // Planificar sin éxito: limitación con su código o error de la app.
   const lim = fetchFalso(() => ({ datos: { ok: true, tipo: 'limitacion', codigo: 'sin-estructuras', mensaje: '', plan: null, sugerencias: [] } }));
   assert.equal((await conv(lim.fetch).planificar(sol)).codigo, 'sin-estructuras');
   const mal = fetchFalso(() => ({ status: 503, datos: { ok: false, error: 'sin-recursos' } }));
   const me = await conv(mal.fetch).planificar(sol);
   assert.deepEqual([me.tipo, me.codigo], ['error', 'sin-recursos']);
-  // Un flujo que se corta sin estado final es un error, no una lección.
-  const cortado = fetchFalso(() => ({ flujo: flujoTrozos([{ estado: 'fuentes' }, { estado: 'redactando' }]) }));
-  assert.deepEqual(await conv(cortado.fetch).crearLeccion(PLAN_NARIZ), { estado: 'error', error: 'incompleta' });
-});
-
-test('conversación: Neuri recuerda la propuesta, el plan y la lección creada (para «quita el maxilar», «hazla más corta»)', async () => {
-  const { L } = ensamblarNariz();
-  const PRO = { ...BIEN, tipo: 'propuesta', mensaje: 'Te propongo una lección nueva.', lecciones: [], solicitud: { accion: 'crear', tema: 'Huesos de la nariz', objetivo: 'Conocerlos', nivel: 1, minutos: 12, leccion_base: null, enfoque: '', supuestos: [], terminos: ['nasal bones'] } };
-  const { fetch, posts } = fetchFalso((cuerpo) => {
-    if (cuerpo.modo === 'planificar') return { datos: { ok: true, tipo: 'plan', mensaje: 'Este es el plan.', plan: PLAN_NARIZ, estructuras: { Maxilla: { nombre: 'Maxilar', evidencias: 9 } }, paginas: [] } };
-    if (cuerpo.modo === 'redactar') return { flujo: flujoTrozos([{ estado: 'lista', leccion: L, informe: { pasos: 4, preguntas: 4, citas: 9, quitadas: 0, avisos: [] }, mensaje: 'Listo.' }]) };
-    return { datos: { ok: true, ...PRO } };
-  });
-  const c = conv(fetch);
-  const mp = await c.preguntar('Crea una lección sobre la nariz');
-  const plan = await c.planificar(mp.solicitud);
-  await c.crearLeccion(plan.plan);
-  c.confirmarGuardada(c.mensajes.at(-1), true);
-  await c.preguntar('quita el maxilar');
+  // Lo que Neuri recuerda de una creación: la propuesta, el plan y que la app la guardó (para «quita el maxilar»).
+  const d = conv(fetch);
+  const pro = await d.preguntar('Créame una lección sobre la nariz');
+  assert.equal(pro.solicitud.explicita, true);
+  const id = '00000000-0000-4000-a000-000000000001';
+  d.anotarTrabajo(id, { estado: 'planificando', titulo: 'Huesos de la nariz' });
+  d.resumirTrabajo(id, { estado: 'guardada', titulo: 'Huesos de la nariz', leccionId: L.id, plan: { titulo: 'Huesos de la nariz', minutos: 12, objetivos: PLAN_NARIZ.objetivos } });
+  await d.preguntar('quita el maxilar');
   const enviados = posts.at(-1).mensajes;
-  assert.deepEqual(enviados.map((m) => m.rol), ['usuario', 'pet', 'usuario'], 'propuesta, plan y creación en un solo turno de Neuri');
+  assert.deepEqual(enviados.map((m) => m.rol), ['usuario', 'pet', 'usuario'], 'la propuesta y la creación en un solo turno de Neuri');
   const recuerdo = enviados[1].texto;
   assert.match(recuerdo, /Propuesta mostrada \(crear\): tema: Huesos de la nariz/);
-  assert.match(recuerdo, /Plan mostrado: «Huesos de la nariz», 12 min.*Maxilar \(contexto\)/s);
-  assert.match(recuerdo, new RegExp(`La app guardó la lección «Huesos de la nariz» \\(${L.id}\\)`));
+  assert.match(recuerdo, new RegExp(`La app guardó la lección «Huesos de la nariz» \\(${L.id}\\) en Mis lecciones\\. Plan: «Huesos de la nariz», 12 min`));
   assert.ok(recuerdo.length <= LIMITES.pet);
-  // Y el servidor lo acepta tal cual.
-  assert.equal(validarPeticion(posts.at(-1), IDS).ok, true);
-});
-
-test('conversación: cancelar una creación y recuperar una que quedó a medias al cerrar', async () => {
-  const { fetch } = fetchFalso((cuerpo, init) => new Promise((_, rechazar) => init.signal.addEventListener('abort', () => rechazar(Object.assign(new Error('abortada'), { name: 'AbortError' })))));
-  const c = conv(fetch);
-  const p = c.crearLeccion(PLAN_NARIZ);
-  await new Promise((r) => setTimeout(r, 0));
-  c.cancelar();
-  assert.equal((await p).error, 'cancelada');
-  assert.equal(c.mensajes.at(-1).generacion.error, 'cancelada');
+  assert.equal(validarPeticion(posts.at(-1), IDS).ok, true, 'y el servidor lo acepta tal cual');
+  // Si la creación se vuelve a empezar con otro identificador, el mismo mensaje la sigue.
+  const otro = '00000000-0000-4000-a000-000000000002';
+  assert.ok(d.cambiarTrabajo(id, otro, { estado: 'fuentes', titulo: 'Huesos de la nariz' }));
+  assert.equal(d.tieneTrabajo(otro), true);
+  assert.equal(d.tieneTrabajo(id), false);
+  // Al recargar: la versión anterior guardaba solo la lista, y una creación antigua a medias queda interrumpida.
   const almacen = memoria({ [CLAVE_SESION]: JSON.stringify({ mensajes: [{ rol: 'pet', tipo: 'generacion', texto: '', generacion: { estado: 'redactando' } }], contexto: null }) });
   assert.equal(conv(fetch, almacen).mensajes[0].generacion.error, 'interrumpida');
-  // La versión anterior guardaba solo la lista de mensajes.
   const viejo = memoria({ [CLAVE_SESION]: JSON.stringify([{ rol: 'usuario', texto: 'hola' }, { rol: 'nadie', texto: 'x' }]) });
   assert.deepEqual(conv(fetch, viejo).mensajes, [{ rol: 'usuario', texto: 'hola' }]);
 });
 
-// ══ «Mis lecciones» ══
-test('Mis lecciones: guardar, validar, listar, quitar y entrar en el catálogo', () => {
+test('conversación: cancelar una pregunta (no cuenta en lo que se envía) y de dos seguidas de la persona, la última', async () => {
+  const { fetch, posts } = fetchFalso((cuerpo, init) => (cuerpo.mensajes.at(-1).texto === 'hombro'
+    ? new Promise((_, rechazar) => init.signal.addEventListener('abort', () => rechazar(Object.assign(new Error('abortada'), { name: 'AbortError' }))))
+    : { datos: { ok: true, ...BIEN } }));
+  const c = conv(fetch);
+  const p = c.preguntar('hombro');
+  await esperar();
+  assert.equal(c.ocupada, true);
+  assert.equal(c.cancelar(), true);
+  assert.equal(c.ocupada, false, 'la conversación queda libre en el acto');
+  assert.equal(await p, null);
+  assert.equal(c.mensajes[0].cancelada, true);
+  assert.deepEqual(c.historial(), [], 'lo cancelado no se envía');
+  await c.preguntar('rodilla');
+  assert.deepEqual(posts.at(-1).mensajes.map((m) => m.texto), ['rodilla']);
+  assert.equal(c.cancelar(), false, 'sin nada en curso no hay qué cancelar');
+  // Una pregunta que se quedó sin respuesta (un error que no se envía) y otra después: solo cuenta la última.
+  const d = conv(fetch, memoria({ [CLAVE_SESION]: JSON.stringify({ mensajes: [{ rol: 'usuario', texto: 'primera' }, { rol: 'pet', tipo: 'error', texto: '', codigo: 'tiempo' }, { rol: 'usuario', texto: 'segunda' }], contexto: null }) }));
+  assert.deepEqual(d.historial().map((m) => m.texto), ['segunda']);
+});
+
+// Los cinco fallos de robustez que se reprodujeron antes de rehacer el cliente (docs/estudio/matriz-requisitos.md).
+test('robustez 1: un cuerpo que no termina de llegar se corta por plazo y responde el buscador; la conversación queda libre', async () => {
+  const colgado = async (url, init = {}) => {
+    if (init.method === 'GET') return new Response(JSON.stringify({ ok: true, ia: true, crear: true }), { status: 200 });
+    return new Response(new ReadableStream({ start(ctl) { ctl.enqueue(new TextEncoder().encode('{"ok":true,')); } }), { status: 200 });
+  };
+  const c = conv(colgado, memoria(), () => [], { plazos: { comprobar: 50, orientar: 60, planificar: 60 } });
+  const m = await c.preguntar('corazón');
+  assert.equal(m.origen, 'buscador');
+  assert.equal(m.aviso, 'tiempo');
+  assert.equal(c.ocupada, false);
+  assert.equal(c.servicio.estado, 'no-disponible');
+});
+
+test('robustez 2: tras un fallo pasajero la IA se vuelve a probar al cabo de un rato (no queda apagada para siempre)', async () => {
+  let reloj = 1_000_000;
+  let falla = true;
+  const { fetch, posts } = fetchFalso(() => (falla ? { status: 504, datos: { ok: false, error: 'tiempo' } } : { datos: { ok: true, ...BIEN } }));
+  const c = conv(fetch, memoria(), () => [], { ahora: () => reloj });
+  assert.equal((await c.preguntar('corazón')).aviso, 'tiempo');
+  assert.equal(c.servicio.estado, 'no-disponible');
+  falla = false;
+  const m2 = await c.preguntar('riñones');
+  assert.deepEqual([m2.origen, m2.aviso, posts.length], ['buscador', 'no-disponible', 1], 'mientras tanto, el buscador (sin llamar)');
+  reloj += ESPERAS.caida + 1;
+  const m3 = await c.preguntar('hombro');
+  assert.equal(m3.origen, 'ia');
+  assert.equal(c.servicio.estado, 'disponible');
+  // Sin clave o sin servidor, también se vuelve a comprobar (más espaciado).
+  let ia = false;
+  const g = fetchFalso(() => ({ datos: { ok: true, ...BIEN } }));
+  const f = async (url, init = {}) => (init.method === 'GET' ? new Response(JSON.stringify({ ok: true, ia, crear: ia }), { status: 200 }) : g.fetch(url, init));
+  const d = conv(f, memoria(), () => [], { ahora: () => reloj });
+  assert.equal(await d.comprobar(), false);
+  ia = true;
+  assert.equal(await d.comprobar(), false, 'aún no toca');
+  reloj += ESPERAS.sinClave + 1;
+  assert.equal(await d.comprobar(), true);
+  assert.equal(d.crear, true);
+});
+
+test('robustez 3: una comprobación inicial que llega tarde no pisa una respuesta buena más nueva', async () => {
+  let soltarGet;
+  const { fetch: post } = fetchFalso(() => ({ datos: { ok: true, ...BIEN } }));
+  const f = async (url, init = {}) => {
+    if (init.method === 'GET') { await new Promise((r) => { soltarGet = r; }); return new Response(JSON.stringify({ ok: false }), { status: 500 }); }
+    return post(url, init);
+  };
+  const c = conv(f);
+  const comprobando = c.comprobar();
+  const m = await c.preguntar('hombro');
+  assert.equal(m.origen, 'ia');
+  soltarGet();
+  await comprobando;
+  assert.equal(c.servicio.estado, 'disponible');
+  assert.equal(c.ia, true);
+});
+
+test('robustez 4: si el buscador de la app también falla, un error que se puede volver a preguntar (nunca un silencio)', async () => {
+  const { fetch } = fetchFalso(() => ({ status: 503, datos: { ok: false, error: 'sin-ia' } }));
+  const c = crearConversacion({ ids: IDS, fetch, almacen: memoria(), local: () => { throw new Error('índice roto'); }, progreso: () => ({ terminadas: [], enCurso: [], repasos: [], guardadas: [] }), idioma: () => 'es' });
+  const m = await c.preguntar('rodilla');
+  assert.deepEqual([m.tipo, m.codigo, m.reintentar], ['error', 'local', 'rodilla']);
+  assert.equal(c.ocupada, false);
+  assert.ok(t('pet.error.local').length > 10);
+});
+
+test('robustez 5: una respuesta que llega después de «nueva conversación» se descarta', async () => {
+  let soltar = null;
+  const { fetch } = fetchFalso(() => (soltar ? { datos: { ok: true, ...BIEN } } : new Promise((r) => { soltar = () => r({ datos: { ok: true, ...BIEN } }); })));
+  const c = conv(fetch);
+  const p = c.preguntar('hombro');
+  await esperar();
+  c.reiniciar();
+  assert.equal(c.ocupada, false);
+  soltar();
+  assert.equal(await p, null);
+  assert.deepEqual(c.mensajes, []);
+  assert.equal((await c.preguntar('corazón')).origen, 'ia', 'y se puede seguir preguntando');
+});
+
+// ══ Las creaciones (src/pet/trabajos.js) ══
+const idT = (n) => `00000000-0000-4000-a000-${String(n).padStart(12, '0')}`;
+const INFORME = { pasos: 4, preguntas: 4, citas: 9, quitadas: 0, avisos: [] };
+function trabajosDe(fetch, { almacen = memoria(), guardar = () => ({ ok: true }), plazos = { planificar: 2000, conectar: 2000, inactividad: 2000 }, ahora } = {}) {
+  return crearTrabajos({
+    fetch, almacen, plazos, ...(ahora ? { ahora } : {}),
+    comun: () => ({ v: 2, idioma: 'es', progreso: { terminadas: [], enCurso: [], repasos: [], guardadas: [] }, propias: [], contexto: null }),
+    historial: () => [{ rol: 'usuario', texto: 'Créame una lección sobre la nariz' }],
+    guardarLeccion: guardar,
+  });
+}
+/** Flujo que manda unos eventos y se queda abierto (como una creación larga) hasta que se corta la conexión. */
+function flujoAbierto(signal, lista = []) {
+  const cod = new TextEncoder();
+  return new ReadableStream({
+    start(c) {
+      for (const e of lista) c.enqueue(cod.encode(`${JSON.stringify(e)}\n`));
+      signal?.addEventListener('abort', () => { try { c.error(Object.assign(new Error('abortada'), { name: 'AbortError' })); } catch { /* ya cerrado */ } });
+    },
+  });
+}
+const sinRepetidos = (xs) => xs.filter((x, i) => x !== xs[i - 1]);
+
+test('crear: de una vez (planifica y redacta), con las etapas reales y «Lista para estudiar» solo cuando la app la guarda', async () => {
+  const { L } = ensamblarNariz();
+  const { fetch, posts } = fetchFalso((cuerpo) => {
+    if (cuerpo.modo === 'planificar') return { datos: { ok: true, tipo: 'plan', mensaje: 'Plan.', plan: PLAN_NARIZ, estructuras: { Nasal_Bone: { nombre: 'Hueso nasal', evidencias: 4 } }, paginas: [] } };
+    return { flujo: flujoTrozos([{ estado: 'fuentes' }, { estado: 'latido' }, { estado: 'redactando', evidencias: 20 }, { estado: 'comprobando' }, { estado: 'corrigiendo' }, { estado: 'comprobando' }, { estado: 'lista', leccion: L, informe: INFORME, mensaje: 'Borrador listo.' }].map((e) => ({ ...e, trabajo: cuerpo.trabajo }))) };
+  });
+  const almacen = memoria();
+  const guardadas = [];
+  const tr = trabajosDe(fetch, { almacen, guardar: (x) => { guardadas.push(x); return { ok: true }; } });
+  const estados = [];
+  tr.suscribir((x) => x && estados.push(x.estado));
+  const sol = limpiarSolicitud({ accion: 'crear', tema: 'Huesos de la nariz', supuestos: [] });
+  const x = tr.iniciar({ solicitud: sol });
+  assert.match(x.id, /^[0-9a-f-]{36}$/);
+  assert.equal(x.estado, 'planificando');
+  await hasta(() => FINALES.includes(x.estado));
+  assert.deepEqual(sinRepetidos(estados), ['planificando', 'fuentes', 'redactando', 'comprobando', 'corrigiendo', 'comprobando', 'guardando', 'guardada']);
+  assert.deepEqual(posts.map((p) => p.modo), ['planificar', 'redactar']);
+  assert.deepEqual(posts[0].solicitud, sol);
+  assert.deepEqual(posts[0].mensajes.map((m) => m.texto), ['Créame una lección sobre la nariz'], 'el plan se hace con la conversación');
+  assert.equal(posts[1].trabajo, x.id, 'la creación lleva el identificador que puso la app');
+  assert.deepEqual(posts[1].mensajes, []);
+  assert.equal(posts[1].plan.titulo, PLAN_NARIZ.titulo);
+  assert.equal(validarPeticion(posts[1], IDS).ok, true);
+  assert.deepEqual([guardadas.length, guardadas[0].id, x.leccionId, x.evidencias, x.mensaje], [1, L.id, L.id, 20, 'Borrador listo.']);
+  assert.deepEqual(x.informe, INFORME);
+  const guardado = JSON.parse(almacen.getItem(CLAVE_TRABAJOS));
+  assert.equal(guardado[0].estado, 'guardada');
+  assert.ok(!JSON.stringify(guardado).includes(L.pasos[1].texto), 'la lección no se guarda en la lista de creaciones');
+  // Planificar sin éxito: aclaración o limitación, con su mensaje; o un error con su código.
+  const acl = trabajosDe(fetchFalso(() => ({ datos: { ok: true, tipo: 'aclaracion', mensaje: '¿De qué región?', plan: null, sugerencias: [] } })).fetch);
+  const a = acl.iniciar({ solicitud: sol });
+  await hasta(() => FINALES.includes(a.estado));
+  assert.deepEqual([a.estado, a.mensaje], ['aclaracion', '¿De qué región?']);
+  const sinIa = trabajosDe(fetchFalso(() => ({ status: 503, datos: { ok: false, error: 'sin-ia' } })).fetch);
+  const s = sinIa.iniciar({ solicitud: sol });
+  await hasta(() => FINALES.includes(s.estado));
+  assert.deepEqual([s.estado, s.error, s.reanudable], ['error', 'sin-ia', false]);
+});
+
+test('crear: si el navegador no la deja guardar, se conserva para volver a guardarla o descargarla (sin pagarla otra vez)', async () => {
+  const { L } = ensamblarNariz();
+  const listo = [{ estado: 'fuentes' }, { estado: 'redactando' }, { estado: 'comprobando' }, { estado: 'lista', leccion: L, informe: INFORME, mensaje: 'Listo.' }];
+  const { fetch, posts } = fetchFalso(() => ({ flujo: flujoTrozos(listo) }));
+  let lleno = true;
+  const almacen = memoria();
+  const tr = trabajosDe(fetch, { almacen, guardar: () => (lleno ? { ok: false, error: 'lleno' } : { ok: true }) });
+  const x = tr.iniciar({ plan: PLAN_NARIZ });
+  assert.equal(x.estado, 'fuentes', 'con el plan hecho, empieza por las fuentes');
+  await hasta(() => FINALES.includes(x.estado));
+  assert.deepEqual([x.estado, x.error, x.leccionId], ['no-guardada', 'lleno', L.id]);
+  assert.equal(tr.resultado(x.id).id, L.id, 'el resultado sigue en la pestaña');
+  const copia = almacen.getItem(CLAVE_TRABAJOS);
+  lleno = false;
+  assert.equal(tr.reintentar(x.id), x);
+  assert.equal(x.estado, 'guardada');
+  assert.equal(tr.resultado(x.id), null);
+  assert.equal(posts.length, 1, 'sin volver a pedirla');
+  // Tras recargar la página, la lección ya no está en la pestaña: se vuelve a pedir al servidor por su identificador.
+  const otra = fetchFalso(() => ({ flujo: flujoTrozos(listo) }));
+  const tr2 = trabajosDe(otra.fetch, { almacen: memoria({ [CLAVE_TRABAJOS]: copia }) });
+  assert.equal(tr2.buscar(x.id).estado, 'no-guardada');
+  assert.equal(tr2.resultado(x.id), null);
+  tr2.reintentar(x.id);
+  await hasta(() => tr2.buscar(x.id).estado === 'guardada');
+  assert.deepEqual(otra.posts.map((p) => [p.modo, p.trabajo]), [['trabajo', x.id]]);
+});
+
+test('crear: cancelar corta la conexión, pide al servidor que pare y no guarda nada; volver a crearla es otro trabajo', async () => {
+  const { fetch, posts } = fetchFalso((cuerpo, init) => (cuerpo.modo === 'cancelar' ? { datos: { ok: true, cancelado: true } } : { flujo: flujoAbierto(init.signal, [{ estado: 'fuentes' }, { estado: 'redactando', evidencias: 12 }]) }));
+  const guardadas = [];
+  const tr = trabajosDe(fetch, { guardar: (L) => { guardadas.push(L); return { ok: true }; } });
+  const x = tr.iniciar({ plan: PLAN_NARIZ });
+  await hasta(() => x.estado === 'redactando');
+  assert.equal(tr.enCurso.length, 1);
+  assert.equal(await tr.cancelar(x.id), true);
+  assert.deepEqual([x.estado, x.error, x.reanudable], ['error', 'cancelada', false]);
+  assert.deepEqual(posts.at(-1), { v: 2, modo: 'cancelar', trabajo: x.id });
+  assert.equal(validarPeticion(posts.at(-1), IDS).ok, true);
+  await esperar(20);
+  assert.equal(x.estado, 'error', 'nada de lo que llegue después lo cambia');
+  assert.equal(guardadas.length, 0);
+  assert.equal(await tr.cancelar(x.id), false, 'ya terminó');
+  // Volver a crearla: un trabajo nuevo con el mismo plan, que sustituye al cancelado.
+  const n = tr.reintentar(x.id);
+  assert.notEqual(n.id, x.id);
+  assert.equal(n.reemplaza, x.id);
+  assert.deepEqual(n.plan, x.plan);
+  assert.deepEqual(tr.lista.map((t) => t.id), [n.id]);
+  await hasta(() => n.estado === 'redactando');
+  assert.equal(posts.at(-1).trabajo, n.id);
+  await tr.cancelar(n.id);
+  // Quitar: solo lo terminado.
+  assert.equal(tr.quitar(n.id), true);
+  assert.deepEqual(tr.lista, []);
+});
+
+test('crear: al recargar la página se retoma sin repetirla; si el servidor ya no la tiene, queda interrumpida', async () => {
   const { L } = ensamblarNariz();
   const almacen = memoria();
-  assert.deepEqual(guardarPropia(almacen, L), { ok: true });
+  const primera = fetchFalso((cuerpo, init) => (cuerpo.modo === 'cancelar' ? { datos: { ok: true } } : { flujo: flujoAbierto(init.signal, [{ estado: 'fuentes' }, { estado: 'redactando', evidencias: 9 }]) }));
+  const t1 = trabajosDe(primera.fetch, { almacen });
+  const x = t1.iniciar({ plan: PLAN_NARIZ });
+  await hasta(() => x.estado === 'redactando');
+  const copia = almacen.getItem(CLAVE_TRABAJOS);          // lo que queda guardado al recargar
+  await t1.cancelar(x.id);                                // (cierra la conexión de la «pestaña» anterior)
+  // La página nueva lee la lista y se vuelve a conectar al mismo trabajo: el servidor repite lo hecho y sigue.
+  const segunda = fetchFalso(() => ({ flujo: flujoTrozos([{ estado: 'fuentes' }, { estado: 'redactando', evidencias: 9 }, { estado: 'comprobando' }, { estado: 'lista', leccion: L, informe: INFORME, mensaje: 'Listo.' }]) }));
+  const guardadas = [];
+  const t2 = trabajosDe(segunda.fetch, { almacen: memoria({ [CLAVE_TRABAJOS]: copia }), guardar: (y) => { guardadas.push(y); return { ok: true }; } });
+  assert.equal(t2.buscar(x.id).estado, 'redactando');
+  await t2.retomarPendientes();
+  assert.deepEqual(segunda.posts, [{ v: 2, modo: 'trabajo', trabajo: x.id }], 'ni se vuelve a planificar ni a redactar');
+  assert.equal(validarPeticion(segunda.posts[0], IDS).ok, true);
+  assert.deepEqual([t2.buscar(x.id).estado, guardadas.length], ['guardada', 1]);
+  // El servidor ya no lo tiene (pasó media hora o se reinició).
+  const olvido = fetchFalso(() => ({ status: 404, datos: { ok: false, error: 'trabajo-desconocido' } }));
+  const t3 = trabajosDe(olvido.fetch, { almacen: memoria({ [CLAVE_TRABAJOS]: copia }) });
+  await t3.retomarPendientes();
+  assert.equal(t3.buscar(x.id).estado, 'interrumpida');
+  // Uno que se estaba planificando: el plan no queda en el servidor, así que se planifica otra vez y se empieza.
+  const planificando = JSON.stringify([{ ...JSON.parse(copia)[0], estado: 'planificando', plan: null, solicitud: limpiarSolicitud({ accion: 'crear', tema: 'Huesos de la nariz', supuestos: [] }) }]);
+  const cuarta = fetchFalso((cuerpo) => (cuerpo.modo === 'planificar' ? { datos: { ok: true, tipo: 'plan', mensaje: '', plan: PLAN_NARIZ, estructuras: {}, paginas: [] } } : { flujo: flujoTrozos([{ estado: 'lista', leccion: L, informe: INFORME, mensaje: '' }]) }));
+  const t4 = trabajosDe(cuarta.fetch, { almacen: memoria({ [CLAVE_TRABAJOS]: planificando }) });
+  await t4.retomarPendientes();
+  assert.deepEqual(cuarta.posts.map((p) => p.modo), ['planificar', 'redactar']);
+  assert.equal(t4.lista[0].estado, 'guardada');
+});
+
+test('crear: un corte de red se reintenta con el mismo identificador; otro fallo, con uno nuevo; y un silencio largo es «tiempo»', async () => {
+  const { L } = ensamblarNariz();
+  let n = 0;
+  const { fetch, posts } = fetchFalso(() => ({ flujo: flujoTrozos(n++ === 0 ? [{ estado: 'fuentes' }] : [{ estado: 'redactando' }, { estado: 'lista', leccion: L, informe: INFORME, mensaje: '' }]) }));
+  const tr = trabajosDe(fetch);
+  const x = tr.iniciar({ plan: PLAN_NARIZ });
+  await hasta(() => FINALES.includes(x.estado));
+  assert.deepEqual([x.estado, x.error, x.reanudable], ['error', 'incompleta', true], 'un flujo que se corta sin final no es una lección');
+  assert.equal(tr.reintentar(x.id), x, 'el mismo trabajo: el servidor sigue o devuelve lo que tenía');
+  await hasta(() => FINALES.includes(x.estado));
+  assert.equal(x.estado, 'guardada');
+  assert.deepEqual(posts.map((p) => [p.modo, p.trabajo]), [['redactar', x.id], ['redactar', x.id]]);
+  // Un error del servidor dentro del flujo: no se reanuda, se empieza otra vez con el mismo plan.
+  const err = fetchFalso(() => ({ flujo: flujoTrozos([{ estado: 'fuentes' }, { estado: 'error', error: 'servidor' }]) }));
+  const t2 = trabajosDe(err.fetch);
+  const y = t2.iniciar({ plan: PLAN_NARIZ });
+  await hasta(() => FINALES.includes(y.estado));
+  assert.deepEqual([y.estado, y.error, y.reanudable], ['error', 'servidor', false]);
+  const z = t2.reintentar(y.id);
+  assert.deepEqual([z.reemplaza, t2.lista.length], [y.id, 1]);
+  await hasta(() => FINALES.includes(z.estado));
+  // El servidor no manda nada (ni latidos): se corta por plazo y se puede reintentar.
+  const mudo = fetchFalso((cuerpo, init) => ({ flujo: flujoAbierto(init.signal, [{ estado: 'fuentes' }]) }));
+  const t3 = trabajosDe(mudo.fetch, { plazos: { planificar: 1000, conectar: 1000, inactividad: 40 } });
+  const w = t3.iniciar({ plan: PLAN_NARIZ });
+  await hasta(() => FINALES.includes(w.estado));
+  assert.deepEqual([w.estado, w.error, w.reanudable], ['error', 'tiempo', true]);
+  // Sin conexión al empezar.
+  const caido = trabajosDe(async () => { throw new TypeError('Failed to fetch'); });
+  const v = caido.iniciar({ plan: PLAN_NARIZ });
+  await hasta(() => FINALES.includes(v.estado));
+  assert.deepEqual([v.estado, v.error, v.reanudable], ['error', 'conexion', true]);
+});
+
+test('crear: lo guardado dañado o de otra versión no rompe nada; como mucho 20 y nunca se olvida una en curso', () => {
+  const ahora = Date.now();
+  const enCurso = [1, 2, 3].map((i) => ({ id: idT(i), estado: 'redactando', titulo: `en curso ${i}`, plan: PLAN_NARIZ, actualizado: ahora }));
+  const finales = Array.from({ length: 25 }, (_, i) => ({ id: idT(100 + i), estado: 'error', error: 'servidor', titulo: `fallo ${i}`, actualizado: ahora - i }));
+  const raro = { id: idT(998), estado: 'pensando', titulo: 'de otra versión', actualizado: ahora };
+  const viejo = { id: idT(999), estado: 'guardada', titulo: 'hace ocho días', actualizado: ahora - 8 * 24 * 3600e3 };
+  const datos = [raro, ...finales.slice(0, 10), ...enCurso, ...finales.slice(10), viejo, null, 'texto', { id: 'MAL id', estado: 'error' }, { id: idT(997) }];
+  const tr = trabajosDe(async () => { throw new Error('no debe llamar'); }, { almacen: memoria({ [CLAVE_TRABAJOS]: JSON.stringify(datos) }) });
+  assert.equal(tr.lista.length, MAX_TRABAJOS);
+  assert.ok(enCurso.every((e) => tr.buscar(e.id)), 'las que están en curso, todas');
+  assert.equal(tr.buscar(raro.id).estado, 'interrumpida', 'un estado desconocido no se puede seguir');
+  assert.equal(tr.buscar(viejo.id), null, 'lo terminado hace más de una semana se olvida');
+  assert.equal(tr.enCurso.length, 3);
+  assert.deepEqual(trabajosDe(null, { almacen: memoria({ [CLAVE_TRABAJOS]: '{no es json' }) }).lista, []);
+  assert.deepEqual(trabajosDe(null, { almacen: { getItem() { throw new Error('bloqueado'); }, setItem() { throw new Error('bloqueado'); } } }).lista, []);
+  // Sin almacenamiento: las creaciones siguen en memoria.
+  const sin = trabajosDe(fetchFalso(() => ({ flujo: flujoTrozos([]) })).fetch, { almacen: { getItem: () => null, setItem() { throw new Error('QuotaExceededError'); } } });
+  assert.equal(sin.iniciar({ plan: PLAN_NARIZ }).estado, 'fuentes');
+  assert.equal(sin.lista.length, 1);
+});
+
+test('crear: otra pestaña cambia la lista y esta la vuelve a leer sin perder lo que sigue ella', async () => {
+  const almacen = memoria();
+  const { fetch } = fetchFalso((cuerpo, init) => (cuerpo.modo === 'cancelar' ? { datos: { ok: true } } : { flujo: flujoAbierto(init.signal, [{ estado: 'fuentes' }]) }));
+  const a = trabajosDe(fetch, { almacen });
+  const x = a.iniciar({ plan: PLAN_NARIZ });
+  await hasta(() => x.estado === 'fuentes');
+  // La otra pestaña escribe su lista (sin la creación de esta).
+  almacen.setItem(CLAVE_TRABAJOS, JSON.stringify([{ id: idT(5), estado: 'guardada', titulo: 'De la otra pestaña', creado: Date.now() - 10, actualizado: Date.now() }]));
+  a.recargar();
+  assert.deepEqual(a.lista.map((t) => t.id).sort(), [idT(5), x.id].sort());
+  assert.equal(a.buscar(x.id), x, 'la que sigue esta pestaña es el mismo objeto');
+  await a.cancelar(x.id);
+});
+
+test('el puente con Node: si la app se va antes de la respuesta, la petición se aborta (y la llamada corta a Claude con ella)', async () => {
+  const { peticionDeNode } = await import('../server/vite-pet.mjs');
+  const { EventEmitter } = await import('node:events');
+  const req = { url: '/api/pet', method: 'POST', headers: { host: 'localhost:5180', 'content-type': 'application/json', origin: 'http://localhost:5180' } };
+  const res = Object.assign(new EventEmitter(), { writableEnded: false });
+  const r = peticionDeNode(req, res, Buffer.from(JSON.stringify(conversacion('hombro'))));
+  assert.equal(r.signal.aborted, false);
+  // El manejador corta la llamada en curso a Claude cuando la petición se aborta.
+  let abortada = false;
+  const create = (params, opciones) => new Promise((_, rechazar) => opciones?.signal?.addEventListener('abort', () => { abortada = true; rechazar(new Anthropic.APIUserAbortError()); }));
+  const manejar = crearManejador({ catalogo: CATALOGO, cliente: { messages: { create }, beta: { messages: { create } } }, recursos: () => recursosFalsos(), registro: silencio });
+  const respuesta = manejar(r, { ip: '1.2.3.4' });
+  await esperar(5);
+  res.emit('close');
+  assert.equal(r.signal.aborted, true);
+  const fin = await respuesta;
+  assert.equal(abortada, true);
+  assert.equal((await fin.json()).error, 'cancelada');
+  // Una respuesta que ya terminó no aborta nada al cerrarse.
+  const res2 = Object.assign(new EventEmitter(), { writableEnded: true });
+  const r2 = peticionDeNode(req, res2, Buffer.from('{}'));
+  res2.emit('close');
+  assert.equal(r2.signal.aborted, false);
+});
+
+// ══ «Mis lecciones» ══
+test('Mis lecciones: guardar, validar, listar, quitar y entrar en el catálogo (con sus requisitos válidos)', () => {
+  const { L } = ensamblarNariz();
+  const almacen = memoria();
+  assert.deepEqual(guardarPropia(almacen, L), { ok: true, id: L.id });
   assert.deepEqual(cargarPropias(almacen).map((x) => x.id), [L.id]);
+  assert.deepEqual(guardarPropia(almacen, L), { ok: true, id: L.id }, 'la misma otra vez: nada cambia');
+  assert.equal(cargarPropias(almacen).length, 1);
   assert.equal(guardarPropia(almacen, { ...L, id: 'sin-prefijo' }).error, 'invalida');
   assert.equal(guardarPropia(almacen, { ...L, pasos: [] }).error, 'invalida');
-  // Lo guardado dañado o de otra forma no se abre.
-  almacen.setItem(CLAVE_PROPIAS, JSON.stringify([L, { id: 'neuri-roto-aaaa', origen: { neuri: true } }]));
-  assert.equal(cargarPropias(almacen).length, 1);
-  almacen.setItem(CLAVE_PROPIAS, '{no es json');
-  assert.deepEqual(cargarPropias(almacen), []);
-  guardarPropia(almacen, L);
-  const e = entradaCatalogo(L, 1000);
+  assert.equal(guardarPropia(almacen, { ...L, titulo: '  ' }).error, 'invalida');
+  const e = entradaCatalogo({ ...L, requisitos: ['cab-cara-huesos', 'no-existe'], siguiente: ['otra-que-no'] }, 1000, (id) => id === 'cab-cara-huesos');
   assert.equal(e.propia, true);
   assert.equal(e.pasos, L.pasos.length);
+  assert.deepEqual([e.requisitos, e.siguiente], [['cab-cara-huesos'], []], 'los requisitos válidos se conservan');
   assert.deepEqual(e.estructuras.find((x) => x.id === 'nasal-bone'), { id: 'nasal-bone', nombre: 'Hueso nasal', tipo: 'hueso', papel: 'nucleo', en: null, la: null });
   assert.equal(borrarPropia(almacen, L.id), true);
   assert.deepEqual(cargarPropias(almacen), []);
-  const lleno = { getItem: () => null, setItem: () => { throw new Error('QuotaExceededError'); } };
-  assert.equal(guardarPropia(lleno, L).error, 'almacenamiento');
+  assert.equal(borrarPropia(almacen, L.id), false, 'ya no estaba');
+  // El navegador sin sitio o bloqueado: se dice cuál, sin perder nada.
+  const sinSitio = { getItem: () => null, setItem: () => { throw Object.assign(new Error('cuota'), { name: 'QuotaExceededError' }); } };
+  assert.equal(guardarPropia(sinSitio, L).error, 'espacio');
+  const bloqueado = { getItem: () => null, setItem: () => { throw Object.assign(new Error('no'), { name: 'SecurityError' }); } };
+  assert.equal(guardarPropia(bloqueado, L).error, 'almacenamiento');
+  assert.equal(guardarPropia({ getItem() { throw new Error('no'); }, setItem() {} }, L).error, 'almacenamiento');
+});
+
+test('Mis lecciones: al llegar al máximo no se borra ninguna; lo dañado se aparta sin perderse; el mismo identificador con otro contenido es una copia', () => {
+  const { L } = ensamblarNariz();
+  const variante = (i) => ({ ...L, id: `neuri-leccion-${String(i).padStart(4, '0')}`, titulo: `Lección ${i}` });
+  const almacen = memoria();
+  for (let i = 0; i < MAX_PROPIAS; i++) assert.equal(guardarPropia(almacen, variante(i)).ok, true);
+  const r = guardarPropia(almacen, variante(99));
+  assert.deepEqual(r, { ok: false, error: 'lleno' });
+  assert.equal(cargarPropias(almacen).length, MAX_PROPIAS);
+  assert.ok(cargarPropias(almacen).some((x) => x.id === variante(0).id), 'la más antigua sigue ahí');
+  // Dañadas o de otra versión: no se abren, pero antes de escribir se apartan tal cual.
+  const rota = { id: 'neuri-roto-aaaa', origen: { neuri: true } };
+  const d = memoria({ [CLAVE_PROPIAS]: JSON.stringify([L, rota, 'texto suelto']) });
+  assert.deepEqual(cargarPropias(d).map((x) => x.id), [L.id]);
+  assert.equal(guardarPropia(d, variante(1)).ok, true);
+  assert.deepEqual(apartadas(d).map((x) => JSON.parse(x.texto)), [rota, 'texto suelto']);
+  assert.ok(apartadas(d).every((x) => typeof x.apartada === 'string'));
+  guardarPropia(d, variante(2));
+  assert.equal(apartadas(d).length, 2, 'sin repetirlas');
+  // Una lista que no se puede leer entera: se aparta su texto antes de escribir encima.
+  const ilegible = memoria({ [CLAVE_PROPIAS]: '{no es json' });
+  assert.deepEqual(estadoPropias(ilegible), { lecciones: 0, maximo: MAX_PROPIAS, danadas: 1, apartadas: 1 });
+  assert.equal(guardarPropia(ilegible, L).ok, true);
+  assert.equal(apartadas(ilegible)[0].texto, '{no es json');
+  // Descartarlas (lo pide la persona): salen de lo apartado y de la lista.
+  assert.equal(descartarApartadas(d), true);
+  assert.deepEqual([apartadas(d).length, estadoPropias(d).danadas], [0, 0]);
+  assert.deepEqual(cargarPropias(d).map((x) => x.id), [variante(2).id, variante(1).id, L.id]);
+  // Si no se puede poner a salvo lo dañado, no se escribe.
+  const lleno = memoria({ [CLAVE_PROPIAS]: JSON.stringify([L, rota]) });
+  lleno.setItem = (k, v) => { if (k === CLAVE_APARTADAS) throw new Error('QuotaExceededError'); lleno.datos[k] = v; };
+  assert.equal(guardarPropia(lleno, variante(3)).error, 'apartar');
+  assert.deepEqual(JSON.parse(lleno.datos[CLAVE_PROPIAS]), [L, rota], 'la lista queda como estaba');
+  // El mismo identificador con otro contenido: copia, nunca se sobrescribe.
+  const c = memoria();
+  guardarPropia(c, L);
+  const otra = { ...L, resumen: 'Otro resumen distinto.' };
+  const rc = guardarPropia(c, otra);
+  assert.deepEqual(rc, { ok: true, id: `${L.id}-copia2` });
+  assert.deepEqual(cargarPropias(c).map((x) => [x.id, x.resumen]), [[`${L.id}-copia2`, 'Otro resumen distinto.'], [L.id, L.resumen]]);
+});
+
+test('Mis lecciones: renombrar (el contenido, la versión y el progreso no cambian), exportar e importar combinando', () => {
+  const { L } = ensamblarNariz();
+  const almacen = memoria();
+  guardarPropia(almacen, L);
+  assert.deepEqual(renombrarPropia(almacen, L.id, '  Mi   nariz  '), { ok: true });
+  const R = cargarPropias(almacen)[0];
+  assert.deepEqual([R.titulo, R.version, R.origen.tituloOriginal], ['Mi nariz', L.version, L.titulo]);
+  assert.deepEqual(R.pasos, L.pasos);
+  renombrarPropia(almacen, L.id, 'Otra vez');
+  assert.equal(cargarPropias(almacen)[0].origen.tituloOriginal, L.titulo, 'se recuerda el primero');
+  assert.equal(renombrarPropia(almacen, L.id, '').error, 'titulo');
+  assert.equal(renombrarPropia(almacen, L.id, 'x'.repeat(MAX_TITULO + 1)).error, 'titulo');
+  assert.equal(renombrarPropia(almacen, 'neuri-no-esta-0000', 'Hola').error, 'no-existe');
+  // Exportar: un archivo con todas, que se puede volver a importar.
+  const archivo = exportarPropias(almacen, { ahora: () => Date.UTC(2026, 10, 9) });
+  const d = JSON.parse(archivo);
+  assert.deepEqual([d.formato, d.version, d.fecha, d.lecciones.length], ['anato3d.mis-lecciones', 1, '2026-11-09T00:00:00.000Z', 1]);
+  // Importar en otro navegador: se añaden; lo igual no se repite; lo distinto con el mismo identificador, como copia.
+  const otro = memoria();
+  assert.deepEqual(importarPropias(otro, archivo), { ok: true, añadidas: 1, iguales: 0, copias: 0, invalidas: 0, sinSitio: 0 });
+  assert.deepEqual(importarPropias(otro, archivo), { ok: true, añadidas: 0, iguales: 1, copias: 0, invalidas: 0, sinSitio: 0 });
+  const cambiada = JSON.stringify({ ...L, titulo: 'Otra versión' });
+  assert.deepEqual(importarPropias(otro, cambiada), { ok: true, añadidas: 0, iguales: 0, copias: 1, invalidas: 0, sinSitio: 0 }, 'una lección sola (la que se descarga)');
+  assert.deepEqual(cargarPropias(otro).map((x) => x.titulo).sort(), ['Otra versión', 'Otra vez']);
+  assert.deepEqual(importarPropias(otro, JSON.stringify([{ id: 'neuri-mal-0000' }, 3])), { ok: true, añadidas: 0, iguales: 0, copias: 0, invalidas: 2, sinSitio: 0 });
+  assert.equal(importarPropias(otro, 'no es json').error, 'formato');
+  assert.equal(importarPropias(otro, JSON.stringify({ formato: 'otro', cosas: [] })).error, 'formato');
+  // Sin sitio: entran las que caben y se dice cuántas no.
+  const casi = memoria();
+  for (let i = 0; i < MAX_PROPIAS - 1; i++) guardarPropia(casi, { ...L, id: `neuri-casi-${String(i).padStart(4, '0')}` });
+  const dos = JSON.stringify([{ ...L, id: 'neuri-nueva-aaaa' }, { ...L, id: 'neuri-nueva-bbbb' }]);
+  assert.deepEqual(importarPropias(casi, dos), { ok: true, añadidas: 1, iguales: 0, copias: 0, invalidas: 0, sinSitio: 1 });
+  assert.equal(cargarPropias(casi).length, MAX_PROPIAS);
+});
+
+test('crear: si «Mis lecciones» está llena, la lección queda sin guardar (para descargarla) y si no pasa la comprobación de la app, es un error', async () => {
+  const { L } = ensamblarNariz();
+  const listo = (leccion) => [{ estado: 'fuentes' }, { estado: 'lista', leccion, informe: INFORME, mensaje: '' }];
+  const almacen = memoria();
+  for (let i = 0; i < MAX_PROPIAS; i++) guardarPropia(almacen, { ...L, id: `neuri-llena-${String(i).padStart(4, '0')}` });
+  const tr = trabajosDe(fetchFalso(() => ({ flujo: flujoTrozos(listo(L)) })).fetch, { guardar: (x) => guardarPropia(almacen, x) });
+  const x = tr.iniciar({ plan: PLAN_NARIZ });
+  await hasta(() => FINALES.includes(x.estado));
+  assert.deepEqual([x.estado, x.error], ['no-guardada', 'lleno']);
+  assert.equal(tr.resultado(x.id).id, L.id);
+  borrarPropia(almacen, 'neuri-llena-0000');
+  tr.reintentar(x.id);
+  assert.deepEqual([x.estado, x.leccionId], ['guardada', L.id]);
+  // Una lección que la app no puede abrir: guardarla otra vez daría lo mismo.
+  const tr2 = trabajosDe(fetchFalso(() => ({ flujo: flujoTrozos(listo({ ...L, pasos: [] })) })).fetch, { guardar: (y) => guardarPropia(memoria(), y) });
+  const y = tr2.iniciar({ plan: PLAN_NARIZ });
+  await hasta(() => FINALES.includes(y.estado));
+  assert.deepEqual([y.estado, y.error, tr2.resultado(y.id)], ['error', 'validacion', null]);
+});
+
+test('aceptación: una palabra desconocida no bloquea (sin IA, el buscador aclara y la siguiente pregunta funciona)', async () => {
+  const { fetch } = fetchFalso(() => ({ status: 503, datos: { ok: false, error: 'sin-ia' } }));
+  const c = conv(fetch);
+  const m = await c.preguntar('xqzvbk');
+  assert.ok(m && m.texto.length > 10, 'responde algo');
+  assert.ok(m.sugerencias.length > 0 || m.lecciones.length > 0, 'y ofrece por dónde seguir');
+  assert.equal(c.ocupada, false);
+  const m2 = await c.preguntar('corazón');
+  assert.equal(m2.lecciones[0].id, 'tor-corazon');
+});
+
+test('aceptación: una lección de Neuri no puede llegar como «revisada» (ni creada ni importada)', () => {
+  const { L } = ensamblarNariz();
+  assert.equal(L.revision.estado, 'borrador');
+  const falsa = { ...L, id: 'neuri-falsa-0000', revision: { estado: 'revisado', revisor: 'Alguien', fecha: '2026-11-09', notas: '' } };
+  assert.equal(esPropiaValida(falsa), false);
+  const almacen = memoria();
+  assert.equal(importarPropias(almacen, JSON.stringify([falsa])).invalidas, 1);
+  assert.equal(entradaCatalogo(L).estado, 'borrador');
+});
+
+test('aceptación: una lección creada por Neuri se evalúa como las demás (todas sus metas, y entra en el repaso)', async () => {
+  const { evaluacionDe, corregir } = await import('../src/biblioteca/evaluar.js');
+  const P = await import('../src/biblioteca/progreso.js');
+  const { L } = ensamblarNariz();
+  const preguntas = evaluacionDe(L, { modelo: 'male' });
+  assert.ok(preguntas.length >= L.objetivos.length);
+  assert.deepEqual([...new Set(preguntas.map((q) => q.objetivo))].sort(), L.objetivos.map((_, i) => i), 'cubre todos los objetivos');
+  const d = P.vacio();
+  for (const q of preguntas) P.anotar(d, q.item, corregir(q, q.opciones ? q.opciones.findIndex((o) => !o.correcta) : 'no-lo-se'), 0, { huella: q.huella });
+  assert.equal(P.vencidas(d, { ahora: 1 }).length, preguntas.length, 'lo fallado vuelve en el repaso');
 });
 
 test('la conversación para la API', () => {

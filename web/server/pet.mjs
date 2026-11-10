@@ -15,10 +15,12 @@
 // por hora, y nada de lo que escribe nadie se guarda ni se registra.
 import { VERSION, LIMITES, validarPeticion, limpiarRespuesta, limpiarPlan, ID_PROPIA } from '../src/pet/protocolo.js';
 import { RECORRIDOS } from '../src/biblioteca/recorridos.js';
+import { RETIRADAS } from '../src/biblioteca/retiradas.js';
 import { REGIONES, SISTEMAS, TEMAS, FORMATOS, SUBREGION_POR_ID, REGION_POR_ID } from '../src/biblioteca/taxonomia.js';
 import { frases, evidencias as evidenciasDe, objetivoObservable, TIPOS_PASO } from '../src/biblioteca/formato.js';
 import { crearBuscador } from '../src/biblioteca/buscar.js';
-import { ESPECIFICACION, APP, textoModo, esquemaOrientar, esquemaPlan, esquemaLeccion, esquemaVerificar } from './neuri/instrucciones.mjs';
+import { ESPECIFICACION, APP, textoModo, esquemaOrientar, esquemaPlan, esquemaLeccion, esquemaVerificar, VERSION_INSTRUCCIONES } from './neuri/instrucciones.mjs';
+import { crearRegistro } from './neuri/trabajos.mjs';
 import { textoCatalogo, textoContexto, textoEvidencias, textoSolicitud, textoPlan, textoBase, mensajesApi } from './pet-prompt.mjs';
 import { llamar, crearCliente, elegirModelo, ErrorNeuri, MODELO_POR_DEFECTO } from './neuri/modelo.mjs';
 import { ensamblarLeccion, validarLeccion, afirmaciones, quitarNoRespaldadas, idLeccion } from './neuri/ensamblar.mjs';
@@ -28,6 +30,9 @@ export { elegirModelo, MODELO_POR_DEFECTO };
 const LIMITE_POR_DEFECTO = { porIp: 20, ventanaIp: 10 * 60_000, porHora: 200 };
 const LIMITE_LECCIONES = { porIp: 4, ventanaIp: 60 * 60_000, porHora: 20 };
 const MIN_EVIDENCIAS = 8;
+// Plazos de cada llamada a Claude (con un reintento del SDK si falla la red o la API está saturada). La app espera algo
+// más que la suma de lo que puede tardar cada modo (src/pet/conversacion.js).
+const PLAZO = { orientar: 30_000, verificarExplicacion: 30_000, planificar: 60_000, redactar: 240_000, verificar: 120_000 };
 
 /**
  * Prepara el manejador. `catalogo`: el de src/biblioteca/generado/catalogo.json. `clave`: la de la API (sin clave,
@@ -35,11 +40,15 @@ const MIN_EVIDENCIAS = 8;
  * (server/neuri/recursos.mjs); sin ella, solo Orientar y sin explicaciones. `cliente`: otro cliente (pruebas).
  */
 export function crearManejador({
-  catalogo, clave = null, modelo: pedido = MODELO_POR_DEFECTO, modeloLecciones: pedidoLecciones = null,
+  catalogo: catalogoEntero, clave = null, modelo: pedido = MODELO_POR_DEFECTO, modeloLecciones: pedidoLecciones = null,
   cliente = null, recursos = null, ahora = Date.now, limites = {}, limitesLecciones = {}, registro = console, azar = Math.random,
+  trabajos = crearRegistro({ ahora }),
 }) {
   const modelo = elegirModelo(pedido, registro);
   const modeloLecciones = elegirModelo(pedidoLecciones ?? modelo, registro);
+  // Lo retirado mientras se revisa un reporte (src/biblioteca/retiradas.js) tampoco existe para Neuri: Claude no lo ve
+  // en el catálogo, no lo recomienda ni lo adapta (la app ya lo quita del suyo).
+  const catalogo = { ...catalogoEntero, lecciones: catalogoEntero.lecciones.filter((L) => !RETIRADAS.lecciones.includes(L.id)) };
   const ids = { lecciones: new Set(catalogo.lecciones.map((L) => L.id)), recorridos: new Set(RECORRIDOS.map((R) => R.id)) };
   const fijo = `${ESPECIFICACION}\n\n${APP}\n\n${textoCatalogo(catalogo)}`;
   const api = cliente ?? crearCliente(clave);
@@ -49,14 +58,28 @@ export function crearManejador({
   let cargando = null;
   const recursosListos = () => (recursos ? (cargando ??= Promise.resolve().then(() => recursos()).catch((err) => { cargando = null; registro.error?.('[pet] No se pudieron cargar los recursos de Neuri:', err); return null; })) : Promise.resolve(null));
 
+  // Salud del servicio: si la última llamada de verdad a Claude salió bien o falló. Distingue «configurado» (hay clave),
+  // «comprobado» (una llamada salió bien) y «fallando» (la última falló: red, saldo, clave rechazada…).
+  const salud = { ok: null, fallo: null };
+  async function llamarClaude(opciones) {
+    try {
+      const r = await llamar(api, { registro, ...opciones });
+      salud.ok = ahora();
+      return r;
+    } catch (err) {
+      if (err instanceof ErrorNeuri && !['cancelada', 'rechazo', 'formato', 'incompleta'].includes(err.codigo)) salud.fallo = { codigo: err.codigo, fecha: ahora() };
+      throw err;
+    }
+  }
+  const estadoServicio = () => (!api ? 'sin-clave' : salud.fallo && (!salud.ok || salud.fallo.fecha >= salud.ok) ? 'fallando' : salud.ok ? 'comprobada' : 'configurada');
+
   return async function manejar(request, { ip = '' } = {}) {
     if (request.method === 'GET') {
       const R = api ? await recursosListos() : null;
-      return json(200, { ok: true, ia: !!api, crear: !!api && !!R?.disponible, version: VERSION });
+      return json(200, { ok: true, ia: !!api, crear: !!api && !!R?.disponible, version: VERSION, estado: estadoServicio(), instrucciones: VERSION_INSTRUCCIONES });
     }
     if (request.method !== 'POST') return json(405, { ok: false, error: 'metodo' }, { allow: 'GET, POST' });
     if (!mismoOrigen(request)) return json(403, { ok: false, error: 'origen' });
-    if (!api) return json(503, { ok: false, error: 'sin-ia' });
     const crudo = await leerCuerpo(request);
     if (crudo === null) return json(413, { ok: false, error: 'largo' });
     let cuerpo;
@@ -64,13 +87,27 @@ export function crearManejador({
     const v = validarPeticion(cuerpo, ids);
     if (!v.ok) return json(400, { ok: false, error: v.error });
     const peticion = v.peticion;
+    // Un trabajo de creación: cancelarlo, o volver a conectarse a él (tras recargar la página, sin repetirlo).
+    if (peticion.modo === 'cancelar') return json(200, { ok: true, cancelado: trabajos.cancelar(peticion.trabajo) });
+    if (peticion.modo === 'trabajo') return trabajos.tiene(peticion.trabajo) ? flujoTrabajo(trabajos, peticion.trabajo) : json(404, { ok: false, error: 'trabajo-desconocido' });
+    // Lo demás necesita la IA (cancelar o retomar un trabajo, no: sin clave, el servidor no tiene ninguno y lo dice).
+    if (!api) return json(503, { ok: false, error: 'sin-ia' });
     const largo = peticion.modo === 'redactar' || peticion.modo === 'adaptar';
+    // Pedir otra vez un trabajo que ya existe lo reanuda: no cuenta para el límite ni se repite (ni se paga dos veces).
+    if (largo && peticion.trabajo && trabajos.tiene(peticion.trabajo)) return flujoTrabajo(trabajos, peticion.trabajo);
     const limite = (largo ? limitarLecciones : limitar)(ip);
     if (limite) return json(429, { ok: false, error: limite }, { 'retry-after': '60' });
 
+    if (largo && peticion.trabajo) {
+      const r = trabajos.empezar(peticion.trabajo, ip, (emitir, signal) => redactar(peticion, emitir, signal));
+      if (r.motivo) return json(429, { ok: false, error: r.motivo }, { 'retry-after': '60' });
+      return flujoTrabajo(trabajos, peticion.trabajo);
+    }
     if (largo) return flujo((emitir, signal) => redactar(peticion, emitir, signal));
+    // Las peticiones cortas se cortan si la app se va (la petición trae su señal): no se sigue gastando.
+    const signal = request.signal ?? null;
     try {
-      const r = peticion.modo === 'planificar' ? await planificar(peticion) : await orientar(peticion);
+      const r = peticion.modo === 'planificar' ? await planificar(peticion, signal) : await orientar(peticion, signal);
       return json(200, { ok: true, ...r });
     } catch (err) {
       if (err instanceof ErrorNeuri) return json(err.status, { ok: false, error: err.codigo });
@@ -79,7 +116,7 @@ export function crearManejador({
   };
 
   // ── Orientar ──
-  async function orientar(p) {
+  async function orientar(p, signal = null) {
     const idsL = new Set([...ids.lecciones, ...p.propias.map((x) => x.id)]);
     const R = await recursosListos();
     const consulta = `${p.mensajes.at(-1).texto} ${p.contexto.tema ?? ''}`;
@@ -92,9 +129,9 @@ export function crearManejador({
       for (const x of [...deLecciones, ...dePaginas].filter((x) => x.cobertura >= 0.5 && x.puntos >= mejor * 0.35)) mapa.set(`E${mapa.size + 1}`, x.entrada);
     }
     const variable = [textoModo('orientar', { idioma: p.idioma }), textoContexto(p), R ? textoEvidencias(mapa, R.corpus) : 'EVIDENCIAS: no disponibles en este servidor.'].join('\n\n');
-    const { datos, modelo: usado } = await llamar(api, {
+    const { datos, modelo: usado } = await llamarClaude({
       modelo, sistema: [fijo, variable], mensajes: mensajesApi(p.mensajes), esquema: esquemaOrientar({ lecciones: idsL, recorridos: ids.recorridos }),
-      esfuerzo: 'low', maxTokens: 3000, registro, etiqueta: 'orientar',
+      esfuerzo: 'low', maxTokens: 3000, etiqueta: 'orientar', signal, plazoMs: PLAZO.orientar,
     });
     // Las evidencias citadas, con su fuente, para que la app las enseñe y enlace.
     datos.evidencias = (datos.evidencias ?? []).map((id) => mapa.get(id)).filter(Boolean).map((e) => {
@@ -108,19 +145,19 @@ export function crearManejador({
     if (r.tipo === 'explicacion' && !r.evidencias.length) r.aviso = 'sin-evidencia';
     // Con evidencias, otra llamada comprueba que las citas respaldan lo que dice (como en las lecciones). Si no (o si no
     // se puede comprobar), la explicación se retira: la app enseña solo las citas, que son frases literales de las fuentes.
-    if (r.tipo === 'explicacion' && r.evidencias.length && !(await explicacionRespaldada(r))) {
+    if (r.tipo === 'explicacion' && r.evidencias.length && !(await explicacionRespaldada(r, signal))) {
       r.aviso = 'sin-respaldo';
       r.mensaje = '[Explicación retirada: sus citas no la respaldaban del todo; la app mostró solo las citas.]';
     }
     return { ...r, modelo: usado };
   }
 
-  async function explicacionRespaldada(r) {
+  async function explicacionRespaldada(r, signal = null) {
     const citas = r.evidencias.map((e) => `“${e.cita}”${e.texto ? ` (frase de la lección: «${e.texto}»)` : ''}`).join(' | ');
     try {
-      const v = await llamar(api, {
-        modelo, sistema: [fijo, textoModo('verificar')], esquema: esquemaVerificar(), esfuerzo: 'low', maxTokens: 2000, registro, etiqueta: 'verificar explicación',
-        mensajes: [{ role: 'user', content: `1. Afirmación: «${r.mensaje}»\n   Citas: ${citas}` }],
+      const v = await llamarClaude({
+        modelo, sistema: [fijo, textoModo('verificar')], esquema: esquemaVerificar(), esfuerzo: 'low', maxTokens: 2000, etiqueta: 'verificar explicación',
+        mensajes: [{ role: 'user', content: `1. Afirmación: «${r.mensaje}»\n   Citas: ${citas}` }], signal, plazoMs: PLAZO.verificarExplicacion,
       });
       return v.datos.veredictos?.find((x) => x.n === 1)?.respalda === 'si';
     } catch (err) {
@@ -130,7 +167,7 @@ export function crearManejador({
   }
 
   // ── Planificar ──
-  async function planificar(p) {
+  async function planificar(p, signal = null) {
     const R = await recursosListos();
     if (!R?.disponible) throw new ErrorNeuri('sin-recursos', 503);
     const s = p.solicitud;
@@ -153,13 +190,14 @@ export function crearManejador({
       regiones: REGIONES.map((r) => ({ id: r.id, sub: r.sub.map((x) => x.id) })),
     });
     const mensajes = [...mensajesApi(p.mensajes), { role: 'user', content: '[La persona pulsó «Planificar» en la propuesta.]' }];
-    let { datos, modelo: usado } = await llamar(api, { modelo: modeloLecciones, sistema: [fijo, variable], mensajes, esquema, esfuerzo: 'medium', maxTokens: 8000, registro, etiqueta: 'planificar' });
+    const opcionesPlan = { modelo: modeloLecciones, sistema: [fijo, variable], esquema, esfuerzo: 'medium', maxTokens: 8000, signal, plazoMs: PLAZO.planificar, trabajo: p.trabajo };
+    let { datos, modelo: usado } = await llamarClaude({ ...opcionesPlan, mensajes, etiqueta: 'planificar' });
     if (datos.tipo !== 'plan' || !datos.plan) return { tipo: datos.tipo === 'aclaracion' ? 'aclaracion' : 'limitacion', mensaje: String(datos.mensaje ?? '').slice(0, LIMITES.pet), plan: null, sugerencias: (datos.sugerencias ?? []).slice(0, LIMITES.sugerencias), modelo: usado };
     let rev = revisarPlan(datos.plan, { candidatas: new Set(candidatas), idioma: p.idioma });
     if (rev.errores.length) {
       // Una ronda de corrección con los problemas concretos.
       const correccion = [...mensajes, { role: 'assistant', content: JSON.stringify(datos) }, { role: 'user', content: `[La app encontró estos problemas en el plan: ${rev.errores.join(' · ')}. Devuelve el plan corregido completo.]` }];
-      ({ datos, modelo: usado } = await llamar(api, { modelo: modeloLecciones, sistema: [fijo, variable], mensajes: correccion, esquema, esfuerzo: 'medium', maxTokens: 8000, registro, etiqueta: 'planificar (corrección)' }));
+      ({ datos, modelo: usado } = await llamarClaude({ ...opcionesPlan, mensajes: correccion, etiqueta: 'planificar (corrección)' }));
       if (datos.tipo !== 'plan' || !datos.plan) return { tipo: 'limitacion', mensaje: String(datos.mensaje ?? '').slice(0, LIMITES.pet), plan: null, sugerencias: [], modelo: usado };
       rev = revisarPlan(datos.plan, { candidatas: new Set(candidatas), idioma: p.idioma });
       if (rev.errores.length) return { tipo: 'limitacion', codigo: 'plan-invalido', errores: rev.errores.slice(0, 6), mensaje: '', plan: null, sugerencias: [], modelo: usado };
@@ -205,34 +243,37 @@ export function crearManejador({
     const variable = [textoModo(modo, { idioma: p.idioma }), textoPlan(plan, nombre), base ? textoBase(base) : '', textoEvidencias(mapa, R.corpus)].filter(Boolean).join('\n\n');
     const esquema = esquemaLeccion({ claves: plan.estructuras.map((e) => e.clave), evidencias: [...mapa.keys()] });
     const pedir = [{ role: 'user', content: `[La persona pulsó «${modo === 'adaptar' ? 'Crear la adaptación' : 'Crear la lección'}» en el plan.]` }];
-    const opciones = { modelo: modeloLecciones, sistema: [fijo, variable], esquema, esfuerzo: 'medium', maxTokens: 32000, flujo: true, registro, signal };
+    const opciones = { modelo: modeloLecciones, sistema: [fijo, variable], esquema, esfuerzo: 'medium', maxTokens: 32000, flujo: true, signal, plazoMs: PLAZO.redactar, trabajo: p.trabajo };
     let gasto = 0;
     let r;
-    try { r = await llamar(api, { ...opciones, mensajes: pedir, etiqueta: modo }); } catch (err) { return emitir(errorEvento(err)); }
+    try { r = await llamarClaude({ ...opciones, mensajes: pedir, etiqueta: modo }); } catch (err) { return emitir(errorEvento(err)); }
     gasto += r.coste ?? 0;
     if (r.datos.tipo !== 'leccion' || !r.datos.leccion) return emitir({ estado: 'limitacion', mensaje: String(r.datos.mensaje ?? '').slice(0, LIMITES.pet) });
 
     const id = idLeccion(plan.titulo, azar);
     const fuentes = fuentesDe(R, mapa);
     const montar = async (datos) => {
-      const { L, quitado } = ensamblarLeccion({ plan, borrador: datos.leccion, evidencias: mapa, inventario: R.inventario, idioma: p.idioma, id, modo, base: base?.id ?? null, modeloIA: r.modelo, fuentes });
+      const { L, quitado } = ensamblarLeccion({ plan, borrador: datos.leccion, evidencias: mapa, inventario: R.inventario, idioma: p.idioma, id, modo, base: base?.id ?? null, modeloIA: r.modelo, fuentes, instrucciones: VERSION_INSTRUCCIONES });
       emitir({ estado: 'comprobando' });
       const lista = afirmaciones(L);
       let quitadas = [];
+      let problemas = [];
       if (lista.length) {
-        const v = await llamar(api, {
-          modelo: modeloLecciones, sistema: [fijo, textoModo('verificar')], esquema: esquemaVerificar(), esfuerzo: 'low', maxTokens: 12000, registro, etiqueta: 'verificar', signal,
-          mensajes: [{ role: 'user', content: lista.map((a) => `${a.n}. Afirmación: «${a.texto}»\n   Citas: ${a.citas.map((c) => `“${c}”`).join(' | ')}`).join('\n') }],
+        const v = await llamarClaude({
+          modelo: modeloLecciones, sistema: [fijo, textoModo('verificar')], esquema: esquemaVerificar(), esfuerzo: 'low', maxTokens: 12000, etiqueta: 'verificar', signal, plazoMs: PLAZO.verificar, trabajo: p.trabajo,
+          mensajes: [{ role: 'user', content: lista.map((a) => `${a.n}. ${a.pregunta ? 'Pregunta' : 'Afirmación'}: «${a.texto}»\n   Citas: ${a.citas.map((c) => `“${c}”`).join(' | ')}`).join('\n') }],
         });
         gasto += v.coste ?? 0;
         const veredictos = (v.datos.veredictos ?? []).filter((x) => Number.isInteger(x.n));
         // Lo que no tiene veredicto cuenta como no respaldado.
         const conVeredicto = new Set(veredictos.map((x) => x.n));
-        for (const a of lista) if (!conVeredicto.has(a.n)) veredictos.push({ n: a.n, respalda: 'no' });
+        for (const a of lista) if (!conVeredicto.has(a.n)) veredictos.push({ n: a.n, respalda: 'no', categoria: 'sin-respaldo', gravedad: null, evidencia: null, reparacion: null, duda: true });
+        // Los problemas, con su categoría y la reparación que sugiere la comprobación (para la ronda de corrección).
+        problemas = veredictos.filter((x) => x.respalda !== 'si').map((x) => ({ ...x, texto: lista.find((a) => a.n === x.n)?.texto ?? '' }));
         quitadas = quitarNoRespaldadas(L, lista, veredictos);
       }
       const val = validarLeccion(L, { inventario: R.inventario, citaEnFuente: R.corpus.citaEnFuente, fuentes });
-      return { L, quitado, quitadas, val, afirmadas: lista.length };
+      return { L, quitado, quitadas, problemas, val, afirmadas: lista.length };
     };
     let res;
     try { res = await montar(r.datos); } catch (err) { return emitir(errorEvento(err)); }
@@ -240,12 +281,12 @@ export function crearManejador({
       emitir({ estado: 'corrigiendo', errores: res.val.errores.length + res.quitadas.length });
       const problemas = [
         ...res.val.errores,
-        ...res.quitadas.map((t) => `Afirmación sin respaldo en sus citas (reformúlala con lo que dicen o quítala): «${t.slice(0, 160)}»`),
+        ...res.problemas.map((x) => `${x.categoria ?? 'sin-respaldo'}${x.gravedad ? ` (${x.gravedad})` : ''}: «${x.texto.slice(0, 160)}»${x.evidencia ? ` — la cita dice: ${x.evidencia.slice(0, 160)}` : ''}${x.reparacion ? ` — reparación: ${x.reparacion.slice(0, 160)}` : ' — reformúlala con lo que dicen sus citas o quítala'}`),
         ...res.quitado.slice(0, 10),
       ].slice(0, 30);
-      const correccion = [...pedir, { role: 'assistant', content: JSON.stringify(r.datos) }, { role: 'user', content: `[La app encontró estos problemas: ${problemas.join(' · ')}. Devuelve la lección corregida completa en el mismo formato.]` }];
+      const correccion = [...pedir, { role: 'assistant', content: JSON.stringify(r.datos) }, { role: 'user', content: `[La app encontró estos problemas: ${problemas.join(' · ')}. Corrige solo lo necesario, conserva las evidencias válidas y devuelve la lección completa en el mismo formato.]` }];
       try {
-        r = await llamar(api, { ...opciones, mensajes: correccion, etiqueta: `${modo} (corrección)` });
+        r = await llamarClaude({ ...opciones, mensajes: correccion, etiqueta: `${modo} (corrección)` });
         gasto += r.coste ?? 0;
         if (r.datos.tipo !== 'leccion' || !r.datos.leccion) return emitir({ estado: 'limitacion', mensaje: String(r.datos.mensaje ?? '').slice(0, LIMITES.pet) });
         res = await montar(r.datos);
@@ -254,10 +295,17 @@ export function crearManejador({
     if (res.val.errores.length) return emitir({ estado: 'error', error: 'validacion', errores: res.val.errores.slice(0, 8) });
     const L = res.L;
     const citas = L.pasos.reduce((n, x) => n + [...x.texto, ...(x.detalle ?? [])].reduce((m, f) => m + f.slice(1).filter((e) => e?.f || e?.m).length, 0), 0);
-    registro.info?.(`[pet] ${modo}: lección «${L.titulo}» lista (${L.pasos.length} pasos, ${L.preguntas.length} preguntas, ${citas} citas; ≈ ${gasto.toFixed(4)} US$ en total).`);
+    // (Sin el título: puede decir algo de la persona; el registro técnico solo lleva identificadores y cifras.)
+    registro.info?.(`[pet] ${modo}${p.trabajo ? ` · trabajo ${p.trabajo}` : ''}: lección ${L.id} lista (${L.pasos.length} pasos, ${L.preguntas.length} preguntas, ${citas} citas; ≈ ${gasto.toFixed(4)} US$ en total).`);
+    // Lo que la comprobación quitó, por categoría (anexo C), y cuántas dudas necesitarían una revisión humana.
+    const porCategoria = {};
+    for (const x of res.problemas) porCategoria[x.categoria ?? 'sin-respaldo'] = (porCategoria[x.categoria ?? 'sin-respaldo'] ?? 0) + 1;
     return emitir({
       estado: 'lista', leccion: L, mensaje: String(r.datos.mensaje ?? '').slice(0, LIMITES.pet),
-      informe: { pasos: L.pasos.length, preguntas: L.preguntas.length, citas, quitadas: res.quitadas.length + res.quitado.length, avisos: res.val.avisos.slice(0, 5) },
+      informe: {
+        pasos: L.pasos.length, preguntas: L.preguntas.length, citas, quitadas: res.quitadas.length + res.quitado.length, avisos: res.val.avisos.slice(0, 5),
+        problemas: porCategoria, dudas: res.problemas.filter((x) => x.duda).length, instrucciones: VERSION_INSTRUCCIONES,
+      },
     });
   }
 
@@ -408,6 +456,27 @@ function flujo(trabajo) {
       if (!cerrado) { cerrado = true; try { controller.close(); } catch { /* ya cerrado */ } }
     },
     cancel() { cerrado = true; control.abort(); },
+  });
+  return new Response(cuerpo, { status: 200, headers: { 'content-type': 'application/x-ndjson; charset=utf-8', 'cache-control': 'no-store', 'x-accel-buffering': 'no' } });
+}
+
+/**
+ * Respuesta en flujo de un trabajo del registro: lo que ya pasó y lo que falta. Si la app se desconecta, el trabajo
+ * sigue (para volver a conectarse); solo «cancelar» lo detiene.
+ */
+function flujoTrabajo(trabajos, id) {
+  const cod = new TextEncoder();
+  let soltar = null;
+  const cuerpo = new ReadableStream({
+    start(controller) {
+      let cerrado = false;
+      soltar = trabajos.conectar(id, (evento) => {
+        if (cerrado) return;
+        if (evento === null) { cerrado = true; try { controller.close(); } catch { /* ya cerrado */ } return; }
+        try { controller.enqueue(cod.encode(`${JSON.stringify({ ...evento, trabajo: id })}\n`)); } catch { cerrado = true; }
+      });
+    },
+    cancel() { soltar?.(); },
   });
   return new Response(cuerpo, { status: 200, headers: { 'content-type': 'application/x-ndjson; charset=utf-8', 'cache-control': 'no-store', 'x-accel-buffering': 'no' } });
 }

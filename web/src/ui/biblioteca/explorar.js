@@ -4,15 +4,16 @@ import * as P from '../../biblioteca/progreso.js';
 import * as F from '../../biblioteca/filtros.js';
 import { REGIONES, SISTEMAS, FORMATOS, TEMAS, NIVELES, DURACIONES, SUBREGION_POR_ID } from '../../biblioteca/taxonomia.js';
 import { RECORRIDOS, RECORRIDO_POR_ID, MODULO_BIB_POR_ID } from '../../biblioteca/recorridos.js';
-import { proponer, itemsDePractica } from '../../biblioteca/sesion.js';
+import { proponer, itemsDePractica, sinRepetirRecientes } from '../../biblioteca/sesion.js';
 import { preguntaDeItem, evaluacionDe, instanciar, disponibleEn, barajar } from '../../biblioteca/evaluar.js';
-import { t, tn } from '../../i18n/idioma.js';
+import { t, tn, idioma } from '../../i18n/idioma.js';
+import { botonReportar, enlazarReportar } from './reportar.js';
 import { tr } from '../../i18n/contenido.js';
 import { SYSTEM_BY_ID } from '../../systems.js';
 import { etiqueta } from '../../i18n/idioma.js';
 import {
   esc, icono, fecha, fechaDia, tarjetaLeccion, tarjetaRecorrido, barra, etiquetaEstado, chipsMeta, vacio, enEsteIdioma,
-  nomRegion, nomSub, nomSistema, nomFormato, nomTema, nomNivel, nomLugar,
+  nomRegion, nomSub, nomSistema, nomFormato, nomTema, nomNivel, nomLugar, nombreIdioma,
 } from './comun.js';
 import { svgNeuri } from './neuri-svg.js';
 
@@ -53,23 +54,29 @@ function alternarFav(ctx, id, boton) {
 
 /**
  * Prácticas: 'vencidas' (lo que toca repasar), 'errores', 'identificar' (identificación 3D sin etiquetas de lo
- * estudiado) y 'lecciones' (repaso de unas lecciones concretas: una región, un sistema o una búsqueda).
+ * estudiado), 'lecciones' (repaso de unas lecciones concretas: una región, un sistema o una búsqueda) e 'items' (unas
+ * preguntas concretas: las dificultades del mapa de aprendizaje).
  */
-export async function empezarPractica(ctx, tipo, { lecciones = null, titulo = null } = {}) {
+export async function empezarPractica(ctx, tipo, { lecciones = null, titulo = null, items: elegidos = null } = {}) {
   const modelo = ctx.api.modelo();
   let preguntas = [];
+  let esperan = 0;
   if (tipo === 'identificar') {
     const ids = (lecciones ?? Object.keys(ctx.data.lecciones)).filter((id) => ctx.porId.has(id));
     const Ls = (await Promise.all(ids.map((id) => ctx.cargarLeccion(id)))).filter(Boolean);
     preguntas = barajar(Ls.flatMap((L) => L.preguntas.filter((q) => (q.tipo === 'identificar' || q.tipo === 'localizar') && disponibleEn(L, q, modelo)).map((q) => instanciar(L, q))), Math.random).slice(0, 10);
   } else {
-    const items = itemsDePractica(ctx.data, tipo === 'lecciones' ? 'region' : tipo, { lecciones, max: 12 });
+    // 'items': unas preguntas concretas (las dificultades del mapa de aprendizaje).
+    const items = tipo === 'items' ? (elegidos ?? []).slice(0, 12) : itemsDePractica(ctx.data, tipo === 'lecciones' ? 'region' : tipo, { lecciones, max: 12 });
     const ids = [...new Set(items.map((id) => id.slice(0, id.indexOf('/'))))];
     await Promise.all(ids.map((id) => ctx.cargarLeccion(id)));
-    preguntas = items.map((id) => preguntaDeItem(ctx.lecciones, id, { modelo })).filter(Boolean);
+    // Lo que se acaba de fallar no se repite tal cual: otra pregunta de lo mismo o, si no hay, más tarde.
+    const r = sinRepetirRecientes(items, { data: ctx.data, lecciones: ctx.lecciones, modelo });
+    esperan = r.esperan;
+    preguntas = r.items.map((id) => preguntaDeItem(ctx.lecciones, id, { modelo })).filter(Boolean);
   }
-  if (!preguntas.length) return ctx.toast(t(tipo === 'identificar' ? 'bib.nadaQueIdentificar' : 'bib.nadaQueRepasar'));
-  ctx.ir({ tipo: 'preguntas', modo: tipo === 'vencidas' || tipo === 'errores' || tipo === 'lecciones' ? 'repaso' : 'practica', titulo: titulo ?? t(`bib.practica.${tipo}`), preguntas, i: 0, respuestas: [], vuelta: ctx.vista });
+  if (!preguntas.length) return ctx.toast(t(tipo === 'identificar' ? 'bib.nadaQueIdentificar' : esperan ? 'bib.esperanRecientes' : 'bib.nadaQueRepasar'), esperan ? 6000 : undefined);
+  ctx.ir({ tipo: 'preguntas', modo: ['vencidas', 'errores', 'lecciones', 'items'].includes(tipo) ? 'repaso' : 'practica', titulo: titulo ?? t(`bib.practica.${tipo}`), preguntas, i: 0, respuestas: [], vuelta: ctx.vista });
 }
 
 /** Evaluación de una lección (cubre todos sus objetivos). */
@@ -91,8 +98,8 @@ export async function renderResultados(ctx) {
   const recorridos = b.solo === 'lecciones' || b.solo === 'propias' ? [] : r ? r.recorridos : b.solo === 'recorridos' ? RECORRIDOS : [];
   const estructuras = r ? r.estructuras.slice(0, 8) : [];
   const verLecciones = b.solo !== 'recorridos';
-  const activos = F.activos(b.filtros, t);
-  const ampliar = !lecciones.length && activos.length ? F.ampliar(base, b.filtros, ctxF, t) : [];
+  const activos = F.activos(b.filtros, t, nombreIdioma);
+  const ampliar = !lecciones.length && activos.length ? F.ampliar(base, b.filtros, ctxF, t, nombreIdioma) : [];
   const entendido = r ? [
     ...r.lugares.map((l) => nomLugar([l.region, l.sub])),
     ...r.materias.map((m) => (m.sistema ? nomSistema(m.sistema) : nomTema(m.tema))),
@@ -111,7 +118,7 @@ export async function renderResultados(ctx) {
         <select id="bib-orden" aria-label="${esc(t('bib.ordenar'))}">${F.ORDENES.map((o) => `<option value="${o}" ${o === b.orden ? 'selected' : ''}>${esc(t(`orden.${o}`))}</option>`).join('')}</select>
       </label>
     </div>
-    ${b.filtrosAbiertos ? panelFiltros(b.filtros) : ''}
+    ${b.filtrosAbiertos ? panelFiltros(b.filtros, base) : ''}
     ${activos.length ? `<p class="bib-activos" aria-label="${esc(t('bib.filtrosActivos'))}">${activos.map((a) => `<button class="bib-chip on" data-quitar="${a.clave}" aria-label="${esc(t('bib.quitarFiltro', { f: a.nombre }))}">${esc(etiqueta(a.nombre))} ${icono('close')}</button>`).join('')}
       <button class="link" data-quitar-todos>${esc(t('bib.quitarTodos'))}</button></p>` : ''}
     ${r?.correcciones.length ? `<p class="bib-nota">${esc(t('bib.corregido', { de: r.correcciones.map(([a]) => a).join(', '), a: r.correcciones.map(([, x]) => x).join(', ') }))}</p>` : ''}
@@ -148,6 +155,16 @@ export async function renderResultados(ctx) {
   body.querySelectorAll('[data-sug]').forEach((x) => x.addEventListener('click', () => nueva(x.dataset.sug)));
   body.querySelector('[data-neuri-q]')?.addEventListener('click', () => ctx.neuri.abrir(b.texto));
   if (r && verLecciones && !lecciones.length) ctx.neuri.sinResultados();
+  // Estadísticas (si se activaron): una búsqueda sin resultados, sin su texto (solo qué filtros había). Se anota si la
+  // búsqueda se queda así un momento (no cada letra mientras se escribe).
+  clearTimeout(ctx.esperaSinResultados);
+  if (verLecciones && !lecciones.length && (r || activos.length)) {
+    let h = 5381;
+    for (const c of `${b.texto}|${activos.map((a) => a.clave).join()}`) h = ((h * 33) ^ c.charCodeAt(0)) >>> 0;
+    ctx.esperaSinResultados = setTimeout(() => {
+      if (ctx.vista.tipo === 'resultados') ctx.evento?.('busqueda_sin_resultados', { filtros: activos.map((a) => a.clave), conTexto: !!r }, { clave: h.toString(36) });
+    }, 2000);
+  }
   body.querySelectorAll('[data-region-entera]').forEach((x) => x.addEventListener('click', () => {
     ctx.busqueda = { texto: '', filtros: { ...F.vacios(), region: x.dataset.regionEntera, sistema: r?.materias.find((m) => m.sistema)?.sistema ?? null }, orden: 'recomendado' };
     ctx.ir({ tipo: 'resultados' }, { reemplazar: true });
@@ -163,7 +180,10 @@ export async function renderResultados(ctx) {
 }
 
 // Panel de filtros: un desplegable por filtro (los cambios se aplican al momento).
-function panelFiltros(f) {
+function panelFiltros(f, base) {
+  // Solo los filtros que dan algo en estas lecciones (o el que ya está puesto, para poder quitarlo).
+  const presentes = (clave) => F.valoresPresentes(base, clave);
+  const ofrecer = (clave, minimo = 2) => f[clave] != null || presentes(clave).length >= minimo;
   const sel = (clave, opciones, valor) => `
     <label class="bib-filtro"><span>${esc(t(`filtro.${clave}`))}</span>
       <select data-filtro="${clave}"><option value="">${esc(t('filtro.todos'))}</option>
@@ -175,9 +195,12 @@ function panelFiltros(f) {
     ${sel('subregion', subs.map((s) => [s.id, f.region ? nomSub(s.id) : `${nomRegion(SUBREGION_POR_ID.get(s.id).region)} › ${nomSub(s.id)}`]), f.subregion)}
     ${sel('sistema', SISTEMAS.map((s) => [s.id, nomSistema(s.id)]), f.sistema)}
     ${sel('formato', FORMATOS.map((x) => [x.id, nomFormato(x.id)]), f.formato)}
+    ${ofrecer('estructura') ? sel('estructura', F.GRUPOS_ESTRUCTURA.filter((g) => presentes('estructura').includes(g.id) || f.estructura === g.id).map((g) => [g.id, t(`filtro.grupo.${g.id}`)]), f.estructura) : ''}
     ${sel('tema', TEMAS.map((x) => [x.id, nomTema(x.id)]), f.tema)}
     ${sel('nivel', NIVELES.map((n) => [n.id, nomNivel(n.id)]), f.nivel)}
     ${sel('duracion', DURACIONES.map((d) => [d.id, etiqueta(d.nombre)]), f.duracion)}
+    ${ofrecer('idioma') ? sel('idioma', [...new Set([...presentes('idioma'), ...(f.idioma ? [f.idioma] : [])])].map((i) => [i, nombreIdioma(i)]), f.idioma) : ''}
+    ${ofrecer('procedencia') ? sel('procedencia', F.PROCEDENCIAS.map((p) => [p, t(`filtro.proc.${p}`)]), f.procedencia) : ''}
     ${sel('progreso', F.PROGRESOS.map((p) => [p, t(`progreso.${p}`)]), f.progreso)}
     <label class="bib-check"><input type="checkbox" data-filtro="repaso" ${f.repaso ? 'checked' : ''}/> ${esc(t('filtro.conRepaso'))}</label>
     <label class="bib-check"><input type="checkbox" data-filtro="favoritas" ${f.favoritas ? 'checked' : ''}/> ${esc(t('filtro.favoritas'))}</label>
@@ -291,6 +314,7 @@ export function renderInfo(ctx) {
     <p class="mod-foot">${esc(t('estudio.progresoLocal'))}
       <button class="link" data-accion="reiniciar">${esc(t('bib.reiniciar'))}</button> ·
       <button class="link" data-accion="borrar">${esc(t('bib.borrar'))}</button>${L.propia ? ` · <button class="link" data-accion="quitar">${esc(t('pet.quitarPropia'))}</button>` : ''}</p>
+    <p class="bib-rep-fila">${botonReportar()}</p>
     ${L.propia ? `<div class="mod-confirm mod-confirm-propia" hidden>
       <p>${esc(t('pet.quitarPregunta'))}</p>
       <button class="btn danger" data-accion="quitar-si">${esc(t('pet.quitarSi'))}</button> <button class="btn" data-accion="quitar-no">${esc(t('estudio.cancelar'))}</button>
@@ -302,6 +326,7 @@ export function renderInfo(ctx) {
   body.querySelector('[data-atras]').addEventListener('click', () => ctx.volver());
   body.querySelectorAll('[data-info]').forEach((x) => x.addEventListener('click', () => ctx.ir({ tipo: 'info', id: x.dataset.info })));
   body.querySelectorAll('[data-rec]').forEach((x) => x.addEventListener('click', () => ctx.ir({ tipo: 'recorrido', id: x.dataset.rec })));
+  enlazarReportar(body, () => ({ vista: 'ficha', leccion: L.id, version: L.version, idioma: idioma(), modelo: ctx.api.modelo() }), { alEnviar: ctx.alReportar });
   body.querySelector('[data-fav]').addEventListener('click', (ev) => { alternarFav(ctx, L.id, ev.currentTarget); renderInfo(ctx); });
   body.querySelectorAll('[data-accion]').forEach((x) => x.addEventListener('click', async () => {
     const a = x.dataset.accion;

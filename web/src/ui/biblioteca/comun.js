@@ -107,3 +107,24 @@ export function tarjetaRecorrido(R, r, fav) {
 }
 
 export const vacio = (texto) => `<p class="bib-vacio">${esc(texto)}</p>`;
+
+/** Descarga un texto como archivo (JSON de «Mis lecciones», una lección, lo apartado…). Devuelve si se pudo. */
+export function descargarArchivo(nombre, texto, tipo = 'application/json') {
+  try {
+    const url = URL.createObjectURL(new Blob([texto], { type: tipo }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nombre;
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    return true;
+  } catch { return false; }
+}
+
+/** La fecha de hoy como AAAA-MM-DD (en la hora local), para nombres de archivo. */
+export function hoyISO(ahora = new Date()) {
+  const d = new Date(ahora);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
