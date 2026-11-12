@@ -29,11 +29,15 @@ export const MODULOS_BIBLIOTECA = [
   },
   { id: 'movimientos', titulo: 'Movimientos y músculos que los producen', lecciones: ['fund-movimientos', 'sis-muscular', 'ms-hombro-musculos', 'brazo', 'mi-glutea', 'mi-muslo-anterior-medial', 'mi-pierna-posterior'] },
   { id: 'articulaciones-principales', titulo: 'Articulaciones principales', lecciones: ['sis-articular', 'cab-masticacion', 'ms-hombro-articulacion', 'ms-codo', 'mi-cadera', 'mi-rodilla', 'mi-pie-huesos-tobillo'] },
-  { id: 'vasos', titulo: 'Corazón, arterias y venas', lecciones: ['sis-cardiovascular', 'tor-corazon', 'cue-vasos', 'cab-arterias-encefalo', 'abd-vasos', 'ms-vasos', 'mi-vasos'] },
-  { id: 'nervios', titulo: 'Nervios y sus territorios', lecciones: ['sis-nervioso', 'cab-nervios-craneales', 'esp-medula', 'ms-nervios', 'mi-nervios'] },
+  {
+    id: 'vasos', titulo: 'Corazón, arterias y venas',
+    lecciones: ['sis-cardiovascular', 'tor-corazon', 'tor-pared-vasos', 'cue-vasos', 'cab-arterias-encefalo', 'cab-arterias-corticales', 'cab-senos-venosos', 'abd-vasos', 'pel-vasos', 'ms-vasos', 'mi-vasos'],
+  },
+  { id: 'encefalo', titulo: 'El encéfalo por dentro', lecciones: ['cab-encefalo', 'cab-surcos-lateral', 'cab-surcos-medial', 'cab-nucleos-basales', 'cab-limbico', 'cab-tronco-encefalo', 'cab-senos-venosos'] },
+  { id: 'nervios', titulo: 'Nervios y sus territorios', lecciones: ['sis-nervioso', 'cab-nervios-craneales', 'cab-tronco-encefalo', 'esp-medula', 'ms-nervios', 'pel-nervios-linfaticos', 'mi-nervios'] },
   {
     id: 'organos', titulo: 'Órganos y sus relaciones',
-    lecciones: ['cab-nariz', 'cue-visceras', 'tor-corazon', 'tor-pulmones', 'tor-mediastino', 'abd-tubo-digestivo', 'abd-higado-pancreas', 'abd-rinones', 'sis-reproductor-masculino', 'sis-reproductor-femenino'],
+    lecciones: ['cab-nariz', 'cue-visceras', 'tor-corazon', 'tor-pulmones', 'tor-segmentos', 'tor-mediastino', 'tor-linfaticos', 'abd-tubo-digestivo', 'abd-peritoneo', 'abd-higado-pancreas', 'abd-rinones', 'sis-reproductor-masculino', 'sis-reproductor-femenino'],
   },
   {
     id: 'compartimentos', titulo: 'Compartimentos de los miembros',
@@ -76,17 +80,17 @@ export const RECORRIDOS = [
   },
   {
     id: 'arterias-venas', titulo: 'Arterias y venas', tema: 'arterias-venas', nivel: 2,
-    descripcion: 'El corazón y el recorrido de las arterias y las venas principales de la cabeza, el cuello, el tronco y los miembros.',
+    descripcion: 'El corazón y el recorrido de las arterias y las venas principales de la cabeza, el cuello, el tronco y los miembros, con los senos venosos del cráneo y los vasos de la pared del tórax y de la pelvis.',
     requisitos: 'Visión general del sistema cardiovascular.', modulos: ['vasos'],
   },
   {
     id: 'nervios-territorios', titulo: 'Nervios y territorios', tema: 'nervios', nivel: 2,
-    descripcion: 'Organización del sistema nervioso, nervios craneales, médula espinal y los nervios de los miembros con lo que inervan.',
-    requisitos: 'Visión general del sistema nervioso.', modulos: ['nervios'],
+    descripcion: 'Organización del sistema nervioso, el encéfalo por dentro, los nervios craneales y sus núcleos, la médula espinal y los nervios de la pelvis y de los miembros con lo que inervan.',
+    requisitos: 'Visión general del sistema nervioso.', modulos: ['encefalo', 'nervios'],
   },
   {
     id: 'organos-relaciones', titulo: 'Órganos y relaciones', tema: 'organos', nivel: 2,
-    descripcion: 'Los órganos del cuello, el tórax, el abdomen y la pelvis: dónde están y con qué se relacionan.',
+    descripcion: 'Los órganos del cuello, el tórax, el abdomen y la pelvis: dónde están y con qué se relacionan, con los segmentos de los pulmones, los nodos linfáticos del tórax y el peritoneo.',
     requisitos: 'Visión general de los sistemas.', modulos: ['organos'],
   },
   {
