@@ -118,7 +118,7 @@ Los límites viven en la memoria del servidor, así que con varias instancias no
 | --- | ---: |
 | Comprobar si hay IA | 12 s |
 | Una respuesta de la conversación | 75 s |
-| Planificar | 150 s |
+| Planificar (una lección o un recorrido) | 150 s |
 | Conectarse a una creación | 30 s |
 | Silencio en una creación en curso | 60 s |
 
@@ -156,6 +156,16 @@ Mientras trabaja, el servidor manda una señal de vida cada 15 s.
 - **Techo de la salida:** sale de los presupuestos de arriba, porque el razonamiento cuenta dentro de la salida máxima.
 - **La entrada:** se suma a la salida; con la caché, son céntimos de céntimo por llamada.
 - **Lo habitual:** la estimación de `docs/estudio/neuri.md`, entre 0,01 y 0,02 US$, sigue siendo una estimación, no una factura.
+
+### Un recorrido por unidades
+
+| Supuesto | Tokens de salida | Coste de esa salida |
+| --- | ---: | ---: |
+| Repartir el tema en unidades | Hasta 6 000 (12 000 con la ronda de corrección) | ≤ 0,003 US$ (≤ 0,006 US$) |
+| Cada unidad que se crea | Como una creación | ≤ 0,026 US$ (≤ 0,052 US$ con correcciones) |
+
+- **Solo se paga lo que se crea:** las unidades se crean de una en una, cuando la persona lo decide. Las pendientes no cuestan nada.
+- **Límites:** repartir el tema cuenta como conversación, y cada unidad como una creación (4 por hora y dirección). Una cadena larga se para con el error «limite» y lo dice.
 
 ### Un mensaje de conversación
 

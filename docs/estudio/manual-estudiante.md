@@ -151,6 +151,30 @@ Necesita la IA, así que hoy solo funciona con la clave de API configurada. Las 
 
 En la captura 10, la lección se creó con la IA simulada. Luego se recargó la página sin simulación: la propuesta antigua avisa de que crear necesita la IA, y la lección creada sigue disponible.
 
+### Un curso entero: un recorrido por unidades
+
+Si pides algo que no cabe en una lección («Créame un curso del miembro superior»), Neuri lo reparte en un **recorrido personal** de varias unidades. Cada unidad es una lección corta que se crea y se comprueba aparte, igual que las demás.
+
+1. **La propuesta** dice qué entendió: tema, objetivo, nivel y cuánto dura cada unidad.
+   - Si lo pediste claramente, Neuri reparte el tema y prepara **la primera unidad**.
+   - Si no, pulsa **Planificar el recorrido**.
+2. **La tarjeta del recorrido** enseña el estado real de cada unidad:
+   - **Lista para estudiar**, con **Abrir**;
+   - en preparación: dice la etapa en la que va (planificando, redactando…). **Ver cómo va** enseña todas las etapas y deja cancelarla;
+   - **Pendiente** o **En cola**;
+   - **No se pudo crear** o **Interrumpida** (el servidor ya no la tiene): **Ver qué pasó** explica el motivo, e **Intentarlo de nuevo** la repite. Si hay que pedirla de otra manera, ofrece **Cambiar algo**;
+   - **Lista, pero sin guardar en este navegador**, si Mis lecciones se llenó mientras tanto: **Ver qué pasó** deja descargarla o guardarla después de liberar espacio.
+3. **Tú decides cuándo se crea el resto:**
+   - **Crear la unidad N**, o **Crear** en una concreta;
+   - **Crear las N que faltan, una tras otra**: van de una en una, nunca a la vez. La cadena se para si una falla o si la cancelas, y **Parar después de la que se está creando** la detiene.
+
+   Antes de empezar cada unidad se comprueba que quepa en Mis lecciones. Si no cabe, te lo dice y no gasta nada.
+4. **Cambiar algo:** díselo a Neuri («quita la unidad de vasos», «añade la mano»). Lo ya creado se conserva, y si una unidad creada sale del recorrido, su lección sigue en Mis lecciones.
+
+Cada unidad cuenta como una creación para los límites de uso (unas 4 por hora): si pides muchas seguidas, la cadena se para y te lo dice.
+
+![Recorrido por unidades: la primera lista, la segunda en preparación y dos en cola (IA simulada)](capturas/18-recorrido-por-unidades-ia-simulada.jpg)
+
 ## 7. Adaptar, guardar, encontrar y quitar tus lecciones
 
 **Dónde están:** **Mis lecciones**, en la entrada. También en el buscador, con el filtro «Procedencia: Mis lecciones».
@@ -165,11 +189,21 @@ En la captura 10, la lección se creó con la IA simulada. Luego se recargó la 
 
 **Para todas:** **Exportar todas** e **Importar…** Al importar no se duplica ni se sobrescribe nada: si ya tienes una lección con ese nombre y otro contenido, entra como copia.
 
-**En preparación** muestra las creaciones en curso y las que no terminaron bien. **Ver qué pasó** explica cada una y **Quitar** la olvida.
+**En preparación** muestra las creaciones en curso y las que no terminaron bien. **Ver qué pasó** explica cada una y **Quitar** la olvida. Si es una unidad de un recorrido, dice de cuál.
+
+**Mis recorridos**, arriba, muestra cada recorrido con el estado de sus unidades:
+- **Abrir** una unidad lista;
+- **Crear la unidad N**;
+- **Seguir en la conversación**;
+- **Quitar el recorrido**: no borra sus lecciones, que siguen en Mis lecciones. Si también quieres quitarlas, la confirmación tiene un botón aparte, **Quitar también sus N lecciones**, que avisa de que no se puede deshacer.
+
+Cada lección que es una unidad dice de qué recorrido es.
 
 **Cuando no cabe más:** no se borra nada solo. La creación queda «lista pero sin guardar» para descargarla o guardarla después de liberar espacio.
 
 ![Mis lecciones](capturas/11-mis-lecciones.jpg)
+
+![Mis recorridos: dos unidades listas y una pendiente, tras quitar dos y añadir la mano (IA simulada)](capturas/19-mis-recorridos-ia-simulada.jpg)
 
 ## 8. Preparar un examen con tu temario
 
@@ -275,7 +309,7 @@ Necesita conexión:
 | Qué | Dónde |
 | --- | --- |
 | Progreso, respuestas, repasos, preferencias y plan de examen | Este navegador (`localStorage`) |
-| Mis lecciones y sus creaciones | Este navegador |
+| Mis lecciones, sus creaciones y tus recorridos | Este navegador |
 | Conversación con Neuri | Esta pestaña: se borra al cerrarla |
 | Lo que se envía a Neuri | Al servidor de Anato3D y de ahí a Anthropic (Claude Haiku 5.5); el servidor no guarda la conversación |
 | Reportes | Este navegador y la cola de revisión de Anato3D, sin tu dirección IP |
@@ -292,7 +326,7 @@ El detalle técnico está en `docs/estudio/contratos-datos.md`.
 
 **Neuri:**
 - Usa Claude Haiku 5.5 y puede equivocarse: el contenido con fuentes está en las lecciones.
-- Crear lecciones con la IA real está programado y probado con simulaciones, pero **aún no con el servicio real**.
+- Crear lecciones y recorridos con la IA real está programado y probado con simulaciones, pero **aún no con el servicio real**.
 
 **Cuentas y web publicada:** no hay cuentas, sincronización ni web publicada todavía.
 

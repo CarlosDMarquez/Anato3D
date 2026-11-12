@@ -6,11 +6,12 @@ import { CLAVE_PROPIAS, CLAVE_APARTADAS, cargarPropias, importarPropias } from '
 import { CLAVE_EVENTOS, CLAVE_PRIVACIDAD, CLAVE_INVITADO } from './eventos.js';
 import { CLAVE_REPORTES } from './reportes.js';
 import { CLAVE_TRABAJOS } from '../pet/trabajos.js';
+import { CLAVE_RECORRIDOS, CLAVE_RECORRIDOS_APARTADOS, importarRecorridos, contarRecorridos } from '../pet/recorridos.js';
 
 export const FORMATO_DATOS = 'anato3d.mis-datos';
 export const VERSION_DATOS = 1;
 /** Todo lo de estudio que la app guarda en el navegador (los ajustes de la app, como el idioma, no son datos de estudio). */
-export const CLAVES_ESTUDIO = [P.CLAVE, P.CLAVE_V1, P.CLAVE_APARTADO, CLAVE_PROPIAS, CLAVE_APARTADAS, CLAVE_TRABAJOS, CLAVE_REPORTES, CLAVE_EVENTOS, CLAVE_PRIVACIDAD, CLAVE_INVITADO, 'anato3d.neuri.visto'];
+export const CLAVES_ESTUDIO = [P.CLAVE, P.CLAVE_V1, P.CLAVE_APARTADO, CLAVE_PROPIAS, CLAVE_APARTADAS, CLAVE_TRABAJOS, CLAVE_RECORRIDOS, CLAVE_RECORRIDOS_APARTADOS, CLAVE_REPORTES, CLAVE_EVENTOS, CLAVE_PRIVACIDAD, CLAVE_INVITADO, 'anato3d.neuri.visto'];
 export const CLAVES_SESION = ['anato3d.neuri'];
 
 const leer = (almacen, clave) => { try { return JSON.parse(almacen?.getItem(clave) ?? 'null'); } catch { return null; } };
@@ -20,6 +21,8 @@ export function exportarDatos({ almacen, data, ahora = Date.now }) {
   return JSON.stringify({
     formato: FORMATO_DATOS, version: VERSION_DATOS, fecha: new Date(ahora()).toISOString(),
     progreso: data, propias: cargarPropias(almacen), trabajos: leer(almacen, CLAVE_TRABAJOS) ?? [],
+    // (Desde el 9 nov 2026: los recorridos personales, con su propio formato versionado; un archivo anterior no los trae.)
+    recorridos: leer(almacen, CLAVE_RECORRIDOS),
     reportes: leer(almacen, CLAVE_REPORTES) ?? [], eventos: leer(almacen, CLAVE_EVENTOS) ?? [], privacidad: leer(almacen, CLAVE_PRIVACIDAD),
   }, null, 2);
 }
@@ -66,9 +69,10 @@ export function fusionarProgreso(aqui, otro) {
 }
 
 /**
- * Importa un archivo de «Mis datos»: el progreso se combina (fusionarProgreso) y las lecciones propias también
- * (importarPropias: sin duplicar ni sobrescribir). Devuelve { ok, data?, cambios?, propias?, error? }; `data` es el
- * progreso combinado, que la app guarda.
+ * Importa un archivo de «Mis datos»: el progreso se combina (fusionarProgreso), las lecciones propias también
+ * (importarPropias: sin duplicar ni sobrescribir) y los recorridos personales igual (importarRecorridos, después de las
+ * lecciones, para que sus unidades encuentren las suyas). Devuelve { ok, data?, cambios?, propias?, recorridos?, error? };
+ * `data` es el progreso combinado, que la app guarda.
  */
 export function importarDatos(texto, { almacen, data }) {
   let d;
@@ -78,7 +82,8 @@ export function importarDatos(texto, { almacen, data }) {
   const progresoValido = prog && prog.version === P.VERSION && typeof prog.lecciones === 'object' && typeof prog.items === 'object';
   const fusion = progresoValido ? fusionarProgreso(data, prog) : { data, cambios: { lecciones: 0, items: 0, intentos: 0 } };
   const propias = Array.isArray(d.propias) && d.propias.length ? importarPropias(almacen, JSON.stringify(d.propias)) : { ok: true, añadidas: 0, copias: 0, iguales: 0, invalidas: 0, sinSitio: 0 };
-  return { ok: true, data: fusion.data, cambios: fusion.cambios, propias, progresoValido };
+  const recorridos = d.recorridos ? importarRecorridos(almacen, d.recorridos) : { ok: true, añadidos: 0, iguales: 0, invalidos: 0, sinSitio: 0 };
+  return { ok: true, data: fusion.data, cambios: fusion.cambios, propias, recorridos, progresoValido };
 }
 
 /** Cuánto hay guardado de cada cosa (para explicarlo en la vista). */
@@ -88,9 +93,9 @@ export function inventarioDatos({ almacen, data, sesion = null }) {
   try { conversacion = (JSON.parse(sesion?.getItem('anato3d.neuri') ?? 'null')?.mensajes ?? []).length; } catch { conversacion = 0; }
   return {
     lecciones: Object.keys(data.lecciones ?? {}).length, respuestas: (data.intentos ?? []).length, preguntas: Object.keys(data.items ?? {}).length,
-    propias: cargarPropias(almacen).length, trabajos: n(CLAVE_TRABAJOS), reportes: n(CLAVE_REPORTES), eventos: n(CLAVE_EVENTOS),
+    propias: cargarPropias(almacen).length, trabajos: n(CLAVE_TRABAJOS), recorridos: contarRecorridos(almacen), reportes: n(CLAVE_REPORTES), eventos: n(CLAVE_EVENTOS),
     examen: !!data.examen, preferencias: !!data.preferencias, conversacion,
-    apartado: !!(leer(almacen, P.CLAVE_APARTADO) || n(CLAVE_APARTADAS)),
+    apartado: !!(leer(almacen, P.CLAVE_APARTADO) || n(CLAVE_APARTADAS) || n(CLAVE_RECORRIDOS_APARTADOS)),
   };
 }
 

@@ -6,6 +6,7 @@
 //   recomendacion | explicacion | aclaracion | propuesta (con «solicitud») | limitacion | salud | fuera_de_alcance
 //   plan        (con «plan»: el alcance de una lección; de la versión anterior, cuando se planificaba aparte)
 //   trabajo     (con «trabajo»: el identificador de una creación de src/pet/trabajos.js y su último resumen)
+//   recorrido   (con «recorrido»: el identificador de un recorrido personal de src/pet/recorridos.js y su último resumen)
 //   error       (con «codigo»: lo que falló, para reintentar)
 // La conversación se guarda en sessionStorage (se pierde al cerrar la pestaña); las lecciones creadas, no: viven en
 // «Mis lecciones» (src/biblioteca/propias.js) y los trabajos en curso, en src/pet/trabajos.js.
@@ -30,11 +31,12 @@ const JSON_H = { 'content-type': 'application/json', accept: 'application/json' 
 const AVISOS = new Set(['limite', 'ocupado', 'tiempo', 'conexion', 'no-disponible', 'sin-saldo', 'error']);
 
 /**
- * `ids`: { lecciones: Set, recorridos: Set } (con las propias). `local(texto)`: respuesta del buscador. `progreso()`:
- * resumen del progreso. `propias()`: resúmenes de «Mis lecciones». `idioma()`: el de la interfaz. `fetch`: el del navegador.
+ * `ids`: { lecciones: Set, recorridos: Set, personales?: Set } (con las propias y los recorridos personales).
+ * `local(texto)`: respuesta del buscador. `progreso()`: resumen del progreso. `propias()`: resúmenes de «Mis lecciones».
+ * `recorridos()`: resúmenes de los recorridos personales. `idioma()`: el de la interfaz. `fetch`: el del navegador.
  * `ahora` y `plazos`: el reloj y los plazos (las pruebas los cambian).
  */
-export function crearConversacion({ ids, local, progreso, propias = () => [], idioma, fetch = globalThis.fetch?.bind(globalThis), almacen = null, url = URL_API, ahora = Date.now, plazos = PLAZOS }) {
+export function crearConversacion({ ids, local, progreso, propias = () => [], recorridos = () => [], idioma, fetch = globalThis.fetch?.bind(globalThis), almacen = null, url = URL_API, ahora = Date.now, plazos = PLAZOS }) {
   let { mensajes, contexto } = leer(almacen);
   // El servicio de IA: desconocido, disponible, sin-clave, sin-servidor, sin-saldo o no-disponible (pasajero). `marca`:
   // el orden en que empezó la petición que lo dijo (lo más nuevo manda; un contador, porque dos peticiones pueden
@@ -81,7 +83,7 @@ export function crearConversacion({ ids, local, progreso, propias = () => [], id
     return servicio.estado === 'disponible';
   }
 
-  const comun = () => ({ v: VERSION, idioma: idioma(), progreso: progreso(), propias: propias(), contexto });
+  const comun = () => ({ v: VERSION, idioma: idioma(), progreso: progreso(), propias: propias(), recorridos: recorridos(), contexto });
 
   /**
    * Lo que se envía al servidor: los últimos turnos, empezando por la persona. Los de Neuri seguidos (una propuesta, su
@@ -259,6 +261,21 @@ export function crearConversacion({ ids, local, progreso, propias = () => [], id
       m.resumen = { ...m.resumen, ...resumen };
       guardar();
     },
+    /** Anota en la conversación un recorrido personal (src/pet/recorridos.js) para enseñar ahí sus unidades. */
+    anotarRecorrido(id, resumen) {
+      const m = { rol: 'pet', tipo: 'recorrido', texto: '', recorrido: id, resumen: { ...resumen }, origen: 'app' };
+      mensajes.push(m);
+      guardar();
+      return m;
+    },
+    /** ¿Hay un mensaje de este recorrido en la conversación? */
+    tieneRecorrido: (id) => mensajes.some((x) => x.tipo === 'recorrido' && x.recorrido === id),
+    /** Actualiza lo que se recuerda de un recorrido (su estado y el de sus unidades) en sus mensajes. */
+    resumirRecorrido(id, resumen) {
+      let hay = false;
+      for (const m of mensajes) if (m.tipo === 'recorrido' && m.recorrido === id) { m.resumen = { ...m.resumen, ...resumen }; hay = true; }
+      if (hay) guardar();
+    },
     /** Nueva conversación: corta lo que esté en curso (las creaciones siguen: son trabajos aparte). */
     reiniciar() {
       if (enCurso) { cortar(enCurso.control, 'cancelada'); enCurso = null; }
@@ -270,11 +287,24 @@ export function crearConversacion({ ids, local, progreso, propias = () => [], id
   };
 }
 
-/** Un turno de Neuri tal como se le recuerda: su texto y, entre corchetes, lo que la app mostró (propuesta, plan, creación). */
+const ESTADO_UNIDAD = { lista: 'lista para estudiar', preparando: 'en preparación', pendiente: 'pendiente', error: 'no se pudo crear', interrumpida: 'interrumpida', 'sin-guardar': 'lista pero sin guardar' };
+
+/** Un turno de Neuri tal como se le recuerda: su texto y, entre corchetes, lo que la app mostró (propuesta, plan, creación, recorrido). */
 function resumenTurno(m) {
   const s = m.solicitud;
   if (m.tipo === 'propuesta' && s) {
-    return `${m.texto}\n[Propuesta mostrada (${s.accion}${s.leccion_base ? ` de ${s.leccion_base}` : ''}): tema: ${s.tema}; objetivo: ${s.objetivo || '—'}; nivel: ${s.nivel ?? '—'}; minutos: ${s.minutos ?? '—'}; enfoque: ${s.enfoque || '—'}.]`;
+    const de = s.leccion_base ? ` de ${s.leccion_base}` : s.recorrido_base ? ` de ${s.recorrido_base}` : '';
+    const cuantas = s.accion === 'recorrido' ? `; unidades: ${s.unidades ?? '—'}; minutos de cada unidad: ${s.minutos ?? '—'}` : `; minutos: ${s.minutos ?? '—'}`;
+    return `${m.texto}\n[Propuesta mostrada (${s.accion}${de}): tema: ${s.tema}; objetivo: ${s.objetivo || '—'}; nivel: ${s.nivel ?? '—'}${cuantas}; enfoque: ${s.enfoque || '—'}.]`;
+  }
+  if (m.tipo === 'recorrido') {
+    const r = m.resumen ?? {};
+    if (!r.titulo) return '';
+    const unidades = (r.unidades ?? []).map((u, i) => `${i + 1}. ${u.titulo} (${ESTADO_UNIDAD[u.estado] ?? u.estado}${u.leccion ? `: ${u.leccion}` : ''})`).join('; ');
+    if (r.quitado) return `[La persona quitó el recorrido personal «${r.titulo}»; sus lecciones siguen en Mis lecciones.]`;
+    if (unidades) return `[Recorrido personal «${r.titulo}» (${m.recorrido})${r.estado === 'planificando' ? ', cambiándose' : ''}: ${unidades}.]`;
+    if (r.estado === 'planificando') return `[Planificando las unidades del recorrido personal «${r.titulo}».]`;
+    return `[No se planificó el recorrido «${r.titulo}»: ${r.error ?? r.codigo ?? r.estado}.${r.mensaje ? ` ${r.mensaje}` : ''}]`;
   }
   if (m.tipo === 'plan' && m.plan) {
     const p = m.plan;

@@ -18,9 +18,11 @@ function item(ctx, x) {
   const codigo = x.estado === 'error' ? x.error : x.estado === 'no-guardada' ? 'no-guardada' : x.estado === 'interrumpida' ? 'interrumpida' : x.estado === 'aclaracion' ? 'aclaracion' : x.codigo ?? 'limitacion';
   const texto = !final ? ctx.neuri.etiquetaEtapa(x) : codigo === 'no-guardada' ? t('pet.noGuardadaCorto') : ctx.neuri.textoError(codigo);
   const titulo = x.titulo || t('pet.leccionNueva');
+  // Una unidad de un recorrido personal dice de cuál.
+  const de = ctx.neuri.recorridos?.deTrabajo(x.id);
   return `<li class="bib-prep-item${final ? ' mal' : ''}">
     ${final ? icono('info') : '<i class="neuri-giro" aria-hidden="true"></i>'}
-    <span class="bib-prep-txt"><b>${esc(titulo)}</b><small>${esc(texto)}</small></span>
+    <span class="bib-prep-txt"><b>${esc(titulo)}</b>${de ? `<small class="bib-prep-de">${esc(t('pet.rec.unidadDe', { n: de.n, total: de.total, titulo: de.recorrido.titulo }))}</small>` : ''}<small>${esc(texto)}</small></span>
     <span class="bib-prep-acc">
       <button class="link" type="button" data-ver-trabajo="${esc(x.id)}">${esc(t(final ? 'pet.verQuePaso' : 'pet.verComoVa'))}</button>
       ${final ? `<button class="link" type="button" data-quitar-trabajo="${esc(x.id)}" aria-label="${esc(t('pet.quitarAvisoDe', { titulo }))}">${esc(t('pet.quitarAviso'))}</button>` : ''}

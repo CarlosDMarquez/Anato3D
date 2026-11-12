@@ -956,7 +956,8 @@ body.saliendo .start { opacity: 0; }
 .neuri-acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
 .neuri-acciones .btn { display: inline-flex; align-items: center; gap: 6px; }
 .neuri-aviso-t { color: #f0c27a !important; font-size: 12.5px; }
-.neuri-plan-t { margin: 0; font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: 0; text-transform: none; }
+/* (Dentro de la tarjeta, para que no lo pise «.panel-study h4».) */
+.neuri-tarjeta .neuri-plan-t { margin: 0; font-size: 16px; font-weight: 600; color: var(--text); letter-spacing: 0; text-transform: none; }
 .neuri-plan-base { font-size: 12.5px; color: var(--muted); }
 .neuri-plan-r { color: var(--text-2); }
 .neuri-tarjeta h5 { margin: 6px 0 0; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
@@ -996,3 +997,67 @@ body.saliendo .start { opacity: 0; }
 .neuri-ev-de { margin-top: 3px !important; color: var(--muted); font-size: 12px; }
 .neuri-ev-de a { color: var(--text-2); }
 @media (prefers-reduced-motion: reduce) { .neuri-pasos-gen li.actual > i { animation: none; border-right-color: var(--accent); } }
+/* Recorridos personales: la tarjeta con sus unidades y el estado real de cada una (src/ui/biblioteca/pet.js). */
+.neuri-rec-ref { gap: 4px; padding: 9px 12px; }
+.neuri-rec-ref p:last-child { font-size: 12.5px; color: var(--muted); }
+.neuri-unidades { list-style: none; margin: 2px 0 0; padding: 0; display: grid; gap: 6px; }
+.neuri-unidad { display: flex; align-items: flex-start; gap: 10px; padding: 9px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--raise); }
+.neuri-unidad-n { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 600; line-height: 1; color: var(--text-2); border: 1.5px solid var(--line-strong); font-variant-numeric: tabular-nums; }
+.neuri-unidad.lista .neuri-unidad-n, .mis-rec-u.lista .neuri-unidad-n { border-color: rgba(90, 200, 140, 0.6); color: #c9f0d9; background: rgba(90, 200, 140, 0.12); }
+.neuri-unidad.preparando .neuri-unidad-n, .mis-rec-u.preparando .neuri-unidad-n { border-color: var(--accent); color: #bfe0ff; background: var(--accent-soft); }
+.neuri-unidad.error .neuri-unidad-n, .neuri-unidad.interrumpida .neuri-unidad-n, .neuri-unidad.sin-guardar .neuri-unidad-n,
+.mis-rec-u.error .neuri-unidad-n, .mis-rec-u.interrumpida .neuri-unidad-n, .mis-rec-u.sin-guardar .neuri-unidad-n { border-color: rgba(240, 180, 80, 0.6); color: #f0c27a; }
+.neuri-unidad-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.neuri-unidad-t { color: var(--text); overflow-wrap: anywhere; }
+.neuri-unidad-t b { font-weight: 500; }
+.neuri-unidad-t small { color: var(--muted); font-size: 11.5px; white-space: nowrap; }
+.neuri-unidad-o { font-size: 12.5px; line-height: 1.45; color: var(--text-2); }
+.neuri-unidad-e { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.neuri-unidad-e .ui-icon { width: 13px; height: 13px; flex: none; }
+.neuri-unidad-e .neuri-giro, .mis-rec-u-txt .neuri-giro { width: 11px; height: 11px; border-width: 1.5px; }
+.neuri-unidad-e small { font-size: 11.5px; color: var(--muted); }
+.neuri-unidad.lista .neuri-unidad-e, .mis-rec-u.lista .mis-rec-u-txt small { color: #c9f0d9; }
+.neuri-unidad.lista .neuri-unidad-e .ui-icon, .mis-rec-u.lista .mis-rec-u-txt small .ui-icon { color: #8fe0b3; }
+.neuri-unidad.preparando .neuri-unidad-e, .mis-rec-u.preparando .mis-rec-u-txt small { color: #bfe0ff; }
+.neuri-unidad.error .neuri-unidad-e, .neuri-unidad.interrumpida .neuri-unidad-e, .neuri-unidad.sin-guardar .neuri-unidad-e,
+.mis-rec-u.error .mis-rec-u-txt small, .mis-rec-u.interrumpida .mis-rec-u-txt small, .mis-rec-u.sin-guardar .mis-rec-u-txt small { color: #f0c27a; }
+.neuri-unidad-vacio { width: 11px; height: 11px; flex: none; border-radius: 50%; border: 1.5px dashed var(--line-strong); }
+.neuri-unidad-rel { font-size: 12px; color: var(--muted); }
+.neuri-unidad-rel .link { font-size: 12px; }
+.neuri-unidad-det { margin-top: 4px; }
+.neuri-unidad-det > .neuri-tarjeta { margin-top: 6px; }
+.neuri-unidad-acc { flex: none; display: flex; align-items: center; gap: 6px; }
+.neuri-unidad-acc .btn { padding: 5px 12px; font-size: 12.5px; }
+.neuri-rec-aviso { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(240, 180, 80, 0.3); background: rgba(240, 180, 80, 0.06); font-size: 12.5px; line-height: 1.5; color: var(--text-2); }
+.neuri-rec-aviso > .ui-icon { width: 14px; height: 14px; flex: none; margin-top: 3px; color: #f0c27a; }
+.neuri-rec-aviso > p, .neuri-rec-aviso > div { flex: 1; min-width: 0; }
+.neuri-rec-aviso .neuri-acciones { margin-top: 8px; }
+.neuri-rec-x { flex: none; display: grid; place-items: center; width: 24px; height: 24px; margin: -2px -4px 0 0; border-radius: 6px; color: var(--muted); }
+.neuri-rec-x:hover { color: var(--text); background: var(--raise-2); }
+.neuri-rec-x .ui-icon { width: 13px; height: 13px; }
+.neuri-rec-cambiando { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #bfe0ff; }
+@media (max-width: 520px) { .neuri-unidad { flex-wrap: wrap; } .neuri-unidad-acc { width: 100%; padding-left: 34px; } }
+/* «Mis lecciones» → Mis recorridos (src/ui/biblioteca/mis-recorridos.js) */
+.mis-recs-sec { margin-top: 16px; }
+.panel h4.mis-rec-h { margin: 0 0 4px; }
+.mis-rec-h:focus { outline: none; }
+.mis-rec-h:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+.mis-recs { list-style: none; margin: 10px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.mis-rec { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--raise); }
+.mis-rec-t { display: flex; align-items: center; gap: 7px; margin: 0; color: var(--text); overflow-wrap: anywhere; }
+.mis-rec-t .ui-icon { width: 15px; height: 15px; flex: none; color: var(--accent); }
+.mis-rec-t b { font-weight: 500; font-size: 14px; }
+.mis-rec-meta { margin: 2px 0 0 22px; font-size: 12px; color: var(--muted); }
+.mis-rec-aviso { margin: 0; font-size: 12px; line-height: 1.45; color: #f0c27a; }
+.mis-rec-unidades { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.mis-rec-u { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.mis-rec-u .neuri-unidad-n { width: 20px; height: 20px; font-size: 11px; }
+.mis-rec-u-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.mis-rec-u-txt b { font-weight: 500; font-size: 13px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mis-rec-u-txt small { display: flex; align-items: center; gap: 5px; font-size: 11.5px; color: var(--muted); }
+.mis-rec-u-txt small .ui-icon { width: 12px; height: 12px; flex: none; }
+.mis-rec-u .link { flex: none; font-size: 12px; }
+.mis-confirmar-rec .btn { margin: 0 6px 6px 0; }
+.mis-confirmar-nota { margin: 0 0 8px !important; font-size: 12px; color: #ffb3b3; }
+.bib-prep-txt small.bib-prep-de { color: var(--muted); }
+@media (max-width: 520px) { .mis-recs { grid-template-columns: 1fr; } }

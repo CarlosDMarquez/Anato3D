@@ -12,6 +12,10 @@
 //
 // Reintentar: tras un corte de red (`reanudable`), con el mismo identificador (el servidor sigue el trabajo o devuelve
 // lo que ya tenía, sin repetirlo); tras cualquier otro final, un trabajo nuevo con el mismo plan que sustituye al viejo.
+//
+// Una unidad de un recorrido personal (src/pet/recorridos.js) es un trabajo más, con `unidad: { recorrido, id }`: se
+// planifica con su propia solicitud (que ya lleva lo que hace falta del recorrido), sin la conversación, y un reintento
+// sigue siendo de la misma unidad.
 import { VERSION, LIMITES, ID_TRABAJO, limpiarPlan } from './protocolo.js';
 import { pedirJSON, leerFlujo, leerJSON, cortar, motivo, nuevoId } from './red.js';
 
@@ -49,18 +53,19 @@ export function crearTrabajos({ fetch = globalThis.fetch?.bind(globalThis), url 
     avisar(t);
   }
 
-  function nuevo({ solicitud = null, plan = null, titulo = null }) {
+  function nuevo({ solicitud = null, plan = null, titulo = null, unidad = null }) {
     return {
       id: nuevoId(), estado: plan ? 'fuentes' : 'planificando', titulo: plan?.titulo ?? titulo ?? solicitud?.tema ?? '',
       accion: plan?.accion ?? solicitud?.accion ?? 'crear', solicitud, plan, base: plan?.base ?? solicitud?.leccion_base ?? null,
       estructuras: null, evidencias: null, informe: null, leccionId: null, error: null, codigo: null, errores: null, mensaje: null,
-      reanudable: false, creado: ahora(), actualizado: ahora(),
+      reanudable: false, creado: ahora(), actualizado: ahora(), ...(unidad ? { unidad: { recorrido: unidad.recorrido, id: unidad.id } } : {}),
     };
   }
 
   /**
    * Empieza a crear: con una solicitud (planifica y redacta seguido) o con un plan ya hecho (redacta). Devuelve el
-   * trabajo. `titulo`: lo que se enseña mientras no hay plan.
+   * trabajo. `titulo`: lo que se enseña mientras no hay plan; `unidad`: { recorrido, id } si es una unidad de un
+   * recorrido personal.
    */
   function iniciar(datos) {
     const t = nuevo(datos);
@@ -91,8 +96,10 @@ export function crearTrabajos({ fetch = globalThis.fetch?.bind(globalThis), url 
 
   async function planificar(t, control) {
     const base = t.base ? basePropia(t.base) : null;
+    // Una unidad de un recorrido se planifica con su solicitud, sin la conversación (que pedía el recorrido entero).
+    const mensajes = t.unidad ? [] : historial();
     try {
-      const { r, d } = await pedirJSON(fetch, url, { method: 'POST', headers: JSON_H, body: JSON.stringify({ ...comun(), modo: 'planificar', mensajes: historial(), solicitud: t.solicitud, trabajo: t.id, ...(base ? { base } : {}) }) }, plazos.planificar, control);
+      const { r, d } = await pedirJSON(fetch, url, { method: 'POST', headers: JSON_H, body: JSON.stringify({ ...comun(), modo: 'planificar', mensajes, solicitud: t.solicitud, trabajo: t.id, ...(base ? { base } : {}) }) }, plazos.planificar, control);
       if (motivo(control) === 'cancelada') return false;
       if (r.ok && d?.ok && d.tipo === 'plan' && limpiarPlan(d.plan)) {
         const plan = { ...limpiarPlan(d.plan), accion: d.plan.accion, base: d.plan.base ?? null };
@@ -216,7 +223,7 @@ export function crearTrabajos({ fetch = globalThis.fetch?.bind(globalThis), url 
         ejecutar(t);
         return t;
       }
-      const n = { ...nuevo({ solicitud: t.solicitud, plan: t.plan, titulo: t.titulo }), estructuras: t.estructuras, reemplaza: t.id };
+      const n = { ...nuevo({ solicitud: t.solicitud, plan: t.plan, titulo: t.titulo, unidad: t.unidad }), estructuras: t.estructuras, reemplaza: t.id };
       lista = podar([n, ...lista.filter((x) => x.id !== t.id)]);
       resultados.delete(t.id);
       guardar();

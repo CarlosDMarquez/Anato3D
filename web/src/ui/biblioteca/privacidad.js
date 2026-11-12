@@ -22,7 +22,7 @@ export function renderDatos(ctx, { foco = null, aviso = null } = {}) {
     <h4 class="bib-h">${esc(t('dat.aqui'))}</h4>
     <ul class="dat-lista">
       ${fila('dat.lecciones', inv.lecciones)}${fila('dat.respuestas', inv.respuestas)}${fila('dat.propias', inv.propias)}
-      ${fila('dat.trabajos', inv.trabajos)}${fila('dat.examen', t(inv.examen ? 'dat.si' : 'dat.no'))}${fila('dat.preferencias', t(inv.preferencias ? 'dat.si' : 'dat.no'))}
+      ${fila('dat.trabajos', inv.trabajos)}${fila('dat.recorridos', inv.recorridos)}${fila('dat.examen', t(inv.examen ? 'dat.si' : 'dat.no'))}${fila('dat.preferencias', t(inv.preferencias ? 'dat.si' : 'dat.no'))}
       ${fila('dat.reportes', inv.reportes)}${fila('dat.conversacion', inv.conversacion)}${fila('dat.eventos', inv.eventos)}
     </ul>
     <p class="dat-nota">${esc(t('dat.aquiNota'))}</p>
@@ -84,6 +84,7 @@ export function renderDatos(ctx, { foco = null, aviso = null } = {}) {
     ctx.data = r.data;
     ctx.guardar();
     ctx.actualizarPropias?.();
+    ctx.neuri.recorridos?.recargar();                     // los recorridos importados (sus unidades ya ven sus lecciones)
     repintar({ foco: '#datos-h', aviso: t('dat.importado', { lecciones: r.cambios.lecciones, respuestas: r.cambios.intentos, propias: r.propias.añadidas + r.propias.copias }) });
   });
   const conf = body.querySelector('.dat-confirmar');

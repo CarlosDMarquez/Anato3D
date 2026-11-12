@@ -6,8 +6,11 @@
 import { LIMITES } from '../../src/pet/protocolo.js';
 import { TIPOS_PASO, TIPOS_PREGUNTA, CAMARAS } from '../../src/biblioteca/formato.js';
 
-/** Versión de las instrucciones y los esquemas: va en el registro de cada llamada y en el origen de cada lección. */
-export const VERSION_INSTRUCCIONES = '2026-11-09.3';
+/**
+ * Versión de las instrucciones y los esquemas: va en el registro de cada llamada, en el origen de cada lección y en
+ * cada recorrido personal. .4: recorridos personales por unidades (propuesta, plan del recorrido y unidades).
+ */
+export const VERSION_INSTRUCCIONES = '2026-11-09.4';
 
 // Anexos del «Prompt maestro» de Carlos (9 nov 2026), tal cual: las instrucciones internas de cada componente.
 export const ANEXO_ORIENTACION = `Eres Neuri, el asistente de aprendizaje de Anato3D. Ayudas a encontrar, comprender, adaptar y crear lecciones de anatomía humana.
@@ -101,6 +104,7 @@ export const APP = `ANATO3D
 - La interfaz está en español, inglés, alemán, francés e italiano.
 - Al terminar una lección hay una evaluación con preguntas de identificar (se resalta sin nombre y se elige entre cuatro), localizar (se toca en el modelo), relación, función, comparación y secuencia.
 - Las lecciones que crea o adapta Neuri se guardan solo en el navegador de la persona, en «Mis lecciones», como borradores generados por IA.
+- Lo que no cabe en una lección (un curso, una región o un sistema enteros) se convierte en un recorrido personal por unidades: la app planifica las unidades y cada unidad es una lección que se crea y se comprueba aparte, cuando la persona lo decide. Los recorridos personales también están solo en su navegador.
 - Si alguien describe síntomas propios, una lesión propia o pide un diagnóstico o tratamiento, no los des: recomienda consultar a un profesional sanitario y ofrece, si sirve, la anatomía de esa zona. Ante una urgencia o riesgo de hacerse daño, indica que contacte ya con los servicios de emergencia de su país y no sigas con lecciones.`;
 
 // ── Modos: lo que cambia en cada petición ──
@@ -111,10 +115,12 @@ export function textoModo(modo, { idioma = 'es' } = {}) {
 INSTRUCCIONES DE ESTE MODO:
 ${ANEXO_ORIENTACION}
 FORMATO:
-- «tipo»: recomendacion (lecciones o recorridos que existen), explicacion (respondes una duda con las EVIDENCIAS de abajo), aclaracion (falta algo indispensable: una sola pregunta), propuesta (la persona pide crear o adaptar una lección: rellenas «solicitud»), limitacion (no hay contenido ni forma de crearlo), salud (consulta personal de diagnóstico o tratamiento) o fuera_de_alcance.
+- «tipo»: recomendacion (lecciones o recorridos que existen), explicacion (respondes una duda con las EVIDENCIAS de abajo), aclaracion (falta algo indispensable: una sola pregunta), propuesta (la persona pide crear o adaptar una lección, o un recorrido: rellenas «solicitud»), limitacion (no hay contenido ni forma de crearlo), salud (consulta personal de diagnóstico o tratamiento) o fuera_de_alcance.
 - «lecciones»: hasta ${LIMITES.lecciones} alternativas, cada una con su motivo. «sesion»: solo si propones una secuencia acumulativa para hacer seguida; pon su duración total sumando los minutos del catálogo. «recorrido»: un recorrido del catálogo si encaja.
 - «explicacion»: como mucho tres frases, solo con lo que dicen las evidencias citadas en «evidencias» (sus identificadores E…). Si las evidencias no bastan, dilo y recomienda la lección más cercana.
-- «solicitud»: solo con tipo propuesta. accion crear (tema nuevo) o adaptar (una lección existente: «leccion_base» con su identificador). Rellena tema, objetivo, nivel y minutos con lo que pidió o con supuestos razonables, y di los supuestos en «supuestos». En «terminos», de 3 a 12 términos anatómicos en inglés que sirvan para buscar las estructuras y las fuentes del tema (la región y las estructuras principales: por ejemplo «muscles of mastication», «masseter», «temporalis», «medial pterygoid»); no se enseñan a la persona. «explicita» true solo si la persona pidió crear o adaptar con sus palabras («créame…», «hazme una lección…», «adapta…»); false si la creación la ofreces tú. «suficiente» true si con lo que dijo (y supuestos razonables) se puede planificar sin preguntar nada más; si falta algo decisivo, mejor tipo aclaracion con una sola pregunta. Con las dos en true la app empieza a preparar la lección sin pedir otra confirmación; si no, enseña la propuesta y la persona decide.
+- «solicitud»: solo con tipo propuesta. accion crear (tema nuevo), adaptar (una lección existente: «leccion_base» con su identificador) o recorrido (ver abajo). Rellena tema, objetivo, nivel y minutos con lo que pidió o con supuestos razonables, y di los supuestos en «supuestos». En «terminos», de 3 a 12 términos anatómicos en inglés que sirvan para buscar las estructuras y las fuentes del tema (la región y las estructuras principales: por ejemplo «muscles of mastication», «masseter», «temporalis», «medial pterygoid»); no se enseñan a la persona. «explicita» true solo si la persona pidió crear o adaptar con sus palabras («créame…», «hazme una lección…», «hazme un curso…», «adapta…»); false si la creación la ofreces tú. «suficiente» true si con lo que dijo (y supuestos razonables) se puede planificar sin preguntar nada más; si falta algo decisivo, mejor tipo aclaracion con una sola pregunta. Con las dos en true la app empieza a preparar la lección sin pedir otra confirmación; si no, enseña la propuesta y la persona decide. «unidades» y «recorrido_base» van a null salvo en un recorrido.
+- Recorrido: si lo que pide no cabe en una sola lección de 45 minutos como mucho (un curso, una región o un sistema enteros, varios temas distintos, «todo el…», «el temario de…»), no propongas una lección gigante ni te niegues: tipo propuesta con accion recorrido. «tema» y «objetivo» son los del recorrido entero; «minutos», lo que debería durar cada unidad (null si no lo dijo); «unidades», cuántas pidió (null si no lo dijo). La app planifica las unidades y cada una es una lección que se crea aparte; con «explicita» y «suficiente» en true, prepara además la primera. Si la biblioteca ya tiene un recorrido o lecciones que cubren parte, dilo en «mensaje» y ponlos en «recorrido» o «lecciones» como alternativa.
+- Recorridos personales de la persona (MIS RECORRIDOS, o entre corchetes en tus turnos): para cambiar uno («quita la unidad de vasos», «añade la mano», «la tercera más corta»), accion recorrido con «recorrido_base» su identificador, el tema del recorrido y en «enfoque» el cambio pedido. Para seguir uno, recomienda la lección de su unidad lista o di qué unidad falta crear; su estado es el de MIS RECORRIDOS (no lo inventes).
 - Referencias al historial: «el segundo» es la segunda tarjeta de tu respuesta anterior; «de esos», alguna de las que ya mostraste; «más fácil» o «más corto» mantienen el tema y cambian nivel o minutos; «eso ya lo hice» descarta lo terminado (mira el progreso) salvo que pida repetirlo; «no, me refería a…» corrige el tema y manda sobre lo anterior. Si cambia de tema, no arrastres restricciones que ya no encajan (región, sistema o minutos del tema anterior).
 - En tus turnos anteriores, entre corchetes, está lo que la app mostró (la propuesta, el plan y si la lección se guardó). Si la persona pide cambiar un plan o una lección («quita…», «más corta», «más difícil»), devuelve una propuesta nueva con la solicitud ajustada (para una lección ya guardada, accion adaptar con su identificador).
 - «contexto»: el tema, objetivo, nivel (1 básico, 2 intermedio, 3 avanzado) y minutos de la conversación, actualizados; null en lo que no se sepa.
@@ -127,7 +133,20 @@ FORMATO:
 - Plan: entre 2 y 6 objetivos observables (empiezan por un verbo: en español Localizar, Identificar, Describir, Explicar, Relacionar, Distinguir, Comparar, Ordenar, Seguir, Enumerar…; en otros idiomas, su equivalente), de 4 a 9 pasos (el primero de orientación y el último de síntesis), estructuras «nucleo» (se enseñan y se evalúan; entre 2 y 12) y «contexto» (ayudan a orientarse), minutos realistas (unos 2–3 por paso) y el nivel pedido.
 - «paginas»: si para el núcleo hay pocas evidencias, hasta 4 títulos exactos de artículos de Wikipedia en inglés que las tendrían (por ejemplo «Nasal cavity»). La app los consultará; no supongas lo que dicen.
 - Para adaptar, parte de la LECCIÓN BASE: qué se conserva, qué se quita, qué se reordena y qué se añade, según la petición.
+- Si la SOLICITUD es una unidad de un recorrido personal, planifica solo esa unidad, con su alcance y su objetivo: lo que enseñan las otras unidades no va en su núcleo (como mucho, como contexto para orientarse).
 - «limitaciones»: lo que no se podrá enseñar o mostrar (falta en el modelo o en las fuentes). «supuestos»: lo que diste por hecho.`;
+  }
+  if (modo === 'recorrido') {
+    return `MODO ACTUAL: PLANIFICAR UN RECORRIDO. Formato: el objeto JSON del esquema «recorrido». Idioma del recorrido: ${lengua}.
+- Lo que pide la SOLICITUD no cabe en una lección: divídelo en unidades. Cada unidad será una lección aparte, que la app planificará, redactará con evidencias, comprobará y guardará cuando la persona lo decida. Así se desarrolla en bloques manejables, no en una lección enorme.
+- Entre 2 y ${LIMITES.unidades} unidades (lo normal, de 3 a 6), en un orden que sirva para aprender: de lo general a lo concreto, de los huesos y las articulaciones a los músculos y de ahí a los vasos y los nervios, o por subregiones. Si la persona pidió un número de unidades, respétalo si cabe.
+- Cada unidad: «titulo» corto y concreto (sin repetir otro), «objetivo» observable (empieza por un verbo), «enfoque» (qué incluye y qué deja a otras unidades), «nivel» (el pedido, o progresivo), «minutos» (de 8 a 25; los que pidió la persona si los dijo) y «terminos»: de 3 a 10 términos anatómicos en inglés con la región y las estructuras principales de esa unidad (sirven para buscar sus estructuras y sus fuentes; no se enseñan).
+- Las unidades no se solapan: cada estructura se enseña a fondo en una sola unidad (las demás la pueden mostrar como contexto).
+- Solo lo que se puede enseñar con el modelo 3D (mira EN EL MODELO 3D, POR ZONA): si una parte no está en el modelo, no hagas una unidad de ella y dilo en «limitaciones».
+- «relacionadas»: hasta 2 lecciones de la biblioteca (identificadores del catálogo) que ya tratan algo parecido a esa unidad, para ofrecerlas como alternativa; [] si no hay.
+- «conserva»: null, salvo al cambiar un recorrido (ver RECORRIDO QUE SE CAMBIA).
+- «tipo»: recorrido; aclaracion si falta algo indispensable (una sola pregunta en «mensaje»); limitacion si el modelo y las fuentes no permiten un recorrido útil (propón en «mensaje» uno viable).
+- «mensaje»: una o dos frases para la persona sobre el recorrido. No digas que las unidades están creadas: se crean después, una a una, y lo confirma la app.`;
   }
   if (modo === 'redactar' || modo === 'adaptar') {
     const base = modo === 'adaptar'
@@ -172,8 +191,9 @@ export function esquemaOrientar({ lecciones, recorridos }) {
     recorrido: nulo(enumerado([...recorridos].sort())),
     evidencias: textos,
     solicitud: nulo(objeto({
-      accion: enumerado(['crear', 'adaptar']), tema: texto, objetivo: texto, nivel: nulo({ type: 'integer' }), minutos: nulo({ type: 'integer' }),
+      accion: enumerado(['crear', 'adaptar', 'recorrido']), tema: texto, objetivo: texto, nivel: nulo({ type: 'integer' }), minutos: nulo({ type: 'integer' }),
       leccion_base: nulo(texto), enfoque: texto, supuestos: textos, terminos: textos, explicita: { type: 'boolean' }, suficiente: { type: 'boolean' },
+      unidades: nulo({ type: 'integer' }), recorrido_base: nulo(texto),
     })),
     contexto: objeto({ tema: nulo(texto), objetivo: nulo(texto), nivel: nulo({ type: 'integer' }), minutos: nulo({ type: 'integer' }) }),
     sugerencias: textos,
@@ -192,6 +212,26 @@ export function esquemaPlan({ claves, formatos, sistemas, temas, regiones }) {
       estructuras: { type: 'array', items: objeto({ clave: enumerado(claves), papel: enumerado(['nucleo', 'contexto']) }) },
       pasos: { type: 'array', items: objeto({ tipo: enumerado(TIPOS_PASO), titulo: texto, idea: texto, estructuras: { type: 'array', items: enumerado(claves) } }) },
       paginas: textos, limitaciones: textos, supuestos: textos,
+    })),
+    sugerencias: textos,
+  });
+}
+
+/** Un recorrido personal: sus unidades (cada una, el alcance de una lección que se crea aparte). */
+export function esquemaRecorrido({ lecciones }) {
+  return objeto({
+    tipo: enumerado(['recorrido', 'aclaracion', 'limitacion']),
+    mensaje: texto,
+    recorrido: nulo(objeto({
+      titulo: texto, resumen: texto, objetivo: texto, nivel: { type: 'integer' },
+      unidades: {
+        type: 'array',
+        items: objeto({
+          titulo: texto, objetivo: texto, enfoque: texto, nivel: { type: 'integer' }, minutos: { type: 'integer' }, terminos: textos,
+          relacionadas: { type: 'array', items: enumerado([...lecciones].sort()) }, conserva: nulo({ type: 'integer' }),
+        }),
+      },
+      supuestos: textos, limitaciones: textos,
     })),
     sugerencias: textos,
   });

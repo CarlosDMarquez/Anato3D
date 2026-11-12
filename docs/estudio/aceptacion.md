@@ -18,7 +18,7 @@ Los 26 escenarios obligatorios de la especificación (prompt maestro, sección 2
 | **Humana** | Necesita una persona: un móvil físico, un lector de pantalla o la revisión de un especialista. |
 | **Bloqueado** | Depende de una decisión o credencial externa (se dice cuál). |
 
-**Resultado de las comprobaciones:** `npm test` da **148 pruebas, 148 correctas** *[Histórico: 145 antes de la documentación del paso 11, que añadió tres]*; `npm run check` («todo correcto»: fichas, textos en cinco idiomas, biblioteca de 71 lecciones sin errores ni avisos, inventario de Neuri al día); `vite build` sin errores. Citas de la biblioteca: **3068 comprobadas en 286 páginas, 0 sin encontrar** (`node scripts/biblioteca/fuentes.mjs comprobar`).
+**Resultado de las comprobaciones:** `npm test` da **165 pruebas, 165 correctas** *[Histórico: 148 antes de los recorridos por unidades, que añadieron 17; 145 antes de la documentación del paso 11, que añadió tres]*; `npm run check` («todo correcto»: fichas, textos en cinco idiomas, biblioteca de 71 lecciones sin errores ni avisos, inventario de Neuri al día); `vite build` sin errores. Citas de la biblioteca: **3068 comprobadas en 286 páginas, 0 sin encontrar** (`node scripts/biblioteca/fuentes.mjs comprobar`).
 
 **Prueba real con Haiku: no hecha.** No hay clave de API en `web/.env.local` y la prueba gasta dinero: necesita el permiso de Carlos (`npm run pet:prueba` y `npm run pet:prueba -- --crear`).
 
@@ -80,6 +80,21 @@ Invitado → estudio → generación → evaluación → repaso → cuenta → c
 | Requisitos circulares | ✅ | «requisitos circulares: el orden termina, incluye todas y no repite ninguna». |
 | Permisos | 🟡 | Mismo origen en el servidor; la cola de reportes no se puede leer desde la web; revisar exige `--revisor`; una lección de Neuri nunca puede figurar como revisada (ni importada). Permisos por cuenta: bloqueado (sin cuentas). |
 
+## Petición extensa: un recorrido por unidades (sección 14)
+
+«Para peticiones extensas, crea un recorrido dividido en unidades y desarrolla bloques manejables. Cada unidad disponible debe estar completa; el resto debe figurar con su estado real.» No es uno de los 26 escenarios, pero se comprobó igual. En el navegador, con la IA simulada y el servidor de una copia aparte (puerto 5181).
+
+| Caso | Estado | Evidencia |
+| --- | --- | --- |
+| Pide un curso entero | ✅ simulada · ⬜ real | **Automática (simulada)**: «orientar: «créame un curso…» llega como propuesta de recorrido…», «planificar un recorrido: unidades revisadas (de 2 a 8, sin repetir y con objetivo)…», «recorrido: «créame un curso…» planifica las unidades y crea solo la primera…». **Navegador (IA simulada)**: «Créame un curso del miembro superior» → cuatro unidades → la primera se crea sola hasta «Lista para estudiar»; las demás esperan. **Real**: pendiente de la prueba con Haiku. |
+| Cada unidad, completa y de una en una | ✅ simulada | **Automática (simulada)**: «una unidad se planifica sola…», «recorrido: de una en una; «todas» van en cola, nunca en paralelo…». Cada unidad es una creación como las demás: plan, redacción, comprobación de citas y guardado en Mis lecciones. **Navegador (IA simulada)**: «Crear las 3 que faltan, una tras otra» → una en marcha, con su etapa real, y las demás «En cola» (captura 18 del manual). |
+| El resto, con su estado real | ✅ simulada | **Automática (simulada)**: «recorrido: cada unidad dice su estado real (sin guardar, interrumpida, error, cancelada, lección quitada)…», «recorrido: al recargar, la unidad en preparación se retoma sin repetirla…». **Navegador (IA simulada)**: cancelada; con error e «Intentarlo de nuevo»; «En preparación» dice «Unidad 3 de 3 de «Miembro superior»». |
+| Sin sitio en Mis lecciones | ✅ | **Automática (simulada)**: «recorrido: si no cabe en «Mis lecciones», la unidad no empieza (ni gasta) y lo dice…». |
+| Cambiar el recorrido | ✅ simulada | **Automática (simulada)**: «cambiar un recorrido: lo creado se conserva con sus textos…», «recorrido: cambiarlo conserva lo creado…». **Navegador (IA simulada)**: «quita los músculos del brazo y los nervios y añade la mano» → se conservan las unidades creadas, entra «La mano» y un aviso dice qué salió; sus lecciones siguen en Mis lecciones (4 de 4). |
+| Quitar el recorrido | ✅ | **Automática (simulada)**: «recorrido: quitarlo no borra sus lecciones…». **Navegador**: la confirmación pone el foco en «Quitar solo el recorrido»; las lecciones se quedan (5 de 5). Quitarlas también es un botón aparte que avisa de que no se puede deshacer. Mis recorridos: captura 19 del manual. |
+| Sin IA | ✅ | **Automática**: «sin IA: «créame un curso…» dice que crear necesita la IA y busca lo que hay de ese tema». **Navegador**: sin botones para crear ni para cambiar, y con el aviso. |
+| Guardado, Mis datos e idiomas | ✅ | **Automática**: «recorrido: guardado versionado…», «Mis datos: los recorridos se exportan, se importan sin duplicar…», «textos de los recorridos: en los cinco idiomas y, en francés, siempre de «vous»». **Navegador**: francés, móvil a 375 px sin desbordes y «Mis datos» con los recorridos. |
+
 ## Fallos encontrados al hacer estas pruebas (y corregidos)
 
 1. En el móvil con el teclado abierto, la conversación de Neuri quedaba en una franja de 18 px.
@@ -97,4 +112,7 @@ Invitado → estudio → generación → evaluación → repaso → cuenta → c
 13. Al desactivar las estadísticas se borraban los eventos, pero se quedaba el seudónimo. Ahora se borra también, y al reactivarlas se crea otro, con prueba.
 14. El registro técnico del servidor no anotaba la duración de cada llamada ni a qué creación pertenecía. Ahora sí, sin textos de la conversación, con prueba.
 
-Los fallos 8 a 14 se encontraron al documentar y medir (paso 11), después de los recorridos de arriba.
+15. En «Mis lecciones», el apartado «En preparación» no se actualizaba mientras una creación avanzaba o terminaba: solo se repintaba la portada de «Estudiar».
+16. El título del plan de una creación salía a 12 px, porque una regla general de los títulos del panel lo pisaba.
+
+Los fallos 8 a 14 se encontraron al documentar y medir (paso 11), después de los recorridos de arriba. Los fallos 15 y 16, al hacer los recorridos por unidades (sección 14); afectaban también a las creaciones de antes.

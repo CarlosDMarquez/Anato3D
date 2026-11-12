@@ -2,11 +2,13 @@
 // abrir, renombrar, pedir una adaptación (otra lección: la original no cambia), descargar y quitar (con confirmación);
 // exportar todas e importar un archivo (se combinan, sin borrar ninguna); y ver lo que se está preparando. Si había
 // lecciones guardadas que ya no se pueden abrir, están apartadas (sin borrar) para descargarlas o descartarlas.
+// Arriba, «Mis recorridos» (mis-recorridos.js): los recorridos por unidades, con el estado real de cada unidad.
 import { t, tn } from '../../i18n/idioma.js';
 import { tr } from '../../i18n/contenido.js';
 import { esc, icono, tarjetaLeccion, fechaDia, descargarArchivo, hoyISO } from './comun.js';
 import { enlazarTarjetas } from './explorar.js';
 import { htmlPreparacion, enlazarPreparacion } from './preparacion.js';
+import { htmlMisRecorridos, enlazarMisRecorridos } from './mis-recorridos.js';
 import { MAX_PROPIAS, MAX_TITULO } from '../../biblioteca/propias.js';
 
 export function renderMisLecciones(ctx, { foco = null, aviso = null } = {}) {
@@ -21,9 +23,11 @@ export function renderMisLecciones(ctx, { foco = null, aviso = null } = {}) {
     const base = completa?.origen?.base && ctx.porId.get(completa.origen.base);
     const de = completa?.origen?.modo === 'adaptar' && base ? t('pet.misAdaptadaDe', { base: tr(base.titulo), fecha: fechaDia(completa.origen.fecha) }) : t('pet.misCreada', { fecha: fechaDia(completa?.origen?.fecha) });
     const titulo = tr(L.titulo);
+    // Si es una unidad de un recorrido personal, de cuál.
+    const unidad = ctx.neuri.recorridos.deLeccion(L.id);
     return `<li class="mis-item" data-id="${esc(L.id)}">
       ${tarjetaLeccion(L, ctx.estado(L, { ahora }), ctx.data.favoritos.includes(L.id), { compacta: true })}
-      <p class="mis-origen">${esc(de)}${completa?.origen?.tituloOriginal && completa.origen.tituloOriginal !== completa.titulo ? ` · ${esc(t('pet.misTituloOriginal', { titulo: completa.origen.tituloOriginal }))}` : ''}</p>
+      <p class="mis-origen">${esc(de)}${unidad ? ` · ${esc(t('pet.rec.unidadDe', { n: unidad.n, total: unidad.total, titulo: unidad.recorrido.titulo }))}` : ''}${completa?.origen?.tituloOriginal && completa.origen.tituloOriginal !== completa.titulo ? ` · ${esc(t('pet.misTituloOriginal', { titulo: completa.origen.tituloOriginal }))}` : ''}</p>
       <div class="mis-item-acc" role="group" aria-label="${esc(t('pet.misAccionesDe', { titulo }))}">
         <button class="link" type="button" data-renombrar>${icono('pencil')}<span>${esc(t('pet.renombrar'))}</span></button>
         <button class="link" type="button" data-adaptar>${icono('sparkles')}<span>${esc(t('pet.pedirAdaptacion'))}</span></button>
@@ -71,6 +75,7 @@ export function renderMisLecciones(ctx, { foco = null, aviso = null } = {}) {
           <button class="btn danger" type="button" data-descartar-si>${esc(t('pet.descartarSi'))}</button>
           <button class="btn" type="button" data-descartar-no>${esc(t('estudio.cancelar'))}</button></div></div>
       </div>` : ''}
+      <div id="mis-rec">${htmlMisRecorridos(ctx)}</div>
       <div id="mis-prep">${htmlPreparacion(ctx)}</div>
       ${entradas.length ? `<ul class="mis-lista">${entradas.map(item).join('')}</ul>` : `<p class="bib-vacio">${esc(t('pet.misVacio'))}</p>`}
     </section>`;
@@ -82,7 +87,8 @@ export function renderMisLecciones(ctx, { foco = null, aviso = null } = {}) {
   enlazarTarjetas(ctx, body);
   body.querySelector('[data-neuri]').addEventListener('click', () => ctx.neuri.abrir());
   enlazarPreparacion(ctx, body.querySelector('#mis-prep'), () => repintar({ foco: '#mis-h' }));
-  // Lo que se prepara avanza solo: se repinta esa parte (sin mover el foco).
+  enlazarMisRecorridos(ctx, body.querySelector('#mis-rec'), { repintar, decir });
+  // Lo que se prepara avanza solo: se repintan esas partes (sin mover el foco).
   ctx.repintarPropias = () => {
     const cont = ctx.vista.tipo === 'propias' && body.querySelector('#mis-prep');
     if (!cont) return;
@@ -92,6 +98,15 @@ export function renderMisLecciones(ctx, { foco = null, aviso = null } = {}) {
     cont.innerHTML = htmlPreparacion(ctx);
     enlazarPreparacion(ctx, cont, () => repintar({ foco: '#mis-h' }));
     if (dentro) (cont.querySelector(`[data-ver-trabajo="${CSS.escape(dentro)}"]`) ?? body.querySelector('#mis-h'))?.focus({ preventScroll: true });
+    // Los recorridos: el foco vuelve al mismo botón (por sus atributos) si sigue, o al título de la sección.
+    const rec = body.querySelector('#mis-rec');
+    const activo = rec.contains(document.activeElement) ? document.activeElement : null;
+    // (Con una confirmación abierta no se repinta: se perdería lo que la persona está decidiendo.)
+    if (rec.querySelector('.mis-confirmar-rec:not([hidden]), .mis-confirmar-rec-apartados:not([hidden])')) return;
+    const clave = activo && [...activo.attributes].find((a) => a.name.startsWith('data-'));
+    rec.innerHTML = htmlMisRecorridos(ctx);
+    enlazarMisRecorridos(ctx, rec, { repintar, decir });
+    if (activo) ((clave && rec.querySelector(`[${clave.name}="${CSS.escape(clave.value)}"]`)) || rec.querySelector('#mis-rec-h') || body.querySelector('#mis-h'))?.focus({ preventScroll: true });
   };
 
   // Exportar e importar
