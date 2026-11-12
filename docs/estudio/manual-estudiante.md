@@ -64,7 +64,7 @@ Los filtros activos se ven arriba y se quitan uno a uno o con **Quitar todos**. 
    - **Vista aislada**: solo lo del paso;
    - **Restaurar**: vuelve a la vista del paso si moviste el modelo.
 
-   «En el modelo» lista las estructuras del paso. Si el modelo no tiene una pieza, la lección lo dice y adapta la actividad.
+   «En el modelo» lista las estructuras del paso. Si el modelo no tiene una pieza, la lección lo dice y adapta la actividad. Si una pieza tiene un error conocido en el modelo, el paso lo avisa en ámbar (ver «Limitaciones conocidas»).
 2. **Las fuentes:**
    - cada afirmación lleva la frase de la fuente que la respalda, en su idioma original y comprobada palabra por palabra;
    - ábrelas en **Fuentes de este paso**;
@@ -73,7 +73,8 @@ Los filtros activos se ven arriba y se quitan uno a uno o con **Quitar todos**. 
 4. **La evaluación:**
    - al terminar, **Evaluarme ahora**;
    - las preguntas son de identificar en 3D, localizar, relaciones, función, comparación y orden, sin pistas que revelen la respuesta;
-   - el resultado se da por objetivo. Hay **aprendizaje demostrado** con el 80 % o más y algún acierto en cada objetivo.
+   - el resultado se da por objetivo. Hay **aprendizaje demostrado** con el 80 % o más y algún acierto en cada objetivo;
+   - no se hacen las preguntas que piden en el modelo una pieza con un error conocido. El resultado dice cuántas fueron y, si un objetivo se queda sin ninguna, lo marca «sin evaluar».
 5. **Practicar:**
    - repaso de hoy, repaso de errores, identificación en 3D sin etiquetas o una sesión según tu tiempo;
    - en repasos y prácticas, una estructura que ya reconociste se pide **escribiendo su nombre**. Si lo escrito se parece pero no coincide, te compararás con la respuesta y contará como duda. **Prefiero ver opciones** y **No lo sé** siempre están disponibles.
@@ -289,6 +290,17 @@ El detalle técnico está en `docs/estudio/contratos-datos.md`.
 - Las 71 lecciones son **borradores** que nadie ha revisado todavía: las redactó una IA a partir de fuentes citadas.
 - El contenido de las 69 lecciones nuevas está solo en español. Brazo y antebrazo están en cinco idiomas, traducidos con IA y sin revisar.
 - Hay huecos de la anatomía sin lección: `docs/estudio/cobertura.md` los cuenta.
+
+**Modelo 3D:**
+- Tres piezas tienen errores conocidos:
+  - el surco paracentral está fuera de sitio;
+  - el surco temporal inferior tiene un nombre dudoso;
+  - la arteria meníngea media está incompleta.
+
+  Su ficha lo avisa en ámbar, con la explicación y las fuentes.
+- Las dos primeras no se usan para preguntarte en el modelo ni como opción falsa. Tus respuestas antiguas sobre ellas se guardan, pero no cuentan ni vuelven al repaso.
+- Si por eso un objetivo de una lección se queda sin preguntas, la evaluación lo dice y no da la lección por demostrada.
+- Solo se han examinado estas tres piezas: puede haber otros errores. Si ves uno, usa «Reportar un problema».
 
 **Neuri:**
 - Usa Claude Haiku 5.5 y puede equivocarse: el contenido con fuentes está en las lecciones.

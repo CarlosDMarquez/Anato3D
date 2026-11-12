@@ -380,6 +380,7 @@ export function crearNeuri(ctx, panel) {
       return `<div class="neuri-tarjeta neuri-gen ${ok ? 'ok' : 'mal'}" data-trabajo="${esc(x.id)}">
         <p class="neuri-tarjeta-t">${icono(ok ? 'check' : 'info')}<span>${esc(ok ? t('pet.estado.guardada') : t('pet.noGuardadaTitulo', { titulo: x.titulo }))}</span></p>
         ${x.mensaje && ok ? `<div class="neuri-globo neuri-globo-in">${parrafos(x.mensaje)}</div>` : ''}
+        ${inf?.limitesModelo ? `<p class="neuri-informe">${esc(tn('pet.limite.quitadas', inf.limitesModelo))}</p>` : ''}
         ${inf ? `<p class="neuri-informe">${esc(t('pet.informe', { pasos: inf.pasos, preguntas: inf.preguntas, citas: inf.citas }))}${inf.quitadas ? `. ${esc(tn('pet.informeQuitadas', inf.quitadas))}` : ''}</p>` : ''}
         ${ok && L ? `<div class="neuri-recs">${tarjetaLeccion(L, ctx.estado(L), fav(L.id), { compacta: true })}</div>
           <div class="neuri-acciones"><button class="btn primary" type="button" data-abrir-leccion="${esc(L.id)}">${esc(t('pet.abrirLeccion'))}</button>

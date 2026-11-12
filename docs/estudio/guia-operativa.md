@@ -73,6 +73,7 @@ La consola dice el coste de cada llamada.
 | `npm run check` | Fichas, textos en cinco idiomas, biblioteca (formato, citas comprobadas, catálogo y cobertura al día) e inventario de Neuri | «todo correcto» |
 | `npm run fuentes -- comprobar` | Cada cita de cada lección, palabra por palabra, en su página guardada | 3068 citas en 286 páginas, 0 sin encontrar |
 | `npm run build` | Que la versión de producción se construye | Sin errores |
+| `node scripts/limitaciones.mjs --citas` | Las citas del registro de limitaciones del modelo, en la revisión de Wikipedia que indican (necesita red) | 7 de 7 (rama `claude/limitaciones-modelo`) |
 
 Las pruebas manuales de los recorridos y su evidencia están en `docs/estudio/aceptacion.md`.
 
@@ -103,6 +104,33 @@ Lo que depende de la versión:
 **Las lecciones de Neuri no pueden marcarse como revisadas:** la app lo impide, también al importarlas.
 
 El paquete para la revisión docente está en `docs/estudio/revision-docente.md`.
+
+### Limitaciones conocidas del modelo 3D
+
+El registro está en `src/data/limitaciones.js`. Qué es, dónde actúa y por qué se explica en
+`docs/estudio/limitaciones-modelo.md`.
+
+**Añadir una:**
+1. **Reproducirla** en los dos modelos y los dos lados con `docs/revision/limitaciones-modelo/medir-limitaciones.js`, que
+   se pega en la consola del navegador con la app abierta. Anotarla en `hallazgos.md` con capturas y el blob de git de
+   los archivos.
+2. **Añadir la entrada**, con:
+   - tipo, estado, fecha, recurso y evidencia;
+   - lo que restringe;
+   - el aviso y el detalle en cinco idiomas;
+   - fuentes reales: Wikipedia en una revisión fija, con citas literales.
+3. **Comprobar** con `npm run check` (que las piezas existan en los modelos y que los textos estén completos),
+   `node scripts/limitaciones.mjs --citas` y `npm test`.
+4. **Publicar.** Es código, como `retiradas.js`.
+
+**Retirarla** cuando se corrija la geometría:
+- volver a medir y anotar «no reproducido en la versión…»;
+- quitar la entrada, o reducir lo que restringe.
+
+El progreso no se toca: lo que se había apartado se recupera solo.
+
+**Si se reconstruye un modelo,** hay que volver a medir las piezas registradas y actualizar `recurso`. `npm run check`
+solo detecta que una pieza haya cambiado de nombre o desaparecido.
 
 ## 5. Reportes de problemas y retirada de contenido
 

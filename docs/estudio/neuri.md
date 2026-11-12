@@ -92,6 +92,19 @@ Lo que decide el modelo y lo que pone la app están separados:
 
   La revisión siempre queda como «borrador», sin revisor.
 - **Explicaciones:** en Orientar, una explicación solo puede usar las evidencias que se le dan. Otra llamada comprueba que la respaldan. Si no (o si no se puede comprobar), la explicación se retira y la app enseña solo las frases de la biblioteca con sus citas.
+- **Limitaciones conocidas del modelo 3D** (desde el 9 de noviembre de 2026, rama `claude/limitaciones-modelo`; ver
+  `limitaciones-modelo.md`):
+  - **Qué le llega a Neuri:** una nota corta, solo de las estructuras que trata. En Orientar, de las que nombra la
+    persona (en su último mensaje, en los anteriores o en el tema que se conserva, en los cinco idiomas); al planificar,
+    en cada candidata limitada; al redactar y adaptar, las del plan y de la lección base. Las notas van en la parte
+    variable de cada llamada, no en las instrucciones fijas que se guardan en caché.
+  - **Qué hace la app:** el ensamblado (`server/neuri/ensamblar.mjs`) quita de forma determinista las preguntas de
+    identificar o localizar y la actividad «localizar» sobre una pieza limitada; nunca cambia esa actividad por otra
+    estructura. Nunca la ofrece como candidata ni como opción falsa.
+  - **Qué ve la persona:** el informe de la creación dice, en su propio párrafo, cuántas actividades se quitaron
+    (`limitesModelo`); no se suman a las afirmaciones quitadas por sus citas.
+  - **Si algo se escapa:** `validarLeccion` lo trata como error, y la lección pasa por la ronda de corrección o no se
+    entrega.
 
 ## Creaciones que no se pierden
 

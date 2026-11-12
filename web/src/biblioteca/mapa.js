@@ -25,10 +25,11 @@ export const cuenta = (i) => CUENTAN.has(i.m) && ['acierto', 'duda', 'fallo'].in
 
 /**
  * El mapa. `catalogo`: lecciones del catálogo (para contar lecciones y no hablar de lo que ya no existe);
- * `invalida(intento)`: si un intento ya no vale (su pregunta se corrigió o se retiró).
+ * `invalida(intento)`: si un intento ya no vale (su pregunta se corrigió o se retiró); `estado(L)`: el estado de una
+ * lección como lo enseñan las tarjetas (en la app, ctx.estado, que tiene en cuenta las limitaciones del modelo).
  * Devuelve { habilidades, lecciones, dificultades, repasos, tecnicos }.
  */
-export function calcularMapa(data, { catalogo = [], ahora = Date.now(), invalida = () => false } = {}) {
+export function calcularMapa(data, { catalogo = [], ahora = Date.now(), invalida = () => false, estado = null } = {}) {
   const existe = new Set(catalogo.map((L) => L.id));
   // `invalida(i)`: intentos de preguntas que se corrigieron o retiraron (no cuentan contra el estudiante).
   const intentos = (data.intentos ?? []).filter((i) => existe.has(i.l) && !invalida(i));
@@ -51,7 +52,7 @@ export function calcularMapa(data, { catalogo = [], ahora = Date.now(), invalida
   // Lecciones: visitadas, terminadas, con aprendizaje demostrado y consolidadas (cada cosa por separado).
   const lecciones = { visitadas: 0, completadas: 0, demostradas: 0, dominadas: 0 };
   for (const L of catalogo) {
-    const e = P.estadoLeccion(data, L, { ahora }).estado;
+    const e = (estado ? estado(L) : P.estadoLeccion(data, L, { ahora })).estado;
     if (e !== 'sin-empezar') lecciones.visitadas++;
     if (['completada', 'demostrada', 'dominada'].includes(e)) lecciones.completadas++;
     if (['demostrada', 'dominada'].includes(e)) lecciones.demostradas++;

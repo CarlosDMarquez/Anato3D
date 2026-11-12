@@ -3,6 +3,7 @@
 // Las descripciones de las fichas y el módulo de estudio siguen solo en español (ficha.soloEs, estudio.soloEs).
 import { TEXTOS_BIBLIOTECA, ETIQUETAS_BIBLIOTECA } from './textos-biblioteca.js';
 import { TEXTOS_PET } from './textos-pet.js';
+import { TEXTOS_LIMITACIONES } from './textos-limitaciones.js';
 
 export const TEXTOS = {
   'doc.titulo': {
@@ -412,6 +413,7 @@ export const TEXTOS = {
   'estudio.volverModulo': { es: 'Volver al módulo', en: 'Back to the module', de: 'Zurück zum Modul', fr: 'Retour au module', it: 'Torna al modulo' },
   ...TEXTOS_BIBLIOTECA,
   ...TEXTOS_PET,
+  ...TEXTOS_LIMITACIONES,
 };
 
 // Etiquetas cortas que el código ya da en español (sistemas y capas de systems.js; tipo de pieza, lado y tejido de

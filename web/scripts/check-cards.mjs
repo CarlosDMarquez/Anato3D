@@ -16,6 +16,7 @@ import { ETIQUETAS, ETIQUETAS_PATRON } from '../src/i18n/textos.js';
 import { MODULOS } from '../src/content/index.js';
 import { revisarFicha, revisarModulo, GENERICOS } from '../src/content/schema.js';
 import { FUENTES } from '../src/content/fuentes.js';
+import { LIMITACIONES, revisarLimitaciones } from '../src/data/limitaciones.js';
 
 // --models <carpeta>: revisa otra carpeta (build_all.sh revisa así el candidato antes de publicarlo).
 const flag = process.argv.indexOf('--models');
@@ -82,6 +83,12 @@ for (const model of only > 0 ? [process.argv[only + 1]] : ['male', 'female']) {
     console.log(`  ${k}: ${v.length} — ${[...new Set(v.map((s) => s.replace(/_[LR]$/, '')))].slice(0, 12).join(', ')}`);
   }
 }
+// Limitaciones conocidas del modelo (src/data/limitaciones.js): cada pieza existe en los modelos revisados, con sus
+// textos en los cinco idiomas. Si un modelo reconstruido cambia el nombre de una pieza registrada, falla aquí.
+const problemasLimites = revisarLimitaciones(LIMITACIONES, { piezasDe: (m) => nombres[m] ?? null });
+console.log(`limitaciones conocidas del modelo: ${LIMITACIONES.length} (${LIMITACIONES.map((l) => `${l.piezas.join('+')}: ${l.tipo}, ${l.estado}`).join('; ')})`);
+for (const p of problemasLimites) console.log(`  ${p.nivel}: ${p.texto}`);
+fallos += problemasLimites.filter((p) => p.nivel === 'error').length;
 // Contenido de estudio.
 for (const modulo of MODULOS) {
   const ids = new Set(modulo.estructuras.map((f) => f.id));

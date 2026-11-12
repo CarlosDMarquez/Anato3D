@@ -199,7 +199,7 @@ kbd { display: inline-block; min-width: 22px; padding: 2px 6px; border-radius: 5
 .pop-list button.current .step { border-color: var(--accent); background: var(--accent); color: #04111f; }
 .pop-list small { margin-left: auto; font-size: 11px; color: var(--muted); }
 .tooltip { position: fixed; top: 0; left: 0; padding: 4px 9px; border-radius: 6px; background: rgba(9, 12, 16, 0.88); border: 1px solid var(--line); font-size: 12.5px; color: var(--text); pointer-events: none; z-index: 15; white-space: nowrap; }
-.toast { position: fixed; left: 50%; bottom: 112px; transform: translate(-50%, 6px); padding: 7px 14px; border-radius: 8px; background: rgba(9, 12, 16, 0.92); border: 1px solid var(--line-strong); font-size: 13px; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 15; white-space: nowrap; }
+.toast { position: fixed; left: 50%; bottom: 112px; transform: translate(-50%, 6px); padding: 7px 14px; border-radius: 8px; background: rgba(9, 12, 16, 0.92); border: 1px solid var(--line-strong); font-size: 13px; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; z-index: 15; width: max-content; max-width: min(560px, calc(100vw - 24px)); text-align: center; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 /* Aviso con acción (p. ej. «Reintentar»): admite clics, puede ocupar dos líneas y no caduca solo. */
 .toast.actionable { pointer-events: auto; display: flex; align-items: center; gap: 12px; white-space: normal; max-width: min(560px, calc(100vw - 24px)); width: max-content; }
@@ -419,6 +419,16 @@ body.saliendo .start { opacity: 0; }
 /* En otro idioma, el contenido traducido con IA lo dice (ficha y panel Estudiar). */
 .info-traduccion, .study-aviso { margin: 14px 0 0; font-size: 11px; line-height: 1.5; color: var(--muted); }
 .study-aviso { margin: 0 0 12px; }
+/* Limitaciones conocidas del modelo (src/data/limitaciones.js): en la cabecera de la ficha, visible aunque esté plegada,
+   y en los pasos y preguntas de «Estudiar»; la explicación, en el cuerpo de la ficha. */
+.aviso-limite { display: flex; gap: 8px; align-items: flex-start; margin: 12px 0 0; padding: 9px 11px; border-radius: 10px; border: 1px solid rgba(240, 180, 80, 0.3); background: rgba(240, 180, 80, 0.06); font-size: 12.5px; line-height: 1.5; color: var(--text-2); }
+.aviso-limite > .ui-icon { width: 15px; height: 15px; flex: none; margin-top: 2px; color: #f0c27a; }
+.aviso-limite b { font-weight: 600; color: var(--text); }
+.aviso-limite > div > p { margin: 0; }
+.aviso-limite .limite-mas summary { margin-top: 4px; cursor: pointer; font-size: 12px; color: var(--muted); }
+.aviso-limite .limite-mas p { margin: 6px 0 0; }
+.info-body .limite-detalle p { font-size: 13.5px; }
+.info-body .limite-detalle .limite-estado { margin-top: 6px; font-size: 11px; line-height: 1.5; color: var(--muted); }
 
 /* ── Biblioteca de estudio (ui/biblioteca/) ───────────────────
    El panel «Estudiar» se ensancha para el catálogo (.ancho) y vuelve a su ancho para las lecciones y las preguntas,
@@ -589,6 +599,7 @@ body.saliendo .start { opacity: 0; }
 .bib-objetivos li { display: flex; gap: 10px; justify-content: space-between; padding: 6px 8px; border-radius: 7px; background: var(--raise); font-size: 12.5px; color: var(--text-2); }
 .bib-objetivos li.ok b { color: #8fe0b3; }
 .bib-objetivos li.bad b { color: #ffb3b3; }
+.bib-objetivos li.sin-evaluar small { color: #f0c27a; }
 .step-title .ui-icon { width: 18px; height: 18px; vertical-align: -3px; color: #8fe0b3; }
 @media (max-width: 760px) {
   /* En el móvil, el catálogo ocupa la pantalla (entre la barra de arriba y la de sistemas) y la lección vuelve a la hoja

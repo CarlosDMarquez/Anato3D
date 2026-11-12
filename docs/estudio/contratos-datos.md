@@ -37,6 +37,7 @@ Qué datos hay, dónde viven, quién puede cambiarlos, con qué versión y qué 
 | Fuentes | Generado | `web/src/biblioteca/generado/fuentes.json` | `huella` de cada página | `node scripts/biblioteca/fuentes.mjs` |
 | Recorridos y módulos | Código | `web/src/biblioteca/recorridos.js` | — | Quien edita el contenido |
 | Contenido retirado | Código | `web/src/biblioteca/retiradas.js` | — | Quien revisa, con `npm run reportes -- retirar` (y publicar) |
+| Limitaciones conocidas del modelo 3D | Código | `web/src/data/limitaciones.js` | `comprobada` (fecha) y `recurso` (archivo de cada modelo) de cada entrada | Quien comprueba el modelo, con `npm run check` (y publicar); ver `limitaciones-modelo.md` |
 | Progreso, intentos, repasos, sesiones, preferencias y plan de examen | Navegador | `anato3d.biblioteca` (localStorage) | 2 | La persona, al estudiar |
 | Progreso de la versión 1 | Navegador | `anato3d.progreso` | 1 | Nadie (solo se lee para migrar) |
 | Mis lecciones | Navegador | `anato3d.propias` | — (cada lección valida su forma) | La persona, con Neuri |
@@ -116,7 +117,7 @@ El filtro de idioma y la etiqueta de la tarjeta usan `idiomas`.
 
 ```
 { version: 2,
-  lecciones: { [id]: { version, paso, vistos, completada, actividad, evaluaciones: [{ fecha, aciertos, total, porObjetivo, demostrada }] } },
+  lecciones: { [id]: { version, paso, vistos, completada, actividad, evaluaciones: [{ fecha, aciertos, total, porObjetivo, demostrada, sinEvaluar? }] } },
   items:     { [leccion/pregunta]: { caja, aciertos, fallos, dudas, ultimo, proximo, qh?, aplazado?, huerfana? } },
   favoritos: [ids], sesiones: [{ fecha, tipo, aciertos, total }],
   intentos:  [{ f, l, v, q, t, h, o, e, r, x, d, m, qh?, a? }],
@@ -133,6 +134,13 @@ Cuatro cosas distintas:
 - **aprendizaje demostrado:** una evaluación con el 80 % o más y algún acierto en cada objetivo;
 - **dominio a largo plazo:** todas sus preguntas en la caja 3 o más del repaso.
 
+**Limitaciones del modelo:** las preguntas que el modelo 3D no permite hacer (ver `limitaciones-modelo.md`) no entran en la
+evaluación ni cuentan para el dominio.
+- Si a un objetivo no le queda ninguna, su índice se guarda en `sinEvaluar`. Esa evaluación no demuestra la lección y,
+  mientras dure la limitación, tampoco hay dominio.
+- Si una pregunta no se puede mostrar a mitad de la evaluación, queda como intento `tecnico`. El evento `error_tecnico`
+  lleva entonces el código `limite-modelo`, y no `pregunta-no-mostrable`.
+
 Abrir o leer no cuenta como comprensión.
 
 ### Repaso espaciado (Leitner)
@@ -142,7 +150,9 @@ Abrir o leer no cuenta como comprensión.
 - **Acierto con duda:** se queda donde estaba.
 - **Fallo o «no lo sé»:** vuelve a la 0.
 - **`aplazado`:** la persona pidió no verla hasta una fecha (de 1 a 30 días).
-- **`huerfana`:** su pregunta ya no existe o está retirada. No cuenta, pero se conserva por si vuelve.
+- **`huerfana`:** su pregunta ya no existe, está retirada o pide en el modelo 3D una pieza con una limitación conocida
+  (`motivoNoDisponible` da `'limitacion'` con el modelo en uso). No cuenta, pero se conserva por si vuelve: al retirar la
+  limitación, se recupera sola la próxima vez que se abra la lección.
 
 ### Intento
 

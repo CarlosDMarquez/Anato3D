@@ -53,6 +53,22 @@ Los 26 escenarios obligatorios de la especificación (prompt maestro, sección 2
 | 25 | Móvil con el teclado abierto | Puede escribir y usar las acciones | ✅ emulado · ⬜ humana | **Navegador (375×430, como con el teclado abierto)**: se encontró que la conversación quedaba en 18 px y se corrigió (barra de sistemas oculta y cabecera compacta: 182 px de conversación; enviar visible y activo). Con un móvil físico: pendiente. |
 | 26 | Teclado y lector de pantalla | Comprende estados y completa acciones | 🟡 | **Navegador**: Enter en las acciones, foco visible, el foco no se pierde cuando una creación cambia de etapa (se corrigió), anuncios en una región `aria-live`, todos los controles nuevos con nombre accesible. Con un lector de pantalla real: pendiente (humana). |
 
+### Limitaciones conocidas del modelo (9 nov 2026, noche)
+
+Estos casos no son de la especificación: los pidió la ronda 1 del bucle con ChatGPT. Se probaron en la rama
+`claude/limitaciones-modelo`, y el detalle está en `limitaciones-modelo.md`.
+
+| Caso | Resultado esperado | Estado | Evidencia |
+| --- | --- | --- | --- |
+| Abrir desde el buscador la ficha de una pieza limitada | Aviso visible en la cabecera; explicación con estado, fecha y fuentes | ✅ | **Navegador:** `Paracentral_sulcus`, en escritorio y en el móvil con la ficha plegada, en los cinco idiomas. **Automática:** `npm run check` valida que el registro tenga los cinco idiomas y fuentes. |
+| Evaluar una lección con la pieza en el núcleo | No se pregunta ni se ofrece como opción; la ficha y el resultado lo explican | ✅ | **Navegador (Neuri simulado):** la ficha de la lección dice «1 pregunta en 3D… no se hace»; 4 preguntas sin la pieza ni su nombre; nota en el resultado. **Automática:** `limitaciones.test.mjs`. |
+| Un fallo antiguo sobre la pieza | Se conserva sin contar y no vuelve al repaso | ✅ | **Navegador:** el ítem queda huérfano y «Repasar ahora» baja de 4 a 3. **Automática.** |
+| Una estructura de varias piezas con una limitada | Sigue valiendo con las demás | ✅ | **Navegador:** se resalta y se toca sin la limitada, con el aviso de nombre dudoso en el paso. **Automática.** |
+| Neuri crea una lección con la pieza en el núcleo | Recibe la nota; quita las actividades en 3D sobre ella y el informe lo dice | ✅ simulada · ⛔ real | **Automática (simulada):** el informe da `limitesModelo: 3` y `quitadas: 0`; una actividad que pone primero la pieza limitada se quita, no se cambia de pieza; la validación rechaza lo que se escape. Real: falta la clave. |
+| Se nombra la pieza a Neuri en francés o en italiano, o en la pregunta siguiente | Recibe la nota igual | ✅ simulada | **Automática (simulada):** «sillon paracentral», «solco temporale inferiore», «artère méningée moyenne» y «¿Y dónde lo veo en el modelo 3D?» tras nombrarla. |
+| Se repasa en un modelo una lección que solo existe en el otro | El mensaje de siempre, sin culpar a las limitaciones | ✅ | **Automática:** los ítems siguen como antes y no se cuentan como limitaciones. Era una regresión; la encontró la revisión adversarial y está corregida. |
+| Una evaluación con un objetivo que no se puede evaluar | Con 4 de 4, el veredicto de la limitación; con 0 de 4, el de siempre y la nota aparte | ✅ | **Navegador:** las dos, con una lección propia simulada. |
+
 ## Recorrido completo (sección 30)
 
 Invitado → estudio → generación → evaluación → repaso → cuenta → continuidad.
