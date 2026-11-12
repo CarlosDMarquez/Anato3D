@@ -7,21 +7,23 @@
 //
 // Lo que la IA propone se comprueba aquí antes de que llegue a nadie:
 //  - Orientar: solo lecciones y recorridos que existen; una explicación solo con evidencias citadas.
-//  - Planificar: solo estructuras del inventario de los modelos; objetivos, pasos y duración según el formato.
+//  - Planificar: solo estructuras del inventario de los modelos; objetivos, pasos y duración según el formato. Un
+//    recorrido personal (lo que no cabe en una lección): de 2 a 8 unidades distintas, cada una el alcance de una
+//    lección que la app crea aparte; al cambiarlo, lo que ya existe se conserva tal cual.
 //  - Redactar y adaptar: la lección se ensambla en el formato de la biblioteca, pasa su revisor, cada cita es una frase
 //    literal de su fuente y otra llamada comprueba que cada cita respalda lo que se afirma (lo que no, se quita). Si
 //    queda algún error, una ronda de corrección; si sigue, no se entrega.
 // Protecciones: solo la propia web, tamaños y turnos limitados (src/pet/protocolo.js), límites de uso por dirección y
 // por hora, y nada de lo que escribe nadie se guarda ni se registra.
-import { VERSION, LIMITES, validarPeticion, limpiarRespuesta, limpiarPlan, ID_PROPIA } from '../src/pet/protocolo.js';
+import { VERSION, LIMITES, validarPeticion, limpiarRespuesta, limpiarPlan, limpiarRecorrido, ID_PROPIA } from '../src/pet/protocolo.js';
 import { RECORRIDOS } from '../src/biblioteca/recorridos.js';
 import { RETIRADAS } from '../src/biblioteca/retiradas.js';
 import { REGIONES, SISTEMAS, TEMAS, FORMATOS, SUBREGION_POR_ID, REGION_POR_ID } from '../src/biblioteca/taxonomia.js';
 import { frases, evidencias as evidenciasDe, objetivoObservable, TIPOS_PASO } from '../src/biblioteca/formato.js';
-import { crearBuscador } from '../src/biblioteca/buscar.js';
-import { ESPECIFICACION, APP, textoModo, esquemaOrientar, esquemaPlan, esquemaLeccion, esquemaVerificar, VERSION_INSTRUCCIONES } from './neuri/instrucciones.mjs';
+import { crearBuscador, normalizar } from '../src/biblioteca/buscar.js';
+import { ESPECIFICACION, APP, textoModo, esquemaOrientar, esquemaPlan, esquemaRecorrido, esquemaLeccion, esquemaVerificar, VERSION_INSTRUCCIONES } from './neuri/instrucciones.mjs';
 import { crearRegistro } from './neuri/trabajos.mjs';
-import { textoCatalogo, textoContexto, textoEvidencias, textoSolicitud, textoPlan, textoBase, mensajesApi } from './pet-prompt.mjs';
+import { textoCatalogo, textoContexto, textoEvidencias, textoSolicitud, textoPlan, textoBase, textoRecorridoBase, textoZona, mensajesApi } from './pet-prompt.mjs';
 import { llamar, crearCliente, elegirModelo, ErrorNeuri, MODELO_POR_DEFECTO } from './neuri/modelo.mjs';
 import { ensamblarLeccion, validarLeccion, afirmaciones, quitarNoRespaldadas, idLeccion } from './neuri/ensamblar.mjs';
 
@@ -139,7 +141,7 @@ export function crearManejador({
       const meta = c.f ? R.corpus.fuente(c.f) : null;
       return { cita: c.c ?? e.texto, texto: e.texto ?? null, f: c.f ?? '', titulo: meta?.titulo ?? '', url: meta?.url ?? null, licencia: meta?.licencia ?? '', leccion: e.leccion ?? null, paso: e.paso ?? null };
     });
-    const r = limpiarRespuesta(datos, { lecciones: idsL, recorridos: ids.recorridos });
+    const r = limpiarRespuesta(datos, { lecciones: idsL, recorridos: ids.recorridos, personales: new Set(p.recorridos.map((x) => x.id)) });
     if (!r) throw new ErrorNeuri('ia');
     // Una explicación sin evidencias no se presenta como tal: la app avisa de que no cita fuentes.
     if (r.tipo === 'explicacion' && !r.evidencias.length) r.aviso = 'sin-evidencia';
@@ -168,6 +170,7 @@ export function crearManejador({
 
   // ── Planificar ──
   async function planificar(p, signal = null) {
+    if (p.solicitud.accion === 'recorrido') return planificarRecorrido(p, signal);
     const R = await recursosListos();
     if (!R?.disponible) throw new ErrorNeuri('sin-recursos', 503);
     const s = p.solicitud;
@@ -219,6 +222,46 @@ export function crearManejador({
       tipo: 'plan', mensaje: String(datos.mensaje ?? '').slice(0, LIMITES.pet), plan, sugerencias: (datos.sugerencias ?? []).slice(0, LIMITES.sugerencias),
       estructuras: Object.fromEntries(plan.estructuras.map((e) => [e.clave, { nombre: R.inventario.nombre(e.clave, p.idioma), evidencias: evidencia[e.clave] }])),
       paginas: nuevas, modelo: usado,
+    };
+  }
+
+  // ── Planificar un recorrido personal: lo que no cabe en una lección, dividido en unidades ──
+  // Cada unidad es el alcance de una lección (título, objetivo, enfoque, nivel, minutos y términos para buscar): la app
+  // la crea después, cuando la persona lo decide, como cualquier lección (planificar → redactar → comprobar → guardar).
+  // Aquí no se redacta nada ni se gasta en las unidades: solo se reparte el tema.
+  async function planificarRecorrido(p, signal = null) {
+    const R = await recursosListos();
+    if (!R?.disponible) throw new ErrorNeuri('sin-recursos', 503);
+    const s = p.solicitud;
+    const base = s.recorrido_base ? p.baseRecorrido : null;
+    // Dónde está lo que se pide: las regiones que entiende el buscador de la biblioteca (o, si no hay, los sistemas).
+    const busquedas = [s.tema, `${s.tema} ${s.objetivo} ${s.enfoque}`, ...(s.terminos ?? []).slice(0, 6)].map((q) => buscadorTemas.buscar(q));
+    const regiones = [...new Set(busquedas.flatMap((f) => f.lugares.map((l) => l.region)))].slice(0, 3);
+    const sistemas = regiones.length ? [] : [...new Set(busquedas.flatMap((f) => f.materias.filter((m) => m.sistema).map((m) => m.sistema)))].slice(0, 2);
+    const variable = [
+      textoModo('recorrido', { idioma: p.idioma }), textoSolicitud(s), base ? textoRecorridoBase(base) : '',
+      textoZona(R.inventario, { regiones, sistemas }) || 'EN EL MODELO 3D, POR ZONA: no se reconoció una región concreta; usa las del catálogo y del modelo que encajen con la solicitud.',
+    ].filter(Boolean).join('\n\n');
+    const esquema = esquemaRecorrido({ lecciones: ids.lecciones });
+    const mensajes = [...mensajesApi(p.mensajes), { role: 'user', content: `[La persona pulsó «${base ? 'Cambiar el recorrido' : 'Planificar el recorrido'}» en la propuesta.]` }];
+    const opciones = { modelo: modeloLecciones, sistema: [fijo, variable], esquema, esfuerzo: 'medium', maxTokens: 6000, signal, plazoMs: PLAZO.planificar };
+    let { datos, modelo: usado } = await llamarClaude({ ...opciones, mensajes, etiqueta: 'planificar recorrido' });
+    const otro = (d) => ({ tipo: d.tipo === 'aclaracion' ? 'aclaracion' : 'limitacion', mensaje: String(d.mensaje ?? '').slice(0, LIMITES.pet), recorrido: null, sugerencias: (d.sugerencias ?? []).slice(0, LIMITES.sugerencias), modelo: usado });
+    if (datos.tipo !== 'recorrido' || !datos.recorrido) return otro(datos);
+    let rev = revisarRecorrido(datos.recorrido, { lecciones: ids.lecciones, base });
+    if (rev.errores.length) {
+      // Una ronda de corrección con los problemas concretos.
+      const correccion = [...mensajes, { role: 'assistant', content: JSON.stringify(datos) }, { role: 'user', content: `[La app encontró estos problemas en el recorrido: ${rev.errores.join(' · ')}. Devuelve el recorrido corregido completo.]` }];
+      ({ datos, modelo: usado } = await llamarClaude({ ...opciones, mensajes: correccion, etiqueta: 'planificar recorrido (corrección)' }));
+      if (datos.tipo !== 'recorrido' || !datos.recorrido) return otro(datos);
+      rev = revisarRecorrido(datos.recorrido, { lecciones: ids.lecciones, base });
+      if (rev.errores.length) return { tipo: 'limitacion', codigo: 'recorrido-invalido', errores: rev.errores.slice(0, 6), mensaje: '', recorrido: null, sugerencias: [], modelo: usado };
+    }
+    // (Sin títulos en el registro técnico: pueden decir algo de la persona.)
+    registro.info?.(`[pet] planificar recorrido: ${rev.recorrido.unidades.length} unidades${base ? ` (cambio; ${rev.recorrido.unidades.filter((u) => u.conserva).length} conservadas)` : ''}.`);
+    return {
+      tipo: 'recorrido', mensaje: String(datos.mensaje ?? '').slice(0, LIMITES.pet), recorrido: rev.recorrido, salen: rev.salen,
+      sugerencias: (datos.sugerencias ?? []).slice(0, LIMITES.sugerencias), instrucciones: VERSION_INSTRUCCIONES, modelo: usado,
     };
   }
 
@@ -424,6 +467,57 @@ export function revisarPlan(bruto, { candidatas, idioma = 'es' }) {
   }
   if (!(plan.minutos >= 3 && plan.minutos <= 45)) errores.push('duración fuera de 3–45 minutos');
   return { plan, errores };
+}
+
+/**
+ * Comprueba un recorrido personal: de 2 a 8 unidades con título (sin repetir) y objetivo, minutos razonables y solo
+ * lecciones relacionadas que existen. Al cambiar un recorrido (`base`, como lo manda la app), una unidad que se
+ * «conserva» es la misma de antes, con sus textos (el modelo no la reescribe); las ya creadas que no se conservan salen
+ * del recorrido, pero su lección sigue en «Mis lecciones» (`salen`: sus números de antes).
+ * Devuelve { recorrido (recortado), errores, salen }.
+ */
+export function revisarRecorrido(bruto, { lecciones = new Set(), base = null } = {}) {
+  const r = limpiarRecorrido(bruto);
+  if (!r) return { recorrido: null, errores: ['recorrido vacío o sin título'], salen: [] };
+  const errores = [];
+  if (Array.isArray(bruto.unidades) && bruto.unidades.length > LIMITES.unidades) errores.push(`demasiadas unidades (máximo ${LIMITES.unidades})`);
+  if (r.unidades.length < 2) errores.push('un recorrido necesita al menos 2 unidades (si cabe en una, es una lección)');
+  const titulos = new Set();
+  const conservadas = new Set();
+  // «conserva» solo vale al cambiar un recorrido; en uno nuevo no significa nada.
+  if (!base) for (const u of r.unidades) u.conserva = null;
+  else {
+    // Una unidad que ya existe (con lección o en preparación) y vuelve con el mismo título es la misma unidad, aunque el
+    // modelo olvidara «conserva»: así no se crea dos veces.
+    const existentes = new Map(base.unidades.map((b, i) => [normalizar(b.titulo), { b, n: i + 1 }]).filter(([, x]) => ['lista', 'sin-guardar', 'preparando'].includes(x.b.estado)));
+    const pedidas = new Set(r.unidades.map((u) => u.conserva).filter(Boolean));
+    for (const u of r.unidades) {
+      const x = !u.conserva && existentes.get(normalizar(u.titulo));
+      if (x && !pedidas.has(x.n)) { u.conserva = x.n; pedidas.add(x.n); }
+    }
+  }
+  r.unidades.forEach((u, i) => {
+    const n = i + 1;
+    const b = u.conserva ? base.unidades[u.conserva - 1] : null;
+    if (u.conserva && !b) { errores.push(`unidad ${n}: «conserva» ${u.conserva} no es ninguna unidad del recorrido que se cambia`); u.conserva = null; }
+    else if (u.conserva && conservadas.has(u.conserva)) { errores.push(`unidad ${n}: la unidad ${u.conserva} se conserva dos veces`); u.conserva = null; }
+    else if (b) {
+      conservadas.add(u.conserva);
+      // Lo que se conserva no lo reescribe el modelo: son los textos de la unidad de antes.
+      Object.assign(u, { titulo: b.titulo, objetivo: b.objetivo, enfoque: b.enfoque, nivel: b.nivel, minutos: b.minutos, terminos: b.terminos });
+    }
+    const clave = normalizar(u.titulo);
+    if (titulos.has(clave)) errores.push(`unidad ${n}: título repetido («${u.titulo}»)`);
+    titulos.add(clave);
+    if (!u.objetivo) errores.push(`unidad ${n}: sin objetivo`);
+    u.nivel = u.nivel ?? r.nivel;
+    // Cada unidad es una lección corta: entre 5 y 30 minutos (la duración final la decide el plan de la unidad).
+    u.minutos = Math.min(30, Math.max(5, u.minutos ?? 15));
+    u.relacionadas = u.relacionadas.filter((id) => lecciones.has(id));
+  });
+  // Las unidades que ya existían (lista, sin guardar o en preparación) y no siguen: salen del recorrido, no se borran.
+  const salen = base ? base.unidades.map((b, i) => (!conservadas.has(i + 1) && ['lista', 'sin-guardar', 'preparando'].includes(b.estado) ? i + 1 : null)).filter(Boolean) : [];
+  return { recorrido: r, errores, salen };
 }
 
 function errorEvento(err) {

@@ -17,6 +17,8 @@ const SALUDO = /^(hola|buenas|buenos dias|buenas tardes|hello|hi|hey|hallo|guten
 const CRISIS = /\b(suicid\w*|matarme|quitarme la vida|hacerme dano|autolesion\w*|no quiero vivir|kill myself|end my life|self harm|hurt myself|umbringen|selbstmord|mich verletzen|me tuer|me suicider|me faire du mal|uccidermi|togliermi la vita|farmi del male)\b/;
 // Pedir que se cree o adapte una lección: sin IA no se puede; se dice y se busca lo que hay del tema.
 const CREAR = /\b(crea|crear|creame|hazme|haz|genera|generar|prepara|preparame|adapta|adaptar|create|make|generate|adapt|erstelle|erstellen|mach|passe|cree|creer|adapte|creare|adatta|adattare|prepara)\b/;
+// Un curso o un recorrido entero (con IA, un recorrido personal por unidades): también es pedir que se cree.
+const CURSO = /\b(curso|cursos|course|courses|kurs|kurse|lehrgang|cours|corso|corsi)\b/;
 // El buscador reconoce «repasar» en español e inglés; aquí, también en los otros idiomas de la app.
 const REPASAR = /\b(repasar|repaso|repasemos|review|revise|wiederholen|wiederholung|reviser|revision|ripassare|ripasso)\b/;
 const NUMEROS = { cinco: 5, diez: 10, quince: 15, veinte: 20, treinta: 30, five: 5, ten: 10, fifteen: 15, twenty: 20, thirty: 30, zehn: 10, dix: 10, quinze: 15, vingt: 20, dieci: 10, quindici: 15, venti: 20 };
@@ -75,8 +77,8 @@ export function responderLocal(texto, e) {
   const minutos = minutosPedidos(texto);
   const empezar = EMPEZAR.test(n);
   const repasar = REPASAR.test(n);
-  const crear = CREAR.test(n) && /\b(leccion|lecciones|lesson|lektion|lecon|lezione|tema|clase)\b/.test(n);
-  const consulta = consultaDe(texto).split(' ').filter((w) => !CREAR.test(w)).join(' ');
+  const crear = CREAR.test(n) && (CURSO.test(n) || /\b(leccion|lecciones|lesson|lektion|lecon|lezione|tema|clase|recorrido|path|lernpfad|parcours|percorso)\b/.test(n));
+  const consulta = consultaDe(texto).split(' ').filter((w) => !CREAR.test(w) && !CURSO.test(w)).join(' ');
   const avisoSalud = `${salud ? `${e.t('pet.local.salud')} ` : ''}${crear ? `${e.t('pet.local.crear')} ` : ''}`;
   const lista = (ids, motivo) => ids.filter((id) => e.porId.has(id)).slice(0, MAX).map((id) => ({ id, motivo: typeof motivo === 'function' ? motivo(id) : motivo }));
   const sinHacer = (L) => !e.progreso.terminadas.has(L.id);

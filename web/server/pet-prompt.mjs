@@ -1,6 +1,7 @@
 // Textos que recibe Claude en cada petición de Neuri (los usa server/pet.mjs). Las reglas están en
 // server/neuri/instrucciones.mjs; aquí, los datos: el catálogo (fijo, en caché), el estado de la conversación, el
-// progreso, las lecciones propias, la solicitud, el plan, la lección base y las evidencias numeradas (cambian).
+// progreso, las lecciones y los recorridos propios, la solicitud, el plan, la lección base, el recorrido que se cambia,
+// lo que hay en el modelo por zona y las evidencias numeradas (cambian).
 import { REGION_POR_ID, SUBREGION_POR_ID, SISTEMA_POR_ID, NIVEL_POR_ID, FORMATO_POR_ID } from '../src/biblioteca/taxonomia.js';
 import { RECORRIDOS, leccionesDeRecorrido } from '../src/biblioteca/recorridos.js';
 import { frases } from '../src/biblioteca/formato.js';
@@ -34,8 +35,11 @@ export function textoCatalogo(catalogo) {
   return `CATÁLOGO DE LA BIBLIOTECA (${lecciones.length} lecciones). Cada una: identificador — título, y debajo sus datos.\n\n${bloques.join('\n\n')}\n\nRECORRIDOS (${recorridos.length}): planes de varias lecciones en orden.\n\n${recorridos.join('\n\n')}`;
 }
 
-/** Lo que cambia en cada petición de Orientar: idioma, estado de la conversación, progreso y lecciones propias. */
-export function textoContexto({ idioma, progreso, contexto = null, propias = [] }) {
+/** Estado de una unidad de un recorrido personal, en palabras (src/pet/protocolo.js, ESTADOS_UNIDAD). */
+const ESTADO_UNIDAD = { lista: 'lista para estudiar', preparando: 'en preparación', pendiente: 'pendiente: sin crear', error: 'no se pudo crear', interrumpida: 'interrumpida', 'sin-guardar': 'lista pero sin guardar' };
+
+/** Lo que cambia en cada petición de Orientar: idioma, estado de la conversación, progreso, lecciones y recorridos propios. */
+export function textoContexto({ idioma, progreso, contexto = null, propias = [], recorridos = [] }) {
   const lista = (ids) => (ids.length ? ids.join(', ') : 'ninguna');
   const c = contexto ?? {};
   return [
@@ -49,6 +53,9 @@ export function textoContexto({ idioma, progreso, contexto = null, propias = [] 
     propias.length
       ? `MIS LECCIONES (creadas o adaptadas con Neuri; solo en el navegador de esta persona; borradores generados por IA):\n${propias.map((p) => `- ${p.id} — ${p.titulo} (${p.minutos} min, nivel ${p.nivel}): ${p.resumen}`).join('\n')}`
       : 'MIS LECCIONES: ninguna todavía.',
+    recorridos.length
+      ? `MIS RECORRIDOS (recorridos personales por unidades; cada unidad lista es una lección de MIS LECCIONES):\n${recorridos.map((r) => `- ${r.id} — ${r.titulo}: ${r.unidades.map((u, i) => `${i + 1}. ${u.titulo} (${ESTADO_UNIDAD[u.estado] ?? u.estado}${u.leccion ? `: ${u.leccion}` : ''})`).join('; ')}.`).join('\n')}`
+      : 'MIS RECORRIDOS: ninguno todavía.',
   ].join('\n');
 }
 
@@ -66,9 +73,56 @@ export function textoEvidencias(mapa, corpus) {
   return `EVIDENCIAS (cítalas solo por su identificador; son lo único con lo que puedes afirmar algo de anatomía):\n${lineas.join('\n')}`;
 }
 
-/** La solicitud que se va a planificar. */
+/** La solicitud que se va a planificar: una lección, una adaptación, un recorrido o una unidad de un recorrido. */
 export function textoSolicitud(s) {
-  return `SOLICITUD (${s.accion === 'adaptar' ? `adaptar la lección ${s.leccion_base}` : 'crear una lección nueva'}): tema: ${s.tema}; objetivo: ${s.objetivo || '—'}; nivel: ${s.nivel ?? '—'}; minutos: ${s.minutos ?? '—'}; enfoque: ${s.enfoque || '—'}; supuestos: ${s.supuestos.join('; ') || '—'}; términos de búsqueda: ${(s.terminos ?? []).join(', ') || '—'}.`;
+  const que = s.accion === 'adaptar' ? `adaptar la lección ${s.leccion_base}`
+    : s.accion === 'recorrido' ? (s.recorrido_base ? `cambiar el recorrido personal ${s.recorrido_base}` : 'un recorrido personal por unidades')
+      : 'crear una lección nueva';
+  const minutos = s.accion === 'recorrido' ? `unidades pedidas: ${s.unidades ?? '—'}; minutos de cada unidad: ${s.minutos ?? '—'}` : `minutos: ${s.minutos ?? '—'}`;
+  const r = s.recorrido;
+  const unidad = r ? `\nES LA UNIDAD ${r.n} DE ${r.total} DEL RECORRIDO PERSONAL «${r.titulo}». Las otras unidades: ${r.otras.map((x) => `«${x}»`).join(', ') || '—'}. Planifica solo esta unidad.` : '';
+  return `SOLICITUD (${que}): tema: ${s.tema}; objetivo: ${s.objetivo || '—'}; nivel: ${s.nivel ?? '—'}; ${minutos}; enfoque: ${s.enfoque || '—'}; supuestos: ${s.supuestos.join('; ') || '—'}; términos de búsqueda: ${(s.terminos ?? []).join(', ') || '—'}.${unidad}`;
+}
+
+/** El recorrido personal que se cambia, con el estado real de cada unidad (lo que ya existe no se reescribe). */
+export function textoRecorridoBase(b) {
+  const unidades = b.unidades.map((u, i) => `${i + 1}. «${u.titulo}» (${ESTADO_UNIDAD[u.estado] ?? u.estado}; ${u.minutos ?? '—'} min): ${u.objetivo || '—'}${u.enfoque ? ` Enfoque: ${u.enfoque}` : ''}`);
+  return [
+    `RECORRIDO QUE SE CAMBIA (${b.id}): «${b.titulo}». ${b.objetivo || ''}`.trim(),
+    `Unidades de ahora:\n${unidades.join('\n')}`,
+    'Devuelve el recorrido entero, ya cambiado según la SOLICITUD. Para cada unidad que sigue igual, «conserva» con su número de ahora (sus textos no se tocan). Las unidades listas, sin guardar o en preparación ya existen y no se pueden reescribir: consérvalas, o déjalas fuera solo si la persona pide quitarlas (su lección sigue en Mis lecciones). Las pendientes, con error o interrumpidas se pueden cambiar, quitar o reordenar; si cambias una, va sin «conserva».',
+  ].join('\n');
+}
+
+// Tipos del inventario, en plural, para contar lo que hay en una zona del modelo.
+const TIPOS_EN_PLURAL = {
+  hueso: 'huesos', cartilago: 'cartílagos', diente: 'dientes', musculo: 'músculos', tendon: 'tendones', ligamento: 'ligamentos', capsula: 'cápsulas articulares',
+  bolsa: 'bolsas sinoviales', fascia: 'fascias', vaina: 'vainas', arteria: 'arterias', vena: 'venas', nervio: 'nervios', ganglio: 'ganglios nerviosos',
+  snc: 'partes del encéfalo y la médula', organo: 'órganos', glandula: 'glándulas', nodo: 'ganglios linfáticos', corazon: 'partes del corazón', piel: 'zonas de piel',
+};
+
+/**
+ * Lo que hay en el modelo 3D en la zona de un recorrido: cuántas estructuras de cada tipo por subregión (las unidades
+ * solo pueden enseñar lo que se puede ver). `regiones`: identificadores de la taxonomía; `sistemas`: si no hay región.
+ */
+export function textoZona(inventario, { regiones = [], sistemas = [] } = {}) {
+  const cuentas = new Map();
+  const sumar = (lugar, tipo) => {
+    if (!cuentas.has(lugar)) cuentas.set(lugar, new Map());
+    const m = cuentas.get(lugar);
+    m.set(tipo, (m.get(tipo) ?? 0) + 1);
+  };
+  for (const k of inventario.claves) {
+    const e = inventario.estructuras[k];
+    if (regiones.length) {
+      for (const [r, s] of e.lugares) if (regiones.includes(r)) sumar(nomLugar([r, s]), e.tipo);
+    } else if (sistemas.includes(e.sistema)) {
+      for (const [r] of e.lugares.length ? e.lugares : [['sin región']]) sumar(nomLugar([r, null]), e.tipo);
+    }
+  }
+  if (!cuentas.size) return '';
+  const lineas = [...cuentas].sort((a, b) => a[0].localeCompare(b[0], 'es')).map(([lugar, m]) => `- ${lugar}: ${[...m].sort((a, b) => b[1] - a[1]).map(([t, n]) => `${TIPOS_EN_PLURAL[t] ?? t} (${n})`).join(', ')}.`);
+  return `EN EL MODELO 3D, POR ZONA (número de estructuras de cada tipo; las unidades solo pueden enseñar lo que hay):\n${lineas.join('\n')}`;
 }
 
 /** El plan que se va a redactar, con el nombre de cada estructura en el idioma de la lección. */

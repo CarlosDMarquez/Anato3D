@@ -5,7 +5,7 @@ Neuri es una neurona con cara que vive en la biblioteca «Estudiar». Ayuda a **
 - **Encontrar:** recomienda lecciones, recorridos o una sesión de varias lecciones seguidas.
 - **Comprender:** responde dudas cortas, solo con frases de las fuentes de la biblioteca y citándolas.
 - **Adaptar:** hace una versión de una lección de la biblioteca o de «Mis lecciones» (más corta, más avanzada, con otro enfoque…).
-- **Crear:** prepara una lección nueva sobre un tema que la biblioteca no tiene.
+- **Crear:** prepara una lección nueva sobre un tema que la biblioteca no tiene. Si lo pedido no cabe en una lección (un curso, una región entera), lo reparte en un **recorrido personal por unidades**, que se crean de una en una (ver «Recorridos personales por unidades»).
 
 Las lecciones creadas o adaptadas tienen el mismo formato que las de la biblioteca. Se estudian igual: pasos sobre el modelo 3D, actividades, evaluación y repaso espaciado. Se guardan en «Mis lecciones», solo en el navegador de esa persona, y la app siempre dice que son borradores hechos con IA sin revisión de un especialista.
 
@@ -30,7 +30,8 @@ Las reglas de Neuri son la especificación que escribió Carlos (2026-11-09). Va
 ## Dónde aparece
 
 - **Lanzador:** abajo a la derecha del panel en las vistas del catálogo. La primera vez se presenta con un globo.
-- **Portada:** «¿No sabes cómo buscarlo? Cuéntaselo a Neuri» y la sección **Mis lecciones** («Crear otra con Neuri»).
+- **Portada:** «¿No sabes cómo buscarlo? Cuéntaselo a Neuri» y la sección **Mis lecciones** («Crear otra con Neuri»). En «En preparación», una unidad dice de qué recorrido es («Unidad 3 de 4 de «Miembro superior»»).
+- **Mis lecciones:** arriba, **Mis recorridos**, con el estado de cada unidad; cada lección que es una unidad lo dice.
 - **Búsqueda sin resultados:** «Preguntar a Neuri», que le envía lo que se buscó.
 - **Ficha de una lección:** «Adaptar con Neuri» deja escrito «Adapta la lección «…»: » para que la persona diga cómo. En las propias, también «Quitar de Mis lecciones», con confirmación; borra también su progreso.
 - **Conversación:** ocupa el panel («Biblioteca» vuelve atrás) y se guarda en la pestaña (sessionStorage) hasta cerrarla.
@@ -57,6 +58,64 @@ Si algo falla, la tarjeta dice el motivo:
 - si es del propio plan (pocas evidencias, una limitación), ofrece «Cambiar el plan», porque con el mismo plan saldría lo mismo.
 
 Para cambiar un plan o una lección ya hecha basta con decirlo («quita el maxilar», «más corta»). Neuri recuerda la propuesta, el plan y la lección guardada, y hace una propuesta nueva.
+
+## Recorridos personales por unidades
+
+Desde el 9 de noviembre de 2026 (sección 14 de la especificación: «Para peticiones extensas, crea un recorrido dividido en unidades y desarrolla bloques manejables»).
+
+**Cuándo:** lo pedido no cabe en una lección de 45 minutos como mucho: «Créame un curso del miembro superior», una región o un sistema enteros, varios temas distintos o «el temario de…». Neuri no propone una lección gigante ni se niega: propone un recorrido.
+
+**Cómo:**
+1. **Propuesta** (Orientar). La solicitud lleva `accion: 'recorrido'`: tema y objetivo del recorrido, nivel, minutos de cada unidad y cuántas unidades pidió la persona, si lo dijo. Si la biblioteca ya tiene algo parecido, lo ofrece como alternativa.
+2. **Unidades** (Planificar, con su propio esquema `recorrido`). Son de 2 a 8 (lo normal, de 3 a 6), en un orden que sirva para aprender: de los huesos a los músculos, los vasos y los nervios, o por subregiones. Cada unidad tiene el alcance de una lección: título, objetivo observable, enfoque, nivel, minutos (de 5 a 30) y términos en inglés para buscar sus estructuras y fuentes.
+   - Claude ve qué hay en el modelo 3D en esa zona (por ejemplo, «Miembro superior › Mano: nervios (23), huesos (19)…») para no planificar unidades que no se puedan enseñar.
+   - El servidor revisa: títulos sin repetir, objetivo en cada unidad y solo lecciones relacionadas que existen. Si falla, hay una ronda de corrección; si sigue mal, se responde con una limitación.
+   - Aquí no se redacta nada: solo se reparte el tema.
+3. **Cada unidad es una creación como cualquier otra** («Creaciones que no se pierden»): plan, fuentes, redacción, comprobación y guardado en «Mis lecciones».
+   - Se planifica con su propia solicitud, que dice de qué recorrido es y qué tratan las otras unidades; así no las repite.
+   - La conversación no viaja con ella, porque pedía el curso entero.
+   - Solo cuenta como **lista** cuando se ha validado y guardado.
+
+**De una en una, y cuando la persona lo decide:**
+- **Si lo pidió expresamente** («créame un curso…»), se planifican las unidades y se crea **la primera** (un primer paso útil). Las demás esperan.
+- **Crear la unidad N:** la siguiente pendiente. También se puede crear una concreta, o volver a intentar la que falló, con el mismo plan si ya lo tenía.
+- **Crear las que faltan, una tras otra:** van en cola, nunca dos a la vez.
+  - La cola se para ante cualquier final que no sea «guardada» (un error, una cancelación, «Mis lecciones» llena…) y no reintenta sola lo que falló.
+  - Solo crea las unidades que nunca se intentaron.
+  - Si se recarga la página, sigue donde estaba: la unidad en marcha se retoma sin repetirla.
+  - «Parar después de la que se está creando» la detiene.
+- **Antes de empezar cada unidad** se comprueba que quepa en «Mis lecciones» (contando las que se están preparando). Si no cabe, no empieza ni gasta, y lo dice.
+
+**Estado real de cada unidad** (se deduce de su lección y de su creación; no se guarda aparte):
+
+| Estado | Qué significa |
+| --- | --- |
+| Lista para estudiar | Su lección está en «Mis lecciones», validada y guardada |
+| En preparación | Su creación está en marcha, con la etapa real |
+| Pendiente | Nada creado ni en marcha: sin crear, cancelada o con la lección quitada de «Mis lecciones» |
+| En cola | Pendiente, y la creará la cola |
+| Lista, pero sin guardar | Validada, pero el navegador no la pudo guardar (se puede volver a guardar o descargar) |
+| No se pudo crear | Error, limitación o aclaración, con el motivo en «Ver qué pasó» |
+| Interrumpida | El servidor ya no tiene su creación |
+
+**Cambiar un recorrido** («quita la unidad de vasos», «añade la mano»):
+- Neuri propone el cambio con `recorrido_base` (solo uno de los recorridos de la persona). La app manda el recorrido tal como es ahora, con el estado de cada unidad.
+- Lo que ya existe no se reescribe: una unidad que sigue se conserva tal cual, con su lección. Si el modelo la reescribe, la app pone sus textos de antes; si olvida «conserva», el mismo título basta.
+- Las unidades creadas que salen del recorrido no se borran: un aviso dice que su lección sigue en «Mis lecciones».
+- Cambiar un recorrido para su cola. Cancelar el cambio lo deja como estaba.
+
+**Quitar un recorrido** (en «Mis lecciones», tras confirmarlo):
+- Sus lecciones se quedan en «Mis lecciones», y lo que se está preparando sigue y se guarda.
+- La confirmación ofrece aparte, en rojo y con su aviso, «Quitar también sus N lecciones»: nunca se borran en silencio.
+
+**Dónde se guarda:**
+- En el navegador, `anato3d.recorridos`, con formato versionado (`contratos-datos.md`): como mucho 12 recorridos de 8 unidades.
+- Lo que no se puede leer se aparta sin perderse.
+- Entra en «Mis datos» (exportar, importar y borrar).
+
+**Sin IA:** la tarjeta del recorrido se ve, pero sin botones para crear o cambiar, y dice que hace falta la IA. «Créame un curso…» responde que crear necesita la IA y busca lo que hay.
+
+**Límites:** cada unidad cuenta como una creación para los límites de uso (4 por dirección y hora). Una cola de más de cuatro unidades se parará al llegar al límite, y lo dirá.
 
 ## Cómo se evita que invente
 
@@ -158,6 +217,7 @@ Las cifras de la tabla son estimaciones:
 | --- | --- |
 | Un mensaje de conversación | ≈ 0,002 US$ con la caché caliente (≈ 0,005 US$ si lleva más de 5 min sin uso); una explicación comprobada, ≈ 0,0005 US$ más |
 | Una lección nueva (plan, redacción y comprobación) | ≈ 0,01–0,02 US$; con ronda de corrección, hasta ≈ 0,04 US$ |
+| Un recorrido por unidades | Repartir el tema: una llamada como planificar una lección (dos con la corrección). Después, cada unidad cuesta lo que una lección nueva y solo se paga la que se crea: un recorrido de 4 unidades, ≈ 0,04–0,08 US$ si se crean todas |
 
 Con Sonnet 5.5 (opcional) cuesta unas 20 veces más. Las instrucciones fijas y el catálogo pesan unos 24 000 tokens y van en caché. Los precios son los de la lista de Anthropic de octubre de 2026 (Haiku 5.5: 0,10 / 0,50 US$ por millón de tokens de entrada y salida). Los costes reales salen en la consola en cada llamada.
 
@@ -182,7 +242,7 @@ Ajustes:
 - **Reglas:** nada de consejos médicos personales (remite a un profesional y, en una urgencia, a los servicios de emergencia) y nada fuera de tema. Lo que escribe la persona no cambia el modo, los permisos ni el formato.
 - **Privacidad:**
   - no se guarda ni se registra lo que escribe nadie;
-  - a Anthropic se envían la conversación; los identificadores de las lecciones empezadas, terminadas, con repasos pendientes y guardadas (nunca respuestas ni fechas); el título y el resumen de «Mis lecciones»; al planificar o redactar, el plan, y al adaptar una lección propia, la lección entera. «Mis datos y privacidad» lo explica así desde el 9 de noviembre *[Histórico: antes decía solo «qué lecciones has hecho»]*;
+  - a Anthropic se envían la conversación; los identificadores de las lecciones empezadas, terminadas, con repasos pendientes y guardadas (nunca respuestas ni fechas); el título y el resumen de «Mis lecciones»; el título de los recorridos personales y el estado de sus unidades; al planificar o redactar, el plan; al cambiar un recorrido, sus unidades, y al adaptar una lección propia, la lección entera. «Mis datos y privacidad» lo explica así desde el 9 de noviembre *[Histórico: antes decía solo «qué lecciones has hecho»; los recorridos se añadieron el mismo día, por la noche]*;
   - las lecciones propias solo están en el navegador (localStorage, como mucho 40 y 3 MB).
 
 ## Datos del servidor
@@ -198,7 +258,7 @@ La web publicada es estática. Para que Neuri use la IA hace falta una función 
 
 ## Pruebas
 
-- **`npm test`** (148 pruebas en total; `tests/pet.test.mjs`, 63 sin red ni gasto; *[Histórico: eran 36 antes del 9 de noviembre]*):
+- **`npm test`** (165 pruebas en total; `tests/pet.test.mjs`, 80 sin red ni gasto; *[Histórico: eran 36 antes del 9 de noviembre y 63 antes de los recorridos por unidades]*):
   - las instrucciones y los esquemas;
   - la petición exacta a la API con el SDK real (también en streaming) y que Opus nunca se use;
   - orientar, con la limpieza, las explicaciones comprobadas y retiradas, los errores y los límites;
@@ -207,7 +267,8 @@ La web publicada es estática. Para que Neuri use la IA hace falta una función 
   - las evidencias y sus filtros;
   - el ensamblado y la validación de lecciones;
   - planificar, redactar y adaptar con corrección, limitación y cancelación, y el puente con Node de `npm run dev`;
-  - las respuestas sin IA, la conversación (estados, cancelar, interrumpida, lo que recuerda) y «Mis lecciones».
+  - las respuestas sin IA, la conversación (estados, cancelar, interrumpida, lo que recuerda) y «Mis lecciones»;
+  - los recorridos por unidades: la propuesta, el reparto en unidades (revisión y corrección), el cambio que conserva lo creado, cada unidad como creación, de una en una y en cola (sin paralelo, parada ante un fallo o una cancelación), el estado real de cada unidad, el espacio de «Mis lecciones», la recarga, lo dañado apartado, quitar sin borrar lecciones, «Mis datos» y los textos en cinco idiomas (el francés, de «vous»).
 - **`npm run check`** comprueba, además, que el inventario está al día.
 - **`npm run pet:prueba`** prueba la IA de verdad y **gasta** unos céntimos:
   - 17 conversaciones en los cinco idiomas: explicaciones, propuestas de crear y de adaptar, salud, fuera de tema y un intento de saltarse las reglas;
@@ -216,9 +277,9 @@ La web publicada es estática. Para que Neuri use la IA hace falta una función 
 ## Archivos
 
 - **Servidor:**
-  - `server/pet.mjs`: los modos, la comprobación y los límites;
+  - `server/pet.mjs`: los modos, la comprobación y los límites, y el reparto de un recorrido en unidades (`revisarRecorrido`);
   - `server/neuri/trabajos.mjs`: las creaciones como trabajos (reanudar, cancelar, conservar media hora);
-  - `server/neuri/instrucciones.mjs`: la especificación, la app, los modos y los esquemas;
+  - `server/neuri/instrucciones.mjs`: la especificación, la app, los modos y los esquemas (versión `2026-11-09.4`, con el modo y el esquema del recorrido);
   - `server/neuri/modelo.mjs`: el modelo, las llamadas y los errores;
   - `server/neuri/inventario.mjs`: las estructuras y las candidatas;
   - `server/neuri/evidencias.mjs`: las frases citables y la búsqueda;
@@ -229,7 +290,8 @@ La web publicada es estática. Para que Neuri use la IA hace falta una función 
 - **App:**
   - `src/pet/protocolo.js`, `src/pet/conversacion.js` y `src/pet/local.js`: la lógica;
   - `src/pet/trabajos.js` y `src/pet/red.js`: las creaciones en la app y los plazos que cubren toda la respuesta;
-  - `src/ui/biblioteca/preparacion.js` y `src/ui/biblioteca/mis-lecciones.js`: «En preparación» y «Mis lecciones»;
+  - `src/pet/recorridos.js`: los recorridos personales por unidades (guardado, estado de cada unidad, cola y cambios);
+  - `src/ui/biblioteca/preparacion.js`, `src/ui/biblioteca/mis-lecciones.js` y `src/ui/biblioteca/mis-recorridos.js`: «En preparación», «Mis lecciones» y «Mis recorridos»;
   - `src/biblioteca/propias.js`: «Mis lecciones»;
   - `src/ui/biblioteca/pet.js` y `src/ui/biblioteca/neuri-svg.js`: la interfaz y el personaje;
   - `src/i18n/textos-pet.js`: los textos en los cinco idiomas.

@@ -4,13 +4,15 @@
 //    y con un cliente con guion para los flujos largos (planificar, redactar, adaptar, verificar, corregir).
 //  - El inventario, las evidencias y el ensamblado de lecciones (server/neuri/), con el revisor de la biblioteca.
 //  - La app: respuestas sin IA (src/pet/local.js), la conversación (src/pet/conversacion.js) y «Mis lecciones».
+//  - Los recorridos personales por unidades (src/pet/recorridos.js y planificarRecorrido en el servidor): al final.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'fs';
 import Anthropic from '@anthropic-ai/sdk';
-import { crearManejador, crearLimitador, elegirModelo, MODELO_POR_DEFECTO, revisarPlan } from '../server/pet.mjs';
-import { textoCatalogo, mensajesApi } from '../server/pet-prompt.mjs';
-import { ESPECIFICACION, APP, esquemaOrientar, esquemaLeccion } from '../server/neuri/instrucciones.mjs';
+import { crearManejador, crearLimitador, elegirModelo, MODELO_POR_DEFECTO, revisarPlan, revisarRecorrido } from '../server/pet.mjs';
+import { textoCatalogo, mensajesApi, textoZona } from '../server/pet-prompt.mjs';
+import { ESPECIFICACION, APP, esquemaOrientar, esquemaLeccion, esquemaRecorrido, textoModo, VERSION_INSTRUCCIONES } from '../server/neuri/instrucciones.mjs';
+import { crearRecorridos, importarRecorridos, CLAVE_RECORRIDOS, CLAVE_RECORRIDOS_APARTADOS, MAX_RECORRIDOS } from '../src/pet/recorridos.js';
 import { llamar } from '../server/neuri/modelo.mjs';
 import { cargarInventario } from '../server/neuri/inventario.mjs';
 import { crearCorpus } from '../server/neuri/evidencias.mjs';
@@ -1597,4 +1599,587 @@ test('aceptación: una lección creada por Neuri se evalúa como las demás (tod
 
 test('la conversación para la API', () => {
   assert.deepEqual(mensajesApi([{ rol: 'usuario', texto: 'a' }]), [{ role: 'user', content: 'a' }]);
+});
+
+// ══ Recorridos personales por unidades (especificación, sección 14) ══
+// «Para peticiones extensas, crea un recorrido dividido en unidades y desarrolla bloques manejables. Cada unidad
+// disponible debe estar completa; el resto debe figurar con su estado real.»
+const UNIDADES = [
+  { titulo: 'Huesos del hombro y del brazo', objetivo: 'Localizar la clavícula, la escápula y el húmero.', enfoque: 'Solo los huesos.', nivel: 1, minutos: 15, terminos: ['clavicle', 'scapula', 'humerus'], relacionadas: ['ms-cintura-escapular'], conserva: null },
+  { titulo: 'Músculos del hombro', objetivo: 'Identificar el deltoides y el manguito rotador.', enfoque: '', nivel: 1, minutos: 15, terminos: ['deltoid', 'rotator cuff'], relacionadas: [], conserva: null },
+  { titulo: 'Músculos del brazo', objetivo: 'Distinguir los compartimentos anterior y posterior del brazo.', enfoque: '', nivel: 1, minutos: 12, terminos: ['biceps brachii', 'triceps brachii'], relacionadas: [], conserva: null },
+  { titulo: 'Nervios del miembro superior', objetivo: 'Seguir los nervios mediano, cubital y radial.', enfoque: '', nivel: 1, minutos: 15, terminos: ['median nerve', 'ulnar nerve', 'radial nerve'], relacionadas: [], conserva: null },
+];
+const RECORRIDO_MS = { titulo: 'Miembro superior', resumen: 'Del esqueleto a los nervios, en cuatro unidades.', objetivo: 'Conocer el miembro superior', nivel: 1, unidades: UNIDADES, supuestos: ['Nivel inicial'], limitaciones: [] };
+const SOL_CURSO = limpiarSolicitud({ accion: 'recorrido', tema: 'Miembro superior', objetivo: 'Conocer el miembro superior', nivel: 1, minutos: 15, supuestos: [], terminos: ['upper limb'], explicita: true, suficiente: true });
+
+/** Flujo NDJSON que va soltando sus eventos poco a poco y cuenta cuántos hay abiertos a la vez. */
+function flujoLento(lista, contador) {
+  const cod = new TextEncoder();
+  return new ReadableStream({
+    async start(c) {
+      contador.ahora++;
+      contador.max = Math.max(contador.max, contador.ahora);
+      for (const e of lista) { await esperar(3); c.enqueue(cod.encode(`${JSON.stringify(e)}\n`)); }
+      contador.ahora--;
+      c.close();
+    },
+  });
+}
+/**
+ * Un servidor de Neuri falso: el recorrido (planificar con accion «recorrido»), el plan de cada unidad, su redacción
+ * (cada una con su lección) y volver a conectarse a un trabajo. `falla(cuerpo, k)`: el evento final de la k-ésima
+ * redacción si falla; `colgar(k)`: esa redacción se queda abierta hasta que se corte; `abiertas`: cuenta las redacciones
+ * abiertas a la vez.
+ */
+function servidorCurso({ recorrido = RECORRIDO_MS, falla = () => null, colgar = () => false, abiertas = null } = {}) {
+  let k = 0;
+  const leccion = (id, titulo) => ({ ...ensamblarNariz().L, id, titulo });
+  return (cuerpo, init) => {
+    if (cuerpo.modo === 'cancelar') return { datos: { ok: true, cancelado: true } };
+    if (cuerpo.modo === 'trabajo') return { flujo: flujoTrozos([{ estado: 'redactando', evidencias: 12 }, { estado: 'lista', leccion: leccion('neuri-unidad-retomada-aaaa', 'Retomada'), informe: INFORME, mensaje: '' }]) };
+    if (cuerpo.modo === 'planificar' && cuerpo.solicitud?.accion === 'recorrido') return { datos: { ok: true, tipo: 'recorrido', mensaje: 'Cuatro unidades.', recorrido, salen: [], sugerencias: [], instrucciones: VERSION_INSTRUCCIONES } };
+    if (cuerpo.modo === 'planificar') return { datos: { ok: true, tipo: 'plan', mensaje: '', plan: { ...PLAN_NARIZ, titulo: cuerpo.solicitud.tema }, estructuras: {}, paginas: [] } };
+    const n = ++k;
+    if (colgar(n)) return { flujo: flujoAbierto(init.signal, [{ estado: 'fuentes' }]) };
+    const fallo = falla(cuerpo, n);
+    const eventos = fallo ? [{ estado: 'fuentes' }, fallo] : [{ estado: 'fuentes' }, { estado: 'redactando', evidencias: 12 }, { estado: 'comprobando' }, { estado: 'lista', leccion: leccion(`neuri-unidad-${n}-aaaa`, cuerpo.plan.titulo), informe: INFORME, mensaje: '' }];
+    return { flujo: abiertas ? flujoLento(eventos, abiertas) : flujoTrozos(eventos) };
+  };
+}
+/** Recorridos con creaciones de verdad (src/pet/trabajos.js) contra un servidor falso. `guardadas`: «Mis lecciones». */
+function recorridosDe(servidor, { almacen = memoria(), espacio = () => 40, guardadas = new Set() } = {}) {
+  const { fetch, posts } = fetchFalso(servidor);
+  let rec = null;
+  const comun = () => ({ v: 2, idioma: 'es', progreso: { terminadas: [], enCurso: [], repasos: [], guardadas: [] }, propias: [], recorridos: rec?.resumenes() ?? [], contexto: null });
+  const historial = () => [{ rol: 'usuario', texto: 'Créame un curso del miembro superior' }];
+  const tr = crearTrabajos({ fetch, almacen, comun, historial, guardarLeccion: (L) => { guardadas.add(L.id); return { ok: true }; }, plazos: { planificar: 2000, conectar: 2000, inactividad: 2000 } });
+  rec = crearRecorridos({ fetch, almacen, comun, historial, trabajos: tr, existeLeccion: (id) => guardadas.has(id), espacio, plazos: { planificar: 2000 } });
+  return { rec, tr, posts, almacen, guardadas };
+}
+const estados = (rec, R) => R.unidades.map((u) => rec.estadoUnidad(u).estado);
+
+test('instrucciones de los recorridos: versión nueva, el modo «recorrido» y su esquema (solo lecciones de la biblioteca)', () => {
+  assert.equal(VERSION_INSTRUCCIONES, '2026-11-09.4');
+  const m = textoModo('recorrido', { idioma: 'fr' });
+  assert.match(m, /MODO ACTUAL: PLANIFICAR UN RECORRIDO/);
+  assert.match(m, /Idioma del recorrido: francés/);
+  assert.match(m, /Entre 2 y 8 unidades/);
+  assert.match(m, /No digas que las unidades están creadas/);
+  assert.match(textoModo('orientar'), /accion recorrido/);
+  assert.match(textoModo('orientar'), /no propongas una lección gigante ni te niegues/);
+  assert.match(textoModo('planificar'), /unidad de un recorrido personal, planifica solo esa unidad/);
+  assert.match(APP, /recorrido personal por unidades/);
+  assert.ok(ESPECIFICACION.includes('Para un objetivo extenso, propone una secuencia de lecciones manejables'), 'la especificación de Carlos, tal cual');
+  const e = esquemaRecorrido({ lecciones: IDS.lecciones });
+  assert.deepEqual(e.properties.tipo.enum, ['recorrido', 'aclaracion', 'limitacion']);
+  const u = e.properties.recorrido.anyOf[0].properties.unidades.items;
+  assert.deepEqual(u.properties.relacionadas.items.enum, [...IDS.lecciones].sort());
+  for (const k of ['titulo', 'objetivo', 'enfoque', 'nivel', 'minutos', 'terminos', 'relacionadas', 'conserva']) assert.ok(u.required.includes(k), k);
+  // Lo que hay en el modelo 3D en una zona, para que las unidades se puedan enseñar.
+  const zona = textoZona(INV, { regiones: ['miembro-superior'] });
+  assert.match(zona, /Miembro superior › Mano: .*huesos \(\d+\)/);
+  assert.match(zona, /Miembro superior › Brazo: .*músculos \(\d+\)/);
+  assert.equal(textoZona(INV, { regiones: [] }), '');
+});
+
+test('orientar: «créame un curso…» llega como propuesta de recorrido; Neuri ve MIS RECORRIDOS y un cambio solo puede ser de uno de ellos', async () => {
+  const RID = idT(700);
+  let base = null;
+  const { api, llamadas } = apiGuion(() => ({
+    ...BIEN, tipo: 'propuesta', mensaje: 'Te preparo un recorrido por unidades.', lecciones: [],
+    solicitud: { accion: 'recorrido', tema: 'Miembro superior', objetivo: 'Conocerlo', nivel: 1, minutos: 15, leccion_base: null, enfoque: '', supuestos: [], terminos: ['upper limb'], explicita: true, suficiente: true, unidades: 5, recorrido_base: base },
+  }));
+  const manejar = crearManejador({ catalogo: CATALOGO, cliente: api, registro: silencio });
+  const misRec = [{ id: RID, titulo: 'Miembro superior', unidades: [{ titulo: 'Huesos', estado: 'lista', leccion: 'neuri-no-existe-aaaa' }, { titulo: 'Músculos', estado: 'raro' }] }];
+  const d = await (await manejar(peticion(conversacion('Créame un curso del miembro superior', { recorridos: misRec })))).json();
+  assert.equal(d.tipo, 'propuesta');
+  assert.deepEqual([d.solicitud.accion, d.solicitud.unidades, d.solicitud.recorrido_base, d.solicitud.explicita], ['recorrido', 5, null, true]);
+  const sistema = llamadas[0].system.map((b) => b.text).join('\n');
+  assert.ok(sistema.includes(`MIS RECORRIDOS (recorridos personales por unidades; cada unidad lista es una lección de MIS LECCIONES):\n- ${RID} — Miembro superior: 1. Huesos (lista para estudiar); 2. Músculos (pendiente: sin crear).`), 'con su estado; una lección que no existe no se nombra');
+  const sol = llamadas[0].output_config.format.schema.properties.solicitud.anyOf[0];
+  assert.ok(sol.properties.accion.enum.includes('recorrido'));
+  assert.ok(sol.required.includes('unidades') && sol.required.includes('recorrido_base'));
+  // Un cambio: solo de un recorrido que la persona tiene; si no, sería uno nuevo.
+  base = RID;
+  assert.equal((await (await manejar(peticion(conversacion('Quita los músculos', { recorridos: misRec })))).json()).solicitud.recorrido_base, RID);
+  base = idT(701);
+  assert.equal((await (await manejar(peticion(conversacion('Quita los músculos', { recorridos: misRec })))).json()).solicitud.recorrido_base, null);
+  assert.match(llamadas.at(-1).system.at(-1).text, /MIS RECORRIDOS/);
+  const sin = await (await manejar(peticion(conversacion('hola')))).json();
+  assert.ok(sin.ok);
+  assert.match(llamadas.at(-1).system.at(-1).text, /MIS RECORRIDOS: ninguno todavía\./);
+});
+
+test('planificar un recorrido: unidades revisadas (de 2 a 8, sin repetir y con objetivo), lo que hay en el modelo y una ronda de corrección', async () => {
+  const malo = { ...RECORRIDO_MS, unidades: [UNIDADES[0], { ...UNIDADES[1], titulo: UNIDADES[0].titulo.toUpperCase() }, { ...UNIDADES[2], objetivo: '' }] };
+  const bueno = { ...RECORRIDO_MS, unidades: [{ ...UNIDADES[0], minutos: 90, relacionadas: ['ms-cintura-escapular', 'no-existe'], conserva: 2 }, ...UNIDADES.slice(1)] };
+  const { api, llamadas } = apiGuion((params, n) => ({ tipo: 'recorrido', mensaje: 'Cuatro unidades, de los huesos a los nervios.', recorrido: n === 1 ? malo : bueno, sugerencias: [] }));
+  const manejar = crearManejador({ catalogo: CATALOGO, cliente: api, registro: silencio, recursos: async () => recursosFalsos() });
+  const cuerpo = { v: 2, modo: 'planificar', idioma: 'es', mensajes: [{ rol: 'usuario', texto: 'Créame un curso del miembro superior' }], solicitud: SOL_CURSO };
+  const d = await (await manejar(peticion(cuerpo))).json();
+  assert.equal(d.tipo, 'recorrido');
+  assert.equal(llamadas.length, 2, 'una ronda de corrección');
+  const correccion = llamadas[1].messages.at(-1).content;
+  assert.match(correccion, /título repetido/);
+  assert.match(correccion, /unidad 3: sin objetivo/);
+  assert.deepEqual(d.recorrido.unidades.map((u) => u.titulo), UNIDADES.map((u) => u.titulo));
+  assert.equal(d.recorrido.unidades[0].minutos, 30, 'cada unidad es una lección corta');
+  assert.deepEqual(d.recorrido.unidades[0].relacionadas, ['ms-cintura-escapular'], 'solo lecciones que existen');
+  assert.equal(d.recorrido.unidades[0].conserva, null, 'en un recorrido nuevo no se conserva nada');
+  assert.deepEqual([d.instrucciones, d.mensaje], [VERSION_INSTRUCCIONES, 'Cuatro unidades, de los huesos a los nervios.']);
+  // Lo que ve Claude: el modo, la solicitud y lo que hay en el modelo en esa zona; Haiku 5.5 con esfuerzo medio.
+  const variable = llamadas[0].system.at(-1).text;
+  assert.match(variable, /MODO ACTUAL: PLANIFICAR UN RECORRIDO/);
+  assert.match(variable, /SOLICITUD \(un recorrido personal por unidades\): tema: Miembro superior; .*minutos de cada unidad: 15/);
+  assert.match(variable, /EN EL MODELO 3D, POR ZONA/);
+  assert.match(variable, /Miembro superior › Antebrazo: /);
+  assert.equal(llamadas[0].model, 'claude-haiku-5-5');
+  assert.equal(llamadas[0].output_config.effort, 'medium');
+  assert.match(llamadas[0].messages.at(-1).content, /«Planificar el recorrido»/);
+  // Si sigue mal tras la corrección, no se entrega: una limitación con los problemas.
+  const siempreMal = apiGuion(() => ({ tipo: 'recorrido', mensaje: '', recorrido: { ...RECORRIDO_MS, unidades: [UNIDADES[0]] }, sugerencias: [] }));
+  const m2 = crearManejador({ catalogo: CATALOGO, cliente: siempreMal.api, registro: silencio, recursos: async () => recursosFalsos() });
+  const d2 = await (await m2(peticion(cuerpo))).json();
+  assert.deepEqual([d2.tipo, d2.codigo, d2.recorrido], ['limitacion', 'recorrido-invalido', null]);
+  assert.match(d2.errores.join(' '), /al menos 2 unidades/);
+  assert.equal(siempreMal.llamadas.length, 2);
+  // Una aclaración pasa tal cual; sin fuentes en el servidor, no se planifica.
+  const acl = apiGuion(() => ({ tipo: 'aclaracion', mensaje: '¿Para qué nivel?', recorrido: null, sugerencias: ['Básico'] }));
+  const d3 = await (await crearManejador({ catalogo: CATALOGO, cliente: acl.api, registro: silencio, recursos: async () => recursosFalsos() })(peticion(cuerpo))).json();
+  assert.deepEqual([d3.tipo, d3.mensaje, d3.sugerencias], ['aclaracion', '¿Para qué nivel?', ['Básico']]);
+  const sinRecursos = await crearManejador({ catalogo: CATALOGO, cliente: acl.api, registro: silencio })(peticion(cuerpo));
+  assert.deepEqual([sinRecursos.status, (await sinRecursos.json()).error], [503, 'sin-recursos']);
+  // La revisión, directamente: demasiadas unidades, títulos repetidos sin acentos ni mayúsculas.
+  const nueve = Array.from({ length: 9 }, (_, i) => ({ titulo: `Unidad ${i}`, objetivo: 'Localizar algo.' }));
+  assert.match(revisarRecorrido({ titulo: 'X', unidades: nueve }).errores.join(' '), /demasiadas unidades/);
+  assert.match(revisarRecorrido({ titulo: 'X', unidades: [{ titulo: 'Músculos', objetivo: 'a' }, { titulo: 'musculos', objetivo: 'b' }] }).errores.join(' '), /título repetido/);
+  assert.deepEqual(revisarRecorrido(null).errores, ['recorrido vacío o sin título']);
+});
+
+test('cambiar un recorrido: lo creado se conserva con sus textos (aunque el modelo los reescriba u olvide «conserva») y lo que sale se dice', async () => {
+  const RID = idT(710);
+  const baseRecorrido = {
+    id: RID, titulo: 'Miembro superior', objetivo: 'Conocerlo',
+    unidades: [
+      { titulo: 'Huesos del hombro y del brazo', objetivo: 'Localizar los huesos.', enfoque: '', nivel: 1, minutos: 15, terminos: ['humerus'], estado: 'lista' },
+      { titulo: 'Músculos del hombro', objetivo: 'Identificar el deltoides.', enfoque: '', nivel: 1, minutos: 15, terminos: [], estado: 'pendiente' },
+      { titulo: 'Nervios', objetivo: 'Seguir los nervios.', enfoque: '', nivel: 1, minutos: 15, terminos: [], estado: 'lista' },
+      { titulo: 'Vasos', objetivo: 'Seguir las arterias.', enfoque: '', nivel: 1, minutos: 15, terminos: [], estado: 'preparando' },
+    ],
+  };
+  const cambiado = {
+    ...RECORRIDO_MS,
+    unidades: [
+      { ...UNIDADES[0], titulo: 'Huesos (reescrita)', objetivo: 'Otra cosa.', conserva: 1 },
+      { ...UNIDADES[3], titulo: 'nervios', conserva: null },          // la 3 de antes (ya creada): se conserva sola
+      { ...UNIDADES[2], titulo: 'La mano', objetivo: 'Localizar los huesos de la mano.', conserva: null },
+    ],
+  };
+  const { api, llamadas } = apiGuion(() => ({ tipo: 'recorrido', mensaje: 'Cambiado.', recorrido: cambiado, sugerencias: [] }));
+  const manejar = crearManejador({ catalogo: CATALOGO, cliente: api, registro: silencio, recursos: async () => recursosFalsos() });
+  const misRec = [{ id: RID, titulo: 'Miembro superior', unidades: baseRecorrido.unidades.map((u) => ({ titulo: u.titulo, estado: u.estado })) }];
+  const sol = { ...SOL_CURSO, recorrido_base: RID, enfoque: 'Quita los músculos y los vasos; añade la mano', explicita: false };
+  const cuerpo = { v: 2, modo: 'planificar', idioma: 'es', mensajes: [], solicitud: sol, recorridos: misRec, baseRecorrido };
+  const d = await (await manejar(peticion(cuerpo))).json();
+  assert.equal(d.tipo, 'recorrido');
+  assert.deepEqual(d.recorrido.unidades.map((u) => [u.titulo, u.conserva]), [['Huesos del hombro y del brazo', 1], ['Nervios', 3], ['La mano', null]]);
+  assert.equal(d.recorrido.unidades[0].objetivo, 'Localizar los huesos.', 'lo conservado no lo reescribe el modelo');
+  assert.deepEqual(d.salen, [4], 'la que se estaba preparando sale del recorrido (su lección se guardará igual)');
+  const variable = llamadas[0].system.at(-1).text;
+  assert.match(variable, /SOLICITUD \(cambiar el recorrido personal /);
+  assert.match(variable, /RECORRIDO QUE SE CAMBIA/);
+  assert.match(variable, /1\. «Huesos del hombro y del brazo» \(lista para estudiar; 15 min\)/);
+  assert.match(llamadas[0].messages.at(-1).content, /«Cambiar el recorrido»/);
+  // Sin el recorrido que se cambia (o con otro), no se acepta; si no es de la persona, se planifica como uno nuevo.
+  assert.equal((await manejar(peticion({ ...cuerpo, baseRecorrido: undefined }))).status, 400);
+  assert.equal((await manejar(peticion({ ...cuerpo, baseRecorrido: { ...baseRecorrido, id: idT(711) } }))).status, 400);
+  assert.equal(validarPeticion({ ...cuerpo, recorridos: [] }, IDS).peticion.solicitud.recorrido_base, null);
+});
+
+test('una unidad se planifica sola: su solicitud dice de qué recorrido es y qué tratan las otras (y nada más viaja con ella)', async () => {
+  const { api, llamadas } = apiGuion(() => ({ tipo: 'plan', mensaje: '', plan: PLAN_NARIZ, sugerencias: [] }));
+  const manejar = crearManejador({ catalogo: CATALOGO, cliente: api, registro: silencio, recursos: async () => recursosFalsos() });
+  const sol = limpiarSolicitud({ accion: 'crear', tema: 'Huesos de la nariz', supuestos: [], explicita: true, suficiente: true, recorrido: { titulo: 'La cara', n: 2, total: 3, otras: ['Músculos de la cara', 'Nervios de la cara'] } });
+  await manejar(peticion({ v: 2, modo: 'planificar', idioma: 'es', mensajes: [], solicitud: sol }));
+  assert.equal(llamadas.length >= 1, true);
+  const variable = llamadas[0].system.at(-1).text;
+  assert.match(variable, /ES LA UNIDAD 2 DE 3 DEL RECORRIDO PERSONAL «La cara»\. Las otras unidades: «Músculos de la cara», «Nervios de la cara»\. Planifica solo esta unidad\./);
+  assert.match(variable, /planifica solo esa unidad, con su alcance/);
+  // El contexto del recorrido, solo con forma válida y solo al crear.
+  assert.equal(limpiarSolicitud({ accion: 'crear', tema: 'x', supuestos: [], recorrido: { titulo: 'y', n: 5, total: 3 } }).recorrido, undefined);
+  assert.equal(limpiarSolicitud({ accion: 'adaptar', tema: 'x', leccion_base: 'brazo', supuestos: [], recorrido: { titulo: 'y', n: 1, total: 3 } }, IDS.lecciones).recorrido, undefined);
+  const s = limpiarSolicitud({ accion: 'recorrido', tema: 'Tronco', unidades: 20, recorrido_base: 'no-es-un-id', supuestos: [] });
+  assert.deepEqual([s.unidades, s.recorrido_base, s.leccion_base], [null, null, null]);
+});
+
+test('recorrido: «créame un curso…» planifica las unidades y crea solo la primera; las demás esperan a la persona', async () => {
+  const { rec, tr, posts, almacen, guardadas } = recorridosDe(servidorCurso());
+  const r = rec.planificar(SOL_CURSO, { auto: true });
+  assert.equal(r.ok, true);
+  const R = r.recorrido;
+  assert.match(R.id, /^[0-9a-f-]{36}$/);
+  assert.equal(rec.estadoRecorrido(R), 'planificando', 'se ve «planificando» desde el primer momento');
+  await hasta(() => guardadas.size === 1 && rec.estadoUnidad(R.unidades[0]).estado === 'lista');
+  assert.equal(rec.estadoRecorrido(R), 'listo');
+  assert.deepEqual(R.unidades.map((u) => u.titulo), UNIDADES.map((u) => u.titulo));
+  assert.deepEqual(estados(rec, R), ['lista', 'pendiente', 'pendiente', 'pendiente']);
+  assert.deepEqual(posts.map((p) => [p.modo, p.solicitud?.accion ?? null]), [['planificar', 'recorrido'], ['planificar', 'crear'], ['redactar', null]]);
+  // El recorrido se planifica con la conversación; el servidor acepta la petición.
+  assert.equal(validarPeticion(posts[0], IDS).ok, true);
+  assert.deepEqual(posts[0].mensajes.map((m) => m.texto), ['Créame un curso del miembro superior']);
+  // La unidad, con su propia solicitud (lo que hace falta del recorrido) y sin la conversación, que pedía el curso entero.
+  const pu = posts[1];
+  assert.deepEqual(pu.mensajes, []);
+  assert.equal(pu.solicitud.tema, UNIDADES[0].titulo);
+  assert.deepEqual(pu.solicitud.recorrido, { titulo: 'Miembro superior', n: 1, total: 4, otras: UNIDADES.slice(1).map((u) => u.titulo) });
+  assert.deepEqual(validarPeticion(pu, IDS).peticion.solicitud.recorrido, pu.solicitud.recorrido, 'el servidor la recibe entera');
+  // El trabajo sabe de qué unidad es; la unidad, qué trabajo y qué lección tiene.
+  const x = tr.buscar(R.unidades[0].trabajo);
+  assert.deepEqual(x.unidad, { recorrido: R.id, id: R.unidades[0].id });
+  assert.equal(R.unidades[0].leccion, 'neuri-unidad-1-aaaa');
+  assert.equal(rec.deTrabajo(x.id).n, 1);
+  assert.equal(rec.deLeccion('neuri-unidad-1-aaaa').recorrido, R);
+  // Nada más se crea solo.
+  await esperar(20);
+  assert.equal(posts.length, 3);
+  const res = rec.resumen(R);
+  assert.deepEqual([res.total, res.listas, res.pendientes, res.nuevas, res.nSiguiente, res.minutos], [4, 1, 3, 3, 2, 57]);
+  // Lo guardado: formato versionado, sin las lecciones dentro.
+  const d = JSON.parse(almacen.getItem(CLAVE_RECORRIDOS));
+  assert.deepEqual([d.formato, d.version, d.recorridos.length, d.recorridos[0].instrucciones], ['anato3d.recorridos', 1, 1, VERSION_INSTRUCCIONES]);
+  assert.ok(!JSON.stringify(d).includes('"pasos"'), 'el recorrido no guarda lecciones');
+  // Lo que se cuenta a Neuri: el título y el estado real de cada unidad.
+  assert.deepEqual(rec.resumenes(), [{ id: R.id, titulo: 'Miembro superior', unidades: [{ titulo: UNIDADES[0].titulo, estado: 'lista', leccion: 'neuri-unidad-1-aaaa' }, ...UNIDADES.slice(1).map((u) => ({ titulo: u.titulo, estado: 'pendiente', leccion: null }))] }]);
+  assert.deepEqual(rec.instantanea(R).unidades.map((u) => u.estado), ['lista', 'pendiente', 'pendiente', 'pendiente']);
+});
+
+test('recorrido: de una en una; «todas» van en cola, nunca en paralelo, y la cola se para ante un fallo o una cancelación', async () => {
+  const abiertas = { ahora: 0, max: 0 };
+  const { rec, posts, guardadas } = recorridosDe(servidorCurso({ abiertas }));
+  const R = rec.planificar(SOL_CURSO).recorrido;                   // sin «auto»: decide la persona
+  await hasta(() => rec.estadoRecorrido(R) === 'listo');
+  assert.equal(posts.length, 1, 'sin pedirlo expresamente no se crea ninguna');
+  assert.equal(rec.crearUnidad(R.id, R.unidades[2].id).ok, true, 'una concreta');
+  assert.equal(rec.estadoUnidad(R.unidades[2]).estado, 'preparando');
+  assert.deepEqual(rec.crearUnidad(R.id, R.unidades[0].id), { ok: false, error: 'ocupado' }, 'otra no empieza mientras hay una en preparación');
+  assert.deepEqual(rec.crearUnidad(R.id, R.unidades[2].id), { ok: false, error: 'ya' });
+  await hasta(() => guardadas.size === 1);
+  // «Todas»: las que faltan, en cola.
+  assert.equal(rec.crearTodas(R.id).ok, true);
+  assert.equal(R.cola, true);
+  await hasta(() => guardadas.size === 4 && !R.cola, 5000);
+  assert.equal(abiertas.max, 1, 'nunca dos creaciones a la vez');
+  assert.deepEqual(estados(rec, R), ['lista', 'lista', 'lista', 'lista']);
+  assert.deepEqual(posts.filter((p) => p.modo === 'planificar' && p.solicitud.accion === 'crear').map((p) => p.solicitud.recorrido.n), [3, 1, 2, 4]);
+  assert.deepEqual(rec.crearTodas(R.id), { ok: false, error: 'nada' });
+  assert.deepEqual(rec.crearSiguiente(R.id), { ok: false, error: 'nada' });
+  // Un fallo para la cola: la siguiente no empieza y lo que falló no se reintenta solo.
+  const f = recorridosDe(servidorCurso({ falla: (c, k) => (k === 2 ? { estado: 'error', error: 'servidor' } : null) }));
+  const R2 = f.rec.planificar(SOL_CURSO).recorrido;
+  await hasta(() => f.rec.estadoRecorrido(R2) === 'listo');
+  f.rec.crearTodas(R2.id);
+  await hasta(() => !R2.cola);
+  await esperar(20);
+  assert.deepEqual(estados(f.rec, R2), ['lista', 'error', 'pendiente', 'pendiente']);
+  assert.deepEqual([R2.aviso.codigo, R2.aviso.unidad], ['parada', R2.unidades[1].id]);
+  assert.equal(R2.unidades[2].trabajo, null, 'la siguiente no empezó');
+  assert.equal(f.posts.filter((p) => p.modo === 'redactar').length, 2);
+  // Cancelar una unidad también para la cola, y la unidad vuelve a estar pendiente (cancelada).
+  const c = recorridosDe(servidorCurso({ colgar: (k) => k === 1 }));
+  const R3 = c.rec.planificar(SOL_CURSO).recorrido;
+  await hasta(() => c.rec.estadoRecorrido(R3) === 'listo');
+  c.rec.crearTodas(R3.id);
+  await hasta(() => c.tr.buscar(R3.unidades[0].trabajo)?.estado === 'fuentes');
+  await c.tr.cancelar(R3.unidades[0].trabajo);
+  assert.deepEqual([R3.cola, R3.aviso.codigo], [false, 'cancelada']);
+  const e = c.rec.estadoUnidad(R3.unidades[0]);
+  assert.deepEqual([e.estado, e.motivo], ['pendiente', 'cancelada']);
+  assert.equal(R3.unidades[1].trabajo, null);
+  // Parar la cola: la que está en marcha sigue, las demás esperan.
+  const p = recorridosDe(servidorCurso({ colgar: (k) => k === 1 }));
+  const R4 = p.rec.planificar(SOL_CURSO).recorrido;
+  await hasta(() => p.rec.estadoRecorrido(R4) === 'listo');
+  p.rec.crearTodas(R4.id);
+  assert.equal(p.rec.parar(R4.id), true);
+  assert.equal(R4.cola, false);
+  assert.equal(p.rec.estadoUnidad(R4.unidades[0]).estado, 'preparando');
+  await p.tr.cancelar(R4.unidades[0].trabajo);
+});
+
+test('recorrido: cada unidad dice su estado real (sin guardar, interrumpida, error, cancelada, lección quitada) y volver a intentarla reutiliza su plan', async () => {
+  const ahora = Date.now();
+  const rid = idT(500);
+  const uid = (k) => `uprueba${k}000`;
+  const trabajo = (k, estado, extra = {}) => ({ id: idT(600 + k), estado, titulo: `Unidad ${k}`, accion: 'crear', solicitud: null, plan: PLAN_NARIZ, base: null, unidad: { recorrido: rid, id: uid(k) }, creado: ahora, actualizado: ahora, ...extra });
+  const guardados = [trabajo(1, 'no-guardada', { error: 'lleno', leccionId: 'neuri-x-aaaa' }), trabajo(2, 'interrumpida'), trabajo(3, 'limitacion', { codigo: 'pocas-evidencias' }), trabajo(4, 'error', { error: 'cancelada' }), trabajo(5, 'guardada', { leccionId: 'neuri-quitada-aaaa' }), trabajo(6, 'error', { error: 'servidor' })];
+  const unidad = (k, extra = {}) => ({ id: uid(k), titulo: `Unidad ${k}`, objetivo: 'Localizar algo.', enfoque: '', nivel: 1, minutos: 10, terminos: [], relacionadas: [], trabajo: null, leccion: null, ...extra });
+  const R = {
+    id: rid, estado: 'listo', titulo: 'Prueba', resumen: '', objetivo: '', nivel: 1, solicitud: SOL_CURSO, cambio: null,
+    unidades: [1, 2, 3, 4, 5, 6].map((k) => unidad(k, { trabajo: idT(600 + k), ...(k === 5 ? { leccion: 'neuri-quitada-aaaa' } : {}) })).concat([unidad(7, { leccion: 'neuri-existe-aaaa' }), unidad(8)]),
+    supuestos: [], limitaciones: [], mensaje: null, codigo: null, error: null, errores: null, reanudable: false, cola: false, auto: false, aviso: null, salen: [], creado: ahora, actualizado: ahora,
+  };
+  const almacen = memoria({ [CLAVE_TRABAJOS]: JSON.stringify(guardados), [CLAVE_RECORRIDOS]: JSON.stringify({ formato: 'anato3d.recorridos', version: 1, recorridos: [R] }) });
+  const { rec, posts } = recorridosDe(servidorCurso(), { almacen, guardadas: new Set(['neuri-existe-aaaa']) });
+  const L = rec.buscar(rid);
+  assert.deepEqual(estados(rec, L), ['sin-guardar', 'interrumpida', 'error', 'pendiente', 'pendiente', 'error', 'lista', 'pendiente']);
+  assert.equal(rec.estadoUnidad(L.unidades[2]).codigo, 'pocas-evidencias');
+  assert.equal(rec.estadoUnidad(L.unidades[3]).motivo, 'cancelada');
+  assert.equal(rec.estadoUnidad(L.unidades[4]).motivo, 'quitada', 'guardada, pero su lección ya no está en Mis lecciones');
+  assert.equal(rec.estadoUnidad(L.unidades[7]).motivo, undefined);
+  assert.deepEqual(rec.crearUnidad(rid, L.unidades[0].id), { ok: false, error: 'ya' }, 'sin guardar: se vuelve a guardar desde su creación, no se crea otra');
+  assert.deepEqual(rec.crearUnidad(rid, L.unidades[6].id), { ok: false, error: 'ya' });
+  const res = rec.resumen(L);
+  assert.deepEqual([res.listas, res.pendientes, res.problemas, res.nuevas, res.nSiguiente], [1, 3, 4, 1, 4]);
+  // Volver a intentar la del error: el mismo plan (sin planificar otra vez), en un trabajo nuevo que la sustituye.
+  const r = rec.crearUnidad(rid, L.unidades[5].id);
+  assert.equal(r.ok, true);
+  assert.deepEqual([r.trabajo.reemplaza, L.unidades[5].trabajo, r.trabajo.unidad.id], [idT(606), r.trabajo.id, uid(6)]);
+  await hasta(() => rec.estadoUnidad(L.unidades[5]).estado === 'lista');
+  assert.deepEqual(posts.map((p) => [p.modo, p.plan?.titulo]), [['redactar', PLAN_NARIZ.titulo]], 'sin volver a planificar');
+  // La que nunca se intentó: un trabajo nuevo con su solicitud (unidad 8 de 8).
+  rec.crearUnidad(rid, L.unidades[7].id);
+  await hasta(() => posts.length === 3);
+  assert.deepEqual([posts[1].modo, posts[1].solicitud.recorrido.n, posts[1].solicitud.recorrido.total], ['planificar', 8, 8]);
+});
+
+test('recorrido: si no cabe en «Mis lecciones», la unidad no empieza (ni gasta) y lo dice; con «auto», el recorrido queda listo igual', async () => {
+  const { rec, posts } = recorridosDe(servidorCurso(), { espacio: () => 0 });
+  const R = rec.planificar(SOL_CURSO, { auto: true }).recorrido;
+  await hasta(() => rec.estadoRecorrido(R) === 'listo');
+  assert.equal(R.aviso?.codigo, 'lleno');
+  assert.deepEqual(estados(rec, R), ['pendiente', 'pendiente', 'pendiente', 'pendiente']);
+  assert.deepEqual(rec.crearSiguiente(R.id), { ok: false, error: 'lleno' });
+  assert.deepEqual(rec.crearTodas(R.id), { ok: false, error: 'lleno' });
+  assert.equal(R.cola, false);
+  assert.equal(posts.length, 1, 'solo la planificación del recorrido');
+  rec.olvidarAviso(R.id);
+  assert.equal(R.aviso, null);
+});
+
+test('recorrido: al recargar, la unidad en preparación se retoma sin repetirla y la cola sigue; una planificación cortada queda interrumpida', async () => {
+  const almacen = memoria();
+  const a = recorridosDe(servidorCurso({ colgar: (k) => k === 1 }), { almacen });
+  const R = a.rec.planificar(SOL_CURSO).recorrido;
+  await hasta(() => a.rec.estadoRecorrido(R) === 'listo');
+  a.rec.crearTodas(R.id);
+  await hasta(() => a.tr.buscar(R.unidades[0].trabajo)?.estado === 'fuentes');
+  const copia = { ...almacen.datos };                                // lo que queda guardado al recargar
+  await a.tr.cancelar(R.unidades[0].trabajo);                        // (cierra la conexión de la pestaña anterior)
+  // La página nueva: el servidor termina la unidad 1 (sin repetirla) y la cola sigue con las demás.
+  const b = recorridosDe(servidorCurso(), { almacen: memoria(copia) });
+  const Rb = b.rec.buscar(R.id);
+  assert.equal(Rb.cola, true);
+  assert.equal(b.rec.estadoUnidad(Rb.unidades[0]).estado, 'preparando');
+  b.rec.retomar();
+  assert.equal(b.posts.length, 0, 'mientras la unidad 1 sigue en preparación, la cola espera');
+  await b.tr.retomarPendientes();
+  await hasta(() => b.guardadas.size === 4 && !Rb.cola, 5000);
+  assert.deepEqual(b.posts[0], { v: 2, modo: 'trabajo', trabajo: R.unidades[0].trabajo });
+  assert.equal(Rb.unidades[0].leccion, 'neuri-unidad-retomada-aaaa');
+  assert.deepEqual(b.posts.filter((p) => p.modo === 'planificar').map((p) => p.solicitud.recorrido.n), [2, 3, 4]);
+  assert.deepEqual(estados(b.rec, Rb), ['lista', 'lista', 'lista', 'lista']);
+  // Una planificación que se cortó al cerrar la página: interrumpida; volver a planificar es decisión de la persona.
+  const cortada = JSON.parse(copia[CLAVE_RECORRIDOS]);
+  cortada.recorridos[0] = { ...cortada.recorridos[0], estado: 'planificando', unidades: [], cola: false };
+  const c = recorridosDe(servidorCurso(), { almacen: memoria({ [CLAVE_RECORRIDOS]: JSON.stringify(cortada) }) });
+  const Rc = c.rec.buscar(R.id);
+  assert.equal(c.rec.estadoRecorrido(Rc), 'interrumpido');
+  c.rec.retomar();
+  assert.equal(c.posts.length, 0, 'no se vuelve a planificar solo');
+  assert.equal(c.rec.reintentar(Rc.id).ok, true);
+  assert.equal(c.rec.estadoRecorrido(Rc), 'planificando');
+  await hasta(() => c.rec.estadoRecorrido(Rc) === 'listo');
+  assert.equal(Rc.unidades.length, 4);
+  assert.deepEqual(c.rec.reintentar(Rc.id), { ok: false, error: 'no' }, 'ya está planificado');
+});
+
+test('recorrido: guardado versionado; lo dañado o de una versión más nueva se aparta sin perderse y nunca se sobrescribe', async () => {
+  // Ilegible: se aparta al escribir.
+  const roto = memoria({ [CLAVE_RECORRIDOS]: '{no es json' });
+  const a = recorridosDe(servidorCurso(), { almacen: roto });
+  assert.deepEqual(a.rec.lista, []);
+  assert.deepEqual(a.rec.apartados().map((x) => x.texto), ['{no es json']);
+  const R = a.rec.planificar(SOL_CURSO).recorrido;
+  await hasta(() => a.rec.estadoRecorrido(R) === 'listo');
+  assert.deepEqual(JSON.parse(roto.getItem(CLAVE_RECORRIDOS_APARTADOS)).map((x) => x.texto), ['{no es json']);
+  const bueno = JSON.parse(roto.getItem(CLAVE_RECORRIDOS)).recorridos[0];
+  // De una versión más nueva: esta no lo sabe leer, así que se aparta entero.
+  const futuro = JSON.stringify({ formato: 'anato3d.recorridos', version: 2, recorridos: [{ id: idT(900), algo: 'nuevo' }] });
+  const b = recorridosDe(servidorCurso(), { almacen: memoria({ [CLAVE_RECORRIDOS]: futuro }) });
+  assert.deepEqual(b.rec.lista, []);
+  b.rec.planificar(SOL_CURSO);
+  assert.equal(JSON.parse(b.almacen.getItem(CLAVE_RECORRIDOS_APARTADOS))[0].texto, futuro);
+  // Uno dañado entre otros buenos: se aparta ese solo; un estado que no se conoce se lee como interrumpido.
+  const malo = { ...bueno, id: idT(901), unidades: [{ id: 'X', titulo: '' }] };
+  const raro = { ...bueno, id: idT(902), estado: 'pensando' };
+  const c = recorridosDe(servidorCurso(), { almacen: memoria({ [CLAVE_RECORRIDOS]: JSON.stringify({ formato: 'anato3d.recorridos', version: 1, recorridos: [bueno, malo, raro, bueno] }) }) });
+  assert.deepEqual(c.rec.lista.map((x) => x.id), [bueno.id, idT(902)]);
+  assert.equal(c.rec.estadoRecorrido(c.rec.buscar(idT(902))), 'interrumpido');
+  assert.equal(c.rec.apartados().length, 2, 'el dañado y el repetido');
+  // Si no se puede apartar (ya hay demasiado apartado), no se escribe: lo que había sigue igual.
+  const lleno = memoria({ [CLAVE_RECORRIDOS]: '{roto', [CLAVE_RECORRIDOS_APARTADOS]: JSON.stringify(Array.from({ length: 30 }, (_, i) => ({ texto: `x${i}` }))) });
+  const d = recorridosDe(servidorCurso(), { almacen: lleno });
+  d.rec.planificar(SOL_CURSO);
+  assert.equal(lleno.getItem(CLAVE_RECORRIDOS), '{roto', 'nunca se sobrescribe lo que no se pudo apartar');
+  assert.equal(d.rec.descartarApartados(), true, 'la persona decide descartarlo (después de poder descargarlo)');
+  assert.equal(JSON.parse(lleno.getItem(CLAVE_RECORRIDOS)).recorridos.length, 1);
+  assert.deepEqual(d.rec.apartados(), []);
+  // Como mucho MAX_RECORRIDOS: el siguiente no se planifica (y no se borra ninguno).
+  const doce = Array.from({ length: MAX_RECORRIDOS }, (_, i) => ({ ...bueno, id: idT(1000 + i) }));
+  const e = recorridosDe(servidorCurso(), { almacen: memoria({ [CLAVE_RECORRIDOS]: JSON.stringify({ formato: 'anato3d.recorridos', version: 1, recorridos: doce }) }) });
+  assert.deepEqual(e.rec.planificar(SOL_CURSO), { ok: false, error: 'lleno-recorridos' });
+  assert.equal(e.rec.lista.length, MAX_RECORRIDOS);
+  assert.equal(e.posts.length, 0);
+});
+
+test('recorrido: cambiarlo conserva lo creado, lo que sale sigue en «Mis lecciones», y cancelar el cambio lo deja como estaba', async () => {
+  const nuevo = {
+    ...RECORRIDO_MS,
+    unidades: [{ ...UNIDADES[0], conserva: 1 }, { ...UNIDADES[1], conserva: 2 }, { titulo: 'La mano', objetivo: 'Localizar los huesos de la mano.', enfoque: '', nivel: 1, minutos: 15, terminos: ['hand'], relacionadas: [], conserva: null }],
+  };
+  const base = servidorCurso();
+  let colgar = false;
+  const servidor = (cuerpo, init) => {
+    if (cuerpo.modo === 'planificar' && cuerpo.solicitud?.accion === 'recorrido' && colgar) return new Promise(() => {});
+    if (cuerpo.modo === 'planificar' && cuerpo.solicitud?.recorrido_base) return { datos: { ok: true, tipo: 'recorrido', mensaje: 'Cambiado.', recorrido: nuevo, salen: [3], sugerencias: [] } };
+    return base(cuerpo, init);
+  };
+  const { rec, posts, guardadas } = recorridosDe(servidor);
+  const R = rec.planificar(SOL_CURSO).recorrido;
+  await hasta(() => rec.estadoRecorrido(R) === 'listo');
+  rec.crearUnidad(R.id, R.unidades[0].id);
+  await hasta(() => guardadas.size === 1);
+  rec.crearUnidad(R.id, R.unidades[2].id);
+  await hasta(() => guardadas.size === 2);
+  const [u1, , u3] = R.unidades;
+  const sol = limpiarSolicitud({ accion: 'recorrido', tema: 'Miembro superior', enfoque: 'Quita los músculos del brazo y los nervios; añade la mano', supuestos: [], recorrido_base: R.id }, null, new Set([R.id]));
+  assert.equal(rec.replanificar(R.id, sol).ok, true);
+  assert.equal(rec.estadoRecorrido(R), 'planificando');
+  assert.deepEqual(rec.crearUnidad(R.id, R.unidades[1].id), { ok: false, error: 'planificando' }, 'mientras se cambia, no se crea nada');
+  await hasta(() => rec.estadoRecorrido(R) === 'listo');
+  const p = posts.at(-1);
+  assert.equal(p.solicitud.recorrido_base, R.id);
+  assert.deepEqual(p.baseRecorrido.unidades.map((u) => u.estado), ['lista', 'pendiente', 'lista', 'pendiente']);
+  assert.equal(validarPeticion(p, IDS).ok, true, 'el servidor acepta el cambio: el recorrido es de la persona');
+  assert.deepEqual(R.unidades.map((u) => u.titulo), [UNIDADES[0].titulo, UNIDADES[1].titulo, 'La mano']);
+  assert.equal(R.unidades[0], u1, 'la unidad conservada es la misma, con su trabajo y su lección');
+  assert.equal(rec.estadoUnidad(R.unidades[0]).estado, 'lista');
+  assert.deepEqual(R.salen.map((s) => [s.titulo, s.estado, s.leccion]), [[u3.titulo, 'lista', u3.leccion]]);
+  assert.ok(guardadas.has(u3.leccion), 'su lección sigue en Mis lecciones');
+  rec.olvidarAviso(R.id);
+  assert.deepEqual(R.salen, []);
+  // Cambiarlo con la cola en marcha la para (con unidades nuevas, qué crear después lo decide la persona).
+  R.cola = true;
+  colgar = true;
+  rec.replanificar(R.id, sol);
+  assert.equal(R.cola, false);
+  rec.cancelar(R.id);
+  // Cancelar un cambio: el recorrido sigue como estaba.
+  const antes = R.unidades.map((u) => u.id);
+  rec.replanificar(R.id, sol);
+  assert.deepEqual(rec.replanificar(R.id, sol), { ok: false, error: 'planificando' });
+  assert.equal(rec.cancelar(R.id), true);
+  assert.deepEqual([R.unidades.map((u) => u.id), rec.estadoRecorrido(R), R.aviso.codigo], [antes, 'listo', 'cambio-cancelado']);
+  // Cancelar la planificación de uno nuevo: no deja nada.
+  const n = rec.planificar(SOL_CURSO).recorrido;
+  assert.equal(rec.cancelar(n.id), true);
+  assert.equal(rec.buscar(n.id), null);
+  assert.equal(rec.cancelar(n.id), false);
+});
+
+test('recorrido: quitarlo no borra sus lecciones (las devuelve por si la persona decide aparte) y lo que se prepara sigue', async () => {
+  const { rec, tr, guardadas } = recorridosDe(servidorCurso({ colgar: (k) => k === 2 }));
+  const R = rec.planificar(SOL_CURSO).recorrido;
+  await hasta(() => rec.estadoRecorrido(R) === 'listo');
+  rec.crearUnidad(R.id, R.unidades[0].id);
+  await hasta(() => guardadas.size === 1);
+  rec.crearTodas(R.id);
+  await hasta(() => tr.buscar(R.unidades[1].trabajo)?.estado === 'fuentes');
+  const leccion = R.unidades[0].leccion;
+  const enCurso = R.unidades[1].trabajo;
+  assert.deepEqual(rec.quitar(R.id), { ok: true, lecciones: [leccion] });
+  assert.equal(rec.buscar(R.id), null);
+  assert.ok(guardadas.has(leccion), 'la lección sigue en Mis lecciones');
+  assert.equal(tr.buscar(enCurso).estado, 'fuentes', 'la unidad en preparación sigue (se guardará como una lección más)');
+  assert.equal(rec.deTrabajo(enCurso), null, 'ya no es de ningún recorrido');
+  assert.deepEqual(rec.quitar(R.id), { ok: false, lecciones: [] });
+  await tr.cancelar(enCurso);
+  // «Borrar mis datos»: se olvidan todos.
+  rec.planificar(SOL_CURSO);
+  rec.olvidar();
+  assert.deepEqual(rec.lista, []);
+});
+
+test('conversación: los recorridos viajan en cada petición y Neuri recuerda la propuesta y las unidades con su estado', async () => {
+  const RID = idT(720);
+  const { fetch, posts } = fetchFalso(() => ({ datos: { ok: true, ...BIEN } }));
+  const resumenes = [{ id: RID, titulo: 'Miembro superior', unidades: [{ titulo: 'Huesos', estado: 'lista', leccion: null }] }];
+  const c = conv(fetch, memoria(), () => [], { recorridos: () => resumenes });
+  await c.preguntar('Créame un curso del miembro superior');
+  assert.deepEqual(posts[0].recorridos, resumenes);
+  assert.deepEqual(validarPeticion(posts[0], IDS).peticion.recorridos, resumenes);
+  // La propuesta de un recorrido se recuerda con lo que pidió.
+  c.mensajes.at(-1).tipo = 'propuesta';
+  c.mensajes.at(-1).solicitud = SOL_CURSO;
+  assert.match(c.historial().at(-1).texto, /\[Propuesta mostrada \(recorrido\): tema: Miembro superior; .*unidades: —; minutos de cada unidad: 15/);
+  // Y el recorrido, con el estado de cada unidad (y sus lecciones).
+  c.anotarRecorrido(RID, { estado: 'listo', titulo: 'Miembro superior', unidades: [{ titulo: 'Huesos', estado: 'lista', leccion: 'neuri-huesos-aaaa' }, { titulo: 'Músculos', estado: 'preparando', leccion: null }] });
+  assert.equal(c.tieneRecorrido(RID), true);
+  assert.match(c.historial().at(-1).texto, new RegExp(`\\[Recorrido personal «Miembro superior» \\(${RID}\\): 1\\. Huesos \\(lista para estudiar: neuri-huesos-aaaa\\); 2\\. Músculos \\(en preparación\\)\\.\\]`));
+  c.resumirRecorrido(RID, { quitado: true });
+  assert.match(c.historial().at(-1).texto, /\[La persona quitó el recorrido personal «Miembro superior»; sus lecciones siguen en Mis lecciones\.\]/);
+  c.resumirRecorrido(idT(721), { quitado: true });                  // uno que no está: no pasa nada
+});
+
+test('sin IA: «créame un curso…» dice que crear necesita la IA y busca lo que hay de ese tema', () => {
+  const e = entorno();
+  for (const f of ['Créame un curso del miembro superior', 'Make me a course on the upper limb', 'Erstelle einen Kurs über den Arm']) {
+    const r = responderLocal(f, e);
+    assert.ok(r.mensaje.startsWith(t('pet.local.crear')), f);
+  }
+  assert.ok(responderLocal('Créame un curso del miembro superior', e).lecciones.length >= 1);
+});
+
+test('Mis datos: los recorridos se exportan, se importan sin duplicar (sin las creaciones de otro navegador) y «Borrar mis datos» los quita', async () => {
+  const { exportarDatos, importarDatos, borrarDatos, inventarioDatos, CLAVES_ESTUDIO } = await import('../src/biblioteca/datos.js');
+  const P = await import('../src/biblioteca/progreso.js');
+  const a = recorridosDe(servidorCurso());
+  const R = a.rec.planificar(SOL_CURSO).recorrido;
+  await hasta(() => a.rec.estadoRecorrido(R) === 'listo');
+  a.rec.crearUnidad(R.id, R.unidades[0].id);
+  await hasta(() => a.guardadas.size === 1);
+  const archivo = exportarDatos({ almacen: a.almacen, data: P.vacio(), ahora: () => 0 });
+  assert.equal(JSON.parse(archivo).recorridos.formato, 'anato3d.recorridos');
+  const otro = memoria();
+  otro.removeItem = (k) => { delete otro.datos[k]; };
+  const r = importarDatos(archivo, { almacen: otro, data: P.vacio() });
+  assert.deepEqual([r.recorridos.ok, r.recorridos.añadidos], [true, 1]);
+  const importado = JSON.parse(otro.getItem(CLAVE_RECORRIDOS)).recorridos[0];
+  assert.deepEqual([importado.unidades[0].trabajo, importado.unidades[0].leccion, importado.cola], [null, R.unidades[0].leccion, false]);
+  assert.equal(importarDatos(archivo, { almacen: otro, data: P.vacio() }).recorridos.iguales, 1, 'sin duplicar');
+  assert.equal(inventarioDatos({ almacen: otro, data: P.vacio() }).recorridos, 1);
+  assert.deepEqual(importarRecorridos(otro, { formato: 'otra-cosa' }).error, 'formato');
+  assert.ok(CLAVES_ESTUDIO.includes(CLAVE_RECORRIDOS) && CLAVES_ESTUDIO.includes(CLAVE_RECORRIDOS_APARTADOS));
+  assert.equal(borrarDatos({ almacen: otro }), true);
+  assert.equal(otro.getItem(CLAVE_RECORRIDOS), null);
+});
+
+test('textos de los recorridos: en los cinco idiomas y, en francés, siempre de «vous»', async () => {
+  const { TEXTOS } = await import('../src/i18n/textos.js');
+  const extra = ['pet.campo.recorrido', 'pet.campo.unidades', 'pet.campo.minutosUnidad', 'pet.campo.cambio', 'pet.error.recorrido-invalido', 'pet.error.lleno-recorridos', 'dat.recorridos', 'dat.saleNeuri'];
+  const claves = Object.keys(TEXTOS).filter((k) => k.startsWith('pet.rec.') || extra.includes(k));
+  assert.ok(claves.length >= 70, `${claves.length} textos`);
+  for (const k of claves) {
+    for (const id of ['es', 'en', 'de', 'fr', 'it']) assert.ok([].concat(TEXTOS[k][id]).every((s) => typeof s === 'string' && s.trim()), `${k} (${id})`);
+    // (Con límites de palabra que entienden los acentos: «complètes» no es «tes».)
+    assert.doesNotMatch([].concat(TEXTOS[k].fr).join(' '), /(?<!\p{L})(tu|toi|ton|ta|tes|te)(?!\p{L})|(?<!\p{L})t[’']/iu, `${k}: en francés, de «vous»`);
+  }
+  fijarIdioma('fr');
+  assert.equal(t('pet.rec.cambiarBorrador', { titulo: 'Membre supérieur' }), 'Modifiez le parcours « Membre supérieur » : ');
+  assert.equal(tn('pet.rec.quitarConLecciones', 3), 'Retirer aussi ses 3 leçons');
+  fijarIdioma('de');
+  assert.equal(tn('pet.rec.caben', 1), 'In Meine Lektionen ist nur noch Platz für 1 Lektion.');
+  fijarIdioma('es');
+  assert.equal(t('pet.rec.avance', { listas: 2, total: 6 }), '2 de 6 listas para estudiar');
 });

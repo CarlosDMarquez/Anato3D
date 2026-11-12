@@ -57,6 +57,17 @@ export function cargarPropias(storage) {
   return leerTodo(storage).validas;
 }
 
+/**
+ * Cuántas lecciones hay guardadas, sin comprobarlas una a una (rápido): para saber si cabe otra antes de empezar a
+ * crearla (los recorridos personales, src/pet/recorridos.js). Lo dañado también cuenta: ocupa sitio hasta que se aparta.
+ */
+export function contarGuardadas(storage) {
+  try {
+    const d = JSON.parse(storage?.getItem(CLAVE_PROPIAS) ?? '[]');
+    return Array.isArray(d) ? d.length : 0;
+  } catch { return 0; }
+}
+
 /** Lo apartado (lecciones dañadas o de otra versión que no se pudieron abrir), con cuándo se apartó. */
 export function apartadas(storage) {
   try {

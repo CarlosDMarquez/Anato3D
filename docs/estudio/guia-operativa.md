@@ -69,7 +69,7 @@ La consola dice el coste de cada llamada.
 
 | Comando | Qué comprueba | Resultado el 9 nov 2026 |
 | --- | --- | --- |
-| `npm test` | 148 pruebas sin red ni gasto: biblioteca, evaluación, progreso, datos, Neuri (con la IA simulada) y robustez | 148 de 148 |
+| `npm test` | 165 pruebas sin red ni gasto: biblioteca, evaluación, progreso, datos, Neuri (con la IA simulada, también los recorridos por unidades) y robustez | 165 de 165 *[Histórico: 148 de 148 antes de los recorridos por unidades]* |
 | `npm run check` | Fichas, textos en cinco idiomas, biblioteca (formato, citas comprobadas, catálogo y cobertura al día) e inventario de Neuri | «todo correcto» |
 | `npm run fuentes -- comprobar` | Cada cita de cada lección, palabra por palabra, en su página guardada | 3068 citas en 286 páginas, 0 sin encontrar |
 | `npm run build` | Que la versión de producción se construye | Sin errores |

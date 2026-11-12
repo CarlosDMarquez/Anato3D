@@ -10,10 +10,11 @@ Qué datos hay, dónde viven, quién puede cambiarlos, con qué versión y qué 
 
 ## Principios
 
-1. **Cada cosa tiene su identificador y no se mezclan.** Hay seis identificadores distintos:
+1. **Cada cosa tiene su identificador y no se mezclan.** Hay ocho identificadores distintos *[Histórico: seis hasta los recorridos personales, el 9 nov por la noche]*:
    - el de la lección (estable), por ejemplo `ms-codo` o `neuri-huesos-de-la-nariz-a1b2`;
    - su versión de contenido;
    - el trabajo de creación (un UUID);
+   - el recorrido personal (otro UUID, que nunca es el de un trabajo) y cada una de sus unidades (`u…`, estable aunque el recorrido cambie);
    - el intento de respuesta (fecha, lección y pregunta);
    - el reporte (un UUID);
    - el evento (un UUID).
@@ -42,6 +43,8 @@ Qué datos hay, dónde viven, quién puede cambiarlos, con qué versión y qué 
 | Mis lecciones | Navegador | `anato3d.propias` | — (cada lección valida su forma) | La persona, con Neuri |
 | Lecciones propias apartadas | Navegador | `anato3d.propias.apartadas` | — | La app (solo para no perderlas) |
 | Trabajos de creación | Navegador y servidor | `anato3d.trabajos`; memoria del servidor | — | La app y el servidor |
+| Recorridos personales | Navegador | `anato3d.recorridos` | 1 | La persona, con Neuri |
+| Recorridos apartados | Navegador | `anato3d.recorridos.apartados` | — | La app (solo para no perderlos) |
 | Conversación con Neuri | Pestaña | `anato3d.neuri` (sessionStorage) | — | La persona |
 | Reportes de problemas | Navegador y servidor | `anato3d.reportes`; `web/server/datos/reportes.jsonl` | 1 | La persona (envía); quien revisa (decide) |
 | Decisiones sobre reportes | Servidor | `web/server/datos/decisiones.jsonl` | — | Quien revisa (`npm run reportes`) |
@@ -105,7 +108,7 @@ El filtro de idioma y la etiqueta de la tarjeta usan `idiomas`.
 | Guardar un id que ya existe con otro contenido | Se guarda como copia (`-copia2`…) | La original |
 | Renombrar | Cambia `titulo` y anota `origen.tituloOriginal` | El contenido, la versión, el progreso y las respuestas |
 | Adaptar | Crea **otra** lección (otro `id`, `origen.modo: 'adaptar'`, `origen.base` = la original) | La original y todo su progreso |
-| Quitar (tras confirmar) | Se borra la lección, su progreso, sus preguntas del repaso y su favorito | Lo demás. No se puede deshacer (se avisa) |
+| Quitar (tras confirmar) | Se borra la lección, su progreso, sus preguntas del repaso y su favorito. Si era una unidad de un recorrido, la unidad vuelve a «pendiente» | Lo demás. No se puede deshacer (se avisa) |
 | Exportar | Archivo `{ formato: 'anato3d.mis-lecciones', version: 1, fecha, lecciones }` | — |
 | Importar | Combina sin duplicar: las iguales se omiten, las distintas con el mismo id entran como copia, las no válidas se rechazan y las que no caben se cuentan | Lo que ya había |
 | Datos dañados o de otra versión | Se apartan en `anato3d.propias.apartadas` antes de escribir; la persona puede descargarlos o descartarlos | Todo hasta que la persona decide |
@@ -211,10 +214,15 @@ Los fallos anteriores dejan de contar contra la persona (especificación, secci�
 ```
 { id (UUID), estado, titulo, accion: 'crear' | 'adaptar', solicitud, plan, base,
   estructuras, evidencias, informe, leccionId, error, codigo, errores, mensaje, reanudable, creado, actualizado,
-  reemplaza? }
+  reemplaza?, unidad? }
 ```
 
 `reemplaza` es el id del trabajo al que sustituye un reintento.
+
+`unidad: { recorrido, id }` (opcional) dice que el trabajo crea una unidad de un recorrido personal:
+- se planifica con su propia solicitud, que lleva `recorrido: { titulo, n, total, otras }` (lo que hace falta saber del recorrido para no repetir las otras unidades), y sin la conversación;
+- un reintento conserva `unidad`, así que sigue siendo de la misma unidad;
+- si la unidad o el recorrido ya no están, el trabajo sigue como una creación más y su lección se guarda igual.
 
 **Estados:**
 - **en curso:** `planificando → fuentes → redactando → comprobando (→ corrigiendo → comprobando) → guardando`;
@@ -236,21 +244,88 @@ Un estado que esta versión no conoce se lee como `interrumpida`.
 | Recargar la página | La app se reconecta con `modo: 'trabajo'` (sin coste); si el servidor ya no lo tiene, queda `interrumpida` y volver a empezar es decisión de la persona (cuesta dinero) | El plan |
 | Lista pero sin guardar | `no-guardada`: el resultado se conserva para reintentar o descargar | La lección generada (en memoria de la pestaña) |
 
+## Recorrido personal (versión 1)
+
+Lo que no cabe en una lección, repartido en unidades que se crean de una en una (especificación, sección 14).
+
+**Código:** `web/src/pet/recorridos.js` en la app, y `planificarRecorrido` y `revisarRecorrido` en `web/server/pet.mjs`.
+
+**Clave:** `anato3d.recorridos`. Como mucho 12 recorridos de 8 unidades.
+
+```
+{ formato: 'anato3d.recorridos', version: 1, recorridos: [
+  { id (UUID), estado, titulo, resumen, objetivo, nivel, solicitud, cambio, unidades, supuestos, limitaciones,
+    mensaje, codigo, error, errores, reanudable, cola, auto, aviso, salen, instrucciones, creado, actualizado } ] }
+
+unidad: { id ('u…'), titulo, objetivo, enfoque, nivel, minutos, terminos, relacionadas, trabajo (UUID | null), leccion (id | null) }
+```
+
+| Campo | Qué lleva |
+| --- | --- |
+| `estado` | El de la última planificación: `planificando`, `listo`, `aclaracion`, `limitacion`, `error` o `interrumpido` |
+| `solicitud`, `cambio` | Lo que se pidió al crearlo y, mientras se cambia, el cambio (para volver a intentarlo) |
+| `cola` | La persona pidió crear todas: van en cola, una tras otra |
+| `auto` | La persona pidió el recorrido expresamente: al tener las unidades se crea la primera |
+| `aviso` | Lo último que hay que contar: la cola se paró, no cabe, el cambio se canceló… |
+| `salen` | Las unidades ya creadas que salieron en el último cambio (su lección sigue en «Mis lecciones») |
+| `instrucciones` | `VERSION_INSTRUCCIONES` con que se planificó |
+| `unidad.trabajo`, `unidad.leccion` | La creación de la unidad y la lección que guardó |
+| `unidad.relacionadas` | Hasta 2 lecciones de la biblioteca que tratan algo parecido |
+
+**Estado de cada unidad:** no se guarda; se deduce de su lección y de su trabajo (`ESTADOS_UNIDAD` en `protocolo.js`).
+
+| Estado | Condición |
+| --- | --- |
+| `lista` | Su lección está en «Mis lecciones» |
+| `preparando` | Su trabajo está en curso |
+| `sin-guardar` | Su trabajo terminó `no-guardada` |
+| `error` | Su trabajo terminó en error (no cancelado), limitación o aclaración |
+| `interrumpida` | Su trabajo terminó `interrumpida` |
+| `pendiente` | Sin trabajo ni lección, con el trabajo cancelado, o con la lección quitada de «Mis lecciones» |
+
+Así, una unidad solo cuenta como lista si su lección se validó y se guardó, y el resto figura con su estado real.
+
+**El estado del recorrido:** `planificando` solo mientras la pestaña que lo planifica espera la respuesta. Si la página se cerró a medias, se lee como `interrumpido` y volver a planificar es decisión de la persona.
+
+| Transición | Qué pasa | Qué se conserva |
+| --- | --- | --- |
+| Planificar (propuesta con `accion: 'recorrido'`) | Una petición `planificar`; el servidor devuelve de 2 a 8 unidades revisadas. Si fue explícito («créame un curso…»), se crea la primera | — |
+| Crear una unidad | Un trabajo de creación (ver «Trabajo de creación»). Si ya tenía plan, el mismo; tras un corte de red, el mismo trabajo. No empieza si otra del recorrido se está preparando, si se está planificando o si no cabe en «Mis lecciones» | — |
+| Crear todas | `cola`: la siguiente que nunca se intentó, cuando no hay ninguna en preparación. Se para ante cualquier final que no sea `guardada` (con `aviso`) y no reintenta lo que falló | Lo creado |
+| Recargar la página | El trabajo en marcha se retoma (`trabajos.js`); la cola sigue | Todo |
+| Cambiar (propuesta con `recorrido_base`) | Petición `planificar` con `baseRecorrido`; la cola se para. Una unidad que se conserva (`conserva`) es la misma, con sus textos, su trabajo y su lección; las nuevas, pendientes | Las lecciones de las unidades que salen (`salen`) |
+| Cancelar la planificación | Uno nuevo se quita (no tenía nada); un cambio deja el recorrido como estaba | El recorrido de antes |
+| Quitar (tras confirmar) | Se quita el recorrido; lo que se está preparando sigue y se guarda | **Sus lecciones**: solo se borran si la persona elige aparte «Quitar también sus N lecciones» |
+| Datos dañados o de una versión más nueva | Se apartan en `anato3d.recorridos.apartados` antes de escribir; si no se puede apartar (más de 30), no se escribe | Todo hasta que la persona decide |
+| Otra pestaña los cambia | Se leen otra vez (evento `storage`), sin perder lo que esta pestaña está planificando | — |
+
+**Lo que no decide el modelo:**
+- los identificadores (del recorrido, de las unidades y de las lecciones);
+- el estado de cada unidad;
+- qué recorridos son de la persona: un cambio solo puede apuntar a uno de los que manda la app;
+- los textos de lo que ya existe: al cambiar, la app pone los de antes;
+- las lecciones relacionadas, que tienen que existir en la biblioteca.
+
 ## Protocolo de Neuri (versión 2)
 
 **Código:** `web/src/pet/protocolo.js`, que comparten la app y el servidor.
 
 **Modos:** `orientar`, `planificar`, `redactar`, `adaptar`, `trabajo` y `cancelar`. Los pone la app según el botón.
 
-**Petición:** `{ v, idioma, modo, mensajes, progreso, propias, contexto, solicitud?, plan?, base?, trabajo? }`.
+**Petición:** `{ v, idioma, modo, mensajes, progreso, propias, recorridos, contexto, solicitud?, plan?, base?, baseRecorrido?, trabajo? }`.
 
 | Campo | Qué lleva |
 | --- | --- |
 | `progreso` | Solo identificadores de lecciones: empezadas, terminadas, con repasos pendientes y guardadas |
 | `propias` | Título y resumen de cada lección propia, nunca su progreso |
+| `recorridos` | De cada recorrido personal (hasta 12): identificador, título y, de cada unidad, título, estado y lección si está lista |
 | `base` | La lección propia entera, solo al adaptarla |
+| `baseRecorrido` | Al cambiar un recorrido: cómo es ahora (sus unidades, con su estado). Tiene que ser el de `solicitud.recorrido_base` |
+| `solicitud` | `accion`: `crear`, `adaptar` o `recorrido`. En un recorrido, además, `unidades` (cuántas pidió, o null) y `recorrido_base` (el que se cambia: solo uno de `recorridos`). Al crear una unidad, `recorrido: { titulo, n, total, otras }` |
 
-**Respuesta de orientar:** `{ tipo, mensaje, lecciones, sesion, recorrido, evidencias, solicitud, contexto, sugerencias }`.
+**Respuesta de orientar:** `{ tipo, mensaje, lecciones, sesion, recorrido, evidencias, solicitud, contexto, sugerencias }`. (`recorrido` es uno de la biblioteca; un recorrido personal se pide con `solicitud.accion: 'recorrido'`.)
+
+**Respuesta de planificar un recorrido:** `{ tipo: 'recorrido' | 'aclaracion' | 'limitacion', mensaje, recorrido: { titulo, resumen, objetivo, nivel, unidades, supuestos, limitaciones } | null, salen, sugerencias, instrucciones, codigo?, errores? }`. `codigo: 'recorrido-invalido'` si sigue mal tras la ronda de corrección.
 - `limpiarRespuesta` quita lo que no existe (lecciones, recorridos, evidencias) y recorta los textos.
 - Una propuesta sin solicitud válida pasa a aclaración.
 - La app vuelve a filtrar con **su** catálogo: así no se recomienda nada retirado ni inexistente.
@@ -314,7 +389,7 @@ Un estado que esta versión no conoce se lee como `interrumpida`.
 **Código:** `web/src/biblioteca/datos.js`.
 
 ```
-{ formato: 'anato3d.mis-datos', version: 1, fecha, progreso, propias, trabajos, reportes, eventos, privacidad }
+{ formato: 'anato3d.mis-datos', version: 1, fecha, progreso, propias, trabajos, recorridos, reportes, eventos, privacidad }
 ```
 
 **Reglas al importar (combinar dos progresos):**
@@ -327,6 +402,7 @@ Un estado que esta versión no conoce se lee como `interrumpida`.
 | Favoritos | La unión |
 | Preferencias y plan de examen | Los de aquí, si los hay |
 | Lecciones propias | Como en «Importar» de Mis lecciones |
+| Recorridos personales | Se añaden los que no hay (el mismo identificador no se sobrescribe), hasta 12, después de las lecciones. Sus unidades conservan su lección y pierden su trabajo, que era de otro navegador. Uno que se estaba planificando llega como interrumpido. Un archivo anterior a los recorridos no los trae y no pasa nada |
 
 Es la base para la sincronización entre dispositivos cuando haya cuentas.
 
