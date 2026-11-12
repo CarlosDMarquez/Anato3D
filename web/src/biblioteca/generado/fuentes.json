@@ -8,6 +8,24 @@
   "fecha": "2026-11-09",
   "huella": "5aca6492d472"
  },
+ "tma:abdomen/areas/peritoneal-cavity": {
+  "id": "tma:abdomen/areas/peritoneal-cavity",
+  "titulo": "The Peritoneal Cavity - Greater Sac - Lesser Sac",
+  "url": "https://teachmeanatomy.info/abdomen/areas/peritoneal-cavity/",
+  "actualizada": "2026-05-10",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "f9f553887622"
+ },
+ "tma:abdomen/areas/peritoneum": {
+  "id": "tma:abdomen/areas/peritoneum",
+  "titulo": "The Peritoneum - Visceral - Parietal",
+  "url": "https://teachmeanatomy.info/abdomen/areas/peritoneum/",
+  "actualizada": "2026-06-26",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "373ef8eb6ec8"
+ },
  "tma:abdomen/gi-tract/appendix": {
   "id": "tma:abdomen/gi-tract/appendix",
   "titulo": "The Appendix - Retrocecal - Arterial supply - Appendicitis",
@@ -800,6 +818,60 @@
   "fecha": "2026-11-09",
   "huella": "97f2510a08f8"
  },
+ "tma:neuroanatomy/brainstem/medulla-oblongata": {
+  "id": "tma:neuroanatomy/brainstem/medulla-oblongata",
+  "titulo": "The Medulla Oblongata - Internal Structure - Vasculature",
+  "url": "https://teachmeanatomy.info/neuroanatomy/brainstem/medulla-oblongata/",
+  "actualizada": "2026-10-09",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "90efa6918551"
+ },
+ "tma:neuroanatomy/brainstem/midbrain": {
+  "id": "tma:neuroanatomy/brainstem/midbrain",
+  "titulo": "The Midbrain - Colliculi - Peduncles",
+  "url": "https://teachmeanatomy.info/neuroanatomy/brainstem/midbrain/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "91cf058b7e54"
+ },
+ "tma:neuroanatomy/brainstem/pons": {
+  "id": "tma:neuroanatomy/brainstem/pons",
+  "titulo": "The Pons - Function - Location - Vasculature",
+  "url": "https://teachmeanatomy.info/neuroanatomy/brainstem/pons/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "5801015d1ae0"
+ },
+ "tma:neuroanatomy/structures/basal-ganglia": {
+  "id": "tma:neuroanatomy/structures/basal-ganglia",
+  "titulo": "The Basal Ganglia - Direct - Indirect - Nuclei",
+  "url": "https://teachmeanatomy.info/neuroanatomy/structures/basal-ganglia/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "404faca2ee8e"
+ },
+ "tma:neuroanatomy/structures/cerebrum": {
+  "id": "tma:neuroanatomy/structures/cerebrum",
+  "titulo": "The Cerebrum - Lobes - Vasculature",
+  "url": "https://teachmeanatomy.info/neuroanatomy/structures/cerebrum/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "3328864e1bb8"
+ },
+ "tma:neuroanatomy/structures/meninges": {
+  "id": "tma:neuroanatomy/structures/meninges",
+  "titulo": "The Meninges - Dura - Arachnoid - Pia",
+  "url": "https://teachmeanatomy.info/neuroanatomy/structures/meninges/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "75c27bda4647"
+ },
  "tma:neuroanatomy/vessels/arterial-supply": {
   "id": "tma:neuroanatomy/vessels/arterial-supply",
   "titulo": "Arterial Supply to the Brain - Carotid - Vertebral",
@@ -809,6 +881,33 @@
   "fecha": "2026-11-09",
   "huella": "43c8cbce85fc"
  },
+ "tma:neuroanatomy/vessels/cavernous-sinus": {
+  "id": "tma:neuroanatomy/vessels/cavernous-sinus",
+  "titulo": "The Cavernous Sinus - Contents - Borders - Thrombosis",
+  "url": "https://teachmeanatomy.info/neuroanatomy/vessels/cavernous-sinus/",
+  "actualizada": "2026-05-26",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "983236470a53"
+ },
+ "tma:neuroanatomy/vessels/dural-venous-sinuses": {
+  "id": "tma:neuroanatomy/vessels/dural-venous-sinuses",
+  "titulo": "Dural Venous Sinuses - Superior Sagittal",
+  "url": "https://teachmeanatomy.info/neuroanatomy/vessels/dural-venous-sinuses/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "d1f7b5312689"
+ },
+ "tma:neuroanatomy/vessels/venous-drainage": {
+  "id": "tma:neuroanatomy/vessels/venous-drainage",
+  "titulo": "Venous Drainage of the CNS - Cerebrum",
+  "url": "https://teachmeanatomy.info/neuroanatomy/vessels/venous-drainage/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "68d0fd9bef5e"
+ },
  "tma:pelvis/areas/perineum": {
   "id": "tma:pelvis/areas/perineum",
   "titulo": "The Perineum - Boundaries - Contents - Innervation",
@@ -817,6 +916,15 @@
   "licencia": "© TeachMeSeries Ltd",
   "fecha": "2026-11-09",
   "huella": "2543685a5ba0"
+ },
+ "tma:pelvis/areas/sciatic-foramen": {
+  "id": "tma:pelvis/areas/sciatic-foramen",
+  "titulo": "The Greater Sciatic Foramen and Lesser Sciatic Foramen",
+  "url": "https://teachmeanatomy.info/pelvis/areas/sciatic-foramen/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "04afc46249e5"
  },
  "tma:pelvis/bones/hip-bone": {
   "id": "tma:pelvis/bones/hip-bone",
@@ -835,6 +943,33 @@
   "licencia": "© TeachMeSeries Ltd",
   "fecha": "2026-11-09",
   "huella": "a229835959d0"
+ },
+ "tma:pelvis/other/pudendal-nerve": {
+  "id": "tma:pelvis/other/pudendal-nerve",
+  "titulo": "The Pudendal Nerve - Anatomical Course - Functions",
+  "url": "https://teachmeanatomy.info/pelvis/other/pudendal-nerve/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "262ade576efb"
+ },
+ "tma:pelvis/vasculature/arterial-supply": {
+  "id": "tma:pelvis/vasculature/arterial-supply",
+  "titulo": "Arteries of the Pelvis - Internal Iliac - Pudendal - Vesical",
+  "url": "https://teachmeanatomy.info/pelvis/vasculature/arterial-supply/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "d664192d3d02"
+ },
+ "tma:pelvis/vasculature/venous-drainage": {
+  "id": "tma:pelvis/vasculature/venous-drainage",
+  "titulo": "The Pelvic Veins - External - Internal - Common Iliac",
+  "url": "https://teachmeanatomy.info/pelvis/vasculature/venous-drainage/",
+  "actualizada": "2025-11-06",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "c3585fd2bc59"
  },
  "tma:thorax/areas/anterior-mediastinum": {
   "id": "tma:thorax/areas/anterior-mediastinum",
@@ -943,6 +1078,15 @@
   "licencia": "© TeachMeSeries Ltd",
   "fecha": "2026-11-09",
   "huella": "956486a3e941"
+ },
+ "tma:thorax/vasculature/overview": {
+  "id": "tma:thorax/vasculature/overview",
+  "titulo": "Thoracic Wall Vasculature – Arterial Supply, Venous Drainage &amp; Intercostal Vessels",
+  "url": "https://teachmeanatomy.info/thorax/vasculature/overview/",
+  "actualizada": "2026-04-16",
+  "licencia": "© TeachMeSeries Ltd",
+  "fecha": "2026-11-10",
+  "huella": "f94702d73744"
  },
  "tma:upper-limb/areas/axilla": {
   "id": "tma:upper-limb/areas/axilla",
@@ -1181,6 +1325,26 @@
   "fecha": "2026-11-09",
   "huella": "e9a9089b141f"
  },
+ "wp:Abducens_nucleus": {
+  "id": "wp:Abducens_nucleus",
+  "titulo": "Abducens nucleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Abducens_nucleus&oldid=1350881478",
+  "revid": 1350881478,
+  "actualizada": "2026-04-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "bd9b4b775c86"
+ },
+ "wp:Accessory_hemiazygos_vein": {
+  "id": "wp:Accessory_hemiazygos_vein",
+  "titulo": "Accessory hemiazygos vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Accessory_hemiazygos_vein&oldid=1360606842",
+  "revid": 1360606842,
+  "actualizada": "2026-06-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "8aaa7928c466"
+ },
  "wp:Acetabular_labrum": {
   "id": "wp:Acetabular_labrum",
   "titulo": "Acetabular labrum",
@@ -1261,6 +1425,16 @@
   "fecha": "2026-11-09",
   "huella": "eb98b92d4766"
  },
+ "wp:Amygdala": {
+  "id": "wp:Amygdala",
+  "titulo": "Amygdala",
+  "url": "https://en.wikipedia.org/w/index.php?title=Amygdala&oldid=1377732379",
+  "revid": 1377732379,
+  "actualizada": "2026-09-30",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "4b4db0d502fc"
+ },
  "wp:Anatomical_plane": {
   "id": "wp:Anatomical_plane",
   "titulo": "Anatomical plane",
@@ -1301,6 +1475,16 @@
   "fecha": "2026-11-09",
   "huella": "fc4ae642fc7e"
  },
+ "wp:Angular_gyrus": {
+  "id": "wp:Angular_gyrus",
+  "titulo": "Angular gyrus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Angular_gyrus&oldid=1382084954",
+  "revid": 1382084954,
+  "actualizada": "2026-10-26",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "e4fce4396f1d"
+ },
  "wp:Ankle": {
   "id": "wp:Ankle",
   "titulo": "Ankle",
@@ -1311,6 +1495,26 @@
   "fecha": "2026-11-09",
   "huella": "b62d66387599"
  },
+ "wp:Anterior_cerebral_artery": {
+  "id": "wp:Anterior_cerebral_artery",
+  "titulo": "Anterior cerebral artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Anterior_cerebral_artery&oldid=1380878852",
+  "revid": 1380878852,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "ba1428b67afe"
+ },
+ "wp:Anterior_commissure": {
+  "id": "wp:Anterior_commissure",
+  "titulo": "Anterior commissure",
+  "url": "https://en.wikipedia.org/w/index.php?title=Anterior_commissure&oldid=1378872184",
+  "revid": 1378872184,
+  "actualizada": "2026-10-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "78b53d7aa52b"
+ },
  "wp:Anterior_cruciate_ligament": {
   "id": "wp:Anterior_cruciate_ligament",
   "titulo": "Anterior cruciate ligament",
@@ -1320,6 +1524,26 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "dcd4cbb56343"
+ },
+ "wp:Anterior_ethmoidal_artery": {
+  "id": "wp:Anterior_ethmoidal_artery",
+  "titulo": "Anterior ethmoidal artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Anterior_ethmoidal_artery&oldid=1300867342",
+  "revid": 1300867342,
+  "actualizada": "2025-07-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "3623fa713057"
+ },
+ "wp:Anterior_inferior_cerebellar_artery": {
+  "id": "wp:Anterior_inferior_cerebellar_artery",
+  "titulo": "Anterior inferior cerebellar artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Anterior_inferior_cerebellar_artery&oldid=1380881238",
+  "revid": 1380881238,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "c359c9530652"
  },
  "wp:Anterior_triangle_of_the_neck": {
   "id": "wp:Anterior_triangle_of_the_neck",
@@ -1341,6 +1565,16 @@
   "fecha": "2026-11-09",
   "huella": "0481699368d4"
  },
+ "wp:Appendicular_artery": {
+  "id": "wp:Appendicular_artery",
+  "titulo": "Appendicular artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Appendicular_artery&oldid=1380889304",
+  "revid": 1380889304,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "00e742f96844"
+ },
  "wp:Appendicular_skeleton": {
   "id": "wp:Appendicular_skeleton",
   "titulo": "Appendicular skeleton",
@@ -1350,6 +1584,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "67041cd3c70a"
+ },
+ "wp:Arachnoid_granulation": {
+  "id": "wp:Arachnoid_granulation",
+  "titulo": "Arachnoid granulation",
+  "url": "https://en.wikipedia.org/w/index.php?title=Arachnoid_granulation&oldid=1314212468",
+  "revid": 1314212468,
+  "actualizada": "2025-09-30",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "1b61fe2ffd60"
  },
  "wp:Atlas_(anatomy)": {
   "id": "wp:Atlas_(anatomy)",
@@ -1421,6 +1665,36 @@
   "fecha": "2026-11-09",
   "huella": "2736091e4e86"
  },
+ "wp:Azygos_vein": {
+  "id": "wp:Azygos_vein",
+  "titulo": "Azygos vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Azygos_vein&oldid=1360614728",
+  "revid": 1360614728,
+  "actualizada": "2026-06-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "ba5571845155"
+ },
+ "wp:Basal_ganglia": {
+  "id": "wp:Basal_ganglia",
+  "titulo": "Basal ganglia",
+  "url": "https://en.wikipedia.org/w/index.php?title=Basal_ganglia&oldid=1381378657",
+  "revid": 1381378657,
+  "actualizada": "2026-10-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "7e5f5aa83324"
+ },
+ "wp:Basilar_plexus": {
+  "id": "wp:Basilar_plexus",
+  "titulo": "Basilar venous plexus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Basilar_venous_plexus&oldid=1245894867",
+  "revid": 1245894867,
+  "actualizada": "2024-09-15",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "41c29cac77fb"
+ },
  "wp:Basilic_vein": {
   "id": "wp:Basilic_vein",
   "titulo": "Basilic vein",
@@ -1471,6 +1745,26 @@
   "fecha": "2026-11-09",
   "huella": "81f066099eb8"
  },
+ "wp:Bronchopulmonary_segment": {
+  "id": "wp:Bronchopulmonary_segment",
+  "titulo": "Bronchopulmonary segment",
+  "url": "https://en.wikipedia.org/w/index.php?title=Bronchopulmonary_segment&oldid=1380893548",
+  "revid": 1380893548,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "c5ca0e866a82"
+ },
+ "wp:Bronchus": {
+  "id": "wp:Bronchus",
+  "titulo": "Bronchus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Bronchus&oldid=1340641776",
+  "revid": 1340641776,
+  "actualizada": "2026-02-26",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "c28c00f90b85"
+ },
  "wp:Calcaneus": {
   "id": "wp:Calcaneus",
   "titulo": "Calcaneus",
@@ -1480,6 +1774,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "ec83641c8a9b"
+ },
+ "wp:Calcarine_sulcus": {
+  "id": "wp:Calcarine_sulcus",
+  "titulo": "Calcarine sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Calcarine_sulcus&oldid=1252452315",
+  "revid": 1252452315,
+  "actualizada": "2024-10-21",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "6cc1ba3d1c39"
  },
  "wp:Carpal_bones": {
   "id": "wp:Carpal_bones",
@@ -1511,6 +1815,36 @@
   "fecha": "2026-11-09",
   "huella": "b7e3e68c33b1"
  },
+ "wp:Caudate_nucleus": {
+  "id": "wp:Caudate_nucleus",
+  "titulo": "Caudate nucleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Caudate_nucleus&oldid=1380485512",
+  "revid": 1380485512,
+  "actualizada": "2026-10-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "bd07e818e9cb"
+ },
+ "wp:Cavernous_sinus": {
+  "id": "wp:Cavernous_sinus",
+  "titulo": "Cavernous sinus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cavernous_sinus&oldid=1379907735",
+  "revid": 1379907735,
+  "actualizada": "2026-10-12",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "1e2c76fe08e3"
+ },
+ "wp:Central_arteries": {
+  "id": "wp:Central_arteries",
+  "titulo": "Central arteries",
+  "url": "https://en.wikipedia.org/w/index.php?title=Central_arteries&oldid=1373028243",
+  "revid": 1373028243,
+  "actualizada": "2026-09-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "8a80efc2fcd8"
+ },
  "wp:Central_nervous_system": {
   "id": "wp:Central_nervous_system",
   "titulo": "Central nervous system",
@@ -1520,6 +1854,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "58270109dac1"
+ },
+ "wp:Central_sulcus": {
+  "id": "wp:Central_sulcus",
+  "titulo": "Central sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Central_sulcus&oldid=1340917028",
+  "revid": 1340917028,
+  "actualizada": "2026-02-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "5c706208fd8b"
  },
  "wp:Cephalic_vein": {
   "id": "wp:Cephalic_vein",
@@ -1540,6 +1884,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "ecdb10fbc6e1"
+ },
+ "wp:Cerebral_peduncle": {
+  "id": "wp:Cerebral_peduncle",
+  "titulo": "Cerebral peduncle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cerebral_peduncle&oldid=1320352477",
+  "revid": 1320352477,
+  "actualizada": "2025-11-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "d48eaad595b9"
  },
  "wp:Cerebrum": {
   "id": "wp:Cerebrum",
@@ -1570,6 +1924,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "2a1df1655b2b"
+ },
+ "wp:Cingulate_cortex": {
+  "id": "wp:Cingulate_cortex",
+  "titulo": "Cingulate cortex",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cingulate_cortex&oldid=1372036962",
+  "revid": 1372036962,
+  "actualizada": "2026-08-29",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "ad2dbf6088c6"
  },
  "wp:Circle_of_Willis": {
   "id": "wp:Circle_of_Willis",
@@ -1621,6 +1985,56 @@
   "fecha": "2026-11-09",
   "huella": "4e7d90747469"
  },
+ "wp:Cochlear_nucleus": {
+  "id": "wp:Cochlear_nucleus",
+  "titulo": "Cochlear nucleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cochlear_nucleus&oldid=1360451079",
+  "revid": 1360451079,
+  "actualizada": "2026-06-21",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "751340a6698a"
+ },
+ "wp:Collateral_fissure": {
+  "id": "wp:Collateral_fissure",
+  "titulo": "Collateral fissure",
+  "url": "https://en.wikipedia.org/w/index.php?title=Collateral_fissure&oldid=1258377343",
+  "revid": 1258377343,
+  "actualizada": "2024-11-19",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "e75ddf63a18d"
+ },
+ "wp:Common_iliac_artery": {
+  "id": "wp:Common_iliac_artery",
+  "titulo": "Common iliac artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Common_iliac_artery&oldid=1380880982",
+  "revid": 1380880982,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "5a6c03c50eba"
+ },
+ "wp:Common_iliac_lymph_nodes": {
+  "id": "wp:Common_iliac_lymph_nodes",
+  "titulo": "Common iliac lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Common_iliac_lymph_nodes&oldid=1238348833",
+  "revid": 1238348833,
+  "actualizada": "2024-08-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "f4bded2a6ec7"
+ },
+ "wp:Common_iliac_vein": {
+  "id": "wp:Common_iliac_vein",
+  "titulo": "Common iliac vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Common_iliac_vein&oldid=1207729692",
+  "revid": 1207729692,
+  "actualizada": "2024-02-15",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "9e8ae5af1488"
+ },
  "wp:Common_peroneal_nerve": {
   "id": "wp:Common_peroneal_nerve",
   "titulo": "Common fibular nerve",
@@ -1630,6 +2044,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "5048152c6897"
+ },
+ "wp:Confluence_of_sinuses": {
+  "id": "wp:Confluence_of_sinuses",
+  "titulo": "Confluence of sinuses",
+  "url": "https://en.wikipedia.org/w/index.php?title=Confluence_of_sinuses&oldid=1222887352",
+  "revid": 1222887352,
+  "actualizada": "2024-05-08",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "e4d718bb99ab"
  },
  "wp:Conus_medullaris": {
   "id": "wp:Conus_medullaris",
@@ -1691,6 +2115,26 @@
   "fecha": "2026-11-09",
   "huella": "78608c3aecb7"
  },
+ "wp:Costocervical_trunk": {
+  "id": "wp:Costocervical_trunk",
+  "titulo": "Costocervical trunk",
+  "url": "https://en.wikipedia.org/w/index.php?title=Costocervical_trunk&oldid=1284856557",
+  "revid": 1284856557,
+  "actualizada": "2025-04-10",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "7d90dd7668e6"
+ },
+ "wp:Cranial_nerve_nucleus": {
+  "id": "wp:Cranial_nerve_nucleus",
+  "titulo": "Cranial nerve nucleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cranial_nerve_nucleus&oldid=1377550277",
+  "revid": 1377550277,
+  "actualizada": "2026-09-29",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "64144fc9174a"
+ },
  "wp:Cranial_nerves": {
   "id": "wp:Cranial_nerves",
   "titulo": "Cranial nerves",
@@ -1730,6 +2174,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "2f65f432ab33"
+ },
+ "wp:Cuneus": {
+  "id": "wp:Cuneus",
+  "titulo": "Cuneus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cuneus&oldid=1259458069",
+  "revid": 1259458069,
+  "actualizada": "2024-11-25",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "2c3d12f6e847"
  },
  "wp:Deltoid_muscle": {
   "id": "wp:Deltoid_muscle",
@@ -1781,6 +2235,36 @@
   "fecha": "2026-11-09",
   "huella": "420848d5ebeb"
  },
+ "wp:Dorsal_nucleus_of_vagus_nerve": {
+  "id": "wp:Dorsal_nucleus_of_vagus_nerve",
+  "titulo": "Dorsal nucleus of vagus nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Dorsal_nucleus_of_vagus_nerve&oldid=1320356601",
+  "revid": 1320356601,
+  "actualizada": "2025-11-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "9da9a43ac54f"
+ },
+ "wp:Dura_mater": {
+  "id": "wp:Dura_mater",
+  "titulo": "Dura mater",
+  "url": "https://en.wikipedia.org/w/index.php?title=Dura_mater&oldid=1364169006",
+  "revid": 1364169006,
+  "actualizada": "2026-07-14",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "b7449902c16d"
+ },
+ "wp:Dural_venous_sinuses": {
+  "id": "wp:Dural_venous_sinuses",
+  "titulo": "Dural venous sinuses",
+  "url": "https://en.wikipedia.org/w/index.php?title=Dural_venous_sinuses&oldid=1379905919",
+  "revid": 1379905919,
+  "actualizada": "2026-10-12",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "1c3678434aa2"
+ },
  "wp:Ear": {
   "id": "wp:Ear",
   "titulo": "Ear",
@@ -1801,6 +2285,16 @@
   "fecha": "2026-11-09",
   "huella": "d00d9b67f0b1"
  },
+ "wp:Edinger–Westphal_nucleus": {
+  "id": "wp:Edinger–Westphal_nucleus",
+  "titulo": "Edinger–Westphal nucleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Edinger%E2%80%93Westphal_nucleus&oldid=1377546830",
+  "revid": 1377546830,
+  "actualizada": "2026-09-29",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "a2e829b832ec"
+ },
  "wp:Elbow": {
   "id": "wp:Elbow",
   "titulo": "Elbow",
@@ -1820,6 +2314,26 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "adeede6b1fe8"
+ },
+ "wp:Epidural_hematoma": {
+  "id": "wp:Epidural_hematoma",
+  "titulo": "Epidural hematoma",
+  "url": "https://en.wikipedia.org/w/index.php?title=Epidural_hematoma&oldid=1384704743",
+  "revid": 1384704743,
+  "actualizada": "2026-11-09",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "073ac4b1f76e"
+ },
+ "wp:Epithalamus": {
+  "id": "wp:Epithalamus",
+  "titulo": "Epithalamus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Epithalamus&oldid=1365443009",
+  "revid": 1365443009,
+  "actualizada": "2026-07-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "17bd7e540eda"
  },
  "wp:Erector_spinae_muscles": {
   "id": "wp:Erector_spinae_muscles",
@@ -1861,6 +2375,36 @@
   "fecha": "2026-11-09",
   "huella": "5f6b9075346c"
  },
+ "wp:External_iliac_artery": {
+  "id": "wp:External_iliac_artery",
+  "titulo": "External iliac artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=External_iliac_artery&oldid=1380894405",
+  "revid": 1380894405,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "fae243aac8fb"
+ },
+ "wp:External_iliac_lymph_nodes": {
+  "id": "wp:External_iliac_lymph_nodes",
+  "titulo": "External iliac lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=External_iliac_lymph_nodes&oldid=1223684511",
+  "revid": 1223684511,
+  "actualizada": "2024-05-13",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "647bbf61e557"
+ },
+ "wp:External_iliac_vein": {
+  "id": "wp:External_iliac_vein",
+  "titulo": "External iliac vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=External_iliac_vein&oldid=1222537815",
+  "revid": 1222537815,
+  "actualizada": "2024-05-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "c4608c72b364"
+ },
  "wp:Eye": {
   "id": "wp:Eye",
   "titulo": "Eye",
@@ -1871,6 +2415,16 @@
   "fecha": "2026-11-09",
   "huella": "cbed11baa503"
  },
+ "wp:Facial_motor_nucleus": {
+  "id": "wp:Facial_motor_nucleus",
+  "titulo": "Facial motor nucleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Facial_motor_nucleus&oldid=1320356321",
+  "revid": 1320356321,
+  "actualizada": "2025-11-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "81b7deb66907"
+ },
  "wp:Facial_skeleton": {
   "id": "wp:Facial_skeleton",
   "titulo": "Facial skeleton",
@@ -1880,6 +2434,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "50a2c520b81e"
+ },
+ "wp:Falx_cerebri": {
+  "id": "wp:Falx_cerebri",
+  "titulo": "Falx cerebri",
+  "url": "https://en.wikipedia.org/w/index.php?title=Falx_cerebri&oldid=1380879934",
+  "revid": 1380879934,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "20152252d37f"
  },
  "wp:Female_reproductive_system": {
   "id": "wp:Female_reproductive_system",
@@ -1961,6 +2525,16 @@
   "fecha": "2026-11-09",
   "huella": "da2aaaf7a742"
  },
+ "wp:Flocculus_(cerebellar)": {
+  "id": "wp:Flocculus_(cerebellar)",
+  "titulo": "Flocculus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Flocculus&oldid=1325686946",
+  "revid": 1325686946,
+  "actualizada": "2025-12-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "75eedb9d4c7b"
+ },
  "wp:Foot": {
   "id": "wp:Foot",
   "titulo": "Foot",
@@ -1970,6 +2544,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "df6987b739eb"
+ },
+ "wp:Fornix_(neuroanatomy)": {
+  "id": "wp:Fornix_(neuroanatomy)",
+  "titulo": "Fornix (neuroanatomy)",
+  "url": "https://en.wikipedia.org/w/index.php?title=Fornix_(neuroanatomy)&oldid=1383715300",
+  "revid": 1383715300,
+  "actualizada": "2026-11-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "f9d921bc57bc"
  },
  "wp:Frontal_bone": {
   "id": "wp:Frontal_bone",
@@ -1981,6 +2565,16 @@
   "fecha": "2026-11-09",
   "huella": "c9d0911c2121"
  },
+ "wp:Fusiform_gyrus": {
+  "id": "wp:Fusiform_gyrus",
+  "titulo": "Fusiform gyrus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Fusiform_gyrus&oldid=1349575813",
+  "revid": 1349575813,
+  "actualizada": "2026-04-17",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "85e956e8deec"
+ },
  "wp:Gastrocnemius_muscle": {
   "id": "wp:Gastrocnemius_muscle",
   "titulo": "Gastrocnemius muscle",
@@ -1990,6 +2584,26 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "2fbde298b918"
+ },
+ "wp:Genitofemoral_nerve": {
+  "id": "wp:Genitofemoral_nerve",
+  "titulo": "Genitofemoral nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Genitofemoral_nerve&oldid=1380880016",
+  "revid": 1380880016,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "e8856a978eb9"
+ },
+ "wp:Globus_pallidus": {
+  "id": "wp:Globus_pallidus",
+  "titulo": "Globus pallidus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Globus_pallidus&oldid=1323751073",
+  "revid": 1323751073,
+  "actualizada": "2025-11-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "23910ade2029"
  },
  "wp:Gluteus_maximus": {
   "id": "wp:Gluteus_maximus",
@@ -2031,6 +2645,56 @@
   "fecha": "2026-11-09",
   "huella": "e198d8990b7a"
  },
+ "wp:Greater_omentum": {
+  "id": "wp:Greater_omentum",
+  "titulo": "Greater omentum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Greater_omentum&oldid=1380886307",
+  "revid": 1380886307,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "839956fe569d"
+ },
+ "wp:Greater_sac": {
+  "id": "wp:Greater_sac",
+  "titulo": "Greater sac",
+  "url": "https://en.wikipedia.org/w/index.php?title=Greater_sac&oldid=1372205728",
+  "revid": 1372205728,
+  "actualizada": "2026-08-30",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "0219c934a661"
+ },
+ "wp:Greater_sciatic_foramen": {
+  "id": "wp:Greater_sciatic_foramen",
+  "titulo": "Greater sciatic foramen",
+  "url": "https://en.wikipedia.org/w/index.php?title=Greater_sciatic_foramen&oldid=1360680615",
+  "revid": 1360680615,
+  "actualizada": "2026-06-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "783306488063"
+ },
+ "wp:Gyrification": {
+  "id": "wp:Gyrification",
+  "titulo": "Gyrification",
+  "url": "https://en.wikipedia.org/w/index.php?title=Gyrification&oldid=1369639458",
+  "revid": 1369639458,
+  "actualizada": "2026-08-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "159f7341e163"
+ },
+ "wp:Habenula": {
+  "id": "wp:Habenula",
+  "titulo": "Habenula",
+  "url": "https://en.wikipedia.org/w/index.php?title=Habenula&oldid=1377204730",
+  "revid": 1377204730,
+  "actualizada": "2026-09-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "de4d4510e4c3"
+ },
  "wp:Hand": {
   "id": "wp:Hand",
   "titulo": "Hand",
@@ -2061,6 +2725,16 @@
   "fecha": "2026-11-09",
   "huella": "fe433699215f"
  },
+ "wp:Hemiazygos_vein": {
+  "id": "wp:Hemiazygos_vein",
+  "titulo": "Hemiazygos vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Hemiazygos_vein&oldid=1380881663",
+  "revid": 1380881663,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "f2376ad5614f"
+ },
  "wp:Hepatic_portal_vein": {
   "id": "wp:Hepatic_portal_vein",
   "titulo": "Portal vein",
@@ -2070,6 +2744,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "678aab6845b8"
+ },
+ "wp:Hepatorenal_recess": {
+  "id": "wp:Hepatorenal_recess",
+  "titulo": "Hepatorenal recess",
+  "url": "https://en.wikipedia.org/w/index.php?title=Hepatorenal_recess&oldid=1332886652",
+  "revid": 1332886652,
+  "actualizada": "2026-01-14",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "53055e507ac0"
  },
  "wp:Hip": {
   "id": "wp:Hip",
@@ -2090,6 +2774,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "a2e673133696"
+ },
+ "wp:Hippocampus": {
+  "id": "wp:Hippocampus",
+  "titulo": "Hippocampus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Hippocampus&oldid=1384151783",
+  "revid": 1384151783,
+  "actualizada": "2026-11-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "cbfa54907910"
  },
  "wp:Human_brain": {
   "id": "wp:Human_brain",
@@ -2161,6 +2855,16 @@
   "fecha": "2026-11-09",
   "huella": "244ed3477965"
  },
+ "wp:Hypoglossal_nucleus": {
+  "id": "wp:Hypoglossal_nucleus",
+  "titulo": "Hypoglossal nucleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Hypoglossal_nucleus&oldid=1338618346",
+  "revid": 1338618346,
+  "actualizada": "2026-02-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "ff7dcc32d800"
+ },
  "wp:Hypothalamus": {
   "id": "wp:Hypothalamus",
   "titulo": "Hypothalamus",
@@ -2171,6 +2875,16 @@
   "fecha": "2026-11-09",
   "huella": "bbc14614c39b"
  },
+ "wp:Ileocolic_artery": {
+  "id": "wp:Ileocolic_artery",
+  "titulo": "Ileocolic artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ileocolic_artery&oldid=1380884317",
+  "revid": 1380884317,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "6b95ac9cd894"
+ },
  "wp:Iliofemoral_ligament": {
   "id": "wp:Iliofemoral_ligament",
   "titulo": "Iliofemoral ligament",
@@ -2180,6 +2894,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "346185cbeaca"
+ },
+ "wp:Iliolumbar_artery": {
+  "id": "wp:Iliolumbar_artery",
+  "titulo": "Iliolumbar artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Iliolumbar_artery&oldid=1375574149",
+  "revid": 1375574149,
+  "actualizada": "2026-09-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "722f4aac9c6d"
  },
  "wp:Iliopsoas": {
   "id": "wp:Iliopsoas",
@@ -2211,6 +2935,56 @@
   "fecha": "2026-11-09",
   "huella": "b29517187c5b"
  },
+ "wp:Inferior_colliculus": {
+  "id": "wp:Inferior_colliculus",
+  "titulo": "Inferior colliculus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inferior_colliculus&oldid=1320353918",
+  "revid": 1320353918,
+  "actualizada": "2025-11-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "81a97ebd023e"
+ },
+ "wp:Inferior_frontal_gyrus": {
+  "id": "wp:Inferior_frontal_gyrus",
+  "titulo": "Inferior frontal gyrus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inferior_frontal_gyrus&oldid=1255598123",
+  "revid": 1255598123,
+  "actualizada": "2024-11-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "c4f45311ab61"
+ },
+ "wp:Inferior_frontal_sulcus": {
+  "id": "wp:Inferior_frontal_sulcus",
+  "titulo": "Inferior frontal sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inferior_frontal_sulcus&oldid=1261786503",
+  "revid": 1261786503,
+  "actualizada": "2024-12-07",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "538fdd15c727"
+ },
+ "wp:Inferior_gluteal_artery": {
+  "id": "wp:Inferior_gluteal_artery",
+  "titulo": "Inferior gluteal artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inferior_gluteal_artery&oldid=1293709222",
+  "revid": 1293709222,
+  "actualizada": "2025-06-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "e7601f53dbea"
+ },
+ "wp:Inferior_mesenteric_vein": {
+  "id": "wp:Inferior_mesenteric_vein",
+  "titulo": "Inferior mesenteric vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inferior_mesenteric_vein&oldid=1380880179",
+  "revid": 1380880179,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "3420fac5fa37"
+ },
  "wp:Inferior_nasal_concha": {
   "id": "wp:Inferior_nasal_concha",
   "titulo": "Inferior nasal concha",
@@ -2220,6 +2994,56 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "9bee0ae66cf6"
+ },
+ "wp:Inferior_ophthalmic_vein": {
+  "id": "wp:Inferior_ophthalmic_vein",
+  "titulo": "Inferior ophthalmic vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inferior_ophthalmic_vein&oldid=1300990469",
+  "revid": 1300990469,
+  "actualizada": "2025-07-17",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "bf83e8450528"
+ },
+ "wp:Inferior_parietal_lobule": {
+  "id": "wp:Inferior_parietal_lobule",
+  "titulo": "Inferior parietal lobule",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inferior_parietal_lobule&oldid=1371470339",
+  "revid": 1371470339,
+  "actualizada": "2026-08-26",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "3bbf581a21b5"
+ },
+ "wp:Inferior_petrosal_sinus": {
+  "id": "wp:Inferior_petrosal_sinus",
+  "titulo": "Inferior petrosal sinus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inferior_petrosal_sinus&oldid=1258642053",
+  "revid": 1258642053,
+  "actualizada": "2024-11-20",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "348ff56b9cd6"
+ },
+ "wp:Inferior_sagittal_sinus": {
+  "id": "wp:Inferior_sagittal_sinus",
+  "titulo": "Inferior sagittal sinus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inferior_sagittal_sinus&oldid=1258641904",
+  "revid": 1258641904,
+  "actualizada": "2024-11-20",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "4379d64dba25"
+ },
+ "wp:Inferior_temporal_gyrus": {
+  "id": "wp:Inferior_temporal_gyrus",
+  "titulo": "Inferior temporal gyrus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inferior_temporal_gyrus&oldid=1369116272",
+  "revid": 1369116272,
+  "actualizada": "2026-08-13",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "968251e57d57"
  },
  "wp:Infrahyoid_muscles": {
   "id": "wp:Infrahyoid_muscles",
@@ -2271,6 +3095,16 @@
   "fecha": "2026-11-09",
   "huella": "042545ac67e6"
  },
+ "wp:Insular_cortex": {
+  "id": "wp:Insular_cortex",
+  "titulo": "Insular cortex",
+  "url": "https://en.wikipedia.org/w/index.php?title=Insular_cortex&oldid=1378381057",
+  "revid": 1378381057,
+  "actualizada": "2026-10-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "4773329c2a3a"
+ },
  "wp:Integumentary_system": {
   "id": "wp:Integumentary_system",
   "titulo": "Integumentary system",
@@ -2281,6 +3115,126 @@
   "fecha": "2026-11-09",
   "huella": "a0ed17110e77"
  },
+ "wp:Intercavernous_sinuses": {
+  "id": "wp:Intercavernous_sinuses",
+  "titulo": "Intercavernous sinuses",
+  "url": "https://en.wikipedia.org/w/index.php?title=Intercavernous_sinuses&oldid=1027358364",
+  "revid": 1027358364,
+  "actualizada": "2021-06-07",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "0a9aa5dc84da"
+ },
+ "wp:Intercostal_arteries": {
+  "id": "wp:Intercostal_arteries",
+  "titulo": "Intercostal arteries",
+  "url": "https://en.wikipedia.org/w/index.php?title=Intercostal_arteries&oldid=1380891366",
+  "revid": 1380891366,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "f9b81b6ea1e6"
+ },
+ "wp:Intercostal_lymph_nodes": {
+  "id": "wp:Intercostal_lymph_nodes",
+  "titulo": "Intercostal lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Intercostal_lymph_nodes&oldid=1224153313",
+  "revid": 1224153313,
+  "actualizada": "2024-05-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "d3b68b3649e3"
+ },
+ "wp:Intercostal_nerves": {
+  "id": "wp:Intercostal_nerves",
+  "titulo": "Intercostal nerves",
+  "url": "https://en.wikipedia.org/w/index.php?title=Intercostal_nerves&oldid=1360692005",
+  "revid": 1360692005,
+  "actualizada": "2026-06-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "fe4e2543ddd4"
+ },
+ "wp:Intercostal_space": {
+  "id": "wp:Intercostal_space",
+  "titulo": "Intercostal space",
+  "url": "https://en.wikipedia.org/w/index.php?title=Intercostal_space&oldid=1380893068",
+  "revid": 1380893068,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "2ca580be9882"
+ },
+ "wp:Internal_capsule": {
+  "id": "wp:Internal_capsule",
+  "titulo": "Internal capsule",
+  "url": "https://en.wikipedia.org/w/index.php?title=Internal_capsule&oldid=1328365718",
+  "revid": 1328365718,
+  "actualizada": "2025-12-19",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "594ee5cc9b95"
+ },
+ "wp:Internal_iliac_artery": {
+  "id": "wp:Internal_iliac_artery",
+  "titulo": "Internal iliac artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Internal_iliac_artery&oldid=1379168561",
+  "revid": 1379168561,
+  "actualizada": "2026-10-08",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "2ea5eadb0e8f"
+ },
+ "wp:Internal_iliac_lymph_nodes": {
+  "id": "wp:Internal_iliac_lymph_nodes",
+  "titulo": "Internal iliac lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Internal_iliac_lymph_nodes&oldid=1358630094",
+  "revid": 1358630094,
+  "actualizada": "2026-06-09",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "1c07ac0ca7f4"
+ },
+ "wp:Internal_iliac_vein": {
+  "id": "wp:Internal_iliac_vein",
+  "titulo": "Internal iliac vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Internal_iliac_vein&oldid=1360692133",
+  "revid": 1360692133,
+  "actualizada": "2026-06-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "c5ea6956a042"
+ },
+ "wp:Internal_pudendal_artery": {
+  "id": "wp:Internal_pudendal_artery",
+  "titulo": "Internal pudendal artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Internal_pudendal_artery&oldid=1360692142",
+  "revid": 1360692142,
+  "actualizada": "2026-06-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "edd902e22eed"
+ },
+ "wp:Internal_thoracic_artery": {
+  "id": "wp:Internal_thoracic_artery",
+  "titulo": "Internal thoracic artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Internal_thoracic_artery&oldid=1365849262",
+  "revid": 1365849262,
+  "actualizada": "2026-07-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "51470fe792db"
+ },
+ "wp:Internal_thoracic_vein": {
+  "id": "wp:Internal_thoracic_vein",
+  "titulo": "Internal thoracic vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Internal_thoracic_vein&oldid=1365849270",
+  "revid": 1365849270,
+  "actualizada": "2026-07-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "5856c0679c72"
+ },
  "wp:Interosseous_membrane_of_forearm": {
   "id": "wp:Interosseous_membrane_of_forearm",
   "titulo": "Interosseous membrane of forearm",
@@ -2290,6 +3244,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "e8a38ea5e57e"
+ },
+ "wp:Interpeduncular_fossa": {
+  "id": "wp:Interpeduncular_fossa",
+  "titulo": "Interpeduncular fossa",
+  "url": "https://en.wikipedia.org/w/index.php?title=Interpeduncular_fossa&oldid=1362970739",
+  "revid": 1362970739,
+  "actualizada": "2026-07-07",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "7ce2172b60ae"
  },
  "wp:Interventricular_septum": {
   "id": "wp:Interventricular_septum",
@@ -2310,6 +3274,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "3258a3c87c2d"
+ },
+ "wp:Intraparietal_sulcus": {
+  "id": "wp:Intraparietal_sulcus",
+  "titulo": "Intraparietal sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Intraparietal_sulcus&oldid=1369616308",
+  "revid": 1369616308,
+  "actualizada": "2026-08-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "e53b3443e44f"
  },
  "wp:Ischiofemoral_ligament": {
   "id": "wp:Ischiofemoral_ligament",
@@ -2391,6 +3365,66 @@
   "fecha": "2026-11-09",
   "huella": "09c7bf36aae2"
  },
+ "wp:Lateral_cutaneous_nerve_of_thigh": {
+  "id": "wp:Lateral_cutaneous_nerve_of_thigh",
+  "titulo": "Lateral cutaneous nerve of thigh",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lateral_cutaneous_nerve_of_thigh&oldid=1380884061",
+  "revid": 1380884061,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "45d7fc689bc3"
+ },
+ "wp:Lateral_geniculate_nucleus": {
+  "id": "wp:Lateral_geniculate_nucleus",
+  "titulo": "Lateral geniculate nucleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lateral_geniculate_nucleus&oldid=1374839522",
+  "revid": 1374839522,
+  "actualizada": "2026-09-14",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "a190eceaad7e"
+ },
+ "wp:Lateral_sacral_artery": {
+  "id": "wp:Lateral_sacral_artery",
+  "titulo": "Lateral sacral artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lateral_sacral_artery&oldid=1380881537",
+  "revid": 1380881537,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "f3fd4fb05bd9"
+ },
+ "wp:Lateral_sulcus": {
+  "id": "wp:Lateral_sulcus",
+  "titulo": "Lateral sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lateral_sulcus&oldid=1372803613",
+  "revid": 1372803613,
+  "actualizada": "2026-09-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "a7db7940ab3f"
+ },
+ "wp:Lateral_thoracic_artery": {
+  "id": "wp:Lateral_thoracic_artery",
+  "titulo": "Lateral thoracic artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lateral_thoracic_artery&oldid=1289352828",
+  "revid": 1289352828,
+  "actualizada": "2025-05-08",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "f065b9b8377a"
+ },
+ "wp:Lateral_thoracic_vein": {
+  "id": "wp:Lateral_thoracic_vein",
+  "titulo": "Lateral thoracic vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lateral_thoracic_vein&oldid=1241873640",
+  "revid": 1241873640,
+  "actualizada": "2024-08-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "fdb4cd8ea5d1"
+ },
  "wp:Latissimus_dorsi_muscle": {
   "id": "wp:Latissimus_dorsi_muscle",
   "titulo": "Latissimus dorsi muscle",
@@ -2400,6 +3434,46 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "39c83df33084"
+ },
+ "wp:Lentiform_nucleus": {
+  "id": "wp:Lentiform_nucleus",
+  "titulo": "Lentiform nucleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lentiform_nucleus&oldid=1301105381",
+  "revid": 1301105381,
+  "actualizada": "2025-07-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "3f90e892f34f"
+ },
+ "wp:Lesser_omentum": {
+  "id": "wp:Lesser_omentum",
+  "titulo": "Lesser omentum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lesser_omentum&oldid=1380884721",
+  "revid": 1380884721,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "f9d96f307a1d"
+ },
+ "wp:Lesser_sac": {
+  "id": "wp:Lesser_sac",
+  "titulo": "Lesser sac",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lesser_sac&oldid=1259835957",
+  "revid": 1259835957,
+  "actualizada": "2024-11-27",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "2f71109096d5"
+ },
+ "wp:Lesser_sciatic_foramen": {
+  "id": "wp:Lesser_sciatic_foramen",
+  "titulo": "Lesser sciatic foramen",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lesser_sciatic_foramen&oldid=1196811415",
+  "revid": 1196811415,
+  "actualizada": "2024-01-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "eb9b977bc233"
  },
  "wp:Levator_scapulae_muscle": {
   "id": "wp:Levator_scapulae_muscle",
@@ -2421,6 +3495,26 @@
   "fecha": "2026-11-09",
   "huella": "d4378fcff973"
  },
+ "wp:Ligamentum_arteriosum": {
+  "id": "wp:Ligamentum_arteriosum",
+  "titulo": "Ligamentum arteriosum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ligamentum_arteriosum&oldid=1380878967",
+  "revid": 1380878967,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "66904b7b6c06"
+ },
+ "wp:Limbic_system": {
+  "id": "wp:Limbic_system",
+  "titulo": "Limbic system",
+  "url": "https://en.wikipedia.org/w/index.php?title=Limbic_system&oldid=1383359511",
+  "revid": 1383359511,
+  "actualizada": "2026-11-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "4f94d6aa540d"
+ },
  "wp:Linea_alba_(abdomen)": {
   "id": "wp:Linea_alba_(abdomen)",
   "titulo": "Linea alba (abdomen)",
@@ -2430,6 +3524,26 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "ccefba36cfba"
+ },
+ "wp:Lingual_gyrus": {
+  "id": "wp:Lingual_gyrus",
+  "titulo": "Lingual gyrus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lingual_gyrus&oldid=1368670606",
+  "revid": 1368670606,
+  "actualizada": "2026-08-10",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "a3a25ff8e0f8"
+ },
+ "wp:List_of_lymph_nodes_of_the_human_body": {
+  "id": "wp:List_of_lymph_nodes_of_the_human_body",
+  "titulo": "List of lymph nodes of the human body",
+  "url": "https://en.wikipedia.org/w/index.php?title=List_of_lymph_nodes_of_the_human_body&oldid=1321358933",
+  "revid": 1321358933,
+  "actualizada": "2025-11-10",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "8ae9203c388d"
  },
  "wp:Liver": {
   "id": "wp:Liver",
@@ -2471,6 +3585,26 @@
   "fecha": "2026-11-09",
   "huella": "4c33abbc12d0"
  },
+ "wp:Longitudinal_fissure": {
+  "id": "wp:Longitudinal_fissure",
+  "titulo": "Longitudinal fissure",
+  "url": "https://en.wikipedia.org/w/index.php?title=Longitudinal_fissure&oldid=1370201333",
+  "revid": 1370201333,
+  "actualizada": "2026-08-19",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "65ef5fc3d3fb"
+ },
+ "wp:Lumbar_lymph_nodes": {
+  "id": "wp:Lumbar_lymph_nodes",
+  "titulo": "Periaortic lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Periaortic_lymph_nodes&oldid=1320392388",
+  "revid": 1320392388,
+  "actualizada": "2025-11-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "61b683b34e50"
+ },
  "wp:Lumbar_plexus": {
   "id": "wp:Lumbar_plexus",
   "titulo": "Lumbar plexus",
@@ -2490,6 +3624,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "e76758fbf1f4"
+ },
+ "wp:Lunate_sulcus": {
+  "id": "wp:Lunate_sulcus",
+  "titulo": "Lunate sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lunate_sulcus&oldid=1357091868",
+  "revid": 1357091868,
+  "actualizada": "2026-05-31",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "5c1beb2dd89b"
  },
  "wp:Lung": {
   "id": "wp:Lung",
@@ -2541,6 +3685,16 @@
   "fecha": "2026-11-09",
   "huella": "61c098ccd9fb"
  },
+ "wp:Mammillary_body": {
+  "id": "wp:Mammillary_body",
+  "titulo": "Mammillary body",
+  "url": "https://en.wikipedia.org/w/index.php?title=Mammillary_body&oldid=1381887847",
+  "revid": 1381887847,
+  "actualizada": "2026-10-25",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "9697b9085e75"
+ },
  "wp:Mandible": {
   "id": "wp:Mandible",
   "titulo": "Mandible",
@@ -2581,6 +3735,16 @@
   "fecha": "2026-11-09",
   "huella": "5e038812a744"
  },
+ "wp:Medial_geniculate_nucleus": {
+  "id": "wp:Medial_geniculate_nucleus",
+  "titulo": "Medial geniculate nucleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Medial_geniculate_nucleus&oldid=1297282820",
+  "revid": 1297282820,
+  "actualizada": "2025-06-25",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "6c6c59057902"
+ },
  "wp:Median_nerve": {
   "id": "wp:Median_nerve",
   "titulo": "Median nerve",
@@ -2591,6 +3755,36 @@
   "fecha": "2026-11-09",
   "huella": "72292ea8de30"
  },
+ "wp:Median_sacral_artery": {
+  "id": "wp:Median_sacral_artery",
+  "titulo": "Median sacral artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Median_sacral_artery&oldid=1380884477",
+  "revid": 1380884477,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "2b695466e320"
+ },
+ "wp:Mediastinal_lymph_node": {
+  "id": "wp:Mediastinal_lymph_node",
+  "titulo": "Mediastinal lymph node",
+  "url": "https://en.wikipedia.org/w/index.php?title=Mediastinal_lymph_node&oldid=1317277523",
+  "revid": 1317277523,
+  "actualizada": "2025-10-17",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "80c6849de317"
+ },
+ "wp:Mediastinum": {
+  "id": "wp:Mediastinum",
+  "titulo": "Mediastinum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Mediastinum&oldid=1346717130",
+  "revid": 1346717130,
+  "actualizada": "2026-04-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "87a3e03bb1b6"
+ },
  "wp:Medulla_oblongata": {
   "id": "wp:Medulla_oblongata",
   "titulo": "Medulla oblongata",
@@ -2600,6 +3794,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "201260f457ca"
+ },
+ "wp:Medullary_pyramids_(brainstem)": {
+  "id": "wp:Medullary_pyramids_(brainstem)",
+  "titulo": "Medullary pyramids (brainstem)",
+  "url": "https://en.wikipedia.org/w/index.php?title=Medullary_pyramids_(brainstem)&oldid=1362905688",
+  "revid": 1362905688,
+  "actualizada": "2026-07-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "cd8a7ed31791"
  },
  "wp:Meninges": {
   "id": "wp:Meninges",
@@ -2620,6 +3824,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "859f8e31d7ba"
+ },
+ "wp:Mesentery": {
+  "id": "wp:Mesentery",
+  "titulo": "Mesentery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Mesentery&oldid=1384603638",
+  "revid": 1384603638,
+  "actualizada": "2026-11-09",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "4683ba9d58f8"
  },
  "wp:Metacarpal_bones": {
   "id": "wp:Metacarpal_bones",
@@ -2651,6 +3865,26 @@
   "fecha": "2026-11-09",
   "huella": "92766ae66ded"
  },
+ "wp:Middle_cerebral_artery": {
+  "id": "wp:Middle_cerebral_artery",
+  "titulo": "Middle cerebral artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Middle_cerebral_artery&oldid=1380880527",
+  "revid": 1380880527,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "6433b0b175f7"
+ },
+ "wp:Middle_colic_artery": {
+  "id": "wp:Middle_colic_artery",
+  "titulo": "Middle colic artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Middle_colic_artery&oldid=1380884257",
+  "revid": 1380884257,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "3e07add51c89"
+ },
  "wp:Middle_ear": {
   "id": "wp:Middle_ear",
   "titulo": "Middle ear",
@@ -2660,6 +3894,36 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "f5597c9918dd"
+ },
+ "wp:Middle_frontal_gyrus": {
+  "id": "wp:Middle_frontal_gyrus",
+  "titulo": "Middle frontal gyrus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Middle_frontal_gyrus&oldid=1251998194",
+  "revid": 1251998194,
+  "actualizada": "2024-10-19",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "b6a89e1d4a4e"
+ },
+ "wp:Middle_meningeal_artery": {
+  "id": "wp:Middle_meningeal_artery",
+  "titulo": "Middle meningeal artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Middle_meningeal_artery&oldid=1296440562",
+  "revid": 1296440562,
+  "actualizada": "2025-06-20",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "c79edbb71455"
+ },
+ "wp:Middle_temporal_gyrus": {
+  "id": "wp:Middle_temporal_gyrus",
+  "titulo": "Middle temporal gyrus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Middle_temporal_gyrus&oldid=1369163568",
+  "revid": 1369163568,
+  "actualizada": "2026-08-13",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "b22ce52accfe"
  },
  "wp:Mitral_valve": {
   "id": "wp:Mitral_valve",
@@ -2801,6 +4065,26 @@
   "fecha": "2026-11-09",
   "huella": "3844d669d75b"
  },
+ "wp:Nucleus_ambiguus": {
+  "id": "wp:Nucleus_ambiguus",
+  "titulo": "Nucleus ambiguus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Nucleus_ambiguus&oldid=1365932926",
+  "revid": 1365932926,
+  "actualizada": "2026-07-25",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "31b584e5c27a"
+ },
+ "wp:Obturator_artery": {
+  "id": "wp:Obturator_artery",
+  "titulo": "Obturator artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Obturator_artery&oldid=1380881122",
+  "revid": 1380881122,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "43dced507cf8"
+ },
  "wp:Obturator_foramen": {
   "id": "wp:Obturator_foramen",
   "titulo": "Obturator foramen",
@@ -2831,6 +4115,56 @@
   "fecha": "2026-11-09",
   "huella": "d7c079655b0c"
  },
+ "wp:Occipital_gyri": {
+  "id": "wp:Occipital_gyri",
+  "titulo": "Occipital gyri",
+  "url": "https://en.wikipedia.org/w/index.php?title=Occipital_gyri&oldid=1171977121",
+  "revid": 1171977121,
+  "actualizada": "2023-08-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "4d67d25f8342"
+ },
+ "wp:Occipital_sinus": {
+  "id": "wp:Occipital_sinus",
+  "titulo": "Occipital sinus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Occipital_sinus&oldid=1301154512",
+  "revid": 1301154512,
+  "actualizada": "2025-07-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "2552f271c575"
+ },
+ "wp:Occipitotemporal_sulcus": {
+  "id": "wp:Occipitotemporal_sulcus",
+  "titulo": "Occipitotemporal sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Occipitotemporal_sulcus&oldid=1366171173",
+  "revid": 1366171173,
+  "actualizada": "2026-07-26",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "56569f9dc039"
+ },
+ "wp:Oculomotor_nucleus": {
+  "id": "wp:Oculomotor_nucleus",
+  "titulo": "Oculomotor nucleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Oculomotor_nucleus&oldid=1384220359",
+  "revid": 1384220359,
+  "actualizada": "2026-11-07",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "dc6e58ca94bb"
+ },
+ "wp:Oesophagus": {
+  "id": "wp:Oesophagus",
+  "titulo": "Esophagus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Esophagus&oldid=1374093321",
+  "revid": 1374093321,
+  "actualizada": "2026-09-09",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "b09fab7ca1df"
+ },
  "wp:Olfactory_nerve": {
   "id": "wp:Olfactory_nerve",
   "titulo": "Olfactory nerve",
@@ -2841,6 +4175,26 @@
   "fecha": "2026-11-09",
   "huella": "b3b57bbe2ccf"
  },
+ "wp:Olivary_body": {
+  "id": "wp:Olivary_body",
+  "titulo": "Olivary body",
+  "url": "https://en.wikipedia.org/w/index.php?title=Olivary_body&oldid=1344407786",
+  "revid": 1344407786,
+  "actualizada": "2026-03-20",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "873664b349b8"
+ },
+ "wp:Omental_foramen": {
+  "id": "wp:Omental_foramen",
+  "titulo": "Omental foramen",
+  "url": "https://en.wikipedia.org/w/index.php?title=Omental_foramen&oldid=1380894289",
+  "revid": 1380894289,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "8f1af93a05c0"
+ },
  "wp:Omohyoid_muscle": {
   "id": "wp:Omohyoid_muscle",
   "titulo": "Omohyoid muscle",
@@ -2850,6 +4204,46 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "75fbeddd7592"
+ },
+ "wp:Optic_tract": {
+  "id": "wp:Optic_tract",
+  "titulo": "Optic tract",
+  "url": "https://en.wikipedia.org/w/index.php?title=Optic_tract&oldid=1306653291",
+  "revid": 1306653291,
+  "actualizada": "2025-08-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "8f56838698b5"
+ },
+ "wp:Orbital_gyri": {
+  "id": "wp:Orbital_gyri",
+  "titulo": "Orbital gyri",
+  "url": "https://en.wikipedia.org/w/index.php?title=Orbital_gyri&oldid=1379320233",
+  "revid": 1379320233,
+  "actualizada": "2026-10-09",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "7299c35df556"
+ },
+ "wp:Orbital_sulcus": {
+  "id": "wp:Orbital_sulcus",
+  "titulo": "Orbital sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Orbital_sulcus&oldid=1367207202",
+  "revid": 1367207202,
+  "actualizada": "2026-08-01",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "0e882763ca37"
+ },
+ "wp:Orbitofrontal_artery": {
+  "id": "wp:Orbitofrontal_artery",
+  "titulo": "Orbitofrontal artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Orbitofrontal_artery&oldid=1177175965",
+  "revid": 1177175965,
+  "actualizada": "2023-09-26",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "7f002771728b"
  },
  "wp:Ossicles": {
   "id": "wp:Ossicles",
@@ -2871,6 +4265,16 @@
   "fecha": "2026-11-09",
   "huella": "2a4791088646"
  },
+ "wp:Ovarian_artery": {
+  "id": "wp:Ovarian_artery",
+  "titulo": "Ovarian artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ovarian_artery&oldid=1316171832",
+  "revid": 1316171832,
+  "actualizada": "2025-10-10",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "d10ad8746ce5"
+ },
  "wp:Palatine_bone": {
   "id": "wp:Palatine_bone",
   "titulo": "Palatine bone",
@@ -2891,6 +4295,66 @@
   "fecha": "2026-11-09",
   "huella": "ea977269bde3"
  },
+ "wp:Papez_circuit": {
+  "id": "wp:Papez_circuit",
+  "titulo": "Papez circuit",
+  "url": "https://en.wikipedia.org/w/index.php?title=Papez_circuit&oldid=1382628848",
+  "revid": 1382628848,
+  "actualizada": "2026-10-29",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "1e2de068d4a8"
+ },
+ "wp:Paracentral_lobule": {
+  "id": "wp:Paracentral_lobule",
+  "titulo": "Paracentral lobule",
+  "url": "https://en.wikipedia.org/w/index.php?title=Paracentral_lobule&oldid=1296279219",
+  "revid": 1296279219,
+  "actualizada": "2025-06-19",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "d8c639d42481"
+ },
+ "wp:Paracolic_gutters": {
+  "id": "wp:Paracolic_gutters",
+  "titulo": "Paracolic gutters",
+  "url": "https://en.wikipedia.org/w/index.php?title=Paracolic_gutters&oldid=1380892104",
+  "revid": 1380892104,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "7099d3931ef5"
+ },
+ "wp:Parahippocampal_gyrus": {
+  "id": "wp:Parahippocampal_gyrus",
+  "titulo": "Parahippocampal gyrus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Parahippocampal_gyrus&oldid=1280381107",
+  "revid": 1280381107,
+  "actualizada": "2025-03-14",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "e69a0d08f6e0"
+ },
+ "wp:Pararectal_lymph_nodes": {
+  "id": "wp:Pararectal_lymph_nodes",
+  "titulo": "Pararectal lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pararectal_lymph_nodes&oldid=1358630243",
+  "revid": 1358630243,
+  "actualizada": "2026-06-09",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "3a80d8bca40e"
+ },
+ "wp:Parasternal_lymph_nodes": {
+  "id": "wp:Parasternal_lymph_nodes",
+  "titulo": "Parasternal lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Parasternal_lymph_nodes&oldid=1224153266",
+  "revid": 1224153266,
+  "actualizada": "2024-05-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "4dbd9aa92516"
+ },
  "wp:Parathyroid_gland": {
   "id": "wp:Parathyroid_gland",
   "titulo": "Parathyroid gland",
@@ -2901,6 +4365,16 @@
   "fecha": "2026-11-09",
   "huella": "5dde58b23044"
  },
+ "wp:Paratracheal_lymph_nodes": {
+  "id": "wp:Paratracheal_lymph_nodes",
+  "titulo": "Paratracheal lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Paratracheal_lymph_nodes&oldid=1301166640",
+  "revid": 1301166640,
+  "actualizada": "2025-07-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "fe143a3218af"
+ },
  "wp:Parietal_bone": {
   "id": "wp:Parietal_bone",
   "titulo": "Parietal bone",
@@ -2910,6 +4384,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "e6bcb0359180"
+ },
+ "wp:Parieto-occipital_sulcus": {
+  "id": "wp:Parieto-occipital_sulcus",
+  "titulo": "Parieto-occipital sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Parieto-occipital_sulcus&oldid=1292119826",
+  "revid": 1292119826,
+  "actualizada": "2025-05-25",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "ce4962e90dbf"
  },
  "wp:Patella": {
   "id": "wp:Patella",
@@ -2961,6 +4445,26 @@
   "fecha": "2026-11-09",
   "huella": "48900804187d"
  },
+ "wp:Peritoneal_cavity": {
+  "id": "wp:Peritoneal_cavity",
+  "titulo": "Peritoneal cavity",
+  "url": "https://en.wikipedia.org/w/index.php?title=Peritoneal_cavity&oldid=1293243887",
+  "revid": 1293243887,
+  "actualizada": "2025-05-31",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "8bfcdac726d9"
+ },
+ "wp:Peritoneum": {
+  "id": "wp:Peritoneum",
+  "titulo": "Peritoneum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Peritoneum&oldid=1376410746",
+  "revid": 1376410746,
+  "actualizada": "2026-09-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "9b1353506b93"
+ },
  "wp:Phalanx_bone": {
   "id": "wp:Phalanx_bone",
   "titulo": "Phalanx bone",
@@ -3001,6 +4505,56 @@
   "fecha": "2026-11-09",
   "huella": "413a7289fda5"
  },
+ "wp:Pontine_arteries": {
+  "id": "wp:Pontine_arteries",
+  "titulo": "Pontine arteries",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pontine_arteries&oldid=1222714705",
+  "revid": 1222714705,
+  "actualizada": "2024-05-07",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "683432c8ef69"
+ },
+ "wp:Postcentral_gyrus": {
+  "id": "wp:Postcentral_gyrus",
+  "titulo": "Postcentral gyrus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Postcentral_gyrus&oldid=1222129520",
+  "revid": 1222129520,
+  "actualizada": "2024-05-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "e291c99804f5"
+ },
+ "wp:Postcentral_sulcus": {
+  "id": "wp:Postcentral_sulcus",
+  "titulo": "Postcentral sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Postcentral_sulcus&oldid=1315198018",
+  "revid": 1315198018,
+  "actualizada": "2025-10-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "b6b6c2e6b9c4"
+ },
+ "wp:Posterior_cerebral_artery": {
+  "id": "wp:Posterior_cerebral_artery",
+  "titulo": "Posterior cerebral artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Posterior_cerebral_artery&oldid=1380880344",
+  "revid": 1380880344,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "c93d866b26d6"
+ },
+ "wp:Posterior_commissure": {
+  "id": "wp:Posterior_commissure",
+  "titulo": "Posterior commissure",
+  "url": "https://en.wikipedia.org/w/index.php?title=Posterior_commissure&oldid=1309916321",
+  "revid": 1309916321,
+  "actualizada": "2025-09-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "026de46857ab"
+ },
  "wp:Posterior_cruciate_ligament": {
   "id": "wp:Posterior_cruciate_ligament",
   "titulo": "Posterior cruciate ligament",
@@ -3011,6 +4565,26 @@
   "fecha": "2026-11-09",
   "huella": "8b41ab302843"
  },
+ "wp:Posterior_cutaneous_nerve_of_thigh": {
+  "id": "wp:Posterior_cutaneous_nerve_of_thigh",
+  "titulo": "Posterior cutaneous nerve of thigh",
+  "url": "https://en.wikipedia.org/w/index.php?title=Posterior_cutaneous_nerve_of_thigh&oldid=1377379907",
+  "revid": 1377379907,
+  "actualizada": "2026-09-29",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "96bab34281a2"
+ },
+ "wp:Posterior_ethmoidal_artery": {
+  "id": "wp:Posterior_ethmoidal_artery",
+  "titulo": "Posterior ethmoidal artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Posterior_ethmoidal_artery&oldid=1301177464",
+  "revid": 1301177464,
+  "actualizada": "2025-07-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "b07d2ce9822c"
+ },
  "wp:Posterior_triangle_of_the_neck": {
   "id": "wp:Posterior_triangle_of_the_neck",
   "titulo": "Posterior triangle of the neck",
@@ -3020,6 +4594,56 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "cf2085d24b15"
+ },
+ "wp:Precentral_gyrus": {
+  "id": "wp:Precentral_gyrus",
+  "titulo": "Precentral gyrus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Precentral_gyrus&oldid=1373149773",
+  "revid": 1373149773,
+  "actualizada": "2026-09-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "0fdfcce14e46"
+ },
+ "wp:Precentral_sulcus": {
+  "id": "wp:Precentral_sulcus",
+  "titulo": "Precentral sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Precentral_sulcus&oldid=1291870332",
+  "revid": 1291870332,
+  "actualizada": "2025-05-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "96d4ac0e9d34"
+ },
+ "wp:Precuneus": {
+  "id": "wp:Precuneus",
+  "titulo": "Precuneus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Precuneus&oldid=1369643088",
+  "revid": 1369643088,
+  "actualizada": "2026-08-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "e79575ed2ead"
+ },
+ "wp:Preoccipital_notch": {
+  "id": "wp:Preoccipital_notch",
+  "titulo": "Preoccipital notch",
+  "url": "https://en.wikipedia.org/w/index.php?title=Preoccipital_notch&oldid=1146371594",
+  "revid": 1146371594,
+  "actualizada": "2023-03-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "675ce2e71c37"
+ },
+ "wp:Pterion": {
+  "id": "wp:Pterion",
+  "titulo": "Pterion",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pterion&oldid=1306484767",
+  "revid": 1306484767,
+  "actualizada": "2025-08-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "242bfd3206ed"
  },
  "wp:Pubic_symphysis": {
   "id": "wp:Pubic_symphysis",
@@ -3051,6 +4675,26 @@
   "fecha": "2026-11-09",
   "huella": "993119d9f171"
  },
+ "wp:Pudendal_nerve": {
+  "id": "wp:Pudendal_nerve",
+  "titulo": "Pudendal nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pudendal_nerve&oldid=1370996861",
+  "revid": 1370996861,
+  "actualizada": "2026-08-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "d070039df14e"
+ },
+ "wp:Pulmonary_artery": {
+  "id": "wp:Pulmonary_artery",
+  "titulo": "Pulmonary artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pulmonary_artery&oldid=1380889584",
+  "revid": 1380889584,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "533fb5db0f87"
+ },
  "wp:Pulmonary_valve": {
   "id": "wp:Pulmonary_valve",
   "titulo": "Pulmonary valve",
@@ -3060,6 +4704,26 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "1042b7cc57a1"
+ },
+ "wp:Pulmonary_vein": {
+  "id": "wp:Pulmonary_vein",
+  "titulo": "Pulmonary vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Pulmonary_vein&oldid=1346632936",
+  "revid": 1346632936,
+  "actualizada": "2026-04-01",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "45ea62d5adec"
+ },
+ "wp:Putamen": {
+  "id": "wp:Putamen",
+  "titulo": "Putamen",
+  "url": "https://en.wikipedia.org/w/index.php?title=Putamen&oldid=1344375692",
+  "revid": 1344375692,
+  "actualizada": "2026-03-20",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "d1faf535ac85"
  },
  "wp:Quadriceps_femoris_muscle": {
   "id": "wp:Quadriceps_femoris_muscle",
@@ -3091,6 +4755,26 @@
   "fecha": "2026-11-09",
   "huella": "6df40f7c44c0"
  },
+ "wp:Rectouterine_pouch": {
+  "id": "wp:Rectouterine_pouch",
+  "titulo": "Rectouterine pouch",
+  "url": "https://en.wikipedia.org/w/index.php?title=Rectouterine_pouch&oldid=1380879482",
+  "revid": 1380879482,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "a6c07a9b66b0"
+ },
+ "wp:Rectovesical_pouch": {
+  "id": "wp:Rectovesical_pouch",
+  "titulo": "Rectovesical pouch",
+  "url": "https://en.wikipedia.org/w/index.php?title=Rectovesical_pouch&oldid=1209571343",
+  "revid": 1209571343,
+  "actualizada": "2024-02-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "6ba80c82ac5b"
+ },
  "wp:Rectus_abdominis_muscle": {
   "id": "wp:Rectus_abdominis_muscle",
   "titulo": "Rectus abdominis muscle",
@@ -3120,6 +4804,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "521fcaf498d2"
+ },
+ "wp:Red_nucleus": {
+  "id": "wp:Red_nucleus",
+  "titulo": "Red nucleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Red_nucleus&oldid=1368888741",
+  "revid": 1368888741,
+  "actualizada": "2026-08-11",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "bfc8bb82ddfe"
  },
  "wp:Renal_artery": {
   "id": "wp:Renal_artery",
@@ -3181,6 +4875,16 @@
   "fecha": "2026-11-09",
   "huella": "3e6d3252e8bc"
  },
+ "wp:Retroperitoneal_space": {
+  "id": "wp:Retroperitoneal_space",
+  "titulo": "Retroperitoneal space",
+  "url": "https://en.wikipedia.org/w/index.php?title=Retroperitoneal_space&oldid=1337212185",
+  "revid": 1337212185,
+  "actualizada": "2026-02-08",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "b65c0a192151"
+ },
  "wp:Rhomboid_major_muscle": {
   "id": "wp:Rhomboid_major_muscle",
   "titulo": "Rhomboid major muscle",
@@ -3211,6 +4915,16 @@
   "fecha": "2026-11-09",
   "huella": "3d39a875654b"
  },
+ "wp:Right_lymphatic_duct": {
+  "id": "wp:Right_lymphatic_duct",
+  "titulo": "Right lymphatic duct",
+  "url": "https://en.wikipedia.org/w/index.php?title=Right_lymphatic_duct&oldid=1380954628",
+  "revid": 1380954628,
+  "actualizada": "2026-10-19",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "431f48bec5e0"
+ },
  "wp:Rotator_cuff": {
   "id": "wp:Rotator_cuff",
   "titulo": "Rotator cuff",
@@ -3220,6 +4934,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "4aa9f1ca25c3"
+ },
+ "wp:Sacral_lymph_nodes": {
+  "id": "wp:Sacral_lymph_nodes",
+  "titulo": "Sacral lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sacral_lymph_nodes&oldid=1302423600",
+  "revid": 1302423600,
+  "actualizada": "2025-07-25",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "333093184bfe"
  },
  "wp:Sacral_plexus": {
   "id": "wp:Sacral_plexus",
@@ -3250,6 +4974,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "f893b1762352"
+ },
+ "wp:Salivatory_nuclei": {
+  "id": "wp:Salivatory_nuclei",
+  "titulo": "Salivatory nuclei",
+  "url": "https://en.wikipedia.org/w/index.php?title=Salivatory_nuclei&oldid=1320356649",
+  "revid": 1320356649,
+  "actualizada": "2025-11-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "4eeab62a1c7a"
  },
  "wp:Sartorius_muscle": {
   "id": "wp:Sartorius_muscle",
@@ -3311,6 +5045,16 @@
   "fecha": "2026-11-09",
   "huella": "9a249d1659e1"
  },
+ "wp:Septal_area": {
+  "id": "wp:Septal_area",
+  "titulo": "Septal area",
+  "url": "https://en.wikipedia.org/w/index.php?title=Septal_area&oldid=1372569867",
+  "revid": 1372569867,
+  "actualizada": "2026-09-01",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "a806bdda4035"
+ },
  "wp:Septal_nasal_cartilage": {
   "id": "wp:Septal_nasal_cartilage",
   "titulo": "Septal nasal cartilage",
@@ -3320,6 +5064,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "dd1046cee8e6"
+ },
+ "wp:Septum_pellucidum": {
+  "id": "wp:Septum_pellucidum",
+  "titulo": "Septum pellucidum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Septum_pellucidum&oldid=1300849498",
+  "revid": 1300849498,
+  "actualizada": "2025-07-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "47af71a78e90"
  },
  "wp:Sesamoid_bone": {
   "id": "wp:Sesamoid_bone",
@@ -3351,6 +5105,26 @@
   "fecha": "2026-11-09",
   "huella": "e8fb9d5bd64b"
  },
+ "wp:Sigmoid_arteries": {
+  "id": "wp:Sigmoid_arteries",
+  "titulo": "Sigmoid arteries",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sigmoid_arteries&oldid=1380884284",
+  "revid": 1380884284,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "2379041457b6"
+ },
+ "wp:Sigmoid_sinus": {
+  "id": "wp:Sigmoid_sinus",
+  "titulo": "Sigmoid sinus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sigmoid_sinus&oldid=1258642090",
+  "revid": 1258642090,
+  "actualizada": "2024-11-20",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "27add5499aa7"
+ },
  "wp:Skeletal_muscle": {
   "id": "wp:Skeletal_muscle",
   "titulo": "Skeletal muscle",
@@ -3380,6 +5154,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "d5fca8c60311"
+ },
+ "wp:Solitary_nucleus": {
+  "id": "wp:Solitary_nucleus",
+  "titulo": "Solitary nucleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Solitary_nucleus&oldid=1357497020",
+  "revid": 1357497020,
+  "actualizada": "2026-06-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "b2c934930930"
  },
  "wp:Sphenoid_bone": {
   "id": "wp:Sphenoid_bone",
@@ -3481,6 +5265,66 @@
   "fecha": "2026-11-09",
   "huella": "233cb10ebca8"
  },
+ "wp:Straight_gyrus": {
+  "id": "wp:Straight_gyrus",
+  "titulo": "Straight gyrus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Straight_gyrus&oldid=1261785208",
+  "revid": 1261785208,
+  "actualizada": "2024-12-07",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "e3f5b20c7f62"
+ },
+ "wp:Straight_sinus": {
+  "id": "wp:Straight_sinus",
+  "titulo": "Straight sinus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Straight_sinus&oldid=1292635213",
+  "revid": 1292635213,
+  "actualizada": "2025-05-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "7ac5c6afa9cd"
+ },
+ "wp:Stria_medullaris_of_thalamus": {
+  "id": "wp:Stria_medullaris_of_thalamus",
+  "titulo": "Stria medullaris",
+  "url": "https://en.wikipedia.org/w/index.php?title=Stria_medullaris&oldid=1346514271",
+  "revid": 1346514271,
+  "actualizada": "2026-04-01",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "ce9072c5b20f"
+ },
+ "wp:Stria_terminalis": {
+  "id": "wp:Stria_terminalis",
+  "titulo": "Stria terminalis",
+  "url": "https://en.wikipedia.org/w/index.php?title=Stria_terminalis&oldid=1348048652",
+  "revid": 1348048652,
+  "actualizada": "2026-04-10",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "be48c382e1fd"
+ },
+ "wp:Striatum": {
+  "id": "wp:Striatum",
+  "titulo": "Striatum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Striatum&oldid=1382457282",
+  "revid": 1382457282,
+  "actualizada": "2026-10-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "a20b7ca02189"
+ },
+ "wp:Subparietal_sulcus": {
+  "id": "wp:Subparietal_sulcus",
+  "titulo": "Subparietal sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Subparietal_sulcus&oldid=1217049215",
+  "revid": 1217049215,
+  "actualizada": "2024-04-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "02b2df7d4a1e"
+ },
  "wp:Subscapular_nerves": {
   "id": "wp:Subscapular_nerves",
   "titulo": "Subscapular nerves",
@@ -3501,6 +5345,176 @@
   "fecha": "2026-11-09",
   "huella": "53e10e1c6f3b"
  },
+ "wp:Sulcus_(neuroanatomy)": {
+  "id": "wp:Sulcus_(neuroanatomy)",
+  "titulo": "Sulcus (neuroanatomy)",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sulcus_(neuroanatomy)&oldid=1368825576",
+  "revid": 1368825576,
+  "actualizada": "2026-08-11",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "8e350236f132"
+ },
+ "wp:Superior_cerebellar_peduncle": {
+  "id": "wp:Superior_cerebellar_peduncle",
+  "titulo": "Superior cerebellar peduncle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_cerebellar_peduncle&oldid=1320354827",
+  "revid": 1320354827,
+  "actualizada": "2025-11-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "90df92457bbe"
+ },
+ "wp:Superior_colliculus": {
+  "id": "wp:Superior_colliculus",
+  "titulo": "Superior colliculus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_colliculus&oldid=1377017979",
+  "revid": 1377017979,
+  "actualizada": "2026-09-27",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "3bf06e9de270"
+ },
+ "wp:Superior_diaphragmatic_lymph_nodes": {
+  "id": "wp:Superior_diaphragmatic_lymph_nodes",
+  "titulo": "Superior diaphragmatic lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_diaphragmatic_lymph_nodes&oldid=1315200480",
+  "revid": 1315200480,
+  "actualizada": "2025-10-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "708435a45f06"
+ },
+ "wp:Superior_epigastric_artery": {
+  "id": "wp:Superior_epigastric_artery",
+  "titulo": "Superior epigastric artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_epigastric_artery&oldid=1380881396",
+  "revid": 1380881396,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "9714ce4dcf4e"
+ },
+ "wp:Superior_frontal_gyrus": {
+  "id": "wp:Superior_frontal_gyrus",
+  "titulo": "Superior frontal gyrus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_frontal_gyrus&oldid=1371062941",
+  "revid": 1371062941,
+  "actualizada": "2026-08-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "2d78e233cb5d"
+ },
+ "wp:Superior_frontal_sulcus": {
+  "id": "wp:Superior_frontal_sulcus",
+  "titulo": "Superior frontal sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_frontal_sulcus&oldid=1369417308",
+  "revid": 1369417308,
+  "actualizada": "2026-08-14",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "70360d2cc16b"
+ },
+ "wp:Superior_gluteal_artery": {
+  "id": "wp:Superior_gluteal_artery",
+  "titulo": "Superior gluteal artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_gluteal_artery&oldid=1380892550",
+  "revid": 1380892550,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "26a3c22266dd"
+ },
+ "wp:Superior_gluteal_nerve": {
+  "id": "wp:Superior_gluteal_nerve",
+  "titulo": "Superior gluteal nerve",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_gluteal_nerve&oldid=1360739720",
+  "revid": 1360739720,
+  "actualizada": "2026-06-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "c831c67ae86f"
+ },
+ "wp:Superior_intercostal_vein": {
+  "id": "wp:Superior_intercostal_vein",
+  "titulo": "Superior intercostal vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_intercostal_vein&oldid=1380891388",
+  "revid": 1380891388,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "061d53d096b0"
+ },
+ "wp:Superior_ophthalmic_vein": {
+  "id": "wp:Superior_ophthalmic_vein",
+  "titulo": "Superior ophthalmic vein",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_ophthalmic_vein&oldid=1301225790",
+  "revid": 1301225790,
+  "actualizada": "2025-07-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "65da4e30a8ed"
+ },
+ "wp:Superior_parietal_lobule": {
+  "id": "wp:Superior_parietal_lobule",
+  "titulo": "Superior parietal lobule",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_parietal_lobule&oldid=1369172318",
+  "revid": 1369172318,
+  "actualizada": "2026-08-13",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "77c70cdf5752"
+ },
+ "wp:Superior_petrosal_sinus": {
+  "id": "wp:Superior_petrosal_sinus",
+  "titulo": "Superior petrosal sinus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_petrosal_sinus&oldid=1292384374",
+  "revid": 1292384374,
+  "actualizada": "2025-05-26",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "b7d8b5d31a7c"
+ },
+ "wp:Superior_phrenic_arteries": {
+  "id": "wp:Superior_phrenic_arteries",
+  "titulo": "Superior phrenic arteries",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_phrenic_arteries&oldid=1301225796",
+  "revid": 1301225796,
+  "actualizada": "2025-07-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "04f8d6c33e0c"
+ },
+ "wp:Superior_rectal_artery": {
+  "id": "wp:Superior_rectal_artery",
+  "titulo": "Superior rectal artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_rectal_artery&oldid=1380894045",
+  "revid": 1380894045,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "1399dd140543"
+ },
+ "wp:Superior_sagittal_sinus": {
+  "id": "wp:Superior_sagittal_sinus",
+  "titulo": "Superior sagittal sinus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_sagittal_sinus&oldid=1258641882",
+  "revid": 1258641882,
+  "actualizada": "2024-11-20",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "f44a45c56046"
+ },
+ "wp:Superior_temporal_sulcus": {
+  "id": "wp:Superior_temporal_sulcus",
+  "titulo": "Superior temporal sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_temporal_sulcus&oldid=1370168255",
+  "revid": 1370168255,
+  "actualizada": "2026-08-19",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "a44efe4e0b03"
+ },
  "wp:Suprahyoid_muscles": {
   "id": "wp:Suprahyoid_muscles",
   "titulo": "Suprahyoid muscles",
@@ -3510,6 +5524,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "cc101d0678b0"
+ },
+ "wp:Supramarginal_gyrus": {
+  "id": "wp:Supramarginal_gyrus",
+  "titulo": "Supramarginal gyrus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Supramarginal_gyrus&oldid=1291272051",
+  "revid": 1291272051,
+  "actualizada": "2025-05-20",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "a7d3a2a068ad"
  },
  "wp:Suprascapular_nerve": {
   "id": "wp:Suprascapular_nerve",
@@ -3540,6 +5564,26 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "8aeb58bed075"
+ },
+ "wp:Sympathetic_ganglion": {
+  "id": "wp:Sympathetic_ganglion",
+  "titulo": "Sympathetic ganglia",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sympathetic_ganglia&oldid=1384148509",
+  "revid": 1384148509,
+  "actualizada": "2026-11-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "ce43ab518776"
+ },
+ "wp:Sympathetic_trunk": {
+  "id": "wp:Sympathetic_trunk",
+  "titulo": "Sympathetic trunk",
+  "url": "https://en.wikipedia.org/w/index.php?title=Sympathetic_trunk&oldid=1380893105",
+  "revid": 1380893105,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "d25d714db969"
  },
  "wp:Synovial_joint": {
   "id": "wp:Synovial_joint",
@@ -3601,6 +5645,16 @@
   "fecha": "2026-11-09",
   "huella": "57dbf2d51062"
  },
+ "wp:Tentorium_cerebelli": {
+  "id": "wp:Tentorium_cerebelli",
+  "titulo": "Cerebellar tentorium",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cerebellar_tentorium&oldid=1331508711",
+  "revid": 1331508711,
+  "actualizada": "2026-01-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "e08003743edc"
+ },
  "wp:Teres_major_muscle": {
   "id": "wp:Teres_major_muscle",
   "titulo": "Teres major muscle",
@@ -3641,6 +5695,16 @@
   "fecha": "2026-11-09",
   "huella": "7d88f10a9a0f"
  },
+ "wp:Thoracic_duct": {
+  "id": "wp:Thoracic_duct",
+  "titulo": "Thoracic duct",
+  "url": "https://en.wikipedia.org/w/index.php?title=Thoracic_duct&oldid=1360742155",
+  "revid": 1360742155,
+  "actualizada": "2026-06-23",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "4bf8b3491843"
+ },
  "wp:Thoracic_vertebrae": {
   "id": "wp:Thoracic_vertebrae",
   "titulo": "Thoracic vertebrae",
@@ -3650,6 +5714,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "8a6332057393"
+ },
+ "wp:Thoracoacromial_artery": {
+  "id": "wp:Thoracoacromial_artery",
+  "titulo": "Thoracoacromial artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Thoracoacromial_artery&oldid=1380880450",
+  "revid": 1380880450,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "07cc4b5d3460"
  },
  "wp:Thymus": {
   "id": "wp:Thymus",
@@ -3691,6 +5765,16 @@
   "fecha": "2026-11-09",
   "huella": "fa7c64242a10"
  },
+ "wp:Tracheobronchial_lymph_nodes": {
+  "id": "wp:Tracheobronchial_lymph_nodes",
+  "titulo": "Tracheobronchial lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Tracheobronchial_lymph_nodes&oldid=1380892676",
+  "revid": 1380892676,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "eea759b7ad37"
+ },
  "wp:Transverse_abdominal_muscle": {
   "id": "wp:Transverse_abdominal_muscle",
   "titulo": "Transverse abdominal muscle",
@@ -3711,6 +5795,26 @@
   "fecha": "2026-11-09",
   "huella": "9c34daf5e931"
  },
+ "wp:Transverse_occipital_sulcus": {
+  "id": "wp:Transverse_occipital_sulcus",
+  "titulo": "Transverse occipital sulcus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Transverse_occipital_sulcus&oldid=1252656825",
+  "revid": 1252656825,
+  "actualizada": "2024-10-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "d58b331e46e3"
+ },
+ "wp:Transverse_sinuses": {
+  "id": "wp:Transverse_sinuses",
+  "titulo": "Transverse sinuses",
+  "url": "https://en.wikipedia.org/w/index.php?title=Transverse_sinuses&oldid=1371827795",
+  "revid": 1371827795,
+  "actualizada": "2026-08-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "cec0f7409c11"
+ },
  "wp:Trapezius": {
   "id": "wp:Trapezius",
   "titulo": "Trapezius",
@@ -3730,6 +5834,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "8e720758c33b"
+ },
+ "wp:Trochlear_nucleus": {
+  "id": "wp:Trochlear_nucleus",
+  "titulo": "Trochlear nucleus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Trochlear_nucleus&oldid=1320352358",
+  "revid": 1320352358,
+  "actualizada": "2025-11-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "21eb8a18102f"
  },
  "wp:Ulna": {
   "id": "wp:Ulna",
@@ -3770,6 +5884,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "50aaef2b8cea"
+ },
+ "wp:Uterine_artery": {
+  "id": "wp:Uterine_artery",
+  "titulo": "Uterine artery",
+  "url": "https://en.wikipedia.org/w/index.php?title=Uterine_artery&oldid=1380886795",
+  "revid": 1380886795,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "d4c0ed6dee57"
  },
  "wp:Vastus_intermedius_muscle": {
   "id": "wp:Vastus_intermedius_muscle",
@@ -3841,6 +5965,16 @@
   "fecha": "2026-11-09",
   "huella": "71d541ccb743"
  },
+ "wp:Vestibular_nuclei": {
+  "id": "wp:Vestibular_nuclei",
+  "titulo": "Vestibular nuclei",
+  "url": "https://en.wikipedia.org/w/index.php?title=Vestibular_nuclei&oldid=1354790986",
+  "revid": 1354790986,
+  "actualizada": "2026-05-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "16563bbac68b"
+ },
  "wp:Vomer": {
   "id": "wp:Vomer",
   "titulo": "Vomer",
@@ -3850,6 +5984,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "67c42b40e170"
+ },
+ "wp:White_matter": {
+  "id": "wp:White_matter",
+  "titulo": "White matter",
+  "url": "https://en.wikipedia.org/w/index.php?title=White_matter&oldid=1383409230",
+  "revid": 1383409230,
+  "actualizada": "2026-11-02",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-10",
+  "huella": "586784fa3610"
  },
  "wp:Zona_orbicularis": {
   "id": "wp:Zona_orbicularis",
