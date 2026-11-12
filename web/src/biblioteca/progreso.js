@@ -232,11 +232,15 @@ export function anotar(data, id, resultado, ahora = Date.now(), { huella = null 
   return e;
 }
 
-/** Registra una evaluación de una lección: { aciertos, total, porObjetivo }; devuelve si demuestra aprendizaje. */
-export function registrarEvaluacion(data, L, { aciertos, total, porObjetivo }, ahora = Date.now()) {
+/**
+ * Registra una evaluación de una lección: { aciertos, total, porObjetivo, sinEvaluar }; devuelve si demuestra
+ * aprendizaje. `sinEvaluar`: índices de los objetivos que no se pudieron evaluar por una limitación conocida del modelo
+ * (evaluar.js, planEvaluacion): no se dan por cumplidos, así que con alguno la evaluación no demuestra la lección.
+ */
+export function registrarEvaluacion(data, L, { aciertos, total, porObjetivo, sinEvaluar = [] }, ahora = Date.now()) {
   const p = leccion(data, L);
-  const demostrada = total > 0 && aciertos / total >= UMBRAL_DEMOSTRADA && (porObjetivo ?? []).every(([a, t]) => !t || a > 0);
-  p.evaluaciones.push({ fecha: ahora, aciertos, total, porObjetivo, demostrada });
+  const demostrada = total > 0 && aciertos / total >= UMBRAL_DEMOSTRADA && (porObjetivo ?? []).every(([a, t]) => !t || a > 0) && !sinEvaluar.length;
+  p.evaluaciones.push({ fecha: ahora, aciertos, total, porObjetivo, demostrada, ...(sinEvaluar.length ? { sinEvaluar: [...sinEvaluar] } : {}) });
   if (p.evaluaciones.length > 20) p.evaluaciones.splice(0, p.evaluaciones.length - 20);
   p.actividad = ahora;
   return demostrada;
@@ -272,18 +276,22 @@ export function falladas(data, { filtro = () => true, ahora = Date.now() } = {})
  * Estado de una lección del catálogo: { estado, vistos, total, completada, ultima, demostrada, dominio, pendientes,
  * actividad, cambiada }. estado: 'sin-empezar' | 'en-curso' | 'completada' | 'demostrada' | 'dominada'.
  * `L`: { id, version, pasos (número o lista), preguntas (número) }; `idsPreguntas`: ids de su banco si se conocen.
+ * Si se conoce la lección entera (evaluar.js, noEvaluables): `excluidas`, las preguntas que en este modelo no se hacen
+ * (no cuentan para el dominio), y `sinEvaluar`, cuántos objetivos se quedan sin ninguna (sin ellos no hay dominio).
+ * Lo huérfano (preguntas retiradas, quitadas o que el modelo muestra mal) no está pendiente de repaso.
  */
-export function estadoLeccion(data, L, { ahora = Date.now(), idsPreguntas = null } = {}) {
+export function estadoLeccion(data, L, { ahora = Date.now(), idsPreguntas = null, excluidas = null, sinEvaluar = 0 } = {}) {
   const p = data.lecciones[L.id];
   if (!idsPreguntas && Array.isArray(L.preguntas)) idsPreguntas = L.preguntas.map((q) => q.id);
+  if (idsPreguntas && excluidas?.size) idsPreguntas = idsPreguntas.filter((id) => !excluidas.has(id));
   const nPasos = Array.isArray(L.pasos) ? L.pasos.length : L.pasos;
   const items = Object.entries(data.items).filter(([k]) => k.startsWith(`${L.id}/`) && (!idsPreguntas || idsPreguntas.includes(k.slice(L.id.length + 1))));
-  const pendientes = items.filter(([, e]) => e.proximo != null && e.proximo <= ahora).length;
+  const pendientes = items.filter(([, e]) => e.proximo != null && e.proximo <= ahora && !e.huerfana).length;
   const nPreg = idsPreguntas?.length ?? L.preguntas ?? 0;
   const enDominio = items.filter(([, e]) => e.caja >= CAJA_DOMINIO).length;
   const ultima = p?.evaluaciones?.at(-1) ?? null;
   const demostrada = !!p?.evaluaciones?.some((e) => e.demostrada);
-  const dominada = nPreg > 0 && enDominio >= nPreg;
+  const dominada = nPreg > 0 && enDominio >= nPreg && !sinEvaluar;
   const vistos = Math.min(p?.vistos?.length ?? 0, nPasos);
   const estado = dominada ? 'dominada' : demostrada ? 'demostrada' : p?.completada ? 'completada' : vistos ? 'en-curso' : 'sin-empezar';
   return {
@@ -295,8 +303,9 @@ export function estadoLeccion(data, L, { ahora = Date.now(), idsPreguntas = null
 
 /**
  * Al cargar una lección: las preguntas que se corrigieron (otra huella) empiezan de nuevo, sin sus fallos; las que ya
- * no existen o están retiradas quedan «huérfanas» (no se repasan ni cuentan; si vuelven, se recuperan). `huellaDe(q)`
- * y `retirada(id)`: de evaluar.js. Devuelve cuántos ítems cambió.
+ * no existen, están retiradas o no se pueden hacer por una limitación conocida del modelo quedan «huérfanas» (no se
+ * repasan ni cuentan, pero se conservan; si vuelven, se recuperan). `huellaDe(q)` y `retirada(id, q)`: de evaluar.js
+ * (la interfaz incluye ahí las limitaciones). Devuelve cuántos ítems cambió.
  */
 export function depurar(data, L, huellaDe, retirada = () => false) {
   const preguntas = new Map((L.preguntas ?? []).map((q) => [q.id, q]));
@@ -304,7 +313,7 @@ export function depurar(data, L, huellaDe, retirada = () => false) {
   for (const [id, e] of Object.entries(data.items)) {
     if (!id.startsWith(`${L.id}/`)) continue;
     const q = preguntas.get(id.slice(L.id.length + 1));
-    if (!q || retirada(q.id)) { if (!e.huerfana) { e.huerfana = true; n++; } continue; }
+    if (!q || retirada(q.id, q)) { if (!e.huerfana) { e.huerfana = true; n++; } continue; }
     if (e.huerfana) { delete e.huerfana; n++; }
     const h = huellaDe(q);
     if (e.qh && e.qh !== h) { data.items[id] = { ...itemNuevo(), qh: h }; n++; }

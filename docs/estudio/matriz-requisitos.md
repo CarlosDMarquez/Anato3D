@@ -131,3 +131,17 @@ Actualizada el 9 nov por la noche con los recorridos personales por unidades (fi
 2. **Elegir alojamiento y proveedor de cuentas.** Desbloquea las secciones 18, 19, 21, 22, 25 y 27.
 3. **Contactar** con un docente y estudiantes para la revisión y el piloto, y comprobar los permisos institucionales.
 4. **Revisión legal y de privacidad** antes de publicar.
+
+## Bloque «limitaciones conocidas del modelo» (9 nov 2026, noche)
+
+Rama `claude/limitaciones-modelo`, desde `main` en `454a3cb`, sin commit. Es la ronda 1 del bucle con ChatGPT, con sus
+partes P0 a P3. El detalle está en `limitaciones-modelo.md`.
+
+| Parte | Requisito | Estado | Evidencia | Pendiente |
+| --- | --- | --- | --- | --- |
+| P0 | Reproducir y clasificar los tres hallazgos | ✅ | `docs/revision/limitaciones-modelo/hallazgos.md`: medición en los dos modelos y los dos lados, 10 capturas, los archivos con su blob de git y 7 citas comprobadas | Revisión docente de la clasificación |
+| P1 | Registro común y aviso en la ficha | ✅ | `src/data/limitaciones.js` (3 entradas), validado por `npm run check`. **Navegador:** ficha desde el buscador, en escritorio y en el móvil plegado, en los cinco idiomas. Contraste del aviso de 9,1:1 o más (AA y AAA) y aviso entero con el zoom al 200 % emulado | Lector de pantalla y móvil real (humana) |
+| P1 | Restricciones en la evaluación, el repaso, el progreso y los pasos | ✅ | **Automática:** `tests/limitaciones.test.mjs`. **Navegador (Neuri simulado):** lección propia con la pieza en el núcleo: evaluación sin ella, nota en el resultado, el fallo antiguo huérfano y fuera de «Repasar ahora» | — |
+| P2 | Neuri recibe solo lo pertinente y no puede entregar lo restringido | ✅ simulada · ⛔ real | **Automática (simulada):** notas en orientar, planificar, redactar y adaptar; el ensamblado quita y cuenta; la validación lo para | Prueba real con Haiku |
+| P2 | Pruebas y comprobaciones | ✅ | En esta rama, `npm test` da 164 de 164 (148 + 16). Además: `npm run check`, `vite build` y `node scripts/limitaciones.mjs --citas` (7 de 7). Revisión adversarial con 14 agentes: 5 fallos de gravedad media y 6 de gravedad baja, corregidos; 2 detalles menores quedan explicados sin cambiar (en `limitaciones-modelo.md`). Copia con las tres ramas juntas: 181 de 181 | La cifra global de la matriz (148) se actualiza al fusionar |
+| P3 | Documentación | ✅ | `limitaciones-modelo.md`; notas en la aceptación, los contratos de datos, Neuri, el manual y la guía operativa | — |

@@ -7,7 +7,12 @@
 //  - las citas son frases literales de las evidencias que eligió (nunca texto suyo);
 //  - las opciones de identificar (estructuras parecidas del inventario) y las candidatas de localizar.
 // Lo que no cumple el formato se quita y se apunta; lo que el revisor rechaza vuelve como problema (para corregir).
-import { leccion, GUIA, MODELO, revisarLeccion, distractoresIdentificar, TIPOS_COMPROBAR } from '../../src/biblioteca/formato.js';
+// Tampoco se deja al modelo lo que el 3D muestra mal (src/data/limitaciones.js): una pregunta de identificar o de
+// localizar, o la actividad «localizar» de un paso, sobre una pieza fuera de sitio o de nombre dudoso se quita (y se
+// cuenta en `limites`), esas piezas no se ofrecen como candidatas ni como opciones falsas, y validarLeccion lo comprueba.
+import { leccion, GUIA, MODELO, revisarLeccion, distractoresIdentificar, TIPOS_COMPROBAR, estructuraUtil } from '../../src/biblioteca/formato.js';
+import { motivoNoDisponible } from '../../src/biblioteca/evaluar.js';
+import { piezasRestringidas } from '../../src/data/limitaciones.js';
 import { normalizar as normalizarBusqueda } from '../../src/biblioteca/buscar.js';
 import { SUBREGION_POR_ID, REGION_POR_ID } from '../../src/biblioteca/taxonomia.js';
 
@@ -23,12 +28,17 @@ const GRUPO = { arteria: 'vaso', vena: 'vaso', cartilago: 'hueso', diente: 'hues
 const grupo = (t) => GRUPO[t] ?? t;
 
 /**
- * Lección a partir de un plan (planificar) y un borrador (redactar/adaptar). Devuelve { L, quitado: [textos], problemas }.
+ * Lección a partir de un plan (planificar) y un borrador (redactar/adaptar). Devuelve { L, quitado: [textos], limites }
+ * (`limites`: cuántas preguntas o actividades en 3D se quitaron por pedir lo que el modelo muestra mal).
  * evidencias: Map «E3» → entrada del corpus ({ citas: [{ f, c }], … }); inventario: cargarInventario(); fuentes: meta de
  * cada fuente citada (f → { titulo, url, licencia, revid, fecha }).
  */
 export function ensamblarLeccion({ plan, borrador, evidencias, inventario, idioma = 'es', id, modo = 'redactar', base = null, modeloIA = null, fecha = new Date().toISOString().slice(0, 10), fuentes = {}, terminologia = [], instrucciones = null }) {
   const quitado = [];
+  let limites = 0;
+  // Lo que el modelo muestra mal (en cualquiera de los dos modelos) no se usa en 3D en lo que se corrige.
+  const util = (eid, uso) => estructuraUtil(estructuras[eid], null, uso);
+  const limitada = (donde, eid, que) => { limites++; quitado.push(`${donde}: ${que} sobre una pieza que el modelo 3D muestra mal (${estructuras[eid].piezas.join(', ')}); explícala con fuentes, sin pedir que se mire en el modelo`); };
   // ── Estructuras (del plan, con los datos del inventario) ──
   const porClave = new Map();
   const nucleoPlan = plan.estructuras.filter((e) => e.papel === 'nucleo' && inventario.estructuras[e.clave]);
@@ -104,8 +114,14 @@ export function ensamblarLeccion({ plan, borrador, evidencias, inventario, idiom
     if (a) {
       const es = ids(a.estructuras);
       const txt = String(a.texto ?? '').trim();
-      if (a.tipo === 'localizar' && es.find((k) => nucleo.includes(k)) && txt) paso.actividad = { tipo: 'localizar', estructura: es.find((k) => nucleo.includes(k)), texto: txt };
-      else if (a.tipo === 'comparar' && es.length >= 2 && txt) paso.actividad = { tipo: 'comparar', estructuras: es, texto: txt };
+      const delNucleo = es.filter((k) => nucleo.includes(k));
+      if (a.tipo === 'localizar' && delNucleo.length && txt) {
+        // El objetivo es la primera estructura del núcleo, como la nombra el texto. Si el modelo la muestra mal, la
+        // actividad se quita: cambiarla por otra estructura dejaría un texto que pide tocar una cosa y corrige otra.
+        const objetivo = delNucleo[0];
+        if (util(objetivo, 'localizar')) paso.actividad = { tipo: 'localizar', estructura: objetivo, texto: txt };
+        else limitada(`paso ${i + 1}`, objetivo, 'la actividad «localizar»');
+      } else if (a.tipo === 'comparar' && es.length >= 2 && txt) paso.actividad = { tipo: 'comparar', estructuras: es, texto: txt };
       else if (a.tipo === 'vistas' && a.vistas?.length && txt) paso.actividad = { tipo: 'vistas', vistas: a.vistas.map((v) => ({ nombre: String(v.nombre).trim(), camara: v.camara })), texto: txt };
       else quitado.push(`paso ${i + 1}: actividad incompleta`);
     }
@@ -145,8 +161,10 @@ export function ensamblarLeccion({ plan, borrador, evidencias, inventario, idiom
       const e = porClave.get(q.estructura);
       if (!e || !nucleo.includes(e)) { quitado.push(`${donde}: estructura que no es del núcleo`); return; }
       if (preguntas.some((x) => x.tipo === q.tipo && x.estructura === e)) return;                // repetida
+      if (!util(e, q.tipo)) { limitada(donde, e, `una pregunta de ${q.tipo}`); return; }
       if (q.tipo === 'localizar') {
-        const otras = Object.keys(estructuras).filter((x) => x !== e);
+        // Candidatas: nunca algo que el modelo muestra mal (una pieza fuera de sitio podría quedarse con el toque).
+        const otras = Object.keys(estructuras).filter((x) => x !== e && util(x, 'localizar'));
         const candidatas = [...otras.filter((x) => grupo(estructuras[x].tipo) === grupo(estructuras[e].tipo)), ...otras].filter((x, i, a) => a.indexOf(x) === i).slice(0, 3);
         if (candidatas.length < 2) { quitado.push(`${donde}: sin estructuras con las que confundirla`); return; }
         preguntas.push({ ...comun, estructura: e, candidatas });
@@ -170,11 +188,13 @@ export function ensamblarLeccion({ plan, borrador, evidencias, inventario, idiom
   });
 
   // Identificar necesita 3 nombres con los que confundirla: si la lección no tiene tantos del mismo tipo, del inventario.
+  // Ni unos ni otros pueden ser de piezas que el modelo muestra mal (no se ofrecen como opción falsa).
   const provisional = { estructuras };
+  const sinValor = new Set(Object.keys(estructuras).filter((k) => !util(k, 'distractor')).map((k) => estructuras[k].nombre));
   for (const q of preguntas.filter((x) => x.tipo === 'identificar')) {
     const e = estructuras[q.estructura];
-    if (distractoresIdentificar(provisional, q.estructura).length >= 3) continue;
-    const extra = inventario.parecidas(e.piezas[0], { idioma, excluir: Object.values(estructuras).map((x) => x.piezas[0]) });
+    if (distractoresIdentificar(provisional, q.estructura).filter((n) => !sinValor.has(n)).length >= 3) continue;
+    const extra = inventario.parecidas(e.piezas[0], { idioma, excluir: [...Object.values(estructuras).map((x) => x.piezas[0]), ...piezasRestringidas('distractor')] });
     if (extra.length) e.confusiones = extra;
   }
   // Práctica de los pasos: la primera pregunta de texto que se enseña en cada paso (cada una, una vez).
@@ -205,7 +225,7 @@ export function ensamblarLeccion({ plan, borrador, evidencias, inventario, idiom
   });
   L.fuentesUsadas = fuentesUsadas;
   L.origen = { neuri: true, modo, base, fecha, modelo: modeloIA, instrucciones };
-  return { L, quitado };
+  return { L, quitado, limites };
 }
 
 /**
@@ -218,6 +238,14 @@ export function validarLeccion(L, { inventario, citaEnFuente, fuentes = {} }) {
   if (!L.modelos?.length) errores.push('las estructuras del núcleo no están juntas en ningún modelo');
   const ctx = { piezasDe: (m) => inventario.piezasDe(m), lecciones: null, fuentes: { ...fuentes, ...(L.fuentesUsadas ?? {}) } };
   for (const p of revisarLeccion(L, ctx)) (p.nivel === 'error' ? errores : avisos).push(p.texto.replace(`${L.id}: `, ''));
+  // La red de seguridad de las limitaciones del modelo: ensamblarLeccion ya las quita; si algo llega aquí, es un error (y
+  // la lección pasa por la ronda de corrección o no se entrega).
+  for (const m of L.modelos ?? []) {
+    for (const q of L.preguntas ?? []) if (motivoNoDisponible(L, q, m) === 'limitacion') errores.push(`pregunta ${q.id}: pide ver o tocar una pieza que el modelo 3D muestra mal`);
+  }
+  for (const p of L.pasos ?? []) {
+    if (p.actividad?.tipo === 'localizar' && !estructuraUtil(L.estructuras[p.actividad.estructura], null, 'localizar')) errores.push(`paso ${p.id}: «localizar» sobre una pieza que el modelo 3D muestra mal`);
+  }
   for (const p of L.pasos) {
     for (const f of [...p.texto, ...(p.detalle ?? [])]) {
       for (const e of f.slice(1)) {

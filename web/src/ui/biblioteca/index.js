@@ -17,7 +17,7 @@ import * as P from '../../biblioteca/progreso.js';
 import * as F from '../../biblioteca/filtros.js';
 import { deModulo } from '../../biblioteca/modulos.js';
 import { crearBuscador } from '../../biblioteca/buscar.js';
-import { huella, retirada } from '../../biblioteca/evaluar.js';
+import { huella, retirada, motivoNoDisponible, noEvaluables } from '../../biblioteca/evaluar.js';
 import { RECORRIDOS, leccionesDeRecorrido } from '../../biblioteca/recorridos.js';
 import { MODULOS } from '../../content/index.js';
 import { sinonimosDePieza } from '../../content/index.js';
@@ -49,7 +49,15 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     vista: { tipo: 'portada' }, pila: [],
     busqueda: { texto: '', filtros: F.vacios(), orden: 'relevancia' },
     guardar() { if (!P.guardar(storage, ctx.data)) toast(t('estudio.noGuardado')); },
-    estado(L, extra) { return P.estadoLeccion(ctx.data, L, extra); },
+    // Si la lección tiene preguntas que el modelo no permite hacer (limitaciones conocidas del modelo), esas no cuentan
+    // para el dominio, y un objetivo sin ninguna pregunta posible lo impide. Sin limitaciones, el cálculo de siempre. El
+    // mapa de aprendizaje y la propuesta de sesión usan este mismo estado, para que no digan otra cosa que las tarjetas.
+    estado(L, extra) {
+      const completa = ctx.lecciones.get(L.id);
+      const no = completa?.preguntas ? noEvaluables(completa, api.modelo()) : null;
+      if (!no || (!no.excluidas.size && !no.sinEvaluar.length)) return P.estadoLeccion(ctx.data, L, extra);
+      return P.estadoLeccion(ctx.data, L, { idsPreguntas: completa.preguntas.map((q) => q.id), excluidas: no.excluidas, sinEvaluar: no.sinEvaluar.length, ...extra });
+    },
     terminada(id) { return ['completada', 'demostrada', 'dominada'].includes(ctx.estado(ctx.porId.get(id) ?? { id, pasos: 1, preguntas: 0 }).estado); },
     ir, volver, render, cargarLeccion, resumenRecorrido, recorridosDe,
     esPropia: (id) => ctx.propias.some((L) => L.id === id),
@@ -90,10 +98,15 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
       return ok;
     },
   };
-  /** Tras leer el progreso: lo de preguntas corregidas o retiradas de las lecciones ya cargadas deja de contar. */
+  /**
+   * Lo que de una lección no cuenta ni se repasa: lo retirado mientras se revisa un reporte y lo que en el modelo actual
+   * pide ver o tocar algo que el modelo muestra mal (src/data/limitaciones.js). Sus ítems quedan huérfanos, sin borrar.
+   */
+  const fuera = (L) => (id, q) => retirada(L.id, id) || (!!q && motivoNoDisponible(L, q, api.modelo()) === 'limitacion');
+  /** Tras leer el progreso o cambiar de modelo: lo de preguntas corregidas, retiradas o limitadas deja de contar. */
   function depurarCargadas() {
     let n = 0;
-    for (const L of ctx.lecciones.values()) n += P.depurar(ctx.data, L, huella, (q) => retirada(L.id, q));
+    for (const L of ctx.lecciones.values()) n += P.depurar(ctx.data, L, huella, fuera(L));
     if (n) ctx.guardar();
   }
   depurarCargadas();
@@ -140,6 +153,10 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     for (const L of ctx.propias) ctx.lecciones.delete(L.id);
     ctx.propias = PR.cargarPropias(storage);
     for (const L of ctx.propias) ctx.lecciones.set(L.id, L);
+    // Sus preguntas corregidas, retiradas o limitadas dejan de contar ya (no esperan a que se vuelva a abrir el panel).
+    let n = 0;
+    for (const L of ctx.propias) n += P.depurar(ctx.data, L, huella, fuera(L));
+    if (n) ctx.guardar();
     const base = ctx.catalogoBase;
     // Requisitos y «siguiente» de las propias se conservan si apuntan a lecciones que existen.
     const ids = new Set([...base.lecciones.map((L) => L.id), ...ctx.propias.map((L) => L.id)]);
@@ -167,8 +184,8 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     if (!f) return null;
     const L = (await f()).default;
     ctx.lecciones.set(id, L);
-    // Preguntas corregidas o retiradas desde la última vez: sus fallos anteriores dejan de contar.
-    if (P.depurar(ctx.data, L, huella, (q) => retirada(L.id, q))) ctx.guardar();
+    // Preguntas corregidas, retiradas o limitadas desde la última vez: sus fallos anteriores dejan de contar.
+    if (P.depurar(ctx.data, L, huella, fuera(L))) ctx.guardar();
     ctx.fuentes ??= (await import('../../biblioteca/generado/fuentes.json')).default;
     return L;
   }
@@ -230,7 +247,7 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     },
     // Cambio de idioma o de modelo: rehace la vista actual (sin mover la cámara ni cambiar la pregunta).
     refrescar({ modelo = false } = {}) {
-      if (modelo) ctx.estructuras = null;
+      if (modelo) { ctx.estructuras = null; depurarCargadas(); }          // las limitaciones dependen del modelo
       if (panel.classList.contains('open')) render();
     },
     cerrar() {

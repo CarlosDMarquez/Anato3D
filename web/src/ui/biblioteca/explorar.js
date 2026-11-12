@@ -5,7 +5,7 @@ import * as F from '../../biblioteca/filtros.js';
 import { REGIONES, SISTEMAS, FORMATOS, TEMAS, NIVELES, DURACIONES, SUBREGION_POR_ID } from '../../biblioteca/taxonomia.js';
 import { RECORRIDOS, RECORRIDO_POR_ID, MODULO_BIB_POR_ID } from '../../biblioteca/recorridos.js';
 import { proponer, itemsDePractica, sinRepetirRecientes } from '../../biblioteca/sesion.js';
-import { preguntaDeItem, evaluacionDe, instanciar, disponibleEn, barajar } from '../../biblioteca/evaluar.js';
+import { preguntaDeItem, planEvaluacion, instanciar, disponibleEn, motivoNoDisponible, barajar } from '../../biblioteca/evaluar.js';
 import { t, tn, idioma } from '../../i18n/idioma.js';
 import { botonReportar, enlazarReportar } from './reportar.js';
 import { tr } from '../../i18n/contenido.js';
@@ -61,30 +61,41 @@ export async function empezarPractica(ctx, tipo, { lecciones = null, titulo = nu
   const modelo = ctx.api.modelo();
   let preguntas = [];
   let esperan = 0;
+  let porLimite = 0;      // preguntas que no se hacen por una limitación conocida del modelo (y no tienen sustituta)
   if (tipo === 'identificar') {
     const ids = (lecciones ?? Object.keys(ctx.data.lecciones)).filter((id) => ctx.porId.has(id));
     const Ls = (await Promise.all(ids.map((id) => ctx.cargarLeccion(id)))).filter(Boolean);
-    preguntas = barajar(Ls.flatMap((L) => L.preguntas.filter((q) => (q.tipo === 'identificar' || q.tipo === 'localizar') && disponibleEn(L, q, modelo)).map((q) => instanciar(L, q))), Math.random).slice(0, 10);
+    preguntas = barajar(Ls.flatMap((L) => L.preguntas.filter((q) => (q.tipo === 'identificar' || q.tipo === 'localizar') && disponibleEn(L, q, modelo)).map((q) => instanciar(L, q, Math.random, { modelo }))), Math.random).slice(0, 10);
   } else {
     // 'items': unas preguntas concretas (las dificultades del mapa de aprendizaje).
     const items = tipo === 'items' ? (elegidos ?? []).slice(0, 12) : itemsDePractica(ctx.data, tipo === 'lecciones' ? 'region' : tipo, { lecciones, max: 12 });
     const ids = [...new Set(items.map((id) => id.slice(0, id.indexOf('/'))))];
     await Promise.all(ids.map((id) => ctx.cargarLeccion(id)));
-    // Lo que se acaba de fallar no se repite tal cual: otra pregunta de lo mismo o, si no hay, más tarde.
+    // Lo que se acaba de fallar no se repite tal cual: otra pregunta de lo mismo o, si no hay, más tarde. Lo que el
+    // modelo muestra mal se cambia por otra pregunta de lo mismo o se quita (sesion.js).
     const r = sinRepetirRecientes(items, { data: ctx.data, lecciones: ctx.lecciones, modelo });
     esperan = r.esperan;
+    porLimite = r.quitadas ?? 0;
     preguntas = r.items.map((id) => preguntaDeItem(ctx.lecciones, id, { modelo })).filter(Boolean);
   }
-  if (!preguntas.length) return ctx.toast(t(tipo === 'identificar' ? 'bib.nadaQueIdentificar' : esperan ? 'bib.esperanRecientes' : 'bib.nadaQueRepasar'), esperan ? 6000 : undefined);
-  ctx.ir({ tipo: 'preguntas', modo: ['vencidas', 'errores', 'lecciones', 'items'].includes(tipo) ? 'repaso' : 'practica', titulo: titulo ?? t(`bib.practica.${tipo}`), preguntas, i: 0, respuestas: [], vuelta: ctx.vista });
+  if (!preguntas.length) {
+    if (porLimite) return ctx.toast(tn('bib.limite.repaso', porLimite), 6000);
+    return ctx.toast(t(tipo === 'identificar' ? 'bib.nadaQueIdentificar' : esperan ? 'bib.esperanRecientes' : 'bib.nadaQueRepasar'), esperan ? 6000 : undefined);
+  }
+  ctx.ir({ tipo: 'preguntas', modo: ['vencidas', 'errores', 'lecciones', 'items'].includes(tipo) ? 'repaso' : 'practica', titulo: titulo ?? t(`bib.practica.${tipo}`), preguntas, i: 0, respuestas: [], vuelta: ctx.vista, excluidasLimite: porLimite });
 }
 
-/** Evaluación de una lección (cubre todos sus objetivos). */
+/**
+ * Evaluación de una lección (cubre todos sus objetivos). Lo que el modelo muestra mal no se pregunta: se dice antes
+ * de empezar (la ficha de la lección) y al terminar, y los objetivos que se quedan sin pregunta no se dan por cumplidos.
+ */
 export async function evaluarLeccion(ctx, id) {
   const L = await ctx.cargarLeccion(id);
-  const preguntas = evaluacionDe(L, { modelo: ctx.api.modelo() });
-  if (!preguntas.length) return ctx.toast(t('bib.nadaQueRepasar'));
-  ctx.ir({ tipo: 'preguntas', modo: 'evaluacion', leccion: id, titulo: tr(L.titulo), preguntas, i: 0, respuestas: [], vuelta: ctx.vista });
+  const plan = planEvaluacion(L, { modelo: ctx.api.modelo() });
+  const excluidasLimite = plan.excluidas.filter((x) => x.motivo === 'limitacion').length;
+  const sinEvaluar = plan.sinEvaluar.filter((x) => x.motivo === 'limitacion').map((x) => x.objetivo);
+  if (!plan.preguntas.length) return ctx.toast(t(excluidasLimite ? 'bib.limite.evalVacia' : 'bib.nadaQueRepasar'), excluidasLimite ? 8000 : undefined);
+  ctx.ir({ tipo: 'preguntas', modo: 'evaluacion', leccion: id, titulo: tr(L.titulo), preguntas: plan.preguntas, i: 0, respuestas: [], vuelta: ctx.vista, excluidasLimite, sinEvaluar });
 }
 
 // ── Resultados de búsqueda y filtros ──
@@ -278,6 +289,19 @@ export function renderInfo(ctx) {
   const recs = ctx.recorridosDe(L.id);
   const accion = e.estado === 'en-curso' ? 'bib.seguir' : e.estado === 'sin-empezar' ? 'bib.empezar' : 'bib.repetir';
   const soloUno = L.modelos.length === 1 ? L.modelos[0] : null;
+  // Preguntas en 3D que no se hacen por las limitaciones conocidas del modelo: se dicen antes de evaluarse. Hace falta
+  // la lección entera; si aún no está cargada, se carga, y la ficha solo se repinta si cambia algo de lo que se ve (así
+  // no se cierra lo que la persona abrió ni se le mueve el foco).
+  const excluidasEn = (x) => x.preguntas.filter((q) => motivoNoDisponible(x, q, ctx.api.modelo()) === 'limitacion').length;
+  const completa = ctx.lecciones.get(L.id);
+  if (!completa) {
+    ctx.cargarLeccion(L.id).then((x) => {
+      if (!x || ctx.vista !== vista) return;
+      const e2 = ctx.estado(L);
+      if (excluidasEn(x) || e2.estado !== e.estado || e2.pendientes !== e.pendientes) renderInfo(ctx);
+    }).catch(() => {});
+  }
+  const porLimite = completa ? excluidasEn(completa) : 0;
   body.innerHTML = `
     ${atras(t('bib.volver'))}
     <p class="bib-sobre">${icono('book')}${esc(nomFormato(L.formato))}</p>
@@ -286,6 +310,7 @@ export function renderInfo(ctx) {
     ${chipsMeta(L)}
     ${e.cambiada ? `<p class="mod-note">${esc(t('bib.cambiada'))}</p>` : ''}
     ${soloUno ? `<p class="bib-nota">${esc(t(`bib.soloModelo.${soloUno}`))}</p>` : ''}
+    ${porLimite ? `<p class="aviso-limite" role="note">${icono('info')}<span>${esc(tn('bib.limite.excluidas', porLimite))}</span></p>` : ''}
     ${L.propia ? `<p class="bib-nota bib-nota-propia">${icono('sparkles')}<span>${esc(t(L.origen?.modo === 'adaptar' && L.origen?.base ? 'pet.propiaAdaptada' : 'pet.propiaCreada', { fecha: fechaDia(L.origen?.fecha), base: L.origen?.base && ctx.porId.get(L.origen.base) ? tr(ctx.porId.get(L.origen.base).titulo) : '' }))}</span></p>` : ''}
     <div class="bib-acciones">
       <button class="btn primary" data-accion="leccion">${esc(t(accion))}</button>
@@ -354,7 +379,7 @@ export function renderInfo(ctx) {
 // ── Sesión según el tiempo disponible ──
 export function renderSesion(ctx) {
   const { body, vista } = ctx;
-  vista.bloques ??= proponer({ minutos: vista.minutos, catalogo: ctx.catalogo.lecciones, data: ctx.data, modelo: ctx.api.modelo() });
+  vista.bloques ??= proponer({ minutos: vista.minutos, catalogo: ctx.catalogo.lecciones, data: ctx.data, modelo: ctx.api.modelo(), estadoDe: (L) => ctx.estado(L) });
   const total = vista.bloques.reduce((n, b) => n + b.minutos, 0);
   body.innerHTML = `
     ${atras(t('bib.biblioteca'))}

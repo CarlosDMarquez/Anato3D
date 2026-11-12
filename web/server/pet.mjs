@@ -26,6 +26,7 @@ import { crearRegistro } from './neuri/trabajos.mjs';
 import { textoCatalogo, textoContexto, textoEvidencias, textoSolicitud, textoPlan, textoBase, textoRecorridoBase, textoZona, mensajesApi } from './pet-prompt.mjs';
 import { llamar, crearCliente, elegirModelo, ErrorNeuri, MODELO_POR_DEFECTO } from './neuri/modelo.mjs';
 import { ensamblarLeccion, validarLeccion, afirmaciones, quitarNoRespaldadas, idLeccion } from './neuri/ensamblar.mjs';
+import { notaLimite, textoLimites, clavesDeLeccion, limitadasEn } from './neuri/limites.mjs';
 
 export { elegirModelo, MODELO_POR_DEFECTO };
 
@@ -130,7 +131,12 @@ export function crearManejador({
       const mejor = Math.max(0, ...[...deLecciones, ...dePaginas].map((x) => x.puntos));
       for (const x of [...deLecciones, ...dePaginas].filter((x) => x.cobertura >= 0.5 && x.puntos >= mejor * 0.35)) mapa.set(`E${mapa.size + 1}`, x.entrada);
     }
-    const variable = [textoModo('orientar', { idioma: p.idioma }), textoContexto(p), R ? textoEvidencias(mapa, R.corpus) : 'EVIDENCIAS: no disponibles en este servidor.'].join('\n\n');
+    // Las limitaciones del modelo de lo que nombra la persona (solo esas): en su último mensaje, en el tema que se
+    // conserva y en lo que escribió antes («¿y dónde lo veo en el modelo?» sigue hablando de lo mismo), en cualquiera de
+    // los cinco idiomas, para no mandarla a mirar en el 3D algo que está fuera de sitio o incompleto.
+    const nombrado = [p.mensajes.at(-1).texto, p.contexto.tema, ...p.mensajes.filter((m) => m.rol === 'usuario').map((m) => m.texto)];
+    const limites = R ? textoLimites([...R.inventario.mencionadas(nombrado).keys(), ...limitadasEn(nombrado, R.inventario)]) : '';
+    const variable = [textoModo('orientar', { idioma: p.idioma }), textoContexto(p), R ? textoEvidencias(mapa, R.corpus) : 'EVIDENCIAS: no disponibles en este servidor.'].join('\n\n') + (limites ? `\n\n${limites}` : '');
     const { datos, modelo: usado } = await llamarClaude({
       modelo, sistema: [fijo, variable], mensajes: mensajesApi(p.mensajes), esquema: esquemaOrientar({ lecciones: idsL, recorridos: ids.recorridos }),
       esfuerzo: 'low', maxTokens: 3000, etiqueta: 'orientar', signal, plazoMs: PLAZO.orientar,
@@ -182,7 +188,9 @@ export function crearManejador({
     const cuentas = Object.fromEntries(candidatas.map((k) => [k, R.corpus.cuantas(nombresDe(R, k))]));
     const lista = candidatas.map((k) => {
       const e = R.inventario.estructuras[k];
-      return `${k} — ${R.inventario.nombre(k, p.idioma)} (${e.tipo}; ${e.lugares.map(([r, x]) => [REGION_POR_ID.get(r)?.nombre, x && SUBREGION_POR_ID.get(x)?.nombre].filter(Boolean).join(' › ')).join(', ') || 'sin región'}; ${e.lado}; ${e.modelos.join(' y ')}; evidencias: ${cuentas[k]})`;
+      // Las limitaciones del modelo, solo en las candidatas que las tienen (src/data/limitaciones.js).
+      const limite = notaLimite(k);
+      return `${k} — ${R.inventario.nombre(k, p.idioma)} (${e.tipo}; ${e.lugares.map(([r, x]) => [REGION_POR_ID.get(r)?.nombre, x && SUBREGION_POR_ID.get(x)?.nombre].filter(Boolean).join(' › ')).join(', ') || 'sin región'}; ${e.lado}; ${e.modelos.join(' y ')}; evidencias: ${cuentas[k]})${limite ? ` — ${limite}` : ''}`;
     });
     const variable = [
       textoModo('planificar', { idioma: p.idioma }), textoSolicitud(s), base ? textoBase(base) : '',
@@ -283,7 +291,9 @@ export function crearManejador({
     emitir({ estado: 'redactando', evidencias: mapa.size });
 
     const nombre = (k) => R.inventario.nombre(k, p.idioma);
-    const variable = [textoModo(modo, { idioma: p.idioma }), textoPlan(plan, nombre), base ? textoBase(base) : '', textoEvidencias(mapa, R.corpus)].filter(Boolean).join('\n\n');
+    // Las limitaciones del modelo de las estructuras del plan y de todas las piezas de la lección base (solo las que tienen).
+    const limites = textoLimites([...plan.estructuras.map((e) => e.clave), ...clavesDeLeccion(base)]);
+    const variable = [textoModo(modo, { idioma: p.idioma }), textoPlan(plan, nombre), base ? textoBase(base) : '', textoEvidencias(mapa, R.corpus), limites].filter(Boolean).join('\n\n');
     const esquema = esquemaLeccion({ claves: plan.estructuras.map((e) => e.clave), evidencias: [...mapa.keys()] });
     const pedir = [{ role: 'user', content: `[La persona pulsó «${modo === 'adaptar' ? 'Crear la adaptación' : 'Crear la lección'}» en el plan.]` }];
     const opciones = { modelo: modeloLecciones, sistema: [fijo, variable], esquema, esfuerzo: 'medium', maxTokens: 32000, flujo: true, signal, plazoMs: PLAZO.redactar, trabajo: p.trabajo };
@@ -296,7 +306,7 @@ export function crearManejador({
     const id = idLeccion(plan.titulo, azar);
     const fuentes = fuentesDe(R, mapa);
     const montar = async (datos) => {
-      const { L, quitado } = ensamblarLeccion({ plan, borrador: datos.leccion, evidencias: mapa, inventario: R.inventario, idioma: p.idioma, id, modo, base: base?.id ?? null, modeloIA: r.modelo, fuentes, instrucciones: VERSION_INSTRUCCIONES });
+      const { L, quitado, limites: quitadasLimite } = ensamblarLeccion({ plan, borrador: datos.leccion, evidencias: mapa, inventario: R.inventario, idioma: p.idioma, id, modo, base: base?.id ?? null, modeloIA: r.modelo, fuentes, instrucciones: VERSION_INSTRUCCIONES });
       emitir({ estado: 'comprobando' });
       const lista = afirmaciones(L);
       let quitadas = [];
@@ -316,7 +326,7 @@ export function crearManejador({
         quitadas = quitarNoRespaldadas(L, lista, veredictos);
       }
       const val = validarLeccion(L, { inventario: R.inventario, citaEnFuente: R.corpus.citaEnFuente, fuentes });
-      return { L, quitado, quitadas, problemas, val, afirmadas: lista.length };
+      return { L, quitado, quitadasLimite, quitadas, problemas, val, afirmadas: lista.length };
     };
     let res;
     try { res = await montar(r.datos); } catch (err) { return emitir(errorEvento(err)); }
@@ -343,11 +353,14 @@ export function crearManejador({
     // Lo que la comprobación quitó, por categoría (anexo C), y cuántas dudas necesitarían una revisión humana.
     const porCategoria = {};
     for (const x of res.problemas) porCategoria[x.categoria ?? 'sin-respaldo'] = (porCategoria[x.categoria ?? 'sin-respaldo'] ?? 0) + 1;
+    // Lo quitado por una limitación del modelo va aparte (`limitesModelo`), no entre lo que se quitó por sus citas o su
+    // formato: sus textos siguen en `quitado` solo para que la ronda de corrección sepa por qué se quitaron.
     return emitir({
       estado: 'lista', leccion: L, mensaje: String(r.datos.mensaje ?? '').slice(0, LIMITES.pet),
       informe: {
-        pasos: L.pasos.length, preguntas: L.preguntas.length, citas, quitadas: res.quitadas.length + res.quitado.length, avisos: res.val.avisos.slice(0, 5),
+        pasos: L.pasos.length, preguntas: L.preguntas.length, citas, quitadas: res.quitadas.length + res.quitado.length - (res.quitadasLimite ?? 0), avisos: res.val.avisos.slice(0, 5),
         problemas: porCategoria, dudas: res.problemas.filter((x) => x.duda).length, instrucciones: VERSION_INSTRUCCIONES,
+        ...(res.quitadasLimite ? { limitesModelo: res.quitadasLimite } : {}),
       },
     });
   }

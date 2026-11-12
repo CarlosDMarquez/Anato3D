@@ -2,8 +2,8 @@
 // nombre al pasar el ratón, ni buscador) hasta responder. Después, la explicación, la cita de la fuente y el paso de la
 // lección al que volver. Las preguntas que no se pueden mostrar en este modelo se saltan y no cuentan.
 import * as P from '../../biblioteca/progreso.js';
-import { mallas } from '../../biblioteca/formato.js';
-import { corregir, corregirBreve, porObjetivo, NO_LO_SE } from '../../biblioteca/evaluar.js';
+import { mallas, sinPiezasLimitadas } from '../../biblioteca/formato.js';
+import { corregir, corregirBreve, porObjetivo, motivoNoDisponible, NO_LO_SE } from '../../biblioteca/evaluar.js';
 import { sinonimosDePieza } from '../../content/index.js';
 import { t, tn, idioma } from '../../i18n/idioma.js';
 import { botonReportar, enlazarReportar } from './reportar.js';
@@ -13,6 +13,15 @@ import { htmlFuentes, nombreE } from './leccion.js';
 import { abrirLeccion, empezarPractica, siguienteDeSesion, avanzarSesion } from './explorar.js';
 
 const leccionDe = (ctx, q) => ctx.lecciones.get(q.leccion);
+// La lección con la que se muestra y se corrige una pregunta en 3D: sin las piezas que el modelo muestra mal (las de una
+// estructura de varias piezas se quitan y el resto sirve; src/data/limitaciones.js).
+const leccion3d = (ctx, q) => sinPiezasLimitadas(leccionDe(ctx, q), ctx.api.modelo(), q.tipo);
+// «Ver en 3D» al responder: las estructuras de la pregunta que el modelo muestra bien, sin sus piezas limitadas (no se
+// enseña como respuesta lo que está fuera de sitio o tiene un nombre dudoso).
+function ver3d(ctx, q) {
+  const L = sinPiezasLimitadas(leccionDe(ctx, q), ctx.api.modelo(), 'identificar');
+  return { L, ids: (q.estructuras ?? []).filter((id) => L.estructuras[id]?.piezas?.length) };
+}
 
 // Vista 3D de una pregunta: la del paso de la lección al que pertenece, con solo lo que hace falta resaltado.
 function vistaDe(L, q) {
@@ -30,6 +39,14 @@ export async function renderPreguntas(ctx) {
   const L = leccionDe(ctx, q);
   if (!v.respuesta && !v.preparada) {
     v.preparada = true;
+    // Una pregunta preparada antes (un repaso a medias, otra pestaña) que ahora pide lo que el modelo muestra mal: se
+    // salta como las que no se pueden mostrar, con su motivo, y no cuenta.
+    const delBanco = L?.preguntas?.find((x) => x.id === q.id);
+    if (delBanco && motivoNoDisponible(L, delBanco, ctx.api.modelo()) === 'limitacion') {
+      v.saltada = 'limite';
+      ctx.api.mostrar(L, null);
+      return pintar(ctx);
+    }
     // Respuesta breve: en repasos y prácticas, una estructura que ya se reconoció alguna vez se pide escribiendo su
     // nombre (recordar es más exigente que elegir). En las evaluaciones, siempre con opciones (corrección segura).
     v.breve = q.tipo === 'identificar' && v.modo !== 'evaluacion' && (ctx.data.items[q.item]?.aciertos ?? 0) > 0;
@@ -41,7 +58,8 @@ export async function renderPreguntas(ctx) {
       // Lado al azar en las estructuras pares: así no se aprende «la de la derecha».
       const lado = L.estructuras[q.estructura]?.lado === 'bilateral' && Math.random() < 0.5 ? 'L' : 'R';
       v.lado = lado;
-      const r = await ctx.api.mostrar(L, { ...vistaDe(L, q), lado }, { evaluar: true });
+      const L3 = leccion3d(ctx, q);
+      const r = await ctx.api.mostrar(L3, { ...vistaDe(L3, q), lado }, { evaluar: true });
       if (ctx.vista !== v) return;
       v.cargando = false;
       if (!r.ok) v.saltada = true;
@@ -49,7 +67,7 @@ export async function renderPreguntas(ctx) {
         ctx.api.alTocar((pieza) => {
           if (!pieza || v.respuesta) return true;
           const base = pieza.id;
-          const hit = q.candidatas.find((id) => mallas(L.estructuras[id], 'L').includes(base) || mallas(L.estructuras[id], 'R').includes(base));
+          const hit = q.candidatas.find((id) => mallas(L3.estructuras[id], 'L').includes(base) || mallas(L3.estructuras[id], 'R').includes(base));
           if (!hit) { ctx.toast(t('bib.tocaCandidata')); return true; }
           responder(ctx, hit);
           return true;
@@ -76,7 +94,7 @@ function pintar(ctx) {
     <p class="bib-leccion-t">${esc(v.titulo)}</p>
     <p class="q-count">${esc(t('estudio.pregunta', { i: v.i + 1, n: v.preguntas.length }))} · ${esc(tn('estudio.aciertos', aciertos))}${v.modo !== 'evaluacion' ? ` · ${esc(tr(L.titulo))}` : ''}</p>
     <p class="q-text" tabindex="-1">${esc(enunciado)}</p>
-    ${v.saltada ? `<p class="mod-note">${esc(t('bib.saltada'))}</p>` : !hecho && pista ? `<p class="q-hint">${esc(pista)}</p>` : ''}
+    ${v.saltada ? `<p class="mod-note">${esc(t(v.saltada === 'limite' ? 'bib.limite.saltada' : 'bib.saltada'))}</p>` : !hecho && pista ? `<p class="q-hint">${esc(pista)}</p>` : ''}
     ${v.saltada ? '' : cuerpo(L, q, v)}
     ${hecho || v.saltada ? '' : `<label class="q-doubt"><input type="checkbox" id="q-dude" /> ${esc(t('estudio.dudo'))}</label>`}
     <div class="q-feedback" aria-live="polite">${hecho ? feedback(ctx, L, q, v) : ''}</div>
@@ -114,7 +132,7 @@ function pintar(ctx) {
   body.querySelector('[data-sec-ok]')?.addEventListener('click', () => responder(ctx, v.orden));
   body.querySelector('[data-siguiente]')?.addEventListener('click', () => siguiente(ctx));
   body.querySelector('[data-volver-paso]')?.addEventListener('click', () => volverAlPaso(ctx, q));
-  body.querySelector('[data-ver3d]')?.addEventListener('click', () => ctx.api.resaltar(L, q.estructuras.length ? q.estructuras : [], { lado: v.lado ?? 'R' }));
+  body.querySelector('[data-ver3d]')?.addEventListener('click', () => { const x = ver3d(ctx, q); ctx.api.resaltar(x.L, x.ids, { lado: v.lado ?? 'R' }); });
   requestAnimationFrame(() => body.querySelector(hecho ? '.q-result' : v.cercana ? '.q-cercana' : v.breve && !v.cargando ? '#q-breve-in' : '.q-text')?.focus({ preventScroll: false }));
 }
 
@@ -171,7 +189,7 @@ function feedback(ctx, L, q, v) {
     ${htmlFuentes(ctx, q.evidencia ?? [], L)}
     <div class="step-nav">
       ${paso ? `<button class="btn" data-volver-paso>${esc(t('bib.volverPaso', { paso: tr(paso.titulo) }))}</button>` : ''}
-      ${q.estructuras?.length ? `<button class="btn" data-ver3d>${esc(t('estudio.ver3d'))}</button>` : ''}
+      ${ver3d(ctx, q).ids.length ? `<button class="btn" data-ver3d>${esc(t('estudio.ver3d'))}</button>` : ''}
       <button class="btn primary" data-siguiente>${esc(t(v.i === v.preguntas.length - 1 ? 'estudio.verResultado' : 'estudio.siguiente'))}</button>
     </div>`;
 }
@@ -200,19 +218,20 @@ function responder(ctx, valor, { resultado: corregido = null, elegida: escrita =
   ctx.guardar();
   ctx.api.alTocar(null);
   ctx.api.modoEvaluacion(false);                       // ya respondida: el nombre puede verse
-  const L = leccionDe(ctx, q);
-  if (q.tipo === 'identificar' || q.tipo === 'localizar') ctx.api.resaltar(L, [q.estructura], { lado: v.lado ?? 'R', sinCamara: true });
+  if (q.tipo === 'identificar' || q.tipo === 'localizar') ctx.api.resaltar(leccion3d(ctx, q), [q.estructura], { lado: v.lado ?? 'R', sinCamara: true });
   pintar(ctx);
 }
 
 function siguiente(ctx) {
   const v = ctx.vista;
   if (v.saltada) {
-    // No se pudo mostrar en el modelo: no cuenta (ni como fallo ni en el repaso), pero queda anotado como técnico.
+    // No se pudo mostrar en el modelo (o pide lo que el modelo muestra mal): no cuenta, ni como fallo ni en el repaso,
+    // pero queda anotado como técnico.
     const q = v.preguntas[v.i];
-    v.respuestas.push({ pregunta: q, resultado: null, saltada: true });
+    const limite = v.saltada === 'limite';
+    v.respuestas.push({ pregunta: q, resultado: null, saltada: true, ...(limite ? { limite } : {}) });
     P.registrarIntento(ctx.data, { leccion: q.leccion, version: leccionDe(ctx, q)?.version ?? null, pregunta: q.id, tipo: q.tipo, objetivo: q.objetivo, estructura: q.estructura ?? null, resultado: 'tecnico', modo: v.modo });
-    ctx.evento?.('error_tecnico', { codigo: 'pregunta-no-mostrable', donde: v.modo }, { clave: q.item });
+    ctx.evento?.('error_tecnico', { codigo: limite ? 'limite-modelo' : 'pregunta-no-mostrable', donde: v.modo }, { clave: q.item });
   }
   if (v.i < v.preguntas.length - 1) {
     ctx.vista = { ...v, i: v.i + 1, respuesta: null, preparada: false, saltada: false, orden: null, lado: null, breve: false, cercana: null, ayuda: null };
@@ -224,15 +243,21 @@ function siguiente(ctx) {
   const aciertos = contadas.filter((r) => r.resultado !== 'fallo').length;
   let demostrada = null;
   let objetivos = null;
+  let sinEvaluar = [];
+  // Lo que no se hizo por las limitaciones del modelo: lo quitado antes de empezar y lo saltado al mostrarlo.
+  const porLimite = (v.excluidasLimite ?? 0) + v.respuestas.filter((r) => r.limite).length;
   if (v.modo === 'evaluacion') {
     const L = ctx.lecciones.get(v.leccion);
     objetivos = porObjetivo(L, contadas);
-    demostrada = P.registrarEvaluacion(ctx.data, L, { aciertos, total: contadas.length, porObjetivo: objetivos });
+    // Objetivos sin evaluar por una limitación: los que se sabían al empezar y los que se quedaron sin pregunta al saltar.
+    sinEvaluar = [...new Set([...(v.sinEvaluar ?? []), ...v.respuestas.filter((r) => r.limite).map((r) => r.pregunta.objetivo)])]
+      .filter((i) => !objetivos[i]?.[1]).sort((a, b) => a - b);
+    demostrada = P.registrarEvaluacion(ctx.data, L, { aciertos, total: contadas.length, porObjetivo: objetivos, sinEvaluar });
     ctx.evento?.('evaluacion_terminada', { leccion: L.id, version: L.version, aciertos, total: contadas.length, demostrada });
   } else ctx.evento?.('repaso_realizado', { modo: v.modo, aciertos, total: contadas.length });
   P.registrarSesion(ctx.data, { fecha: Date.now(), tipo: v.modo, aciertos, total: contadas.length });
   ctx.guardar();
-  ctx.ir({ tipo: 'resultado', modo: v.modo, leccion: v.leccion, titulo: v.titulo, aciertos, total: contadas.length, saltadas: v.respuestas.length - contadas.length, objetivos, demostrada, fallos: contadas.filter((r) => r.resultado === 'fallo').map((r) => r.pregunta), vuelta: v.vuelta }, { reemplazar: true });
+  ctx.ir({ tipo: 'resultado', modo: v.modo, leccion: v.leccion, titulo: v.titulo, aciertos, total: contadas.length, saltadas: v.respuestas.length - contadas.length - v.respuestas.filter((r) => r.limite).length, porLimite, sinEvaluar, objetivos, demostrada, fallos: contadas.filter((r) => r.resultado === 'fallo').map((r) => r.pregunta), vuelta: v.vuelta }, { reemplazar: true });
 }
 
 function volverAlPaso(ctx, q) {
@@ -258,17 +283,25 @@ export function renderResultado(ctx) {
   const pct = v.total ? Math.round((100 * v.aciertos) / v.total) : 0;
   const sesion = siguienteDeSesion(ctx);
   const fallosPorLeccion = [...new Map(v.fallos.map((q) => [`${q.leccion}/${q.paso}`, q])).values()];
+  // El veredicto de siempre (el 80 % y algún acierto en cada objetivo evaluado). Si solo lo impide un objetivo que no
+  // se pudo evaluar por una limitación del modelo, se dice eso; si además no se llega, se dice lo de siempre y la nota.
+  const llega = v.total > 0 && v.aciertos / v.total >= P.UMBRAL_DEMOSTRADA && (v.objetivos ?? []).every(([a, n]) => !n || a > 0);
+  const veredicto = v.demostrada ? 'bib.demostradaSi' : llega && v.sinEvaluar?.length ? 'bib.limite.noDemostrada' : 'bib.demostradaNo';
   body.innerHTML = `
     <button class="link back" data-salir>${icono('chevron')}<span>${esc(t('bib.biblioteca'))}</span></button>
     <p class="bib-leccion-t">${esc(v.titulo)}</p>
     <h3 class="step-title" tabindex="-1">${esc(t(v.modo === 'evaluacion' ? 'estudio.resultado' : 'estudio.repasoTerminado'))}</h3>
     <p class="score">${t('estudio.puntuacion', { a: `<b>${v.aciertos}</b>`, b: v.total })} <small>(${pct} %)</small></p>
     ${v.saltadas ? `<p class="muted small">${esc(tn('bib.saltadas', v.saltadas))}</p>` : ''}
+    ${v.porLimite ? `<p class="muted small">${esc(tn('bib.limite.repaso', v.porLimite))}</p>` : ''}
     ${v.modo === 'evaluacion' ? `
-      <p class="bib-veredicto ${v.demostrada ? 'ok' : ''}">${icono(v.demostrada ? 'check' : 'info')}<span>${esc(t(v.demostrada ? 'bib.demostradaSi' : 'bib.demostradaNo'))}</span></p>
+      <p class="bib-veredicto ${v.demostrada ? 'ok' : ''}">${icono(v.demostrada ? 'check' : 'info')}<span>${esc(t(veredicto))}</span></p>
+      ${veredicto === 'bib.demostradaNo' && v.sinEvaluar?.length ? `<p class="muted small">${esc(t('bib.limite.noDemostrada'))}</p>` : ''}
       <h4>${esc(t('bib.porObjetivo2'))}</h4>
       <ul class="bib-objetivos">${L.objetivos.map((o, k) => {
         const [a, n] = v.objetivos[k] ?? [0, 0];
+        // Lo que no se pudo evaluar por una limitación del modelo se dice, sin darlo por cumplido.
+        if (!n && v.sinEvaluar?.includes(k)) return `<li class="sin-evaluar"><span>${esc(tr(o))} <small>· ${esc(t('bib.limite.sinEvaluar'))}</small></span><b>–</b></li>`;
         return n ? `<li class="${a === n ? 'ok' : a ? '' : 'bad'}"><span>${esc(tr(o))}</span><b>${a}/${n}</b></li>` : '';
       }).join('')}</ul>
       <p class="muted small">${esc(t('bib.dominioExplica'))}</p>` : `<p class="muted small">${esc(t('bib.repasoExplica'))}</p>`}

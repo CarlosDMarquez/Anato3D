@@ -1,7 +1,7 @@
 // Sesiones de estudio de la biblioteca: la propuesta según el tiempo disponible y las sesiones de práctica (repaso de lo
 // vencido, de los errores, de una región o un sistema, e identificación 3D sin etiquetas). Sin DOM: lo prueba `npm test`.
 import * as P from './progreso.js';
-import { disponibleEn } from './evaluar.js';
+import { disponibleEn, motivoNoDisponible } from './evaluar.js';
 import { estructurasDePregunta } from './formato.js';
 
 export const MIN_POR_PREGUNTA = 0.75;        // lo que se tarda, de media, en una pregunta de repaso
@@ -10,12 +10,13 @@ export const MIN_POR_PREGUNTA = 0.75;        // lo que se tarda, de media, en un
  * Propuesta para `minutos`: primero lo que toca repasar (sin pasar del 40 % del tiempo si hay lecciones por hacer),
  * luego la lección empezada y después las siguientes recomendadas que caben. Devuelve [{ tipo, … , minutos }]:
  *   { tipo: 'repaso', preguntas, minutos }   { tipo: 'leccion', id, motivo: 'seguir' | 'siguiente', minutos }
- * `catalogo`: lecciones del catálogo (con `orden`); `terminada(id)`; `modelo` para no proponer lo que no está en él.
+ * `catalogo`: lecciones del catálogo (con `orden`); `terminada(id)`; `modelo` para no proponer lo que no está en él;
+ * `estadoDe(L)`: el estado de una lección como lo enseñan las tarjetas (en la app, ctx.estado).
  */
-export function proponer({ minutos, catalogo, data, modelo = 'male', ahora = Date.now(), preferencias = data?.preferencias ?? null }) {
+export function proponer({ minutos, catalogo, data, modelo = 'male', ahora = Date.now(), preferencias = data?.preferencias ?? null, estadoDe = null }) {
   const bloques = [];
   let queda = minutos;
-  const estado = (L) => P.estadoLeccion(data, L, { ahora });
+  const estado = estadoDe ?? ((L) => P.estadoLeccion(data, L, { ahora }));
   const disponibles = catalogo.filter((L) => L.modelos.includes(modelo));
   const vencidas = P.vencidas(data, { ahora, filtro: (id) => disponibles.some((L) => id.startsWith(`${L.id}/`)) });
   const porHacer = disponibles.filter((L) => !['completada', 'demostrada', 'dominada'].includes(estado(L).estado));
@@ -66,7 +67,8 @@ export function itemsDePractica(data, tipo, { lecciones = null, max = 12, ahora 
   const dentro = (id) => !lecciones || lecciones.includes(id.slice(0, id.indexOf('/')));
   if (tipo === 'vencidas') return P.vencidas(data, { ahora, filtro: dentro }).slice(0, max);
   if (tipo === 'errores') return P.falladas(data, { filtro: dentro }).slice(0, max);
-  const todos = Object.entries(data.items).filter(([id]) => dentro(id));
+  // Lo huérfano (retirado, quitado o que el modelo muestra mal) no se practica (progreso.js, depurar).
+  const todos = Object.entries(data.items).filter(([id, e]) => dentro(id) && !e.huerfana);
   const vencidas = new Set(P.vencidas(data, { ahora, filtro: dentro }));
   return todos.sort(([a, x], [b, y]) => (vencidas.has(b) - vencidas.has(a)) || (y.fallos > 0) - (x.fallos > 0) || x.caja - y.caja || (x.ultimo ?? 0) - (y.ultimo ?? 0))
     .slice(0, max).map(([id]) => id);
@@ -89,20 +91,27 @@ export function alternativaDe(L, preguntaId, { data, modelo = 'male', ahora = Da
 
 /**
  * Los ítems de una práctica sin repetir enseguida lo recién fallado: cada uno se cambia por otra pregunta de lo mismo
- * (alternativaDe) o, si no la hay, se deja para más tarde. `lecciones`: Map id → lección (con su banco). Devuelve
- * { items, esperan } (cuántos se dejaron para luego).
+ * (alternativaDe) o, si no la hay, se deja para más tarde. Lo que pide en este modelo una pieza con una limitación
+ * conocida (src/data/limitaciones.js) también se cambia por otra pregunta de lo mismo; si no la hay, se quita y se
+ * cuenta en `quitadas`, que la app explica con ese motivo. Lo que no se puede hacer por otro motivo (una estructura del
+ * otro modelo, una pregunta retirada) sigue como siempre: preguntaDeItem lo descarta sin decir nada. `lecciones`: Map id
+ * → lección (con su banco). Devuelve { items, esperan } (cuántos se dejaron para luego) y, si hay, `quitadas`.
  */
 export function sinRepetirRecientes(items, { data, lecciones, modelo = 'male', ahora = Date.now() }) {
   const usados = new Set();
   let esperan = 0;
+  let quitadas = 0;
   for (const id of items) {
     let it = id;
-    if (P.recienFallada(data, id, ahora)) {
-      const k = id.indexOf('/');
-      it = alternativaDe(lecciones.get(id.slice(0, k)), id.slice(k + 1), { data, modelo, ahora, excluir: new Set([...usados, ...items]) });
-      if (!it) { esperan++; continue; }
+    const k = id.indexOf('/');
+    const L = lecciones.get(id.slice(0, k));
+    const q = L?.preguntas?.find((x) => x.id === id.slice(k + 1));
+    const limitada = !!q && motivoNoDisponible(L, q, modelo) === 'limitacion';
+    if (limitada || P.recienFallada(data, id, ahora)) {
+      it = alternativaDe(L, id.slice(k + 1), { data, modelo, ahora, excluir: new Set([...usados, ...items]) });
+      if (!it) { if (limitada) quitadas++; else esperan++; continue; }
     }
     if (!usados.has(it)) usados.add(it);
   }
-  return { items: [...usados], esperan };
+  return { items: [...usados], esperan, ...(quitadas ? { quitadas } : {}) };
 }

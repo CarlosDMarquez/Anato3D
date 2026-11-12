@@ -49,6 +49,7 @@
 import { REGION_POR_ID, SUBREGION_POR_ID, SISTEMA_POR_ID, FORMATO_POR_ID, TEMA_POR_ID, NIVEL_POR_ID } from './taxonomia.js';
 import { ESTADOS } from '../content/schema.js';
 import { SYSTEMS } from '../systems.js';
+import { restringida, limitacionesDe } from '../data/limitaciones.js';
 
 // Capas de cada sistema del visor (systems.js), para comprobar las `capas` de las vistas.
 const SYSTEMS_VISOR = Object.fromEntries(SYSTEMS.map((s) => [s.id, s.stages.map((st) => st.id)]));
@@ -229,6 +230,9 @@ export function revisarLeccion(L, ctx = {}) {
   }
   (L.objetivos ?? []).forEach((o, i) => { if (!porObjetivo.has(i)) err(`el objetivo ${i + 1} no tiene ninguna pregunta en la evaluación`); });
   if (Q.length < 4) err('el banco de preguntas tiene menos de 4');
+  // Limitaciones conocidas del modelo: solo avisos (la app ya no resalta ni pide tocar esas piezas al evaluar). Un error
+  // apartaría las lecciones propias guardadas que las usen (propias.js) y haría fallar a Neuri.
+  for (const texto of usosLimitados(L)) aviso(texto);
   for (const e of L.fuentesTerminologia ?? []) revisarEvidencia(e, 'terminología', err);
   if (!(L.revision?.estado in ESTADOS)) err('estado de revisión no válido');
   if (L.revision?.estado === 'revisado' && !(L.revision.revisor && L.revision.fecha)) err('«revisado» sin revisor ni fecha');
@@ -287,4 +291,100 @@ export function distractoresIdentificar(L, eid) {
     .filter(([k, x]) => k !== eid && grupoTipo(x.tipo) === grupoTipo(e.tipo))
     .map(([, x]) => x.nombre);
   return [...new Set([...mismos, ...(e.confusiones ?? [])])].filter((n) => n !== e.nombre);
+}
+
+// ── Limitaciones conocidas del modelo (src/data/limitaciones.js) ──
+// Lo que el modelo muestra mal no se resalta ni se pide tocar en lo que se corrige. Se decide pieza a pieza: una
+// estructura de varias piezas sigue sirviendo con las que están bien, y sus piezas limitadas no se muestran entonces.
+/** Tipos de pregunta que dependen de lo que se ve en el modelo 3D. */
+export const TIPOS_3D = ['identificar', 'localizar'];
+
+/** Piezas de una estructura que no se pueden usar así en ese modelo (uso: 'identificar' | 'localizar' | 'distractor'). */
+export const piezasLimitadas = (e, modelo, uso) => (e?.piezas ?? []).filter((p) => restringida(p, modelo, uso));
+
+/** ¿Le queda a la estructura alguna pieza que se pueda usar así en ese modelo? */
+export const estructuraUtil = (e, modelo, uso) => !!e?.piezas?.length && piezasLimitadas(e, modelo, uso).length < e.piezas.length;
+
+/**
+ * La lección para mostrar algo que se corrige (una pregunta, la actividad «localizar» de un paso): cada estructura sin
+ * sus piezas limitadas para ese uso, que así ni se resaltan ni se pueden tocar. Ids y nombres no cambian. Si ninguna
+ * estructura tiene piezas limitadas, devuelve la misma lección.
+ */
+export function sinPiezasLimitadas(L, modelo, uso) {
+  let cambia = false;
+  const estructuras = {};
+  for (const [k, e] of Object.entries(L.estructuras ?? {})) {
+    const fuera = piezasLimitadas(e, modelo, uso);
+    if (fuera.length) cambia = true;
+    estructuras[k] = fuera.length ? { ...e, piezas: e.piezas.filter((p) => !fuera.includes(p)) } : e;
+  }
+  return cambia ? { ...L, estructuras } : L;
+}
+
+/**
+ * En qué paso de una lección se avisa de cada limitación del modelo, una sola vez por lección: en el paso donde la
+ * estructura que tiene la pieza es el foco. Primero, uno cuya actividad (localizar o comparar) la incluye; si no, el que
+ * la resalta junto a menos estructuras; a igualdad, el primero. Un paso cuya actividad «localizar» se desactiva por una
+ * limitación la avisa siempre. Lo que solo sale como contexto o translúcido no se avisa en el paso (sí en su ficha).
+ * Devuelve Map id de paso → [{ limitacion, estructuras: [ids de la lección que tienen la pieza en ese paso] }].
+ */
+export function avisosDePasos(L, modelo) {
+  const limitacionesDeE = (id) => (L.estructuras?.[id]?.piezas ?? []).flatMap((p) => limitacionesDe(p, modelo));
+  const enFoco = (s) => {
+    const a = s.actividad;
+    const act = a?.tipo === 'localizar' ? [a.estructura] : a?.tipo === 'comparar' ? a.estructuras ?? [] : [];
+    return { act, ver: s.vista?.ver ?? [] };
+  };
+  const elegido = new Map();   // id de la limitación → { paso, puntos }
+  for (const s of L.pasos ?? []) {
+    const { act, ver } = enFoco(s);
+    for (const id of new Set([...act, ...ver])) {
+      for (const l of limitacionesDeE(id)) {
+        const puntos = act.includes(id) ? 1000 : 100 - ver.length;
+        if (!elegido.has(l.id) || puntos > elegido.get(l.id).puntos) elegido.set(l.id, { paso: s.id, puntos });
+      }
+    }
+  }
+  const out = new Map();
+  const poner = (s, l, ids) => {
+    const lista = out.get(s.id) ?? [];
+    const ya = lista.find((x) => x.limitacion.id === l.id);
+    if (ya) ya.estructuras = [...new Set([...ya.estructuras, ...ids])];
+    else lista.push({ limitacion: l, estructuras: [...ids] });
+    out.set(s.id, lista);
+  };
+  // En el orden de las estructuras del paso: primero las de la actividad, luego las resaltadas.
+  for (const s of L.pasos ?? []) {
+    const { act, ver } = enFoco(s);
+    for (const id of new Set([...act, ...ver])) {
+      for (const l of limitacionesDeE(id)) if (elegido.get(l.id)?.paso === s.id) poner(s, l, [id]);
+    }
+    const a = s.actividad;
+    if (a?.tipo === 'localizar' && !estructuraUtil(L.estructuras?.[a.estructura], modelo, 'localizar')) {
+      for (const l of limitacionesDeE(a.estructura)) poner(s, l, [a.estructura]);
+    }
+  }
+  return out;
+}
+
+/** Avisos del revisor: preguntas y actividades que tocan piezas con limitaciones conocidas (en cualquier modelo). */
+function usosLimitados(L) {
+  const E = L.estructuras ?? {};
+  const out = [];
+  const de = (eid, uso) => piezasLimitadas(E[eid], null, uso);
+  const decir = (donde, eid, uso, que) => {
+    const fuera = de(eid, uso);
+    if (!fuera.length) return;
+    const todo = fuera.length === E[eid].piezas.length;
+    out.push(`${donde}: ${eid} tiene piezas con limitaciones conocidas del modelo (${fuera.join(', ')}); ${todo ? `no se ${que}` : `se ${que} sin ellas`}`);
+  };
+  for (const p of L.pasos ?? []) if (p.actividad?.tipo === 'localizar' && E[p.actividad.estructura]) decir(`paso ${p.id}`, p.actividad.estructura, 'localizar', 'pide tocar en la actividad');
+  for (const q of L.preguntas ?? []) {
+    if (q.tipo === 'identificar' && E[q.estructura]) decir(`pregunta ${q.id}`, q.estructura, 'identificar', 'pregunta');
+    if (q.tipo === 'localizar' && E[q.estructura]) {
+      decir(`pregunta ${q.id}`, q.estructura, 'localizar', 'pregunta');
+      for (const c of q.candidatas ?? []) if (E[c]) decir(`pregunta ${q.id} (candidata)`, c, 'localizar', 'ofrece para tocar');
+    }
+  }
+  return out;
 }

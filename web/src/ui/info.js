@@ -5,6 +5,7 @@ import { CAMPOS, ESTADOS } from '../content/schema.js';
 import { FUENTES } from '../content/fuentes.js';
 import { t, tn, etiqueta, idioma } from '../i18n/idioma.js';
 import { tr, trCita, trEtimologia } from '../i18n/contenido.js';
+import { limitacionesDe, textoLimitacion, urlFuente } from '../data/limitaciones.js';
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
@@ -28,6 +29,28 @@ const notaTraduccion = () => (idioma() === 'es' ? '' : `<p class="info-traduccio
 const fechaLocal = (f) => (/^\d{4}-\d{2}-\d{2}$/.test(f ?? '') ? new Date(`${f}T12:00:00`).toLocaleDateString(idioma(), { day: 'numeric', month: 'long', year: 'numeric' }) : f ?? '');
 
 const FIELD_LABELS_MODULO = new Set(['Origen', 'Inserción', 'Acción', 'Inervación', 'Irrigación', 'Función']);
+
+/**
+ * Limitaciones conocidas del modelo para una pieza (src/data/limitaciones.js), en el idioma de la interfaz: una línea
+ * para la cabecera de la ficha (se ve también con la ficha plegada en el móvil) y la explicación, con su estado y sus
+ * fuentes, para el cuerpo. { cabeza: '', cuerpo: '' } si la pieza no tiene ninguna en ese modelo.
+ */
+export function avisoLimitacion(id, modelo) {
+  const lims = limitacionesDe(id, modelo);
+  if (!lims.length) return { cabeza: '', cuerpo: '' };
+  const lang = idioma();
+  const titulo = esc(t('lim.titulo'));
+  const fuentes = (l) => [...new Map(l.fuentes.map((f) => [f.f, f])).values()]
+    .map((f) => `<a href="${esc(urlFuente(f))}" target="_blank" rel="noopener">Wikipedia · ${esc(f.f.slice(f.f.indexOf(':') + 1).replace(/_/g, ' '))}</a>`).join(', ');
+  return {
+    cabeza: lims.map((l) => `<p class="aviso-limite" role="note">${uiIcon('info')}<span><b>${titulo}.</b> ${esc(textoLimitacion(l, 'aviso', lang))}</span></p>`).join(''),
+    cuerpo: lims.map((l) => `
+      <section class="limite-detalle"><h3>${titulo}</h3>
+        <p>${esc(textoLimitacion(l, 'detalle', lang))}</p>
+        <p class="limite-estado">${esc(t(`lim.estado.${l.estado}`, { fecha: fechaLocal(l.comprobada) }))}${l.fuentes.length ? ` ${esc(t('ficha.fuentes'))}${lang === 'fr' ? ' :' : ':'} ${fuentes(l)}.` : ''}</p>
+      </section>`).join(''),
+  };
+}
 
 // Cuerpo de la ficha cuando la pieza pertenece a un módulo de estudio (src/content): su contenido con fuentes sustituye
 // a la descripción y los puntos clave antiguos (sin fuentes, y con correlaciones clínicas que no se han revisado); se
@@ -97,6 +120,8 @@ export function renderInfo(el, sel, { system, faded, collapsed, modelo, onAction
     : [...info.chips, info.tissue].filter(Boolean).map(etiqueta);
   const titulo = isGroup ? group.nombre : info.title;
   const latin = isGroup ? group.latin : info.latin;
+  // Lo que el modelo muestra mal de esta pieza: arriba, visible aunque la ficha esté plegada; la explicación, en el cuerpo.
+  const limite = isGroup ? { cabeza: '', cuerpo: '' } : avisoLimitacion(sel.part.id, modelo);
 
   el.style.setProperty('--sys', system.color);
   el.classList.toggle('collapsed', collapsed);
@@ -111,6 +136,7 @@ export function renderInfo(el, sel, { system, faded, collapsed, modelo, onAction
     <h2 class="info-title">${esc(titulo)}</h2>
     ${latin && latin !== titulo ? `<p class="info-latin">${esc(latin)}</p>` : ''}
     <p class="info-meta"><i></i>${meta.map(esc).join('<span>·</span>')}</p>
+    ${limite.cabeza}
     <div class="info-actions">
       ${ACTIONS.map(([act, icon, clave]) => {
         const on = act === 'fade' && faded;
@@ -119,6 +145,7 @@ export function renderInfo(el, sel, { system, faded, collapsed, modelo, onAction
       }).join('')}
     </div>
     <div class="info-body">
+      ${limite.cuerpo}
       ${isGroup ? `
         ${group.descripcion ? `<section><p class="lead">${esc(tr(group.descripcion))}</p></section>` : ''}
         <section><h3>${esc(t('ficha.contiene'))}</h3><ul class="members">${sel.members.map((m) => `

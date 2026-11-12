@@ -3,6 +3,7 @@
 // y los repasos, que se pueden aplazar y retomar. La lógica está en src/biblioteca/mapa.js.
 import * as P from '../../biblioteca/progreso.js';
 import { calcularMapa, cuando } from '../../biblioteca/mapa.js';
+import { motivoNoDisponible } from '../../biblioteca/evaluar.js';
 import { t, tn } from '../../i18n/idioma.js';
 import { tr } from '../../i18n/contenido.js';
 import { esc, icono, fecha, barra } from './comun.js';
@@ -15,10 +16,21 @@ const ESTUDIO = 'https://pubmed.ncbi.nlm.nih.gov/27860396/';
 export async function renderMapa(ctx, { foco = null, aviso = null } = {}) {
   const { body } = ctx;
   const ahora = Date.now();
-  const m = calcularMapa(ctx.data, { catalogo: ctx.catalogo.lecciones, ahora });
+  // Los intentos de preguntas que el modelo muestra mal (limitaciones conocidas, src/data/limitaciones.js) se conservan
+  // pero no son evidencia de lo que se sabe. Hace falta su lección cargada: las de las dificultades se cargan y se recalcula.
+  const invalida = (i) => {
+    const L = ctx.lecciones.get(i.l);
+    const q = L?.preguntas?.find((x) => x.id === i.q);
+    return !!q && motivoNoDisponible(L, q, ctx.api.modelo()) === 'limitacion';
+  };
+  const calcular = () => calcularMapa(ctx.data, { catalogo: ctx.catalogo.lecciones, ahora, invalida, estado: (L) => ctx.estado(L, { ahora }) });
+  const cargar = (difs) => Promise.all([...new Set(difs.map((d) => d.leccion))].map((id) => ctx.cargarLeccion(id).catch(() => null)));
+  let m = calcular();
   // Para explicar las dificultades hacen falta sus lecciones (nombres, enunciados y pasos).
+  const antes = ctx.lecciones.size;
+  await cargar(m.dificultades.slice(0, MAX_DIFICULTADES));
+  if (ctx.lecciones.size !== antes) { m = calcular(); await cargar(m.dificultades.slice(0, MAX_DIFICULTADES)); }
   const difs = m.dificultades.slice(0, MAX_DIFICULTADES);
-  await Promise.all([...new Set(difs.map((d) => d.leccion))].map((id) => ctx.cargarLeccion(id).catch(() => null)));
   if (ctx.vista.tipo !== 'mapa') return;
 
   const vacio = !m.intentos && !m.lecciones.visitadas;

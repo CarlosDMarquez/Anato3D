@@ -2,9 +2,10 @@
 // actividades (localizar, comparar, otras vistas), una pregunta de comprobación cuando la hay, «Saber más» y las fuentes
 // de cada frase. Al terminar: evaluarse, la lección siguiente o seguir con la sesión.
 import * as P from '../../biblioteca/progreso.js';
-import { mallas } from '../../biblioteca/formato.js';
+import { mallas, estructuraUtil, sinPiezasLimitadas, avisosDePasos } from '../../biblioteca/formato.js';
 import { frases, evidencias } from '../../biblioteca/formato.js';
 import { instanciar, corregir, NO_LO_SE } from '../../biblioteca/evaluar.js';
+import { textoLimitacion } from '../../data/limitaciones.js';
 import { FUENTES } from '../../content/fuentes.js';
 import { t, idioma } from '../../i18n/idioma.js';
 import { tr, trCita } from '../../i18n/contenido.js';
@@ -17,6 +18,14 @@ const CAMARA = (nombre) => t(`camara.${nombre}`);
 
 /** Nombre de una estructura de la lección (traducido si la lección es de un módulo antiguo). */
 export const nombreE = (L, id) => tr(L.estructuras[id]?.nombre ?? id);
+
+/**
+ * El aviso de una limitación del modelo en un paso (formato.js, avisosDePasos): con el nombre de la estructura de la
+ * lección que tiene la pieza, la frase corta a la vista y la explicación en «Saber más».
+ */
+export const htmlLimite = (L, { limitacion: l, estructuras }) => `<div class="aviso-limite" role="note">${icono('info')}<div>
+  <p><b>${esc(t('lim.titulo'))}${estructuras.length ? ` · ${esc(estructuras.map((id) => nombreE(L, id)).join(', '))}` : ''}.</b> ${esc(textoLimitacion(l, 'aviso', idioma()))}</p>
+  <details class="limite-mas"><summary>${esc(t('bib.saberMas'))}</summary><p>${esc(textoLimitacion(l, 'detalle', idioma()))}</p></details></div></div>`;
 
 /** Texto de un paso: las frases, con las instrucciones y las notas sobre el modelo aparte. */
 function htmlFrases(lista) {
@@ -91,7 +100,9 @@ export async function renderLeccion(ctx) {
   const ctxIds = v ? (v.contexto ?? []).filter((id) => (L.estructuras[id]?.papel === 'nucleo' || L.estructuras[id]?.tipo !== 'hueso') && deEsteModelo(id)) : [];
   const comp = s.comprobar && L.preguntas.find((q) => q.id === s.comprobar);
   vista.comp ??= {};
-  if (comp && !vista.comp[s.id]) vista.comp[s.id] = { q: instanciar(L, comp), r: null };
+  if (comp && !vista.comp[s.id]) vista.comp[s.id] = { q: instanciar(L, comp, Math.random, { modelo }), r: null };
+  // Lo que el modelo muestra mal: una vez por lección, en el paso donde es el foco (formato.js, avisosDePasos).
+  const limites = fueraDeModelo ? [] : avisosDePasos(L, modelo).get(s.id) ?? [];
   const cq = comp && vista.comp[s.id];
   const todasEv = [...frases(s.texto), ...frases(s.detalle)].flatMap(evidencias);
   if (cq) todasEv.push(...(cq.q.evidencia ?? []));
@@ -108,11 +119,12 @@ export async function renderLeccion(ctx) {
     <h3 class="step-title" tabindex="-1">${esc(tr(s.titulo))}</h3>
     ${fueraDeModelo ? `<p class="mod-note">${esc(t(`bib.soloModelo.${L.modelos[0]}`))}</p>` : ''}
     <div class="bib-aviso-vista" aria-live="polite"></div>
+    ${limites.map((x) => htmlLimite(L, x)).join('')}
     ${htmlFrases(frases(s.texto))}
     ${s.detalle ? `<details class="bib-mas"><summary>${esc(t('bib.saberMas'))}</summary>${htmlFrases(frases(s.detalle))}</details>` : ''}
     ${verIds.length || ctxIds.length ? `<div class="bib-en3d"><p class="bib-en3d-t">${esc(t('bib.enElModelo'))}</p>
       <ul class="bib-chips">${verIds.map((id) => `<li><button class="bib-chip resaltada" data-resaltar="${esc(id)}">${esc(nombreE(L, id))}</button></li>`).join('')}${ctxIds.map((id) => `<li><button class="bib-chip" data-resaltar="${esc(id)}">${esc(nombreE(L, id))}</button></li>`).join('')}</ul></div>` : ''}
-    ${s.actividad ? htmlActividad(L, s.actividad) : ''}
+    ${s.actividad ? htmlActividad(L, s.actividad, modelo) : ''}
     ${cq ? htmlComprobar(L, cq) : ''}
     ${v ? `<p class="bib-vista-acc"><button class="link" data-recuperar>${icono('restart')}${esc(t('bib.recuperarVista'))}</button></p>` : ''}
     ${htmlFuentes(ctx, todasEv, L)}
@@ -124,9 +136,10 @@ export async function renderLeccion(ctx) {
 
   // ── 3D ──
   const avisar = (texto) => { const el = body.querySelector('.bib-aviso-vista'); if (el) el.innerHTML = texto ? `<p class="mod-note">${esc(texto)}</p>` : ''; };
+  // `leccion`: la misma sin las piezas limitadas (formato.js, sinPiezasLimitadas), para la actividad que se corrige.
   const mostrar = async (opciones = {}) => {
     if (!v || fueraDeModelo) return;
-    const r = await api.mostrar(L, v, opciones);
+    const r = await api.mostrar(opciones.leccion ?? L, v, opciones);
     if (ctx.vista !== vista) return;
     if (!r.ok && r.faltan.length) {
       avisar(t('bib.faltanEnModelo', { lista: r.faltan.map((id) => nombreE(L, id)).join(', ') }));
@@ -161,7 +174,11 @@ export async function renderLeccion(ctx) {
   }
 }
 
-function htmlActividad(L, a) {
+function htmlActividad(L, a, modelo) {
+  // Tocar algo que el modelo muestra mal no se corrige, ni se enseña como «la solución» (fijaría un sitio falso).
+  if (a.tipo === 'localizar' && !estructuraUtil(L.estructuras[a.estructura], modelo, 'localizar')) {
+    return `<div class="bib-actividad"><p class="mod-note"><b>${esc(nombreE(L, a.estructura))}.</b> ${esc(t('bib.limite.actividad'))}</p></div>`;
+  }
   if (a.tipo === 'vistas') {
     return `<div class="bib-actividad"><p class="bib-act-t">${icono('rotate')}${esc(tr(a.texto))}</p>
       <div class="bib-acciones">${a.vistas.map((x) => `<button class="btn" data-camara="${x.camara}">${esc(tr(x.nombre))}</button>`).join('')}</div></div>`;
@@ -188,9 +205,11 @@ function enlazarActividad(ctx, L, s, body, mostrar) {
   const loc = body.querySelector('[data-localizar]');
   if (!loc) return;
   const res = body.querySelector('.bib-act-r');
-  const objetivo = L.estructuras[a.estructura];
+  // Lo que se corrige, sin las piezas que el modelo muestra mal: ni se ven ni cuentan al tocar (formato.js).
+  const Lc = sinPiezasLimitadas(L, ctx.api.modelo(), 'localizar');
+  const objetivo = Lc.estructuras[a.estructura];
   loc.addEventListener('click', async () => {
-    await mostrar({ sinResaltar: true });
+    await mostrar({ sinResaltar: true, leccion: Lc });
     res.textContent = t('bib.tocaModelo');
     body.querySelector('[data-solucion]').hidden = false;
     ctx.api.alTocar((pieza) => {
@@ -200,9 +219,9 @@ function enlazarActividad(ctx, L, s, body, mostrar) {
         res.innerHTML = `${icono('check')} ${esc(t('bib.localizarBien', { nombre: nombreE(L, a.estructura) }))}`;
         res.className = 'bib-act-r ok';
         ctx.api.alTocar(null);
-        ctx.api.resaltar(L, [a.estructura], { lado, ficha: false });
+        ctx.api.resaltar(Lc, [a.estructura], { lado, ficha: false });
       } else {
-        const otra = Object.entries(L.estructuras).find(([, e]) => mallas(e, 'L').includes(base) || mallas(e, 'R').includes(base));
+        const otra = Object.entries(Lc.estructuras).find(([, e]) => mallas(e, 'L').includes(base) || mallas(e, 'R').includes(base));
         res.textContent = otra ? t('bib.localizarOtra', { nombre: nombreE(L, otra[0]) }) : t('bib.localizarFuera', { nombre: pieza.info?.title ?? '' });
         res.className = 'bib-act-r mal';
       }
@@ -211,7 +230,7 @@ function enlazarActividad(ctx, L, s, body, mostrar) {
   });
   body.querySelector('[data-solucion]').addEventListener('click', () => {
     ctx.api.alTocar(null);
-    ctx.api.resaltar(L, [a.estructura], { lado, ficha: false });
+    ctx.api.resaltar(Lc, [a.estructura], { lado, ficha: false });
     res.textContent = t('bib.esta', { nombre: nombreE(L, a.estructura) });
     res.className = 'bib-act-r';
   });
