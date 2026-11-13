@@ -123,6 +123,39 @@ En la entrada, **Repasar mis dificultades** abre **Tu mapa de aprendizaje**, que
 
 ![Neuri respondiendo con el buscador de la app](capturas/08-neuri-sin-ia.jpg)
 
+### Una sesión de estudio con Neuri (desde el 12 nov 2026)
+
+Una sesión es un plan para estudiar un rato con lo que ya hay en la biblioteca. Se guarda en este navegador y puedes dejarla y seguir después.
+
+1. **Pedirla:** dile a Neuri, por ejemplo, «Prepárame una sesión de 10 minutos sobre el corazón». También puedes pulsar **Proponer una sesión** en la entrada.
+   - Si el tema está claro, la prepara tu dispositivo, **sin IA** («Planificada en tu dispositivo, sin IA»).
+   - Si mezcla temas o no está claro, la prepara Neuri con la IA («Planificada por Neuri con IA»). Sin IA, te pregunta sobre qué tema.
+2. **Qué trae:** de 1 a 6 bloques en orden: **repaso de lo que toca**, una **lección** entera o una parte, y una **práctica** con preguntas de lo que acabas de estudiar. Cada bloque dice por qué está ahí.
+3. **Hacerla:** **Empezar**, y cada bloque te lleva a la lección o a las preguntas de siempre. En la vista de la sesión tienes también **Saltar bloque** y **Terminar sesión** (lo hecho se conserva).
+4. **Dejarla y seguir:** si sales o recargas, **Continuar la sesión** te devuelve al bloque y al paso o la pregunta donde estabas. Solo hay una sesión en curso: si empiezas otra, la anterior queda en pausa.
+5. **Pista y segundo intento:** dentro de una sesión, si fallas una pregunta, la opción fallada se retira y recibes una **pista**: una frase de la lección donde se enseña, sin el nombre de la respuesta. Si aciertas así, cuenta **«con ayuda»**: no sube en el repaso espaciado ni cuenta como aprendizaje demostrado, y la pregunta vuelve pronto. Si fallas otra vez, ves la respuesta y la explicación.
+6. **Al terminar:** el resumen dice cuántas acertaste a la primera, con ayuda y con la respuesta a la vista, qué conviene repasar y cuándo vuelve, y dos siguientes pasos.
+
+**Mis sesiones** (en la entrada y en «Mis lecciones»): primero las que están en curso; después las terminadas. Cada una se puede abrir, **repetir** o quitar. Quitar una sesión no borra lo que estudiaste. Se guardan como mucho 20: al pasarte se quitan primero las que nunca empezaste y las terminadas más antiguas, nunca la que está en curso, y la app te avisa.
+
+### Preguntar a Neuri desde una lección y verlo en 3D
+
+- En un paso de una lección, **Preguntar a Neuri sobre este paso** abre la conversación sabiendo dónde estás («Sobre: …»; puedes quitarlo). Si el paso tiene una pregunta de comprobación, el botón sale cuando ya la has respondido.
+- Si preguntas por una pregunta de práctica o de evaluación, Neuri no te da la respuesta: te da una pista o te dice en qué paso se explica.
+- **Ver en 3D:** algunas respuestas traen botones para enseñar la estructura en el modelo sin cerrar el panel. «Muéstrame el fémur» funciona también sin IA.
+- **Neuri recuerda el tema entre visitas** (el tema, el objetivo, el nivel y los minutos; nunca los mensajes) durante 30 días. «Borrar mis datos» lo olvida.
+
+### Cuántas preguntas con IA tienes al día
+
+Cada dispositivo tiene un **cupo diario**: **30 preguntas con IA y 3 creaciones de lecciones**. Lo ves arriba de la conversación («IA: quedan … de … preguntas hoy · se renueva …»).
+- **No gastan:** lo que se resuelve en tu dispositivo (búsquedas, «el segundo», las sesiones sin IA, el repaso).
+- **Planificar una lección ya cuenta como creación**, aunque todavía no la hayas creado.
+- **Al acabarse:** Neuri responde con la biblioteca («Hoy ya no quedan preguntas con IA; te respondo con la biblioteca») y todo lo demás sigue igual. Una creación pendiente queda en pausa y sigue sola cuando se renueva.
+- **Se renueva a medianoche** (hora de Mexicali).
+- Para contarlo, la app guarda un **identificador aleatorio de este dispositivo**. No dice quién eres, no va a la IA y no se exporta; si borras tus datos, se crea otro.
+
+**Capturas que faltan** (no se han tomado todavía): la tarjeta de una sesión propuesta, la vista de sesión con sus bloques, la pista del segundo intento, el resumen final, «Mis sesiones», «Preguntar a Neuri sobre este paso» con el enfoque «Sobre: …», «Ver en 3D» y el saldo del cupo, con el aviso de cupo agotado.
+
 ## 6. Pedir una lección, ver cómo se prepara, cancelarla o abrirla
 
 Necesita la IA, así que hoy solo funciona con la clave de API configurada. Las capturas son con la **IA simulada**.
@@ -236,8 +269,10 @@ El temario solo dice qué estudiar: no se envía a ningún sitio ni se usa como 
 **Para llevar tu estudio a otro navegador o dispositivo:**
 1. En **Mis datos y privacidad**, pulsa **Exportar mis datos**. Descarga un archivo con:
    - tu progreso y tus respuestas;
-   - Mis lecciones;
+   - Mis lecciones, tus recorridos y tus sesiones de estudio (una sesión en curso llega en pausa);
    - el plan de examen y tus preferencias.
+
+   No lleva el identificador del dispositivo ni lo que Neuri recuerda del tema: son de este dispositivo.
 2. En el otro navegador, **Importar…** ese archivo. Se combina con lo que haya:
    - no se duplica ni se borra nada;
    - de cada pregunta cuenta tu respuesta más reciente.
@@ -250,7 +285,7 @@ El temario solo dice qué estudiar: no se envía a ningún sitio ni se usa como 
 
 Está en la entrada, abajo. Dice:
 - **qué se guarda** en este navegador, con cifras;
-- **qué sale de él:** a Neuri, la conversación y un resumen de tu progreso hecho solo de identificadores de lecciones; con los reportes, lo del formulario. Nada más;
+- **qué sale de él:** a Neuri, la conversación y un resumen de tu progreso hecho solo de identificadores de lecciones; desde el 12 nov, también un perfil de aprendizaje calculado en tu dispositivo (preferencias, estado de cada habilidad, hasta seis dificultades, repasos pendientes, dónde estás si preguntas desde una lección y el avance de tu última sesión; sin respuestas ni fechas) y, en una cabecera aparte, el identificador aleatorio del dispositivo, solo para el cupo; con los reportes, lo del formulario. Nada más;
 - **que para estudiar no hace falta Neuri:** sin IA, todo lo demás funciona igual.
 
 | | |
@@ -311,7 +346,11 @@ Necesita conexión:
 | --- | --- |
 | Progreso, respuestas, repasos, preferencias y plan de examen | Este navegador (`localStorage`) |
 | Mis lecciones, sus creaciones y tus recorridos | Este navegador |
+| Tus sesiones de estudio (como mucho 20) | Este navegador |
 | Conversación con Neuri | Esta pestaña: se borra al cerrarla |
+| Lo que Neuri recuerda entre visitas (tema, objetivo, nivel y minutos) | Este navegador, 30 días; no se exporta |
+| Identificador aleatorio del dispositivo (solo para el cupo diario) | Este navegador; no se exporta |
+| Cuántas preguntas y creaciones con IA llevas hoy | El servidor de Anato3D, sin tu IP ni el identificador: solo números y claves HMAC que no permiten recuperarlos, del día |
 | Lo que se envía a Neuri | Al servidor de Anato3D y de ahí a Anthropic (Claude Haiku 5.5); el servidor no guarda la conversación |
 | Reportes | Este navegador y la cola de revisión de Anato3D, sin tu dirección IP |
 | Estadísticas (si las activas) | Solo este navegador |
@@ -321,8 +360,10 @@ El detalle técnico está en `docs/estudio/contratos-datos.md`.
 ## Limitaciones conocidas
 
 **Contenido:**
-- Las 71 lecciones son **borradores** que nadie ha revisado todavía: las redactó una IA a partir de fuentes citadas.
-- El contenido de las 69 lecciones nuevas está solo en español. Brazo y antebrazo están en cinco idiomas, traducidos con IA y sin revisar.
+- Las 87 lecciones son **borradores** que nadie ha revisado todavía: las redactó una IA a partir de fuentes citadas.
+- El contenido de las 85 lecciones nuevas está solo en español. Brazo y antebrazo están en cinco idiomas, traducidos con IA y sin revisar.
+
+**Idiomas de la app:** desde el 12 nov de 2026 la app se usa en **español o inglés** (inglés por defecto). Alemán, francés e italiano salen en la lista como «próximamente» y no se pueden elegir todavía; si los tenías elegidos, la app pasa al inglés. Lo nuevo (sesiones, cupo, «Preguntar a Neuri sobre este paso») solo está en español e inglés.
 - Hay huecos de la anatomía sin lección: `docs/estudio/cobertura.md` los cuenta.
 
 **Modelo 3D:**
@@ -338,7 +379,8 @@ El detalle técnico está en `docs/estudio/contratos-datos.md`.
 
 **Neuri:**
 - Usa Claude Haiku 5.5 y puede equivocarse: el contenido con fuentes está en las lecciones.
-- Crear lecciones y recorridos con la IA real está programado y probado con simulaciones, pero **aún no con el servicio real**.
+- Crear lecciones y recorridos con la IA real está programado y probado con simulaciones, pero **aún no con el servicio real**. Lo mismo las sesiones que planifica Neuri con la IA; las que planifica tu dispositivo no necesitan IA.
+- Con IA, como mucho 30 preguntas y 3 creaciones al día en este dispositivo.
 
 **Cuentas y web publicada:** no hay cuentas, sincronización ni web publicada todavía.
 

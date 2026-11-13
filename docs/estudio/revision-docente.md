@@ -9,7 +9,7 @@ estado: preparado-sin-revisiones
 Materiales para que docentes de anatomía revisen el contenido de la biblioteca y las lecciones que crea Neuri (especificación, secciones 23 y 28).
 
 **Estado a 9 de noviembre de 2026:**
-- **Nadie ha revisado todavía ningún contenido.** Las 71 lecciones están en «borrador»; las redactó una IA a partir de fuentes citadas.
+- **Nadie ha revisado todavía ningún contenido.** Las 84 lecciones están en «borrador»; las redactó una IA a partir de fuentes citadas.
 - Este paquete no atribuye a nadie revisiones que no ha hecho. Un nombre solo aparece en una lección cuando esa persona la ha revisado y ha aceptado figurar.
 
 ## Qué se revisa y en qué orden

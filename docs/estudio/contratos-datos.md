@@ -10,14 +10,16 @@ Qué datos hay, dónde viven, quién puede cambiarlos, con qué versión y qué 
 
 ## Principios
 
-1. **Cada cosa tiene su identificador y no se mezclan.** Hay ocho identificadores distintos *[Histórico: seis hasta los recorridos personales, el 9 nov por la noche]*:
+1. **Cada cosa tiene su identificador y no se mezclan.** Hay diez identificadores distintos *[Histórico: ocho hasta las sesiones de estudio, el 12 nov; seis hasta los recorridos personales, el 9 nov por la noche]*:
    - el de la lección (estable), por ejemplo `ms-codo` o `neuri-huesos-de-la-nariz-a1b2`;
    - su versión de contenido;
    - el trabajo de creación (un UUID);
    - el recorrido personal (otro UUID, que nunca es el de un trabajo) y cada una de sus unidades (`u…`, estable aunque el recorrido cambie);
    - el intento de respuesta (fecha, lección y pregunta);
    - el reporte (un UUID);
-   - el evento (un UUID).
+   - el evento (un UUID);
+   - la sesión de estudio con Neuri (`ses-…`), que no es una de las sesiones de práctica de `progreso.sesiones`;
+   - el dispositivo (un UUID aleatorio, `anato3d.dispositivo`), que solo sirve para el cupo diario y no identifica a la persona.
 2. **Ni el navegador ni el modelo se dan permisos o estados editoriales.** Una lección de Neuri es siempre «borrador», también si se importa de un archivo. El modo de cada petición a Neuri lo pone la app según el botón, nunca el texto. Lo que devuelve Claude se recorta y se comprueba contra lo que existe.
 3. **Una sola fuente para el catálogo**, que comparten:
    - la búsqueda;
@@ -46,13 +48,18 @@ Qué datos hay, dónde viven, quién puede cambiarlos, con qué versión y qué 
 | Trabajos de creación | Navegador y servidor | `anato3d.trabajos`; memoria del servidor | — | La app y el servidor |
 | Recorridos personales | Navegador | `anato3d.recorridos` | 1 | La persona, con Neuri |
 | Recorridos apartados | Navegador | `anato3d.recorridos.apartados` | — | La app (solo para no perderlos) |
+| Sesiones de estudio con Neuri | Navegador | `anato3d.sesiones` | 1 | La persona, con Neuri o el planificador de la app |
+| Sesiones apartadas | Navegador | `anato3d.sesiones.apartadas` | — | La app (solo para no perderlas) |
 | Conversación con Neuri | Pestaña | `anato3d.neuri` (sessionStorage) | — | La persona |
+| Memoria de Neuri entre visitas (tema, objetivo, nivel y minutos) | Navegador | `anato3d.neuri.memoria` | 1 | La app; caduca a los 30 días |
+| Identificador del dispositivo | Navegador | `anato3d.dispositivo` | — | La app, una vez; viaja en la cabecera `x-anato3d-dispositivo` |
+| Cupo diario de Neuri | Servidor | `<ANATO3D_DATOS>/cupo.json` (en desarrollo, `build/servidor/cupo.json`) | 2 | El servidor (`server/neuri/cupo.mjs`) |
 | Reportes de problemas | Navegador y servidor | `anato3d.reportes`; `web/server/datos/reportes.jsonl` | 1 | La persona (envía); quien revisa (decide) |
 | Decisiones sobre reportes | Servidor | `web/server/datos/decisiones.jsonl` | — | Quien revisa (`npm run reportes`) |
 | Estadísticas de uso | Navegador | `anato3d.eventos`, `anato3d.privacidad`, `anato3d.invitado` | 1 | La app, solo con consentimiento |
 | Cuentas | — | No existen | — | Bloqueado (ver abajo) |
 
-Las claves de estudio del navegador están en `CLAVES_ESTUDIO` (`web/src/biblioteca/datos.js`). «Borrar mis datos» quita exactamente esas y la conversación, y deja los ajustes de la app (idioma, calidad).
+Las claves de estudio del navegador están en `CLAVES_ESTUDIO` (`web/src/biblioteca/datos.js`). «Borrar mis datos» quita exactamente esas y la conversación, y deja los ajustes de la app (idioma, calidad). Desde el 12 nov incluyen las sesiones, la memoria de Neuri y el identificador del dispositivo. Esos dos últimos (`CLAVES_DISPOSITIVO`) se ven y se borran, pero **no se exportan**: son de este dispositivo, no del estudio.
 
 ## Lección
 
@@ -76,13 +83,14 @@ Las claves de estudio del navegador están en `CLAVES_ESTUDIO` (`web/src/bibliot
 
 | Estado | Condición |
 | --- | --- |
-| `borrador` | El de todas las lecciones hoy (71 de 71) |
+| `borrador` | El de todas las lecciones hoy (87 de 87 el 12 nov) *[Histórico: 71 de 71]* |
 | `revisado` | Exige `revisor` y `fecha`; el revisor de formato lo comprueba |
 | `retirado` | — |
 
-**Idioma del contenido e idioma de la interfaz van aparte.** `idiomas` dice en qué idiomas está el **contenido**. La interfaz está completa en cinco, pero eso no hace que una lección cuente como traducida. Hoy:
+**Idioma del contenido e idioma de la interfaz van aparte.** `idiomas` dice en qué idiomas está el **contenido**. La interfaz solo se puede usar en español e inglés desde el 12 nov (alemán, francés e italiano, «próximamente»; `DISPONIBLES` en `src/i18n/idioma.js`) *[Histórico: completa y elegible en cinco]*, y eso no hace que una lección cuente como traducida. Hoy:
 - brazo y antebrazo tienen contenido en cinco idiomas, traducido con IA y sin revisar;
-- las otras 69 lecciones, solo en español.
+- las otras 85 lecciones, solo en español *[Histórico: 82 el 11 nov; 69 antes de las 13 lecciones del 9 nov]*;
+- en las fichas y los módulos, `npm run check` solo exige el inglés (`REQUERIDOS` en `scripts/contenido-i18n.mjs`).
 
 El filtro de idioma y la etiqueta de la tarjeta usan `idiomas`.
 
@@ -174,7 +182,7 @@ Abrir o leer no cuenta como comprensión.
 | `d` | Si dudó |
 | `m` | Modo: `evaluacion`, `repaso`, `practica` o `leccion` |
 | `qh` | La huella de la pregunta |
-| `a` | Ayudas: `opciones`, `autoevaluada` o `escrita` |
+| `a` | Ayudas: `opciones`, `autoevaluada` o `escrita`; desde el 12 nov, en una sesión con Neuri, también `pista` y `segundo-intento`. Un intento con esas dos se anota como `duda`: no sube de caja y no cuenta como acierto en el mapa (`conAyuda` en `mapa.js`) ni en el perfil |
 
 **Habilidad de cada tipo de pregunta:**
 
@@ -224,10 +232,12 @@ Los fallos anteriores dejan de contar contra la persona (especificación, secci�
 ```
 { id (UUID), estado, titulo, accion: 'crear' | 'adaptar', solicitud, plan, base,
   estructuras, evidencias, informe, leccionId, error, codigo, errores, mensaje, reanudable, creado, actualizado,
-  reemplaza?, unidad? }
+  reemplaza?, unidad?, hasta? }
 ```
 
 `reemplaza` es el id del trabajo al que sustituye un reintento.
+
+`hasta` (ms, desde el 11 nov 2026): en una pausa, cuándo se puede seguir. Una pausa es un `error` con `limite` u `ocupado` (cuota de creaciones) o con `sin-presupuesto` (tope de gasto) en el que el servidor no gastó nada: queda `reanudable` y se sigue con el mismo trabajo.
 
 `unidad: { recorrido, id }` (opcional) dice que el trabajo crea una unidad de un recorrido personal:
 - se planifica con su propia solicitud, que lleva `recorrido: { titulo, n, total, otras }` (lo que hace falta saber del recorrido para no repetir las otras unidades), y sin la conversación;
@@ -249,6 +259,7 @@ Un estado que esta versión no conoce se lee como `interrumpida`.
 | --- | --- | --- |
 | Pedir el mismo id otra vez | El servidor no lo repite: devuelve lo que ya pasó y sigue | El trabajo (no se paga dos veces) |
 | Corte de red (`reanudable`) | Reintentar con el **mismo** id | El trabajo del servidor |
+| Pausa por cuota o tope de gasto (`reanudable`, `hasta`) | El servidor no empezó (ni planificó: lo mira antes); seguir con el **mismo** id cuando se pueda | Todo; no se pagó nada |
 | Otro final y «Reintentar» | Trabajo **nuevo** con el mismo plan, que sustituye al viejo en la conversación | El plan |
 | Cancelar | La app pide `modo: 'cancelar'`; el servidor corta la llamada a Claude; queda `error: 'cancelada'` | La conversación; no se guarda ninguna lección |
 | Recargar la página | La app se reconecta con `modo: 'trabajo'` (sin coste); si el servidor ya no lo tiene, queda `interrumpida` y volver a empezar es decisión de la persona (cuesta dinero) | El plan |
@@ -265,7 +276,7 @@ Lo que no cabe en una lección, repartido en unidades que se crean de una en una
 ```
 { formato: 'anato3d.recorridos', version: 1, recorridos: [
   { id (UUID), estado, titulo, resumen, objetivo, nivel, solicitud, cambio, unidades, supuestos, limitaciones,
-    mensaje, codigo, error, errores, reanudable, cola, auto, aviso, salen, instrucciones, creado, actualizado } ] }
+    mensaje, codigo, error, errores, reanudable, cola, auto, aviso, salen, instrucciones, creado, actualizado, pausa? } ] }
 
 unidad: { id ('u…'), titulo, objetivo, enfoque, nivel, minutos, terminos, relacionadas, trabajo (UUID | null), leccion (id | null) }
 ```
@@ -275,6 +286,7 @@ unidad: { id ('u…'), titulo, objetivo, enfoque, nivel, minutos, terminos, rela
 | `estado` | El de la última planificación: `planificando`, `listo`, `aclaracion`, `limitacion`, `error` o `interrumpido` |
 | `solicitud`, `cambio` | Lo que se pidió al crearlo y, mientras se cambia, el cambio (para volver a intentarlo) |
 | `cola` | La persona pidió crear todas: van en cola, una tras otra |
+| `pausa` | Desde el 11 nov: la cola espera por la cuota (`motivo: 'cuota'`, con `hasta`) o por el tope de gasto (`motivo: 'presupuesto'`, con `hasta` o sin él), con la unidad en pausa |
 | `auto` | La persona pidió el recorrido expresamente: al tener las unidades se crea la primera |
 | `aviso` | Lo último que hay que contar: la cola se paró, no cabe, el cambio se canceló… |
 | `salen` | Las unidades ya creadas que salieron en el último cambio (su lección sigue en «Mis lecciones») |
@@ -290,7 +302,8 @@ unidad: { id ('u…'), titulo, objetivo, enfoque, nivel, minutos, terminos, rela
 | `preparando` | Su trabajo está en curso |
 | `sin-guardar` | Su trabajo terminó `no-guardada` |
 | `error` | Su trabajo terminó en error (no cancelado), limitación o aclaración |
-| `interrumpida` | Su trabajo terminó `interrumpida` |
+| `interrumpida` | Su trabajo terminó `interrumpida`; volver a crearla necesita confirmarlo (`crearUnidad(…, { confirmado: true })`) |
+| `detenida` | En pausa, sin fallo: su trabajo terminó en `error` con `limite` u `ocupado` (`motivo: 'cuota'`, con `hasta`) o con `sin-presupuesto` (`motivo: 'presupuesto'`). Al servidor y a Neuri se les cuenta como `pendiente` |
 | `pendiente` | Sin trabajo ni lección, con el trabajo cancelado, o con la lección quitada de «Mis lecciones» |
 
 Así, una unidad solo cuenta como lista si su lección se validó y se guardó, y el resto figura con su estado real.
@@ -301,7 +314,8 @@ Así, una unidad solo cuenta como lista si su lección se validó y se guardó, 
 | --- | --- | --- |
 | Planificar (propuesta con `accion: 'recorrido'`) | Una petición `planificar`; el servidor devuelve de 2 a 8 unidades revisadas. Si fue explícito («créame un curso…»), se crea la primera | — |
 | Crear una unidad | Un trabajo de creación (ver «Trabajo de creación»). Si ya tenía plan, el mismo; tras un corte de red, el mismo trabajo. No empieza si otra del recorrido se está preparando, si se está planificando o si no cabe en «Mis lecciones» | — |
-| Crear todas | `cola`: la siguiente que nunca se intentó, cuando no hay ninguna en preparación. Se para ante cualquier final que no sea `guardada` (con `aviso`) y no reintenta lo que falló | Lo creado |
+| Crear todas | `cola`: primero la unidad en pausa (si ya es la hora) y luego la siguiente que nunca se intentó, cuando no hay ninguna en preparación. Una pausa no la para: espera (`pausa`) y sigue sola a su hora. Se para ante cualquier otro final que no sea `guardada` (con `aviso`) y no reintenta lo que falló | Lo creado |
+| Seguir ahora | Con una unidad en pausa: lo intenta ya (si sigue sin poderse, el servidor lo dice sin gastar y vuelve la pausa) | Todo |
 | Recargar la página | El trabajo en marcha se retoma (`trabajos.js`); la cola sigue | Todo |
 | Cambiar (propuesta con `recorrido_base`) | Petición `planificar` con `baseRecorrido`; la cola se para. Una unidad que se conserva (`conserva`) es la misma, con sus textos, su trabajo y su lección; las nuevas, pendientes | Las lecciones de las unidades que salen (`salen`) |
 | Cancelar la planificación | Uno nuevo se quita (no tenía nada); un cambio deja el recorrido como estaba | El recorrido de antes |
@@ -316,13 +330,79 @@ Así, una unidad solo cuenta como lista si su lección se validó y se guardó, 
 - los textos de lo que ya existe: al cambiar, la app pone los de antes;
 - las lecciones relacionadas, que tienen que existir en la biblioteca.
 
+## Sesión de estudio con Neuri (versión 1, desde el 11–12 nov 2026)
+
+Un plan de estudio con lo que ya existe, guardado y reanudable en el navegador. No es lo mismo que las sesiones de práctica de `progreso.sesiones` (fecha, tipo, aciertos y total).
+
+**Código:** `web/src/pet/sesiones.js` (almacén), `web/src/pet/planificador.js` (plan sin IA) y `planificarSesion` y `revisarSesion` en `web/server/pet.mjs` (modo `sesion`). El servidor nunca guarda sesiones.
+
+**Clave:** `anato3d.sesiones`. Como mucho 20 (`MAX_SESIONES`).
+
+```
+{ formato: 'anato3d-sesiones', version: 1, sesiones: [
+  { id ('ses-…'), creada, actualizada, origen: 'neuri' | 'local', idioma, modelo, titulo, objetivo, nivel, minutos,
+    mensaje, estado, bloques, i, resultados, posicion: { bloque, n }, quitados, textos? } ] }
+
+bloque:    { tipo: 'repaso', items, minutos, motivo }
+         | { tipo: 'leccion', leccion, pasos: null (entera) | [ids de paso], minutos, motivo }
+         | { tipo: 'practica', leccion, items, minutos, motivo }
+           (+ motivoClave: { clave, datos } si el motivo lo puso la app; perdido: true si su lección ya no existe)
+resultado: { bloque, cuando, aciertos, total, conAyuda, revelados, saltado, motivo?, fallos? }
+```
+
+| Campo | Qué lleva |
+| --- | --- |
+| `origen` | `neuri` (modo `sesion`, con Haiku) o `local` (el planificador de la app) |
+| `estado` | `planificada`, `activa`, `pausada` o `finalizada`. Solo una activa: empezar otra pausa la anterior |
+| `i`, `posicion` | El bloque en curso y, dentro de él, el paso o la pregunta, para reanudar justo ahí |
+| `resultados` | Uno por bloque terminado o saltado; avanzar dos veces el mismo bloque no duplica |
+| `conAyuda`, `revelados` | Bien tras la pista o en el segundo intento; fallada y con la respuesta enseñada |
+| `quitados` | Cuántos bloques se quitaron al materializar el plan (la lección no existe, no está en el modelo o no tiene preguntas) |
+| `textos` | Título, mensaje y objetivo como clave de texto, para que la interfaz los diga en el idioma de ahora |
+
+**Límites:** de 1 a 6 bloques, de 1 a 60 minutos cada uno; el pedido, de 5 a 120 minutos. Un bloque de repaso, hasta 12 preguntas; uno de práctica, hasta 8.
+
+| Transición | Qué pasa | Qué se conserva |
+| --- | --- | --- |
+| Crear | El plan (de la app o de Neuri) se limpia con `limpiarPlanSesion` y se materializa: preguntas reales y pasos de cada parte; lo que no existe o el modelo no muestra se quita y se cuenta | — |
+| Empezar o reanudar | Pasa a `activa` en `i` y `posicion`; la que estaba activa queda `pausada` | Todo |
+| Avanzar o saltar un bloque | Anota su resultado (sin duplicar) y sigue | Lo hecho |
+| Pausar | `pausada` | Todo |
+| Terminar (también antes de tiempo) | `finalizada` | Lo hecho |
+| Una lección que desaparece | Su bloque queda `perdido` y se sigue con el resto | Sus resultados |
+| Más de 20 | Se quitan, de la más antigua a la más nueva: las planificadas sin empezar, luego las finalizadas y, si aún sobran, las pausadas; nunca la activa ni la nueva. Se avisa (`alPodar`) | El progreso de lo estudiado |
+| Quitar (tras confirmar) | Se quita la sesión | El progreso de lo estudiado |
+| Datos dañados o de una versión más nueva | Se apartan en `anato3d.sesiones.apartadas` antes de escribir; si no se puede apartar, no se escribe | Todo hasta que la persona decide |
+| El navegador no deja guardar | Se avisa una vez (`alNoGuardar`), sin perderla en silencio | La sesión en memoria |
+
+**Lo que no decide el modelo:** los identificadores, las preguntas y los pasos reales, el estado, qué se quita y los resultados. El plan de Neuri solo puede usar las lecciones candidatas que le da el servidor, y lo revisa una comprobación determinista.
+
+## Cupo diario de Neuri (servidor, versión 2, desde el 12 nov 2026)
+
+**Código:** `web/server/neuri/cupo.mjs` y `web/server/neuri/ip.mjs`. Diseño: `neuri.md`, «Cupo diario por dispositivo».
+
+```
+{ v: 2, zona, dias: { [día]: { [clave HMAC]: { p, c } } } }
+```
+
+- **Clave:** HMAC-SHA256 (recortada a 128 bits) del identificador del dispositivo o de la IP normalizada, con una clave que sale de `ANATO3D_CUPO_SAL` y del día. La sal no está en el archivo.
+- **`p` y `c`:** las preguntas con IA y las creaciones gastadas ese día.
+- **Por defecto:** 30 y 3 por dispositivo; 300 y 30 por IP.
+- **Días:** los de la zona del tope de gasto (America/Tijuana); los viejos se podan.
+- **Versión 1** (con la sal dentro): al abrirla se empieza de cero, sin ella. **Dañado:** se aparta y se empieza de cero (son contadores del día, no datos de nadie).
+- **Escritura:** atómica, con el mismo cerrojo con el PID que el tope de gasto.
+
+**Lo que ve la app:** `{ preguntas: { limite, usadas, quedan }, creaciones: { … }, renueva }` (`limpiarCupo` en `protocolo.js`), en toda respuesta. Agotado: `429 { ok: false, error: 'cupo', de, cupo, espera }` con `retry-after`.
+
 ## Protocolo de Neuri (versión 2)
 
 **Código:** `web/src/pet/protocolo.js`, que comparten la app y el servidor.
 
-**Modos:** `orientar`, `planificar`, `redactar`, `adaptar`, `trabajo` y `cancelar`. Los pone la app según el botón.
+**Modos:** `orientar`, `planificar`, `redactar`, `adaptar`, `trabajo`, `cancelar` y, desde el 11 nov, `sesion`. Los pone la app según el botón. La versión del protocolo sigue siendo la 2: los campos nuevos son opcionales.
 
-**Petición:** `{ v, idioma, modo, mensajes, progreso, propias, recorridos, contexto, solicitud?, plan?, base?, baseRecorrido?, trabajo? }`.
+**Petición:** `{ v, idioma, modo, mensajes, progreso, propias, recorridos, contexto, solicitud?, plan?, base?, baseRecorrido?, trabajo?, pedido?, perfil?, enfoque? }`.
+
+**Cabecera:** `x-anato3d-dispositivo`, con el identificador del dispositivo (`/^[a-z0-9][a-z0-9-]{15,63}$/`), en todas las peticiones a `/api/pet`. Nunca en el cuerpo.
 
 | Campo | Qué lleva |
 | --- | --- |
@@ -332,8 +412,21 @@ Así, una unidad solo cuenta como lista si su lección se validó y se guardó, 
 | `base` | La lección propia entera, solo al adaptarla |
 | `baseRecorrido` | Al cambiar un recorrido: cómo es ahora (sus unidades, con su estado). Tiene que ser el de `solicitud.recorrido_base` |
 | `solicitud` | `accion`: `crear`, `adaptar` o `recorrido`. En un recorrido, además, `unidades` (cuántas pidió, o null) y `recorrido_base` (el que se cambia: solo uno de `recorridos`). Al crear una unidad, `recorrido: { titulo, n, total, otras }` |
+| `pedido` | Solo en `sesion`, obligatorio: `{ objetivo (hasta 1200 caracteres), minutos (entero de 5 a 120), nivel (1–3 o null), modelo ('male' o 'female') }`. Si no es válido, `{ ok: false, error: 'pedido' }` |
+| `perfil` | En `orientar` y `sesion`, si dice algo: `{ nivel, minutos, intereses, habilidades, dificultades, vencidas, ultima }`. Intereses: hasta 4 regiones o sistemas. Habilidades: las 5, con un estado válido. Dificultades: hasta 6, `{ leccion, estructura, motivo: 'confusion' \| 'nolose' \| 'fallo', fallos (1–9) }`. Vencidas: 0–999. Última sesión: título (hasta 80), bloques (1–12), hechos y si terminó. Sin fechas ni respuestas. Al modelo solo le llegan las cifras de la última sesión, no su título |
+| `enfoque` | En `orientar` y `sesion`: `{ leccion, paso \| null, sesion: sí/no }`, dónde está la persona al preguntar |
+| `mensajes` | Como mucho 12 en `orientar` (el último, de la persona) y 6 en `sesion` |
 
-**Respuesta de orientar:** `{ tipo, mensaje, lecciones, sesion, recorrido, evidencias, solicitud, contexto, sugerencias }`. (`recorrido` es uno de la biblioteca; un recorrido personal se pide con `solicitud.accion: 'recorrido'`.)
+**Texto de la persona como dato** (instrucciones `2026-11-12.1`): el tema, el objetivo y los títulos y resúmenes de sus lecciones y recorridos van en su último mensaje, marcados como dato, nunca en las instrucciones.
+
+**Respuesta de orientar:** `{ tipo, mensaje, lecciones, sesion, recorrido, evidencias, solicitud, contexto, sugerencias, mostrar, sesion_pedida }`. (`recorrido` es uno de la biblioteca; un recorrido personal se pide con `solicitud.accion: 'recorrido'`.) Desde el 11 nov:
+- `mostrar`: hasta 3 estructuras `{ clave, nombre }` para «Ver en 3D» ([] por defecto); el servidor solo deja las que existen en el inventario;
+- `sesion_pedida`: `{ objetivo, minutos, nivel }` o null, si la persona pidió una sesión;
+- `sesion` (la lista de 2 a 8 lecciones de antes) no cambia.
+
+**Respuesta de `sesion`:** `{ tipo: 'sesion', plan: { titulo, mensaje, objetivo, bloques } }` o `{ tipo: 'aclaracion', mensaje, sugerencias }`. Sin lecciones que encajen, aclaración sin llamar a Claude (`codigo: 'sin-candidatas'` u `'otro-modelo'`). Si el plan sigue mal tras la corrección, `502 formato`, y la app lo planifica sola.
+
+**Errores nuevos:** `429 { error: 'cupo', de: 'preguntas' | 'creaciones', cupo, espera }` (ver «Cupo diario de Neuri»).
 
 **Respuesta de planificar un recorrido:** `{ tipo: 'recorrido' | 'aclaracion' | 'limitacion', mensaje, recorrido: { titulo, resumen, objetivo, nivel, unidades, supuestos, limitaciones } | null, salen, sugerencias, instrucciones, codigo?, errores? }`. `codigo: 'recorrido-invalido'` si sigue mal tras la ronda de corrección.
 - `limpiarRespuesta` quita lo que no existe (lecciones, recorridos, evidencias) y recorta los textos.
@@ -388,6 +481,7 @@ Así, una unidad solo cuenta como lista si su lección se validó y se guardó, 
 - de estudio: `actividad_respondida`, `evaluacion_terminada` y `repaso_realizado`;
 - de búsqueda: `busqueda_sin_resultados` (solo qué filtros había);
 - de Neuri: `generacion_solicitada`, `generacion_cancelada`, `generacion_fallida`, `generacion_completada` y `leccion_personal_abierta`;
+- de las sesiones de estudio (desde el 12 nov): `sesion_creada` (origen, bloques y minutos) y `sesion_terminada` (origen, bloques, hechos, aciertos, total y si se completó); nunca el tema;
 - otros: `problema_reportado` y `error_tecnico`.
 
 `migracion_invitado_completada` no existe todavía porque no hay cuentas.
@@ -399,8 +493,10 @@ Así, una unidad solo cuenta como lista si su lección se validó y se guardó, 
 **Código:** `web/src/biblioteca/datos.js`.
 
 ```
-{ formato: 'anato3d.mis-datos', version: 1, fecha, progreso, propias, trabajos, recorridos, reportes, eventos, privacidad }
+{ formato: 'anato3d.mis-datos', version: 1, fecha, progreso, propias, trabajos, recorridos, sesiones, reportes, eventos, privacidad }
 ```
+
+`sesiones` se añadió el 11 nov sin cambiar de versión (con su propio formato versionado). El identificador del dispositivo y la memoria de Neuri **no van en el archivo**.
 
 **Reglas al importar (combinar dos progresos):**
 
@@ -413,6 +509,7 @@ Así, una unidad solo cuenta como lista si su lección se validó y se guardó, 
 | Preferencias y plan de examen | Los de aquí, si los hay |
 | Lecciones propias | Como en «Importar» de Mis lecciones |
 | Recorridos personales | Se añaden los que no hay (el mismo identificador no se sobrescribe), hasta 12, después de las lecciones. Sus unidades conservan su lección y pierden su trabajo, que era de otro navegador. Uno que se estaba planificando llega como interrumpido. Un archivo anterior a los recorridos no los trae y no pasa nada |
+| Sesiones de estudio | Se añaden las que no hay (el mismo identificador no se sobrescribe), hasta 20. Una activa en el archivo llega pausada. Un archivo anterior a las sesiones no las trae y no pasa nada |
 
 Es la base para la sincronización entre dispositivos cuando haya cuentas.
 

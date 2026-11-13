@@ -208,8 +208,10 @@ Las dos ramas terminadas no tocan el núcleo que cambia aquí: `evaluar.js`, `pr
 **`claude/bold-liskov-29585b`** (las 13 lecciones):
 - `cab-surcos-medial`: su «surco occipitotemporal» conserva sus preguntas, sin `Inferior_temporal_sulcus` en el 3D. El
   revisor dará avisos, no errores.
-- `cab-senos-venosos`: la meníngea media no restringe nada, pero conviene arreglar en esa rama su actividad «vistas»,
-  «Sigue la arteria por dentro del cráneo», que contradice su propia nota sobre el modelo.
+- `cab-senos-venosos`: la meníngea media no restringe nada. Su actividad «vistas» decía «Sigue la arteria por dentro del
+  cráneo», que contradecía su propia nota sobre el modelo. **Corregido el 11 nov** tras fusionar: «Mira de lado, desde
+  arriba y de frente el tramo que sube hasta la base del cráneo: en el modelo, sus ramas por dentro de la bóveda no
+  están», con su hoja de revisión regenerada.
 - `catalogo.json` y `cobertura.md` de esa rama siguen al día con esta: esta rama no cambia nada de lo que los genera. Si
   hubiera conflicto en ellos, se regeneran con `node scripts/biblioteca.mjs` en vez de fusionarlos a mano.
 
@@ -220,7 +222,9 @@ Las dos ramas terminadas no tocan el núcleo que cambia aquí: `evaluar.js`, `pr
   - `ui/biblioteca/pet.js`: la nota de las actividades quitadas va en su propio párrafo, encima del informe, para no
     tocar la línea vecina que cambia esa rama;
   - seis documentos de `docs/estudio`.
-- **Al fusionar (opcional):** conectar las limitaciones en `planificarRecorrido`, que solo existe en esa rama.
+- **Al fusionar (opcional), hecho el 11 nov:** conectar las limitaciones en `planificarRecorrido`, que solo existía en esa
+  rama. Quedó con una función `limitadasEnZona` en `server/neuri/limites.mjs` en lugar del fragmento de abajo, y con su
+  prueba (encéfalo: las tres notas; miembro superior: ninguna; nunca en el texto fijo).
   - Las unidades ya se crean por el camino de siempre (planificar → redactar → ensamblar), que aplica las restricciones de
     forma determinista. Esto solo evita que el reparto planifique una unidad centrada en una pieza limitada.
   - El fragmento, en `web/server/pet.mjs`, tras calcular `sistemas`, con `import { LIMITACIONES } from
@@ -244,7 +248,9 @@ Las dos ramas terminadas no tocan el núcleo que cambia aquí: `evaluar.js`, `pr
   - `npm test`: 181 de 181 (178 antes de las 3 pruebas añadidas por la revisión);
   - `npm run check`: correcto, con 84 lecciones, 0 errores y 3 avisos de `cab-surcos-medial` (los previstos);
   - `vite build`: correcto.
-- **Después de fusionar,** hay que poner al día las cifras de pruebas de los documentos: 181.
+- **Fusión real, 11 nov:** las tres ramas están en `main` (commits `a86e470`, `6bdb3ef` y `aec19a9`), sin conflictos.
+  Con todo junto: 181 de 181 pruebas (182 con la de `planificarRecorrido`), `npm run check` y `vite build` correctos, y
+  las cifras de los documentos al día.
 
 **Archivos de este bloque:**
 - **Nuevos:**

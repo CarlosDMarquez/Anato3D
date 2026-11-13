@@ -18,9 +18,13 @@ Los 26 escenarios obligatorios de la especificación (prompt maestro, sección 2
 | **Humana** | Necesita una persona: un móvil físico, un lector de pantalla o la revisión de un especialista. |
 | **Bloqueado** | Depende de una decisión o credencial externa (se dice cuál). |
 
-**Resultado de las comprobaciones:** `npm test` da **165 pruebas, 165 correctas** *[Histórico: 148 antes de los recorridos por unidades, que añadieron 17; 145 antes de la documentación del paso 11, que añadió tres]*; `npm run check` («todo correcto»: fichas, textos en cinco idiomas, biblioteca de 71 lecciones sin errores ni avisos, inventario de Neuri al día); `vite build` sin errores. Citas de la biblioteca: **3068 comprobadas en 286 páginas, 0 sin encontrar** (`node scripts/biblioteca/fuentes.mjs comprobar`).
+**Resultado de las comprobaciones (12 nov 2026):** `npm test` (`node --test tests/`) da **314 pruebas, 314 correctas**, con las sesiones de estudio, el cupo diario, el texto fijo por modo y el sistema linfático nuevo. `npm run check` da «todo correcto»: biblioteca de **87 lecciones** (0 errores y los 3 avisos previstos de `cab-surcos-medial`), textos sin traducir 0 (en el contenido solo exige el inglés desde el 12 nov), inventario de Neuri al día y 66 avisos de campos «pendiente» en las fichas linfáticas (sin fuente libre, no se afirma nada). Citas de la biblioteca: **4130 comprobadas en 511 páginas**.
 
-**Prueba real con Haiku: no hecha.** No hay clave de API en `web/.env.local` y la prueba gasta dinero: necesita el permiso de Carlos (`npm run pet:prueba` y `npm run pet:prueba -- --crear`).
+*Resultado del 11 nov:* `npm test` daba **239 pruebas, 239 correctas**, con los cinco prompts de ChatGPT del 11 nov *[Histórico: 181 con las tres ramas fusionadas en `main` el 11 nov; 165 con los recorridos por unidades; 148 antes de ellos, que añadieron 17; 145 antes de la documentación del paso 11, que añadió tres]*; `npm run check` («todo correcto»: fichas, textos en cinco idiomas, biblioteca de 84 lecciones sin errores y con los 3 avisos previstos de `cab-surcos-medial` *[Histórico: 71 lecciones sin errores ni avisos]*, inventario de Neuri al día); `vite build` sin errores. Citas de la biblioteca: **3969 comprobadas en 478 páginas, 0 sin encontrar** *[Histórico: 3068 en 286]* (`node scripts/biblioteca/fuentes.mjs comprobar`).
+
+**Prueba real con Haiku: no hecha.** No hay clave de API en `web/.env.local` y la prueba gasta dinero, así que necesita el permiso de Carlos.
+- **Preparada y ensayada con el proveedor simulado:** la prueba mínima, `node scripts/prueba-minima.mjs --si-gastar`. Son tres llamadas, unos 0,01 US$ y 0,0123 US$ como máximo desde el texto fijo por modo *[Histórico: 0,1705 US$]* (`activacion.md`, sección 8).
+- **Las largas:** `npm run pet:prueba` y `npm run pet:prueba -- --crear`.
 
 ## Los 26 escenarios
 
@@ -92,7 +96,7 @@ Invitado → estudio → generación → evaluación → repaso → cuenta → c
 | Credenciales rechazadas | ✅ | 401 → «sin-ia», sin reintentos, la app responde con el buscador. |
 | Límites del proveedor | ✅ | 429 → «limite»; sin saldo no se reintenta y se espera 10 min antes de volver a probar. |
 | Entradas extensas | ✅ | Cuerpo demasiado largo → 413; textos recortados (mensajes, comentarios, temario). |
-| Idiomas | ✅ | Objetivos observables en cinco idiomas; los textos de la interfaz completos en los cinco (comprobado por script). |
+| Idiomas | ✅ | Objetivos observables en cinco idiomas. Desde el 12 nov, la interfaz se usa en español e inglés (alemán, francés e italiano, «próximamente»): las pruebas exigen cada texto en español e inglés y los de los otros tres solo si existen; en el contenido, `npm run check` exige solo el inglés *[Histórico: textos de la interfaz completos en los cinco, comprobado por script]*. |
 | Requisitos circulares | ✅ | «requisitos circulares: el orden termina, incluye todas y no repite ninguna». |
 | Permisos | 🟡 | Mismo origen en el servidor; la cola de reportes no se puede leer desde la web; revisar exige `--revisor`; una lección de Neuri nunca puede figurar como revisada (ni importada). Permisos por cuenta: bloqueado (sin cuentas). |
 
@@ -110,6 +114,85 @@ Invitado → estudio → generación → evaluación → repaso → cuenta → c
 | Quitar el recorrido | ✅ | **Automática (simulada)**: «recorrido: quitarlo no borra sus lecciones…». **Navegador**: la confirmación pone el foco en «Quitar solo el recorrido»; las lecciones se quedan (5 de 5). Quitarlas también es un botón aparte que avisa de que no se puede deshacer. Mis recorridos: captura 19 del manual. |
 | Sin IA | ✅ | **Automática**: «sin IA: «créame un curso…» dice que crear necesita la IA y busca lo que hay de ese tema». **Navegador**: sin botones para crear ni para cambiar, y con el aviso. |
 | Guardado, Mis datos e idiomas | ✅ | **Automática**: «recorrido: guardado versionado…», «Mis datos: los recorridos se exportan, se importan sin duplicar…», «textos de los recorridos: en los cinco idiomas y, en francés, siempre de «vous»». **Navegador**: francés, móvil a 375 px sin desbordes y «Mis datos» con los recorridos. |
+
+## Sesiones de estudio con Neuri y cupo diario (12 nov 2026)
+
+No son escenarios numerados de la especificación: los pidió el encargo de Neuri como tutor (11 nov, noche). Diseño en `neuri.md` («Sesiones de estudio con Neuri» y «Cupo diario por dispositivo»).
+
+**Entornos:** «Automática» es `npm test`, sin red; «IA simulada», con Claude guionizado; «IA real pendiente» y «Alojamiento público pendiente», como en la tabla del lanzamiento (abajo). **En el navegador no hay todavía un recorrido documentado de las sesiones**: falta hacerlo y sacar sus capturas (`manual-estudiante.md`, sección 5).
+
+| # | Caso | Resultado esperado | Estado | Entorno | Evidencia |
+| ---: | --- | --- | --- | --- | --- |
+| S1 | Sesión sin IA | Un tema claro da un plan válido y la sesión se hace entera sin llamar a nadie | ✅ | Automática | «conversación: una sesión de 10 minutos sobre un tema claro se crea y se termina con CERO llamadas»; «una sesión de 10 minutos sobre el corazón, de principio a fin, con un fallo, una pista y una recarga a mitad: cero llamadas»; «planificador: un tema claro da un plan válido sin IA…» |
+| S2 | Objetivo ambiguo, con IA | Modo `sesion`; plan solo con lecciones que existen; si falla o no hay cupo, la planifica la app | ✅ simulada · ⛔ real | IA simulada · IA real pendiente | «conversación: un objetivo que mezcla temas va a Neuri…»; «sesión: un plan con lecciones candidatas que existen…»; «sesión: una ronda de corrección…»; «sesión: sin lecciones que encajen no se llama a Claude…» |
+| S3 | Reanudar | Al recargar, el mismo bloque y la misma pregunta; avanzar dos veces no duplica; terminar antes conserva lo hecho | ✅ | Automática | «sesiones: reanudar tras recargar deja en el bloque exacto…»; «el segundo intento se guarda en la sesión…» |
+| S4 | Varias sesiones y almacenamiento | Solo una activa; como mucho 20 sin quitar la activa ni la nueva, con aviso; lo dañado se aparta; sin espacio, aviso | ✅ | Automática | «sesiones: solo una activa también al avanzar o saltar…»; «sesiones: al pasar de 20…»; «sesiones: si el navegador no deja guardar, se avisa…» |
+| S5 | Pista y segundo intento | La pista sale de un paso verificado y nunca dice el nombre; lo acertado con ayuda no sube de caja ni demuestra la habilidad | ✅ | Automática | «la pista de cada pregunta 3D de la biblioteca sale del paso verificado y nunca dice el nombre…»; «la pista nunca revela el nombre por el título del paso…»; «mapa: lo acertado con pista o en el segundo intento no demuestra la habilidad (ni en el perfil de Neuri)…» |
+| S6 | Lección que desaparece o pieza que el modelo no muestra | Se quita del plan y se dice; lo hecho se conserva | ✅ | Automática | «sesiones: un plan del servidor se materializa con preguntas y pasos reales…»; «sesiones: si una lección desaparece…» |
+| S7 | Preguntar a Neuri en una evaluación | No da la respuesta: una pista o en qué paso se explica; desde un paso, solo con la comprobación respondida | ✅ simulada · ⛔ real | IA simulada · IA real pendiente | «orientar: con enfoque, primero las evidencias de esa lección y ese paso…» (instrucción y enfoque). El botón oculto del paso está en `leccion.js`, sin prueba automática (es DOM). Que Haiku lo cumpla: prueba real |
+| S8 | Perfil que viaja | Sin fechas, sin respuestas, ≤ 6 dificultades, ≈ 250 tokens el más lleno; el texto de la persona va como dato | ✅ | IA simulada | «sesión: el perfil llega recortado…»; «inyección: el título de la última sesión (perfil) y el tema de la conversación no van en las instrucciones…» |
+| C1 | El cupo cuenta y se ve | Cada pregunta con IA cuenta una; el saldo llega en todas las respuestas, también en el `GET` | ✅ | IA simulada | «servidor: cada pregunta cuenta una…»; «conversación: lee el cupo de todas las respuestas…» |
+| C2 | Cupo agotado | `429 cupo` sin llamar a Claude; responde la biblioteca, sin muro; una creación queda en pausa, no fallida | ✅ | IA simulada | «servidor: … agotado, 429 «cupo»…»; «trabajos: el cupo diario de creaciones agotado es una pausa…» |
+| C3 | Creaciones | Planificar cobra la creación una vez; redactar ese plan o reanudar no cobra otra; cancelar a mitad no la devuelve | ✅ | IA simulada | «servidor: planificar una lección cobra la creación…»; «servidor: redactar un plan que no se cobró…»; «servidor: cancelar una creación a mitad (o un 5xx)…» |
+| C4 | Renovación | A medianoche de America/Tijuana, no en UTC | ✅ | Automática | «cupo: se renueva a medianoche en la zona del servidor…» |
+| C5 | Reinicio | Con `ANATO3D_CUPO_SAL`, los contadores siguen; sin ella, empiezan de nuevo y el registro lo dice; el archivo no guarda ni el identificador ni la IP | ✅ local · ⏳ volumen | Automática · Alojamiento público pendiente | «cupo: persiste tras reiniciar (con ANATO3D_CUPO_SAL)…»; «cupo: la sal del HMAC no está en el archivo…». En el volumen de Fly: sin probar |
+| C6 | Otro identificador o sin cabecera | Sin cabecera cuenta la IP; borrar los datos crea otro identificador (su cupo empieza de cero), pero el tope por IP sigue; una IPv6 cuenta por su /64 | ✅ | Automática | «servidor: sin cabecera (o con una inválida) cuenta la IP; el tope por IP actúa aunque cambie el dispositivo»; «IP: una IPv6 cuenta por su /64…» |
+| C7 | Dos procesos | No cuentan cada uno (cerrojo) | ✅ | Automática | «cupo: dos procesos con el mismo archivo no cuentan cada uno…» |
+| D1 | Mis datos | Las sesiones se exportan e importan (la activa llega pausada); el dispositivo y la memoria se ven y se borran, pero no se exportan; «Borrar mis datos» olvida el tema | ✅ | Automática | «mis datos: las sesiones se exportan e importan…»; ««Borrar mis datos» olvida también el tema que recuerda Neuri…» |
+| D2 | Textos nuevos | En español e inglés; alemán, francés e italiano, «próximamente» | ✅ | Automática | «textos nuevos de las sesiones, el cupo y el enfoque: en español e inglés…» |
+| R | Calidad real de la sesión con Haiku | Plan útil, explicaciones correctas | ⏳ | IA real pendiente | Falta la clave y el permiso de Carlos |
+
+## Lanzamiento ensayado con el paquete (11 nov 2026)
+
+**Qué se ensayó:**
+- el paquete de producción (`npm run paquete` → `build/paquete`), arrancado con `node servidor.mjs`, fuera de Vite y sin el árbol de desarrollo;
+- en el navegador del panel, en escritorio y en vista móvil (375 × 812), en el puerto 5290;
+- con el SDK real de Anthropic, pero apuntando al proveedor simulado de este Mac (`scripts/proveedor-simulado.mjs`): no salió nada a Anthropic ni se gastó nada.
+
+Cómo activarlo de verdad: `activacion.md`. Alojamiento: `despliegue.md`.
+
+**Entornos (no se presentan unos como otros):**
+
+| Entorno | Qué quiere decir |
+| --- | --- |
+| **Paquete probado localmente** | El paquete en este Mac, en una carpeta limpia, sin `build/` ni el código de desarrollo |
+| **Proveedor simulado** | El SDK real habla HTTP (y flujo SSE) con un servidor local de respuestas fijas. El servicio dice «simulado», nunca «comprobada» |
+| **Alojamiento público pendiente** | Necesita la cuenta y el despliegue en Fly.io (o el que elija Carlos) |
+| **IA real pendiente** | Necesita la clave y el permiso de Carlos para gastar |
+
+Ni una clave configurada ni una respuesta simulada hacen que una instalación pase a «comprobada». Solo lo hace una llamada real a Claude que sale bien.
+
+| # | Escenario | Resultado | Entorno | Evidencia |
+| ---: | --- | --- | --- | --- |
+| 1 | Arranque en una carpeta limpia: sirve la web | ✅ | Paquete probado localmente | **Automática:** «paquete: arranca en una carpeta limpia…» |
+| 2 | Lo que no se expone y lo que no se vuelve a bajar | ✅ | Paquete probado localmente | **Automática:** misma prueba. No sirve recursos, manifiesto, servidor, datos ni plantillas (404, también con `..` codificado). Revalida con ETag (`304`) |
+| 3 | Creación en flujo: varias líneas NDJSON antes del final; llega la lección con sus citas | ✅ | Paquete + proveedor simulado | **Automática:** «paquete con el proveedor simulado: la creación llega línea a línea…» |
+| 4 | Una clave centinela no aparece en los archivos públicos, las respuestas, los registros ni los datos | ✅ | Paquete + proveedor simulado | **Automática:** misma prueba |
+| 5 | Desconectar a mitad y volver al mismo trabajo: no arranca otra generación | ✅ | Paquete + proveedor simulado | **Automática:** «paquete: desconectar a mitad y volver a conectar…» |
+| 6 | Reinicio con una reserva activa: el saldo no vuelve y nada se cobra dos veces por sí solo | ✅ | Paquete + proveedor simulado | **Automática:** «paquete: un reinicio con una reserva activa…» |
+| 7 | IA apagada o almacén del tope roto: la web sigue | ✅ | Paquete + proveedor simulado | **Automática:** misma prueba |
+| 8 | Sin las páginas citables, o alteradas: Neuri no explica con citas ni crea, y lo dice | ✅ | Paquete probado localmente | **Automática:** «paquete sin el corpus completo o alterado…» |
+| 9 | Sin clave: el buscador | ✅ | Paquete probado localmente | **Automática:** misma prueba |
+| 10 | Los reportes van por su camino (carpeta de datos, sin la IP) y su cola no se puede leer desde la web | ✅ | Paquete probado localmente | **Automática:** «paquete: los reportes van por su camino…» |
+| 11 | La dirección del cliente solo sale del proxy configurado, y con su secreto | ✅ | Paquete probado localmente | **Automática:** «configuración: la dirección del cliente…» |
+| 12 | El Worker de Cloudflare reenvía `/api/*` con el secreto y sustituye las cabeceras que mande el navegador | ✅ | Paquete probado localmente | **Automática:** «Worker de Cloudflare (plantilla)…». Plantilla sin probar en Cloudflare |
+| 13 | La simulación solo se activa en las pruebas o en el ensayo local | ✅ | Paquete probado localmente | Solo con `ANTHROPIC_BASE_URL` del servidor, y solo en `localhost`; con otra dirección, el servidor no arranca (**Automática:** «configuración…»). El navegador no tiene ninguna opción para activarla |
+| 14 | Búsqueda local con la frase de Carlos: «Quiero aprender la anatomia del órgano reproductor femenino» | ✅ | Paquete probado localmente | **Navegador:** «Sistema reproductor femenino», «Resuelto en tu dispositivo, sin IA», 0 peticiones a la API |
+| 15 | Seguimiento de una recomendación | ✅ | Paquete probado localmente | **Navegador:** «músculos del brazo» y después «el segundo», resuelto en local con las tarjetas recién mostradas |
+| 16 | Explicación con fuentes | ✅ | Paquete + proveedor simulado | **Navegador:** «¿Qué forman los huesos nasales? Explícamelo.» → explicación con 2 citas comprobadas por el servidor |
+| 17 | Creación | ✅ | Paquete + proveedor simulado | **Navegador:** «Créame una lección de los huesos de la nariz» → guardada en «Mis lecciones», con 4 pasos, 4 preguntas y 4 citas |
+| 18 | Adaptación | ✅ | Paquete + proveedor simulado | **Navegador:** «Adapta la lección de la nariz para el examen» → lección adaptada a partir de `cab-nariz` |
+| 19 | Curso de más de cuatro unidades | ✅ | Paquete + proveedor simulado | **Navegador:** «Créame un curso del miembro superior». La unidad 1 queda lista. Con la cuota llena (4 creaciones por hora), la quinta queda «En pausa… sigue a las 20:49» y la cola espera. Tras recargar, la pausa se conserva sin reintentar sola, y «Seguir ahora» la retoma |
+| 20 | Cancelación | ✅ | Paquete + proveedor simulado | **Navegador:** la unidad 2, cancelada a mitad, sigue pendiente hasta que la persona decida. Su reserva quedó «incierta» y cuenta entera (`npm run presupuesto`) |
+| 21 | Límite de gasto y continuación local | ✅ | Paquete probado localmente | **Navegador**, con el interruptor `IA-APAGADA`: «Explícame cómo funciona el manguito rotador» llega al servidor, que responde «límite» sin llamar a Claude. Neuri contesta con el buscador («Músculos del hombro: deltoides y manguito rotador») y la cabecera pasa a «Límite de gasto con IA alcanzado». Lo siguiente se resuelve en local, sin peticiones |
+| 22 | Los estados visibles, en cinco idiomas | ✅ | Paquete + proveedor simulado | **Navegador (11 nov):** es, en, fr, de e it. Desde el 12 nov solo se eligen español e inglés |
+| 23 | Vista móvil (375 × 812) | ✅ | Paquete probado localmente | **Navegador:** sin desbordamiento horizontal; carga el modelo ligero (`male.ligero.glb`) |
+| 24 | Prueba real mínima, ensayada | ✅ | Proveedor simulado | **Automática:** «la prueba real mínima, ensayada con el proveedor simulado…». **A mano (11 nov):** 3 llamadas, 2 citas, flujo correcto, máximo admitido 0,1705 US$ (desde el 12 nov, 0,0123 US$ por el texto fijo por modo). Sin `--si-gastar` no envía nada |
+| 25 | `npm test`, `npm run check` y `npm run build` | ✅ | Este Mac | Resultado al principio de este documento |
+| 26 | Despliegue en Fly.io: una sola Machine con volumen, `/salud`, secretos | ⏳ | Alojamiento público pendiente | Plantillas en el paquete (`fly.toml`, `Dockerfile`), sin probar. Pasos: `activacion.md`, sección 4 |
+| 27 | El flujo atraviesa el alojamiento sin acumularse (una línea cada 15 s como mínimo) | ⏳ | Alojamiento público pendiente | `activacion.md`, sección 5, paso 4 |
+| 28 | IA real: Haiku 5.5 con la clave, explicación con fuentes, flujo y conciliación con `usage` | ⏳ | IA real pendiente | Preparada (`node scripts/prueba-minima.mjs --si-gastar`), sin ejecutar contra Anthropic |
+| 29 | Estado «comprobada» | ⏳ | IA real pendiente | Solo tras una llamada real que salga bien. El proveedor simulado da «simulado» (escenario 3) |
 
 ## Fallos encontrados al hacer estas pruebas (y corregidos)
 
@@ -131,4 +214,29 @@ Invitado → estudio → generación → evaluación → repaso → cuenta → c
 15. En «Mis lecciones», el apartado «En preparación» no se actualizaba mientras una creación avanzaba o terminaba: solo se repintaba la portada de «Estudiar».
 16. El título del plan de una creación salía a 12 px, porque una regla general de los títulos del panel lo pisaba.
 
-Los fallos 8 a 14 se encontraron al documentar y medir (paso 11), después de los recorridos de arriba. Los fallos 15 y 16, al hacer los recorridos por unidades (sección 14); afectaban también a las creaciones de antes.
+17. **El paquete imprimía la ayuda de `fuentes.mjs` al arrancar.** El servidor empaquetado incluía el bloque que ese script ejecuta cuando se llama solo. Ahora el script comprueba el nombre del archivo antes de ejecutarlo.
+18. **En el paquete, una unidad del curso no pasaba la validación.** Neuri le añadía citas de TeachMeAnatomy, unas páginas que el paquete no lleva y que, por tanto, no se pueden comprobar. Ahora solo añade citas comprobables, con prueba.
+19. **Los modelos 3D no llevaban etiqueta (ETag) en el servidor de producción.** Se habrían vuelto a descargar enteros cada hora. Ahora, si no cambiaron, la respuesta es `304`, con prueba.
+
+**Revisión adversarial de las sesiones y el cupo (12 nov 2026).** 13 fallos reales, demostrados y arreglados, cada uno con su prueba.
+
+En el servidor (5):
+
+20. **El cupo se devolvía tras cancelar.** Una creación cancelada a mitad, que el tope de gasto cobra entera, devolvía la unidad del cupo. Ahora cuenta.
+21. **Planificar no cobraba.** Ahora planificar una lección o una unidad cobra la creación, ligada a su trabajo y a su plan.
+22. **IPv6.** Ahora una IPv6 cuenta por su /64, y una IPv4 dentro de IPv6, como la IPv4 (en el cupo, el limitador y el servidor).
+23. **La sal del HMAC estaba en el archivo del cupo.** Ahora sale de la variable `ANATO3D_CUPO_SAL` (versión 2 del archivo).
+24. **Inyección por el título.** El título de la última sesión llegaba a las instrucciones. Ahora al modelo solo le llegan sus cifras, y el texto de la persona va en su mensaje como dato.
+
+En la app (8):
+
+25. **La pista revelaba el nombre** de la respuesta (también por el título del paso).
+26. **La ayuda se perdía al recargar:** el segundo intento empezaba otra vez «a la primera».
+27. **«Borrar mis datos» no olvidaba el tema** que recuerda Neuri.
+28. **La ayuda contaba como dominio:** lo acertado con pista o en el segundo intento demostraba la habilidad.
+29. **Dos sesiones activas** al avanzar o saltar una planificada.
+30. **Frases de control:** pausar, parar o terminar una sesión, o seguirla con un mensaje largo, no se resolvían bien en la app.
+31. **Almacenamiento lleno:** una sesión que no se podía guardar se perdía en silencio.
+32. **Poda:** al pasar de 20 sesiones, ahora se quitan por orden (planificadas sin empezar, finalizadas y, si hace falta, pausadas), nunca la activa ni la nueva, y se avisa de lo quitado.
+
+Los fallos 8 a 14 se encontraron al documentar y medir (paso 11), después de los recorridos de arriba. Los fallos 15 y 16, al hacer los recorridos por unidades (sección 14); afectaban también a las creaciones de antes. Los fallos 17 a 19, al ensayar el lanzamiento con el paquete (11 nov). Los fallos 20 a 32, en la revisión adversarial del 12 nov.

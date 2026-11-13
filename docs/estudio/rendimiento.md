@@ -71,8 +71,8 @@ Fijados al medir, para vigilar que no empeore: no hizo falta optimizar nada, por
 | --- | --- | ---: | ---: |
 | `index` (visor, interfaz y textos en cinco idiomas) | Al entrar | 1504,1 kB | 421,2 kB |
 | Estilos | Al entrar | 80,7 kB | 15,1 kB |
-| `biblioteca` (vistas de «Estudiar» y Neuri) | Al abrir «Estudiar» | 225,9 kB | 67,1 kB |
-| `catalogo` (fichas de las 71 lecciones, sin los pasos) | Al abrir «Estudiar» | 296,2 kB | 53,8 kB |
+| `biblioteca` (vistas de «Estudiar» y Neuri) | Al abrir «Estudiar» | 270,9 kB *[Histórico: 225,9]* | 78,7 kB *[Histórico: 67,1]* |
+| `catalogo` (fichas de las 84 lecciones, sin los pasos) | Al abrir «Estudiar» | 388,2 kB *[Histórico: 296,2 con 71]* | 68,0 kB *[Histórico: 53,8]* |
 | Una lección (69 archivos, uno por lección) | Al abrirla | 7,8–40,3 kB; mediana 19,3 kB | ≈ 5 kB de mediana |
 
 - **Las lecciones de la biblioteca** suman 1308,7 kB (unos 380 kB con gzip), pero solo se descarga la que se abre.
@@ -87,16 +87,19 @@ Fijados al medir, para vigilar que no empeore: no hizo falta optimizar nada, por
 | --- | --- | ---: | ---: |
 | Orientar (cada mensaje) | `low` | 3000 | 30 s |
 | Comprobar una explicación con citas | `low` | 2000 | 30 s |
+| Planificar una sesión de estudio (modo `sesion`, desde el 11 nov) | `low` | 2500 | 30 s |
 | Planificar una lección | `medium` | 8000 | 60 s |
 | Redactar o adaptar (en flujo) | `medium` | 32 000 | 240 s |
 | Comprobar las citas de la lección | `low` | 12 000 | 120 s |
 
-- **Reparaciones:** como mucho una ronda de corrección al planificar y otra al redactar. Si sigue habiendo errores, la lección no se entrega.
+- **Reparaciones:** como mucho una ronda de corrección al planificar y otra al redactar (y una al planificar una sesión). Si sigue habiendo errores, la lección no se entrega; una sesión la planifica la app sola.
 - **Si la respuesta llega cortada** (`max_tokens`), es un error «incompleta», nunca una lección.
 
 ### Entradas
 
-- **Conversación:** como mucho 12 turnos por petición y 500 caracteres por mensaje.
+- **Conversación:** como mucho 12 turnos por petición y 500 caracteres por mensaje (6 turnos en el modo `sesion`).
+- **Texto fijo en caché, por modo (medido el 12 nov, ≈ 3,7 caracteres por token):** Orientar, 24 347 caracteres (≈ 6 600 tokens: instrucciones y catálogo compacto); el resto, 7 125 (≈ 1 930: solo instrucciones) *[Histórico: ≈ 31 800 tokens, 117 721 caracteres, en todas las llamadas]*.
+- **Perfil de aprendizaje:** ≈ 250 tokens el más lleno; la prueba exige 350 como mucho.
 - **Tamaño:** 64 kB por petición; 200 kB más si viaja una lección propia que se adapta.
 - **Lo que se recorta** al llegar al servidor: el motivo de cada recomendación (240 caracteres), las respuestas de Neuri (1200), los campos cortos (160) y los largos (600).
 
@@ -110,6 +113,8 @@ Fijados al medir, para vigilar que no empeore: no hizo falta optimizar nada, por
 
 Los límites viven en la memoria del servidor, así que con varias instancias no son globales: ver la guía operativa. Mientras tanto, el tope real del gasto es el **límite mensual de la cuenta de Anthropic**.
 
+**Cupo diario (desde el 12 nov, durable, en archivo):** 30 preguntas con IA y 3 creaciones por dispositivo y día; 300 y 30 por IP. Se renueva a medianoche de America/Tijuana. Lo que resuelve la app no cuenta (`neuri.md`, «Cupo diario por dispositivo»).
+
 ### Plazos y esperas de la app
 
 **Plazos:**
@@ -119,6 +124,7 @@ Los límites viven en la memoria del servidor, así que con varias instancias no
 | Comprobar si hay IA | 12 s |
 | Una respuesta de la conversación | 75 s |
 | Planificar (una lección o un recorrido) | 150 s |
+| Planificar una sesión de estudio | 75 s |
 | Conectarse a una creación | 30 s |
 | Silencio en una creación en curso | 60 s |
 
@@ -138,13 +144,14 @@ Mientras trabaja, el servidor manda una señal de vida cada 15 s.
 | Qué | Límite |
 | --- | --- |
 | Mis lecciones | 40 lecciones y 3 MB |
+| Sesiones de estudio | 20 (unos 1,4 KB cada una; 20, unos 28 KB) |
 | Respuestas registradas | Las 600 últimas |
 | Estadísticas de uso | Los 300 últimos eventos |
 | Reportes de problemas | Los 100 últimos |
 
 ## Coste estimado (no facturado)
 
-**Precio comprobado el 9 de noviembre de 2026** en la referencia de modelos de Anthropic: Claude Haiku 5.5 cuesta **0,10 US$ por millón de tokens de entrada y 0,50 US$ por millón de salida**, con peticiones de hasta 100 000 tokens. Las de Neuri quedan por debajo: las instrucciones fijas y el catálogo pesan unos 24 000 tokens y van en caché.
+**Precio comprobado el 9 de noviembre de 2026** en la referencia de modelos de Anthropic: Claude Haiku 5.5 cuesta **0,10 US$ por millón de tokens de entrada y 0,50 US$ por millón de salida**, con peticiones de hasta 100 000 tokens. Las de Neuri quedan por debajo: el texto fijo va en caché y, desde el 12 nov, pesa unos 6 600 tokens en Orientar y unos 1 930 en el resto *[Histórico: unos 24 000 tokens el 9 nov y unos 31 800 el 11 nov, en todas las llamadas]*.
 
 ### Una creación
 
@@ -169,7 +176,7 @@ Mientras trabaja, el servidor manda una señal de vida cada 15 s.
 
 ### Un mensaje de conversación
 
-Unos 0,002 US$ con la caché caliente, y unos 0,005 US$ si lleva más de cinco minutos sin uso (estimación).
+Desde el 12 nov, unos 0,0013 US$ con la caché caliente y unos 0,0021 US$ si lleva más de cinco minutos sin uso (estimación con los perfiles de `npm run coste`) *[Histórico: 0,002 y 0,005 US$]*. Una sesión de estudio con la IA, unos 0,001 US$; sin IA, nada.
 
 ### Cómo saber el coste real
 
