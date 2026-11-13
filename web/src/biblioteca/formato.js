@@ -69,7 +69,8 @@ export const TIPOS_PASO = ['orientacion', 'explicacion', 'exploracion', 'relacio
 export const TIPOS_PREGUNTA = ['identificar', 'localizar', 'relacion', 'funcion', 'comparacion', 'secuencia'];
 export const CAMARAS = ['anterior', 'posterior', 'lateral', 'medial', 'superior', 'inferior', 'anterolateral', 'posterolateral'];
 export const TIPOS_ESTRUCTURA = ['hueso', 'diente', 'cartilago', 'ligamento', 'capsula', 'bolsa', 'vaina', 'fascia', 'musculo',
-  'tendon', 'arteria', 'vena', 'corazon', 'nervio', 'ganglio', 'snc', 'nodo', 'organo', 'glandula', 'piel'];
+  'tendon', 'arteria', 'vena', 'corazon', 'nervio', 'ganglio', 'snc', 'nodo', 'linfatico', 'organo', 'glandula', 'piel'];
+// «nodo»: nodo (ganglio) linfático; «linfatico»: vaso, tronco o conducto linfático; «ganglio»: ganglio nervioso.
 // Verbos con los que empieza un objetivo observable (se puede comprobar si se cumple), en el idioma de la lección: las
 // de la biblioteca están en español; las que crea Neuri, en el de la conversación. En alemán el verbo puede ir al final
 // («Die Rotatorenmanschette beschreiben»), así que basta con que esté.

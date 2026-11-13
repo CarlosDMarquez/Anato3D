@@ -175,7 +175,8 @@ function pista(texto, cita) {
 }
 
 // ── Línea de órdenes ──
-if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname)) {
+// (También el nombre: dentro del paquete del servidor, este módulo va en servidor.mjs y no es la orden.)
+if (process.argv[1] && path.basename(process.argv[1]) === 'fuentes.mjs' && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname)) {
   const [orden, ...args] = process.argv.slice(2);
   if (orden === 'bajar') {
     const registro = leerRegistro();

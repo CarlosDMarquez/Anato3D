@@ -264,7 +264,7 @@ function tipoDe(x) {
   if (s === 'arterial') return sub === 'heart' && t !== 'artery' ? 'corazon' : 'arteria';
   if (s === 'venous') return 'vena';
   if (s === 'nervous') return sub === 'cns' ? 'snc' : sub === 'special_senses' ? 'organo' : t === 'ganglion' ? 'ganglio' : 'nervio';
-  if (s === 'lymphatic') return sub === 'nodes' ? 'nodo' : 'organo';
+  if (s === 'lymphatic') return sub === 'nodes' ? 'nodo' : sub === 'vessels' || t === 'lymph_vessel' ? 'linfatico' : 'organo';
   if (s === 'endocrine') return 'glandula';
   if (s === 'integumentary') return 'piel';
   if (s === 'special_senses') return 'organo';

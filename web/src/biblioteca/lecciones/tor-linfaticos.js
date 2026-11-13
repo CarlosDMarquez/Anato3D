@@ -3,14 +3,17 @@
 // fuentes describen bien los nodos de la pared (paraesternales, intercostales y diafragmáticos) y los del pulmón y la
 // tráquea; de los demás grupos del mediastino (yuxtaesofágicos, pericárdicos, prevertebrales, braquiocefálicos y los
 // nodos del arco de la ácigos y del ligamento arterioso) solo hay fuentes generales: la lección dice dónde están en el
-// modelo, que es junto a la estructura que les da nombre. El modelo no tiene el conducto torácico, el conducto
-// linfático derecho ni los troncos linfáticos: se explican sin mostrarlos.
+// modelo, que es junto a la estructura que les da nombre. Versión 2 (2026-11-12): el modelo ya tiene el conducto
+// torácico, el conducto linfático derecho y los troncos broncomediastínicos (piezas generadas, trazado esquemático,
+// variante clásica: docs/hitos/09-sistema-linfatico.md); se enseñan en 3D en el mediastino posterior.
 import { leccion, W, T, GUIA, MODELO } from '../formato.js';
 
 const LIS = 'List_of_lymph_nodes_of_the_human_body';
 const MED = 'thorax/areas/middle-mediastinum';
 const POS = 'thorax/areas/posterior-mediastinum';
+const TD = 'Thoracic_duct';
 const nodos = (nombre, piezas, lado = 'impar', extra = {}) => ({ nombre, piezas, lado, papel: 'nucleo', tipo: 'nodo', ...extra });
+const linfatico = (nombre, piezas, lado = 'impar', extra = {}) => ({ nombre, piezas, lado, papel: 'nucleo', tipo: 'linfatico', ...extra });
 const contexto = (nombre, piezas, tipo, lado = 'impar') => ({ nombre, piezas, lado, papel: 'contexto', tipo });
 const COSTILLAS = Array.from({ length: 12 }, (_, i) => `Rib_${i + 1}`);
 const TORACICAS = Array.from({ length: 12 }, (_, i) => `Vertebra_T${i + 1}`);
@@ -23,9 +26,9 @@ const CORAZON = ['corazon'];
 
 export default leccion({
   id: 'tor-linfaticos',
-  version: 1,
+  version: 2,
   titulo: 'Nodos linfáticos del tórax',
-  resumen: 'Los nodos de la pared del tórax (paraesternales, intercostales y diafragmáticos), el camino de la linfa del pulmón hasta los nodos traqueobronquiales y paratraqueales, los demás grupos del mediastino, adónde va la linfa por el conducto torácico, el conducto linfático derecho y los troncos broncomediastínicos, y por qué estos nodos importan en las infecciones y los tumores.',
+  resumen: 'Los nodos de la pared del tórax (paraesternales, intercostales y diafragmáticos), el camino de la linfa del pulmón hasta los nodos traqueobronquiales y paratraqueales, los demás grupos del mediastino, el recorrido del conducto torácico por el mediastino posterior, adónde va la linfa por él, por el conducto linfático derecho y por los troncos broncomediastínicos, y por qué estos nodos importan en las infecciones y los tumores.',
   lugares: [['torax', 'mediastino']],
   sistemas: ['linfatico'],
   formato: 'topografia',
@@ -38,7 +41,7 @@ export default leccion({
     'Localizar los nodos de la pared del tórax y decir qué drena cada grupo.',
     'Seguir el camino de la linfa del pulmón hasta los nodos traqueobronquiales y paratraqueales.',
     'Identificar los demás grupos de nodos del mediastino por la estructura que tienen al lado.',
-    'Explicar adónde va la linfa del tórax: conducto torácico, conducto linfático derecho y troncos broncomediastínicos.',
+    'Seguir el conducto torácico por el mediastino posterior y explicar adónde va la linfa del tórax: conducto torácico, conducto linfático derecho y troncos broncomediastínicos.',
     'Relacionar los nodos del tórax con la extensión de los tumores.',
   ],
   estructuras: {
@@ -55,6 +58,10 @@ export default leccion({
     'nodos-braquiocefalicos': nodos('Nodos braquiocefálicos', ['Brachiocephalic_nodes']),
     'nodo-arco-acigos': nodos('Nodo del arco de la vena ácigos', ['Node_of_arch_of_azygos_vein']),
     'nodo-ligamento-arterioso': nodos('Nodo del ligamento arterioso', ['Node_of_ligamentum_arteriosum']),
+    'conducto-toracico': linfatico('Conducto torácico', ['Thoracic_duct'], 'impar', { confusiones: ['Vena ácigos', 'Vena hemiácigos'] }),
+    'troncos-broncomediastinicos': linfatico('Troncos broncomediastínicos', ['Bronchomediastinal_trunk'], 'ambos'),
+    'conducto-derecho': linfatico('Conducto linfático derecho', ['Right_lymphatic_duct']),
+    'colectores-mediastino': { ...linfatico('Colectores del mediastino (esquemáticos)', ['Lymphatic_vessels_of_mediastinum']), papel: 'contexto' },
     traquea: contexto('Tráquea', ['Trachea'], 'organo'),
     bronquios: contexto('Bronquios principales', ['Right_main_bronchus', 'Left_main_bronchus'], 'organo'),
     esofago: contexto('Esófago', ['Oesophagus'], 'organo'),
@@ -65,6 +72,8 @@ export default leccion({
     'toracica-interna': contexto('Arteria torácica interna', ['Internal_thoracic_artery'], 'arteria', 'bilateral'),
     'intercostales-arterias': contexto('Arterias intercostales posteriores', ['Posterior_intercostal_arteries'], 'arteria', 'bilateral'),
     braquiocefalicas: contexto('Venas braquiocefálicas', ['Right_brachiocephalic_vein', 'Left_brachiocephalic_vein'], 'vena'),
+    subclavias: contexto('Venas subclavias', ['Left_subclavian_vein', 'Right_subclavian_vein'], 'vena'),
+    yugulares: contexto('Venas yugulares internas', ['Internal_jugular_vein'], 'vena', 'ambos'),
     'cava-superior': contexto('Vena cava superior', ['Superior_vena_cava'], 'vena'),
     acigos: contexto('Vena ácigos', ['Azygos_vein'], 'vena'),
     diafragma: contexto('Diafragma', ['Diaphragm'], 'musculo'),
@@ -128,19 +137,34 @@ export default leccion({
       comprobar: 'rel-esofago',
     },
     {
+      id: 'recorrido', tipo: 'relaciones', titulo: 'El conducto torácico en el mediastino posterior',
+      texto: [
+        ['El conducto torácico cruza el diafragma por el hiato aórtico y sube por el mediastino posterior entre la aorta torácica, a su izquierda, y la ácigos, a su derecha.', W(TD, 'The thoracic duct traverses the diaphragm at the aortic hiatus to enter the posterior mediastinum.'), W(TD, 'It ascends the posterior mediastinum between the descending thoracic aorta (to its left) and the azygos vein (to its right)')],
+        ['A la altura de T7 está detrás del esófago; hacia T5 cruza la línea media hacia la izquierda y sigue por detrás de la aorta y a la izquierda del esófago.', W(TD, 'is situated posterior to the esophagus at the T7 vertebral level'), W(TD, 'It crosses the midline to the left side at about the T5 level'), W(TD, 'It then passes posterior to the aorta, and to the left of the oesophagus.')],
+        ['En el mediastino superior queda detrás y a la izquierda del esófago, y sube hasta la raíz del cuello, a la altura de C7.', W(TD, 'In the superior mediastinum, the thoracic duct is situated posterior to and to the left of the esophagus.'), W(TD, 'as high up as the C7 vertebral level')],
+        ['En el modelo es una pieza generada de trazado esquemático, y el cruce queda algo más bajo (T6–T5 en el hombre, T8–T7 en la mujer).', MODELO],
+        ['Míralo desde atrás con las vértebras translúcidas y síguelo de abajo arriba.', GUIA],
+      ],
+      vista: { ver: ['conducto-toracico'], contexto: ['aorta-toracica', 'acigos', 'esofago'], fantasma: ['vertebras', 'diafragma'], camara: 'posterior' },
+      actividad: { tipo: 'localizar', estructura: 'conducto-toracico', texto: 'Toca el conducto que sube entre la aorta y la ácigos.' },
+      comprobar: 'rel-recorrido-conducto',
+    },
+    {
       id: 'conductos', tipo: 'funcion', titulo: 'Adónde va la linfa',
       texto: [
         ['La linfa de los nodos traqueobronquiales sube por la tráquea y forma los troncos broncomediastínicos derecho e izquierdo.', W('Tracheobronchial_lymph_nodes', 'Their efferent vessels ascend upon the trachea and unite with efferents of the internal mammary and anterior mediastinal glands to form the right and left bronchomediastinal trunks.')],
-        ['El conducto torácico, el mayor de los dos conductos linfáticos, recoge la linfa de casi todo el cuerpo salvo el lado derecho del tórax, el brazo derecho y el lado derecho de la cabeza y el cuello.', W('Thoracic_duct', 'is the larger of the two lymph ducts of the lymphatic system'), W('Thoracic_duct', 'It also collects most of the lymph in the body other than from the right thorax, arm, head, and neck (which are drained by the right lymphatic duct).')],
-        ['Sube por el mediastino posterior entre la aorta, a su izquierda, y la ácigos, a su derecha, por detrás del esófago, y vierte la linfa a la sangre en el ángulo venoso.', W('Thoracic_duct', 'It ascends the posterior mediastinum between the descending thoracic aorta (to its left) and the azygos vein (to its right), and is situated posterior to the esophagus at the T7 vertebral level.'), W('Thoracic_duct', 'to drain into the systemic (blood) circulation at the venous angle.')],
-        ['El modelo no tiene el conducto torácico, el conducto linfático derecho ni los troncos linfáticos.', MODELO],
+        ['El conducto torácico, el mayor de los dos conductos linfáticos, recoge la linfa de casi todo el cuerpo salvo el lado derecho del tórax, el brazo derecho y el lado derecho de la cabeza y el cuello.', W(TD, 'is the larger of the two lymph ducts of the lymphatic system'), W(TD, 'It also collects most of the lymph in the body other than from the right thorax, arm, head, and neck (which are drained by the right lymphatic duct).')],
+        ['Los dos conductos vierten la linfa en el ángulo venoso: el torácico en el izquierdo y el linfático derecho en el derecho.', W('Venous_angle', 'The thoracic duct drains at the left venous angle, and the right lymphatic duct drains at the right venous angle.')],
+        ['En el modelo, el tronco broncomediastínico izquierdo acaba en el final del conducto torácico y el derecho se une a los otros dos troncos derechos en un conducto linfático derecho corto: es una variante elegida para enseñar.', MODELO],
       ],
       detalle: [
+        ['Lo más frecuente es que cada tronco broncomediastínico se abra por separado en la unión de la yugular interna y la subclavia de su lado.', W('Bronchomediastinal_trunk', 'more frequently, they open independently into the junction of the internal jugular vein and subclavian veins on their respective sides.')],
         ['Los nodos intercostales de los espacios superiores izquierdos van al conducto torácico; los derechos, al conducto linfático derecho.', W('Intercostal_lymph_nodes', 'The efferents of the glands in the upper spaces of the left side end in the thoracic duct; those of the corresponding right spaces, in the right lymphatic duct.')],
         ['En algunas personas, el conducto linfático derecho drena también el lóbulo inferior del pulmón izquierdo.', W('Right_lymphatic_duct', 'also, in some individuals, the lower lobe of the left lung.')],
-        ['Si el conducto torácico se rompe, la linfa inunda la cavidad pleural: es el quilotórax.', W('Thoracic_duct', 'When the duct ruptures, the resulting flood of liquid into the pleural cavity is known as chylothorax.')],
+        ['Si el conducto torácico se rompe, la linfa inunda la cavidad pleural: es el quilotórax.', W(TD, 'When the duct ruptures, the resulting flood of liquid into the pleural cavity is known as chylothorax.')],
       ],
-      vista: { ver: ['nodos-traqueobronquiales-superiores', 'nodos-paratraqueales', 'nodos-yuxtaesofagicos'], contexto: ['traquea', 'esofago', 'aorta-toracica', 'acigos', 'braquiocefalicas'], fantasma: ['vertebras'], camara: 'posterolateral', lado: 'R' },
+      vista: { ver: ['troncos-broncomediastinicos', 'conducto-derecho', 'conducto-toracico'], contexto: ['traquea', 'braquiocefalicas', 'subclavias', 'yugulares'], fantasma: PULMONES, camara: 'anterior' },
+      actividad: { tipo: 'comparar', estructuras: ['troncos-broncomediastinicos', 'conducto-derecho', 'conducto-toracico'], texto: 'Alterna los troncos broncomediastínicos y los dos conductos: mira dónde acaba cada uno.' },
       comprobar: 'rel-conducto-toracico',
     },
     {
@@ -158,7 +182,7 @@ export default leccion({
       texto: [
         ['En la pared: paraesternales junto a la torácica interna, intercostales por detrás y diafragmáticos sobre el diafragma.', W('Parasternal_lymph_nodes', 'by the side of the internal thoracic artery.'), W('Intercostal_lymph_nodes', 'occupy the posterior parts of the intercostal spaces'), W('Superior_diaphragmatic_lymph_nodes', 'lie on the thoracic aspect of the diaphragm')],
         ['La linfa del pulmón pasa del pulmón al hilio y a los nodos de la tráquea, y sigue por los troncos broncomediastínicos.', W(LIS, 'to the hilar lymph nodes'), W('Tracheobronchial_lymph_nodes', 'to form the right and left bronchomediastinal trunks.')],
-        ['El conducto torácico recoge casi toda la linfa del cuerpo; el linfático derecho, la del cuadrante superior derecho.', W('Thoracic_duct', 'It also collects most of the lymph in the body other than from the right thorax, arm, head, and neck'), W('Right_lymphatic_duct', 'is an important lymphatic vessel that drains the right upper quadrant of the human body.')],
+        ['El conducto torácico sube entre la aorta y la ácigos, detrás del esófago, y cruza a la izquierda hacia T5; recoge casi toda la linfa del cuerpo, y el linfático derecho, la del cuadrante superior derecho.', W(TD, 'It ascends the posterior mediastinum between the descending thoracic aorta (to its left) and the azygos vein (to its right)'), W(TD, 'It crosses the midline to the left side at about the T5 level'), W('Thoracic_duct', 'It also collects most of the lymph in the body other than from the right thorax, arm, head, and neck'), W('Right_lymphatic_duct', 'is an important lymphatic vessel that drains the right upper quadrant of the human body.')],
       ],
     },
   ],
@@ -241,15 +265,25 @@ export default leccion({
       evidencia: [W('Thoracic_duct', 'It also collects most of the lymph in the body other than from the right thorax, arm, head, and neck (which are drained by the right lymphatic duct).')],
     },
     {
-      id: 'rel-recorrido-conducto', tipo: 'relacion', objetivo: 3, paso: 'conductos', estructuras: ['aorta-toracica', 'acigos'],
+      id: 'rel-recorrido-conducto', tipo: 'relacion', objetivo: 3, paso: 'recorrido', estructuras: ['conducto-toracico', 'aorta-toracica', 'acigos'],
       enunciado: '¿Entre qué dos vasos sube el conducto torácico por el mediastino posterior?',
       correcta: 'Entre la aorta torácica, a su izquierda, y la ácigos, a su derecha',
       distractores: ['Entre la cava superior y la aorta ascendente', 'Entre las dos venas braquiocefálicas', 'Entre la aorta, a su derecha, y la hemiácigos, a su izquierda'],
       explicacion: 'Sube por el mediastino posterior entre la aorta torácica y la ácigos, por detrás del esófago a la altura de T7, y termina en el ángulo venoso.',
       evidencia: [W('Thoracic_duct', 'It ascends the posterior mediastinum between the descending thoracic aorta (to its left) and the azygos vein (to its right), and is situated posterior to the esophagus at the T7 vertebral level.')],
     },
+    { id: 'id-conducto-toracico', tipo: 'identificar', estructura: 'conducto-toracico', objetivo: 3, paso: 'recorrido' },
+    { id: 'loc-conducto-toracico', tipo: 'localizar', estructura: 'conducto-toracico', candidatas: ['nodos-prevertebrales', 'nodos-yuxtaesofagicos', 'troncos-broncomediastinicos'], objetivo: 3, paso: 'recorrido' },
+    { id: 'id-troncos-broncomediastinicos', tipo: 'identificar', estructura: 'troncos-broncomediastinicos', objetivo: 3, paso: 'conductos' },
     {
-      id: 'rel-troncos', tipo: 'relacion', objetivo: 3, paso: 'conductos', estructuras: ['nodos-traqueobronquiales-superiores'],
+      id: 'rel-cruce', tipo: 'relacion', objetivo: 3, paso: 'recorrido', estructuras: ['conducto-toracico', 'esofago'],
+      enunciado: '¿Hacia qué nivel cruza el conducto torácico la línea media para pasar a la izquierda?',
+      correcta: 'Hacia la vértebra T5', distractores: ['En T12, al cruzar el hiato aórtico', 'En C7, en la raíz del cuello', 'En L2, junto a la cisterna del quilo'],
+      explicacion: 'Sube a la derecha de la línea media entre la aorta y la ácigos y cruza a la izquierda hacia T5; en el modelo el cruce queda algo más bajo, así que el nivel lo da la fuente, no la pieza.',
+      evidencia: [W(TD, 'It crosses the midline to the left side at about the T5 level, continuing to ascend.')],
+    },
+    {
+      id: 'rel-troncos', tipo: 'relacion', objetivo: 3, paso: 'conductos', estructuras: ['nodos-traqueobronquiales-superiores', 'troncos-broncomediastinicos'],
       enunciado: '¿Qué forman los vasos que salen de los nodos traqueobronquiales?',
       correcta: 'Los troncos broncomediastínicos derecho e izquierdo',
       distractores: ['El conducto torácico', 'La cisterna del quilo', 'Los troncos yugulares'],

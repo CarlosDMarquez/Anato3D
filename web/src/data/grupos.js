@@ -1,5 +1,7 @@
 // Regiones y agrupaciones (colecciones de Blender) que aparecen en la ruta jerárquica de la ficha.
 // Al tocar una, se selecciona el grupo completo.
+import { GRUPOS_LINF } from './linfatico/centrales.js';
+import { textoDe, frasesDe, evidenciasFrase } from './linfatico/formato.js';
 
 export const GRUPOS = {
   Skeletal_System: {
@@ -148,3 +150,10 @@ export const GRUPOS = {
     descripcion: 'Órganos especializados en captar estímulos: vista, oído, equilibrio, olfato y gusto.',
   },
 };
+
+// Grupos del sistema linfático (data/linfatico/centrales.js): la descripción se escribe frase a frase con sus fuentes;
+// aquí entra como texto seguido, con la lista de páginas que la respaldan (la ficha de grupo las enseña).
+for (const [id, g] of Object.entries(GRUPOS_LINF)) {
+  const paginas = [...new Set(frasesDe(g.descripcion).flatMap((fr) => evidenciasFrase(fr).filter((e) => e.f).map((e) => e.f)))];
+  GRUPOS[id] = { nombre: g.nombre, latin: g.latin, descripcion: textoDe(g.descripcion), fuentesLinf: paginas };
+}

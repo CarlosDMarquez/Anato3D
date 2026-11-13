@@ -1,5 +1,7 @@
 // Lección «El mediastino». Formato y evidencias: ../formato.js.
-import { leccion, T, GUIA, MODELO } from '../formato.js';
+// Versión 2 (2026-11-12): el modelo ya tiene el conducto torácico (pieza generada, trazado esquemático,
+// docs/hitos/09-sistema-linfatico.md): se muestra en el mediastino posterior entre la aorta y la ácigos.
+import { leccion, T, W, GUIA, MODELO } from '../formato.js';
 
 const SUP = 'thorax/areas/superior-mediastinum';
 const ANT = 'thorax/areas/anterior-mediastinum';
@@ -15,7 +17,7 @@ const PULMONES = ['pulmon-derecho', 'pulmon-izquierdo'];
 
 export default leccion({
   id: 'tor-mediastino',
-  version: 1,
+  version: 2,
   titulo: 'El mediastino',
   resumen: 'El compartimento central del tórax, entre las dos pleuras: cómo se divide (superior e inferior, y este en anterior, medio y posterior), qué hay en cada parte —los grandes vasos, el timo, la tráquea, el corazón, el esófago, la aorta torácica, la ácigos y los nervios— y cómo pasan por él las estructuras que van del cuello al abdomen.',
   lugares: [['torax', 'mediastino']],
@@ -47,6 +49,7 @@ export default leccion({
     esofago: impar('Esófago', ['Oesophagus'], 'organo'),
     vago: { nombre: 'Nervios vagos', piezas: ['Vagus_nerve_X'], lado: 'ambos', papel: 'nucleo', tipo: 'nervio' },
     'tronco-simpatico': { nombre: 'Troncos simpáticos', piezas: ['Sympathetic_trunk'], lado: 'ambos', papel: 'nucleo', tipo: 'nervio' },
+    'conducto-toracico': { ...impar('Conducto torácico', ['Thoracic_duct'], 'linfatico'), confusiones: ['Vena ácigos', 'Tronco simpático', 'Nervio vago'] },
     'atrio-derecho': contexto('Atrio derecho', ['Right_atrium'], 'corazon'),
     'ventriculo-derecho': contexto('Ventrículo derecho', ['Right_ventricle'], 'corazon'),
     'ventriculo-izquierdo': contexto('Ventrículo izquierdo', ['Left_ventricle'], 'corazon'),
@@ -90,7 +93,7 @@ export default leccion({
         ['Los frénicos (C3 a C5) entran por fuera de los grandes vasos.', T(SUP, 'the phrenic nerves (roots C3, C4 and C5) enter the superior mediastinum lateral to the great vessels.')],
       ],
       detalle: [
-        ['El modelo no tiene los nervios frénicos ni los laríngeos recurrentes como piezas propias, ni el conducto torácico.', MODELO],
+        ['El modelo no tiene los nervios frénicos ni los laríngeos recurrentes como piezas propias.', MODELO],
       ],
       vista: { ver: ['vago'], contexto: ['cayado', 'carotida-izquierda', 'subclavia-izquierda', 'cava-superior', 'traquea'], camara: 'anterolateral', lado: 'L' },
       actividad: { tipo: 'vistas', texto: 'Sigue el vago a cada lado.', vistas: [{ nombre: 'Lado izquierdo', camara: 'lateral' }, { nombre: 'De frente', camara: 'anterior' }] },
@@ -112,16 +115,20 @@ export default leccion({
         ['La aorta torácica continúa el cayado desde T4 y baja por la izquierda de las vértebras hasta el diafragma.', T(POS, 'The thoracic (descending) aorta is a continuation of the arch of the aorta, beginning at the lower edge of the T4 vertebra. It descends through the posterior mediastinum to the left of the vertebrae')],
         ['El esófago une la faringe con el estómago; empieza a la derecha y se desvía a la izquierda al bajar, rodeado por el plexo de los vagos.', T(POS, 'The oesophagus is a muscular tube that connects the pharynx to the stomach'), T(POS, 'Whilst initially positioned to the right, the oesophagus deviates to the left as it moves downwards.'), T(POS, 'The oesophageal plexus is a network of nerves surrounding the oesophagus as it descends, comprising of branches from the left and right vagus nerves.')],
         ['Ahí están también el conducto torácico, la vena ácigos y los troncos simpáticos, que van de la base del cráneo al cóccix.', T(POS, 'including the thoracic aorta, oesophagus, thoracic duct, azygos system of veins, and sympathetic trunks.'), T(POS, 'The sympathetic trunks are paired bundles of nerves that extend from the base of the skull to the coccyx.')],
+        ['El conducto torácico sube entre la aorta, a su izquierda, y la ácigos, a su derecha, por detrás del esófago.', W('Thoracic_duct', 'It ascends the posterior mediastinum between the descending thoracic aorta (to its left) and the azygos vein (to its right), and is situated posterior to the esophagus at the T7 vertebral level.')],
       ],
-      vista: { ver: ['aorta-toracica', 'esofago', 'acigos', 'tronco-simpatico'], contexto: ['toracicas', 'diafragma', 'vago'], camara: 'lateral', lado: 'R' },
-      actividad: { tipo: 'comparar', estructuras: ['aorta-toracica', 'esofago', 'acigos'], texto: 'Alterna: la aorta a la izquierda de la columna, el esófago delante y la ácigos a la derecha.' },
+      detalle: [
+        ['Hacia T5 cruza la línea media hacia la izquierda; en el modelo, que lo traza de forma esquemática, el cruce queda algo más bajo.', W('Thoracic_duct', 'It crosses the midline to the left side at about the T5 level'), MODELO],
+      ],
+      vista: { ver: ['aorta-toracica', 'esofago', 'acigos', 'tronco-simpatico', 'conducto-toracico'], contexto: ['toracicas', 'diafragma', 'vago'], camara: 'lateral', lado: 'R' },
+      actividad: { tipo: 'comparar', estructuras: ['aorta-toracica', 'esofago', 'acigos', 'conducto-toracico'], texto: 'Alterna: la aorta a la izquierda de la columna, el esófago delante, la ácigos a la derecha y, entre la aorta y la ácigos, el conducto torácico.' },
       comprobar: 'rel-esofago',
     },
     {
       id: 'sintesis', tipo: 'sintesis', titulo: 'En resumen',
       texto: [
         ['Superior (hasta el ángulo esternal y T4): cayado y sus ramas, cava superior, timo, tráquea y esófago.', T(SUP, 'The three major branches of the aortic arch arise within the superior mediastinum:')],
-        ['Inferior: anterior (casi vacío), medio (corazón y bronquios) y posterior (aorta torácica, esófago, ácigos).', T(ANT, 'The anterior mediastinum contains no major structures.'), T(MED, 'The middle mediastinum contains the heart'), T(POS, 'The posterior mediastinum contains a number of major organs, blood vessels and nerves.')],
+        ['Inferior: anterior (casi vacío), medio (corazón y bronquios) y posterior (aorta torácica, esófago, ácigos y conducto torácico).', T(ANT, 'The anterior mediastinum contains no major structures.'), T(MED, 'The middle mediastinum contains the heart'), T(POS, 'The posterior mediastinum contains a number of major organs, blood vessels and nerves.')],
       ],
     },
   ],
@@ -186,5 +193,14 @@ export default leccion({
     },
     { id: 'id-aorta-toracica', tipo: 'identificar', estructura: 'aorta-toracica', objetivo: 3, paso: 'posterior' },
     { id: 'id-acigos', tipo: 'identificar', estructura: 'acigos', objetivo: 3, paso: 'posterior' },
+    { id: 'id-conducto-toracico', tipo: 'identificar', estructura: 'conducto-toracico', objetivo: 3, paso: 'posterior' },
+    {
+      id: 'rel-conducto-toracico', tipo: 'relacion', objetivo: 3, paso: 'posterior', estructuras: ['conducto-toracico', 'aorta-toracica', 'acigos'],
+      enunciado: '¿Entre qué dos estructuras sube el conducto torácico por el mediastino posterior?',
+      correcta: 'Entre la aorta torácica, a su izquierda, y la ácigos, a su derecha',
+      distractores: ['Entre la tráquea y el esófago', 'Entre la cava superior y la aorta ascendente', 'Entre el corazón y el esternón'],
+      explicacion: 'Sube entre la aorta y la ácigos, por detrás del esófago a la altura de T7.',
+      evidencia: [W('Thoracic_duct', 'It ascends the posterior mediastinum between the descending thoracic aorta (to its left) and the azygos vein (to its right), and is situated posterior to the esophagus at the T7 vertebral level.')],
+    },
   ],
 });

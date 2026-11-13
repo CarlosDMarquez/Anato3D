@@ -156,7 +156,7 @@ export const textoLimitacion = (lim, campo, idioma = 'es') => lim?.[campo]?.[idi
  * ese modelo no se revisa (scripts/check-cards.mjs los saca de los .glb). Lo usan la revisión de `npm run check` y las
  * pruebas.
  */
-export function revisarLimitaciones(lista = LIMITACIONES, { piezasDe = () => null, idiomas = ['es', 'en', 'de', 'fr', 'it'] } = {}) {
+export function revisarLimitaciones(lista = LIMITACIONES, { piezasDe = () => null, idiomas = ['es', 'en'] } = {}) {   // de/fr/it: «próximamente» (12 nov 2026)
   const out = [];
   const err = (texto) => out.push({ nivel: 'error', texto });
   const vistos = new Set();

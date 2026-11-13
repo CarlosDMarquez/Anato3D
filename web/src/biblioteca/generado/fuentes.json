@@ -1555,6 +1555,16 @@
   "fecha": "2026-11-09",
   "huella": "31a67ba3b669"
  },
+ "wp:Aortic_hiatus": {
+  "id": "wp:Aortic_hiatus",
+  "titulo": "Aortic hiatus",
+  "url": "https://en.wikipedia.org/w/index.php?title=Aortic_hiatus&oldid=1380893350",
+  "revid": 1380893350,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-13",
+  "huella": "4031c82c4cf2"
+ },
  "wp:Aortic_valve": {
   "id": "wp:Aortic_valve",
   "titulo": "Aortic valve",
@@ -1745,6 +1755,16 @@
   "fecha": "2026-11-09",
   "huella": "81f066099eb8"
  },
+ "wp:Bronchomediastinal_trunk": {
+  "id": "wp:Bronchomediastinal_trunk",
+  "titulo": "Bronchomediastinal lymph trunk",
+  "url": "https://en.wikipedia.org/w/index.php?title=Bronchomediastinal_lymph_trunk&oldid=1304448227",
+  "revid": 1304448227,
+  "actualizada": "2025-08-06",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "6725f887a9c0"
+ },
  "wp:Bronchopulmonary_segment": {
   "id": "wp:Bronchopulmonary_segment",
   "titulo": "Bronchopulmonary segment",
@@ -1835,6 +1855,16 @@
   "fecha": "2026-11-10",
   "huella": "1e2c76fe08e3"
  },
+ "wp:Celiac_lymph_nodes": {
+  "id": "wp:Celiac_lymph_nodes",
+  "titulo": "Celiac lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Celiac_lymph_nodes&oldid=1300899971",
+  "revid": 1300899971,
+  "actualizada": "2025-07-17",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "e35817afd8ca"
+ },
  "wp:Central_arteries": {
   "id": "wp:Central_arteries",
   "titulo": "Central arteries",
@@ -1905,6 +1935,16 @@
   "fecha": "2026-11-09",
   "huella": "07b520977c11"
  },
+ "wp:Cervical_lymph_nodes": {
+  "id": "wp:Cervical_lymph_nodes",
+  "titulo": "Cervical lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cervical_lymph_nodes&oldid=1360586838",
+  "revid": 1360586838,
+  "actualizada": "2026-06-22",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "46a160583d81"
+ },
  "wp:Cervical_vertebrae": {
   "id": "wp:Cervical_vertebrae",
   "titulo": "Cervical vertebrae",
@@ -1954,6 +1994,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "05ce28b73572"
+ },
+ "wp:Cisterna_chyli": {
+  "id": "wp:Cisterna_chyli",
+  "titulo": "Cisterna chyli",
+  "url": "https://en.wikipedia.org/w/index.php?title=Cisterna_chyli&oldid=1380880257",
+  "revid": 1380880257,
+  "actualizada": "2026-10-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "1a23df6fe169"
  },
  "wp:Clavicle": {
   "id": "wp:Clavicle",
@@ -2184,6 +2234,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-10",
   "huella": "2c3d12f6e847"
+ },
+ "wp:Deep_cervical_lymph_nodes": {
+  "id": "wp:Deep_cervical_lymph_nodes",
+  "titulo": "Deep cervical lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Deep_cervical_lymph_nodes&oldid=1322812686",
+  "revid": 1322812686,
+  "actualizada": "2025-11-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "756172ae5ff6"
  },
  "wp:Deltoid_muscle": {
   "id": "wp:Deltoid_muscle",
@@ -2945,6 +3005,16 @@
   "fecha": "2026-11-10",
   "huella": "81a97ebd023e"
  },
+ "wp:Inferior_deep_cervical_lymph_nodes": {
+  "id": "wp:Inferior_deep_cervical_lymph_nodes",
+  "titulo": "Inferior deep cervical lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inferior_deep_cervical_lymph_nodes&oldid=1301078565",
+  "revid": 1301078565,
+  "actualizada": "2025-07-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "30f946ae1128"
+ },
  "wp:Inferior_frontal_gyrus": {
   "id": "wp:Inferior_frontal_gyrus",
   "titulo": "Inferior frontal gyrus",
@@ -2974,6 +3044,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-10",
   "huella": "e7601f53dbea"
+ },
+ "wp:Inferior_mesenteric_lymph_nodes": {
+  "id": "wp:Inferior_mesenteric_lymph_nodes",
+  "titulo": "Inferior mesenteric lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inferior_mesenteric_lymph_nodes&oldid=1300990457",
+  "revid": 1300990457,
+  "actualizada": "2025-07-17",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "16a0daf60fcf"
  },
  "wp:Inferior_mesenteric_vein": {
   "id": "wp:Inferior_mesenteric_vein",
@@ -3084,6 +3164,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "4e3b5055d7e4"
+ },
+ "wp:Inguinal_lymph_nodes": {
+  "id": "wp:Inguinal_lymph_nodes",
+  "titulo": "Inguinal lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Inguinal_lymph_nodes&oldid=1330887775",
+  "revid": 1330887775,
+  "actualizada": "2026-01-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "b03a70931718"
  },
  "wp:Inner_ear": {
   "id": "wp:Inner_ear",
@@ -3275,6 +3365,16 @@
   "fecha": "2026-11-09",
   "huella": "3258a3c87c2d"
  },
+ "wp:Intestinal_trunk": {
+  "id": "wp:Intestinal_trunk",
+  "titulo": "Intestinal lymph trunk",
+  "url": "https://en.wikipedia.org/w/index.php?title=Intestinal_lymph_trunk&oldid=1290203291",
+  "revid": 1290203291,
+  "actualizada": "2025-05-13",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "ca96215f58f2"
+ },
  "wp:Intraparietal_sulcus": {
   "id": "wp:Intraparietal_sulcus",
   "titulo": "Intraparietal sulcus",
@@ -3315,6 +3415,26 @@
   "fecha": "2026-11-09",
   "huella": "512d8ddbe834"
  },
+ "wp:Jugular_trunk": {
+  "id": "wp:Jugular_trunk",
+  "titulo": "Jugular lymph trunk",
+  "url": "https://en.wikipedia.org/w/index.php?title=Jugular_lymph_trunk&oldid=1223570811",
+  "revid": 1223570811,
+  "actualizada": "2024-05-13",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "060f95291d6d"
+ },
+ "wp:Jugulodigastric_lymph_node": {
+  "id": "wp:Jugulodigastric_lymph_node",
+  "titulo": "Jugulodigastric lymph node",
+  "url": "https://en.wikipedia.org/w/index.php?title=Jugulodigastric_lymph_node&oldid=1292012926",
+  "revid": 1292012926,
+  "actualizada": "2025-05-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "c8b0ff171dd1"
+ },
  "wp:Kidney": {
   "id": "wp:Kidney",
   "titulo": "Kidney",
@@ -3344,6 +3464,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "5ba92f855f7a"
+ },
+ "wp:Labia_majora": {
+  "id": "wp:Labia_majora",
+  "titulo": "Labia majora",
+  "url": "https://en.wikipedia.org/w/index.php?title=Labia_majora&oldid=1385033811",
+  "revid": 1385033811,
+  "actualizada": "2026-11-11",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-13",
+  "huella": "9ecee8782a52"
  },
  "wp:Lacrimal_bone": {
   "id": "wp:Lacrimal_bone",
@@ -3615,6 +3745,16 @@
   "fecha": "2026-11-09",
   "huella": "e135ccff48af"
  },
+ "wp:Lumbar_trunk": {
+  "id": "wp:Lumbar_trunk",
+  "titulo": "Lumbar lymph trunk",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lumbar_lymph_trunk&oldid=1224154015",
+  "revid": 1224154015,
+  "actualizada": "2024-05-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "9cdc21f4bc63"
+ },
  "wp:Lumbar_vertebrae": {
   "id": "wp:Lumbar_vertebrae",
   "titulo": "Lumbar vertebrae",
@@ -3645,6 +3785,26 @@
   "fecha": "2026-11-09",
   "huella": "459ef651b902"
  },
+ "wp:Lymph_duct": {
+  "id": "wp:Lymph_duct",
+  "titulo": "Lymph duct",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lymph_duct&oldid=1320936601",
+  "revid": 1320936601,
+  "actualizada": "2025-11-07",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "a0936f2a0995"
+ },
+ "wp:Lymph_node": {
+  "id": "wp:Lymph_node",
+  "titulo": "Lymph node",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lymph_node&oldid=1360517815",
+  "revid": 1360517815,
+  "actualizada": "2026-06-21",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "0fcc48505446"
+ },
  "wp:Lymphatic_system": {
   "id": "wp:Lymphatic_system",
   "titulo": "Lymphatic system",
@@ -3654,6 +3814,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "c9822ae4525e"
+ },
+ "wp:Lymphatic_vessel": {
+  "id": "wp:Lymphatic_vessel",
+  "titulo": "Lymphatic vessel",
+  "url": "https://en.wikipedia.org/w/index.php?title=Lymphatic_vessel&oldid=1324604892",
+  "revid": 1324604892,
+  "actualizada": "2025-11-28",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "35679ac737da"
  },
  "wp:Major_alar_cartilage": {
   "id": "wp:Major_alar_cartilage",
@@ -3704,6 +3874,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "5ffbeebc62d3"
+ },
+ "wp:Mastoid_lymph_nodes": {
+  "id": "wp:Mastoid_lymph_nodes",
+  "titulo": "Mastoid lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Mastoid_lymph_nodes&oldid=1319318381",
+  "revid": 1319318381,
+  "actualizada": "2025-10-29",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "e5d84ec48a17"
  },
  "wp:Maxilla": {
   "id": "wp:Maxilla",
@@ -4125,6 +4305,16 @@
   "fecha": "2026-11-10",
   "huella": "4d67d25f8342"
  },
+ "wp:Occipital_lymph_nodes": {
+  "id": "wp:Occipital_lymph_nodes",
+  "titulo": "Occipital lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Occipital_lymph_nodes&oldid=1315085330",
+  "revid": 1315085330,
+  "actualizada": "2025-10-04",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "b1d3b9fbecd4"
+ },
  "wp:Occipital_sinus": {
   "id": "wp:Occipital_sinus",
   "titulo": "Occipital sinus",
@@ -4274,6 +4464,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-10",
   "huella": "d10ad8746ce5"
+ },
+ "wp:Ovary": {
+  "id": "wp:Ovary",
+  "titulo": "Ovary",
+  "url": "https://en.wikipedia.org/w/index.php?title=Ovary&oldid=1384907919",
+  "revid": 1384907919,
+  "actualizada": "2026-11-10",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-13",
+  "huella": "232a807d7bcd"
  },
  "wp:Palatine_bone": {
   "id": "wp:Palatine_bone",
@@ -4515,6 +4715,16 @@
   "fecha": "2026-11-10",
   "huella": "683432c8ef69"
  },
+ "wp:Popliteal_lymph_nodes": {
+  "id": "wp:Popliteal_lymph_nodes",
+  "titulo": "Popliteal lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Popliteal_lymph_nodes&oldid=1277704248",
+  "revid": 1277704248,
+  "actualizada": "2025-02-26",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "2f06549f1079"
+ },
  "wp:Postcentral_gyrus": {
   "id": "wp:Postcentral_gyrus",
   "titulo": "Postcentral gyrus",
@@ -4594,6 +4804,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "cf2085d24b15"
+ },
+ "wp:Preaortic_lymph_nodes": {
+  "id": "wp:Preaortic_lymph_nodes",
+  "titulo": "Preaortic lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Preaortic_lymph_nodes&oldid=1336732047",
+  "revid": 1336732047,
+  "actualizada": "2026-02-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "96f83408b99d"
  },
  "wp:Precentral_gyrus": {
   "id": "wp:Precentral_gyrus",
@@ -4875,6 +5095,16 @@
   "fecha": "2026-11-09",
   "huella": "3e6d3252e8bc"
  },
+ "wp:Retroaortic_lymph_nodes": {
+  "id": "wp:Retroaortic_lymph_nodes",
+  "titulo": "Retroaortic lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Retroaortic_lymph_nodes&oldid=1224153655",
+  "revid": 1224153655,
+  "actualizada": "2024-05-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "b2b9e32ba47c"
+ },
  "wp:Retroperitoneal_space": {
   "id": "wp:Retroperitoneal_space",
   "titulo": "Retroperitoneal space",
@@ -5034,6 +5264,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "94d112275552"
+ },
+ "wp:Scrotum": {
+  "id": "wp:Scrotum",
+  "titulo": "Scrotum",
+  "url": "https://en.wikipedia.org/w/index.php?title=Scrotum&oldid=1385068048",
+  "revid": 1385068048,
+  "actualizada": "2026-11-11",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-13",
+  "huella": "95e862b705b9"
  },
  "wp:Sense": {
   "id": "wp:Sense",
@@ -5315,6 +5555,26 @@
   "fecha": "2026-11-10",
   "huella": "a20b7ca02189"
  },
+ "wp:Submandibular_lymph_nodes": {
+  "id": "wp:Submandibular_lymph_nodes",
+  "titulo": "Submandibular lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Submandibular_lymph_nodes&oldid=1285412030",
+  "revid": 1285412030,
+  "actualizada": "2025-04-13",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "b3b7c0857ec4"
+ },
+ "wp:Submental_lymph_nodes": {
+  "id": "wp:Submental_lymph_nodes",
+  "titulo": "Submental lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Submental_lymph_nodes&oldid=1370068512",
+  "revid": 1370068512,
+  "actualizada": "2026-08-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "cafdac3aecd9"
+ },
  "wp:Subparietal_sulcus": {
   "id": "wp:Subparietal_sulcus",
   "titulo": "Subparietal sulcus",
@@ -5355,6 +5615,26 @@
   "fecha": "2026-11-10",
   "huella": "8e350236f132"
  },
+ "wp:Superficial_lateral_cervical_lymph_nodes": {
+  "id": "wp:Superficial_lateral_cervical_lymph_nodes",
+  "titulo": "Superficial lateral cervical lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superficial_lateral_cervical_lymph_nodes&oldid=1252113790",
+  "revid": 1252113790,
+  "actualizada": "2024-10-19",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "785b012d9600"
+ },
+ "wp:Superficial_parotid_lymph_nodes": {
+  "id": "wp:Superficial_parotid_lymph_nodes",
+  "titulo": "Superficial parotid lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superficial_parotid_lymph_nodes&oldid=1328184079",
+  "revid": 1328184079,
+  "actualizada": "2025-12-18",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "7db2460dfb72"
+ },
  "wp:Superior_cerebellar_peduncle": {
   "id": "wp:Superior_cerebellar_peduncle",
   "titulo": "Superior cerebellar peduncle",
@@ -5374,6 +5654,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-10",
   "huella": "3bf06e9de270"
+ },
+ "wp:Superior_deep_cervical_lymph_nodes": {
+  "id": "wp:Superior_deep_cervical_lymph_nodes",
+  "titulo": "Superior deep cervical lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_deep_cervical_lymph_nodes&oldid=1331269900",
+  "revid": 1331269900,
+  "actualizada": "2026-01-05",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "d39f54a67c4d"
  },
  "wp:Superior_diaphragmatic_lymph_nodes": {
   "id": "wp:Superior_diaphragmatic_lymph_nodes",
@@ -5445,6 +5735,16 @@
   "fecha": "2026-11-10",
   "huella": "061d53d096b0"
  },
+ "wp:Superior_mesenteric_lymph_nodes": {
+  "id": "wp:Superior_mesenteric_lymph_nodes",
+  "titulo": "Superior mesenteric lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Superior_mesenteric_lymph_nodes&oldid=1223115643",
+  "revid": 1223115643,
+  "actualizada": "2024-05-10",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "d8f7379f7b89"
+ },
  "wp:Superior_ophthalmic_vein": {
   "id": "wp:Superior_ophthalmic_vein",
   "titulo": "Superior ophthalmic vein",
@@ -5514,6 +5814,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-10",
   "huella": "a44efe4e0b03"
+ },
+ "wp:Supraclavicular_lymph_nodes": {
+  "id": "wp:Supraclavicular_lymph_nodes",
+  "titulo": "Supraclavicular lymph nodes",
+  "url": "https://en.wikipedia.org/w/index.php?title=Supraclavicular_lymph_nodes&oldid=1246099323",
+  "revid": 1246099323,
+  "actualizada": "2024-09-16",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "02006e156f24"
  },
  "wp:Suprahyoid_muscles": {
   "id": "wp:Suprahyoid_muscles",
@@ -5674,6 +5984,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "b3adc1600462"
+ },
+ "wp:Testicle": {
+  "id": "wp:Testicle",
+  "titulo": "Testicle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Testicle&oldid=1371041936",
+  "revid": 1371041936,
+  "actualizada": "2026-08-24",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-13",
+  "huella": "9464439331b2"
  },
  "wp:Thalamus": {
   "id": "wp:Thalamus",
@@ -5925,6 +6245,16 @@
   "fecha": "2026-11-09",
   "huella": "b46e013c0777"
  },
+ "wp:Venous_angle": {
+  "id": "wp:Venous_angle",
+  "titulo": "Venous angle",
+  "url": "https://en.wikipedia.org/w/index.php?title=Venous_angle&oldid=1341405227",
+  "revid": 1341405227,
+  "actualizada": "2026-03-03",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-12",
+  "huella": "6721e33409bb"
+ },
  "wp:Ventricle_(heart)": {
   "id": "wp:Ventricle_(heart)",
   "titulo": "Ventricle (heart)",
@@ -5984,6 +6314,16 @@
   "licencia": "CC BY-SA 4.0",
   "fecha": "2026-11-09",
   "huella": "67c42b40e170"
+ },
+ "wp:Vulva": {
+  "id": "wp:Vulva",
+  "titulo": "Vulva",
+  "url": "https://en.wikipedia.org/w/index.php?title=Vulva&oldid=1385306691",
+  "revid": 1385306691,
+  "actualizada": "2026-11-12",
+  "licencia": "CC BY-SA 4.0",
+  "fecha": "2026-11-13",
+  "huella": "fc3c3348a4a8"
  },
  "wp:White_matter": {
   "id": "wp:White_matter",

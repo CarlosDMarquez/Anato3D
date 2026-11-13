@@ -19,6 +19,7 @@ from anato3d_fit import (Fitter, Extractor, Groups, bonus_paths, es, la, sanitiz
                          log, parse_args, male_only, MODEL, skull_bone, OUT_DIR)
 from mathutils import Matrix, Vector, bvhtree
 import numpy as np
+import lymphatics
 
 opt = parse_args({'budget': 260000, 'only': None})
 argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
@@ -105,7 +106,9 @@ def classify_new(o, base, mat):
     if 'thymus' in low: return 'lymphatic', 'organs', 'thymus', True, ('Lymphoid system', 'Thymus')
     if 'tonsil' in low: return 'lymphatic', 'organs', 'tonsil', True, ('Lymphoid system', 'Pharyngeal lymphoid ring')
     if 'node' in low:
-        region = next((r for r, keys in NODE_REGIONS if any(k in low for k in keys)), 'Abdominal lymph nodes')
+        # Región de la TA2 por la jerarquía de Z-Anatomy (lymphatics.region_of); las palabras del nombre solo si falta
+        # (con ellas los subaórticos caían en el abdomen y los submandibulares y submentonianos en la cabeza).
+        region = lymphatics.region_of(o) or next((r for r, keys in NODE_REGIONS if any(k in low for k in keys)), 'Abdominal lymph nodes')
         return 'lymphatic', 'nodes', 'node', False, ('Lymphoid system', 'Lymph nodes', region)
     return None
 
@@ -301,9 +304,9 @@ for n, it in enumerate(items):
                                out_of_bone=it['tissue'] != 'node', bone_skip=skull_bone)
     if ex.bone_moved: bone_fixed[it['system']] += 1
     if nose and moved: log(f'  {name}: {moved} vértices metidos bajo la piel (salían hasta {worst * 1000:.1f} mm)')
-    if it['tissue'] == 'node':
-        moved, worst = place_nodes(obj, superficial)
-        if moved: log(f'  {name}: {moved} nodos recolocados' + (f' (salían de la piel hasta {worst * 1000:.1f} mm)' if worst > 0 else ''))
+    # Los nodos: su malla (esferas de Z-Anatomy) se sustituye después por ganglios con forma, tamaño y sitio comprobados
+    # (tools/lymphatics.py, al final, con los órganos ya separados). Pasan por ex.fit igual que antes para que el reparto
+    # del presupuesto de caras, y así los demás sistemas, no cambie.
     m = MATS[it['tissue']]
     obj.data.materials.append(m[sum(map(ord, it['base'])) % len(m)] if isinstance(m, list) else m)
     obj['anato3d_id'] = f'{it["system"]}_{name.lower()}'
@@ -501,34 +504,7 @@ organs = [solid(it) for it in items if 'out' in it and it['tissue'] != 'node']
 organs = [o for o in organs if o['closed']]
 def overlap(a, b): return not ((a['lo'] > b['hi']).any() or (a['hi'] < b['lo']).any())
 
-# Nodos: enteros fuera de los órganos.
-nodes_moved = 0
-for it in items:
-    if 'out' not in it or it['tissue'] != 'node': continue
-    obj = it['out']; loc = Vector(obj.location)
-    bm = bmesh.new(); bm.from_mesh(obj.data); bm.verts.ensure_lookup_table()
-    for comp in components(bm):
-        P0 = np.array([(loc + v.co)[:] for v in comp])
-        shift = Vector()
-        # Los órganos cercanos se buscan en cada intento, con el nodo ya movido: al salir de uno podía entrar en el de al
-        # lado (los retrofaríngeos, entre la faringe y el paladar blando) sin que se comprobara. Hasta 8 intentos.
-        for _ in range(8):
-            lo, hi = P0.min(0) + np.array(shift), P0.max(0) + np.array(shift)
-            near = [o for o in organs if not natural(obj.name, o['name']) and not ((lo > o['hi']).any() or (hi < o['lo']).any())]
-            worst = (0.0, None)
-            for o in near:
-                for p in P0:
-                    q = Vector(p) + shift
-                    if not inside(o['T'], q): continue
-                    hit, nrm, _, d = o['T'].find_nearest(q)
-                    if d > worst[0]: worst = (d, nrm * o['sign'])
-            if worst[1] is None: break
-            shift += worst[1] * (worst[0] + 0.0005)
-        if shift.length > 1e-6:
-            for v in comp: v.co += shift
-            nodes_moved += 1
-    bm.to_mesh(obj.data); bm.free(); obj.data.update()
-log(f'nodos sacados de los órganos: {nodes_moved}')
+# Los nodos ya no se sacan aquí de los órganos: lo hace tools/lymphatics.py al final, con los órganos ya separados.
 
 # Órganos: cede el más pequeño, salvo en los pares de CEDE.
 # Revisión a mano de los choques de la auditoría (2026-11-06, docs/hitos/07-solapes-y-modelo-femenino.md): casi todos eran
@@ -656,6 +632,93 @@ for yn, kn in CEDE:
     y, k = by_name.get(yn), by_name.get(kn)
     if y and k: log(f'  {yn} / {kn}: {inside_count(y, k)} y {inside_count(k, y)} vértices dentro del otro')
 log('órganos sacados del hueso, por sistema:', dict(bone_fixed))
+
+# ── Sistema linfático: ganglios (tools/lymphatics.py, hito 9) ───────────────
+# Cada esfera de Z-Anatomy pasa a ser un ganglio ovalado con el tamaño de su grupo, colocado fuera del hueso, de los
+# órganos, de los músculos y de la luz de los vasos, bajo la piel y simétrico. Entran también los 11 nodos que Z-Anatomy
+# esconde (lymphatics.HIDDEN). Después, build_vessels (vacía por ahora) añadirá conductos, troncos y colectores.
+if 'lymphatic' in wanted:
+    import time as _time
+    _t0 = _time.time()
+    MATS.update(lymphatics.materials(principled, srgb))
+    node_objs = {it['out'].name: it for it in items if 'out' in it and it['tissue'] == 'node'}
+
+    def add_piece(name, V, F, group, tissue='lymph_vessel', subsystem='vessels', major=False, name_en='', name_es='',
+                  name_la='', source='Anato3D (generado; tools/lymphatics.py)', material='lymph_vessel'):
+        """Crea una pieza del linfático en Lymphatic_System/<group> (lo usa lymphatics.build_vessels)."""
+        V = np.asarray(V, float); center = (V.min(0) + V.max(0)) / 2
+        me = bpy.data.meshes.new(name); me.from_pydata((V - center).tolist(), [], [tuple(f) for f in F]); me.update()
+        for f in me.polygons: f.use_smooth = True
+        obj = bpy.data.objects.new(name, me); obj.location = center
+        mat = MATS[material]
+        obj.data.materials.append(mat[sum(map(ord, name)) % len(mat)] if isinstance(mat, list) else mat)
+        obj['anato3d_id'] = f'lymphatic_{name.lower()}'
+        obj['system'] = 'lymphatic'; obj['subsystem'] = subsystem; obj['tissue'] = tissue; obj['major'] = bool(major)
+        obj['name_en'] = name_en; obj['name_la'] = name_la; obj['name_es'] = name_es
+        rp = [group] if isinstance(group, str) else list(group)
+        obj['region'] = json.dumps([sanitize(g) for g in rp])
+        obj['source'] = source
+        roots['lymphatic'].collection(rp).objects.link(obj)
+        stats['lymphatic'].append({'name': name, 'sub': subsystem, 'tissue': tissue, 'faces': len(me.polygons),
+                                   'verts': len(me.vertices), 'name_es': name_es})
+        return obj
+
+    for g, (g_es, g_la) in lymphatics.GROUP_NAMES.items(): NAMES_ES.setdefault(g, g_es)
+    ctx = lymphatics.Context(fitter, MATS, add_piece)
+    dg = bpy.context.evaluated_depsgraph_get()
+    anchors_all, piece_obj = [], {}
+    for o in sorted((o for o in bpy.data.collections[lymphatics.ZCOL].objects if lymphatics.is_node_source(o)), key=lambda o: o.name):
+        base, side, hidden = lymphatics.zname(o.name)
+        base = re.sub(r'\*+', '', base).strip()
+        name = sanitize(base) + (f'_{side}' if side else '')
+        C = lymphatics.source_centers(o, dg)
+        if not len(C): log(f'  linfático: {o.name} sin malla; se omite'); continue
+        anchors_all += list(C)
+        ctx.add_nodes(name, sanitize(base), side, fitter.deform(C), o.name)
+        region = lymphatics.region_of(o)
+        es_, la_ = lymphatics.names_of(base) or (None, None)
+        ctx.inventory.append({'zanatomy': o.name, 'piece': name, 'region': region, 'side': side, 'nodes': len(C), 'hidden': hidden,
+                              'name_es': es_ or PARTS_ES.get(sanitize(base)) or es(base) or '', 'name_la': la_ or la(base) or ''})
+        if name in node_objs:
+            piece_obj[name] = node_objs[name]['out']
+            continue
+        if not hidden: log(f'  linfático: {o.name} no está entre los nodos construidos; se omite'); continue
+        me = bpy.data.meshes.new(name); obj = bpy.data.objects.new(name, me)
+        mats = MATS['node']; obj.data.materials.append(mats[sum(map(ord, base)) % len(mats)])
+        obj['anato3d_id'] = f'lymphatic_{name.lower()}'
+        obj['system'] = 'lymphatic'; obj['subsystem'] = 'nodes'; obj['tissue'] = 'node'; obj['major'] = False
+        obj['name_en'] = base; obj['name_la'] = la_; obj['name_es'] = es_
+        rp = ['Lymph nodes', region or 'Abdominal lymph nodes']
+        obj['region'] = json.dumps([sanitize(g) for g in rp])
+        obj['source'] = (f'Z-Anatomy object "{o.name}" (BodyParts3D, DBCLS) CC BY-SA 4.0; hidden in Z-Anatomy (inconstant in '
+                         f'the TA2); refitted to the Anato3D skin')
+        roots['lymphatic'].collection(rp).objects.link(obj)
+        stats['lymphatic'].append({'name': name, 'sub': 'nodes', 'tissue': 'node', 'faces': 0, 'verts': 0, 'name_es': es_})
+        piece_obj[name] = obj
+    missing = sorted(set(node_objs) - set(piece_obj))
+    if missing: log(f'  linfático: nodos construidos sin fuente en Z-Anatomy (se quedan como estaban): {missing}')
+    ctx.vessels = lymphatics.Vessels(fitter, near=np.array(anchors_all))
+    # Obstáculos: los órganos viscerales recién separados (cerrados y abiertos), los músculos y el corazón ya construidos.
+    for o in (solid(it) for it in items if 'out' in it and it['tissue'] != 'node'):
+        ctx.solids.append(lymphatics.Solid(o['name'], o['T'], o['lo'], o['hi'], o['sign'], 'organ', o['closed']))
+    B = os.path.join(OUT_DIR, f'{MODEL}_')
+    ctx.solids += lymphatics.solids_from_blend(B + 'muscular.blend', 'Muscular_System', lambda o: o.get('tissue') == 'muscle', 'muscle')
+    ctx.solids += lymphatics.solids_from_blend(B + 'arterial.blend', 'Arterial_System', lambda o: o.get('subsystem') == 'heart', 'heart')
+    log(f'  linfático: {len(ctx.nodes)} ganglios en {len(ctx.pieces)} piezas; obstáculos: '
+        f'{dict(collections.Counter(s.kind for s in ctx.solids if s.closed))} ({_time.time() - _t0:.0f} s)')
+    left = lymphatics.place(ctx)
+    lig = lymphatics.points_from_blend(B + 'connective.blend', 'Connective_System', {'Inguinal_ligament_L', 'Inguinal_ligament_R'})
+    rel = lymphatics.relations(ctx, lig)
+    log('  linfático: relaciones (cumplen/total):', {k: v['ok'] for k, v in rel.items()})
+    for name, obj in piece_obj.items():
+        nv, nf = lymphatics.write_piece(obj, ctx.pieces[name])
+        for st in stats['lymphatic']:
+            if st['name'] == name: st.update(faces=nf, verts=nv)
+    lymphatics.save_reports(ctx, rel)
+    extra = lymphatics.build_vessels(ctx)
+    for lab in roots['lymphatic'].labels.values():                # latín de los grupos nuevos (no está en Z-Anatomy)
+        if lab['en'] in lymphatics.GROUP_NAMES: lab['latin'] = lab['latin'] or lymphatics.GROUP_NAMES[lab['en']][1]
+    log(f'  linfático: listo en {_time.time() - _t0:.0f} s' + (f'; piezas de vasos: {extra}' if extra else ''))
 
 for system, groups in roots.items():
     save(f'male_{system}', groups, stats[system])

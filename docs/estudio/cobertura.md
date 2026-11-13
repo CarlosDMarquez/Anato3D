@@ -13,50 +13,50 @@ Generado por `node scripts/biblioteca.mjs` (no editar a mano). Cuenta las leccio
 
 ## Resumen
 
-- Lecciones disponibles: **84** de 84 previstas (100 %).
+- Lecciones disponibles: **87** de 87 previstas (100 %).
 - Módulos: **19** · Recorridos: **11**.
-- Estructuras de los modelos: **1718** (hombre 1688, mujer 1701); en el núcleo de alguna lección: **1059** (62 %); con contexto: 1195 (70 %).
-- Pasos: 605 · preguntas de evaluación: 1548 · citas comprobadas: 3969 en 478 páginas.
+- Estructuras de los modelos: **1747** (hombre 1717, mujer 1730); en el núcleo de alguna lección: **1112** (64 %); con contexto: 1253 (72 %).
+- Pasos: 631 · preguntas de evaluación: 1613 · citas comprobadas: 4130 en 511 páginas.
 
 ## Por región
 
 | Región › subregión | Lecciones disponibles | Previstas (hechas de total) | Estado | Estructuras | En el núcleo | Con contexto |
 | --- | ---: | ---: | --- | ---: | ---: | ---: |
-| **Cabeza** | **20** | 19 de 19 | disponible | 403 | 297 (74 %) | 323 |
+| **Cabeza** | **21** | 20 de 20 | disponible | 401 | 303 (76 %) | 330 |
 | Cabeza › Cráneo | 1 | 1 de 1 | disponible | 15 | 8 (53 %) | 9 |
 | Cabeza › Encéfalo y meninges | 9 | 9 de 9 | disponible | 199 | 189 (95 %) | 198 |
-| Cabeza › Cara | 3 | 3 de 3 | disponible | 109 | 51 (47 %) | 58 |
+| Cabeza › Cara | 4 | 4 de 4 | disponible | 109 | 51 (47 %) | 59 |
 | Cabeza › Órbita y ojo | 2 | 2 de 2 | disponible | 32 | 19 (59 %) | 24 |
 | Cabeza › Oído | 2 | 2 de 2 | disponible | 11 | 9 (82 %) | 11 |
 | Cabeza › Nariz y cavidad nasal | 1 | 1 de 1 | disponible | 6 | 5 (83 %) | 6 |
 | Cabeza › Boca y cavidad oral | 2 | 1 de 1 | disponible | 29 | 24 (83 %) | 26 |
-| **Cuello** | **4** | 4 de 4 | disponible | 97 | 48 (49 %) | 58 |
+| **Cuello** | **5** | 5 de 5 | disponible | 99 | 56 (57 %) | 68 |
 | Cuello › Músculos del cuello | 1 | 1 de 1 | disponible | 25 | 16 (64 %) | 16 |
 | Cuello › Laringe, faringe y tiroides | 2 | 2 de 2 | disponible | 31 | 17 (55 %) | 23 |
-| Cuello › Vasos y nervios del cuello | 1 | 1 de 1 | disponible | 40 | 15 (38 %) | 19 |
+| Cuello › Vasos y nervios del cuello | 2 | 2 de 2 | disponible | 42 | 23 (55 %) | 29 |
 | **Espalda y columna** | **3** | 3 de 3 | disponible | 156 | 91 (58 %) | 122 |
 | Espalda y columna › Columna vertebral | 1 | 1 de 1 | disponible | 81 | 54 (67 %) | 78 |
 | Espalda y columna › Músculos de la espalda | 1 | 1 de 1 | disponible | 38 | 25 (66 %) | 31 |
 | Espalda y columna › Médula espinal | 1 | 1 de 1 | disponible | 35 | 12 (34 %) | 13 |
-| **Tórax** | **10** | 10 de 10 | disponible | 210 | 196 (93 %) | 198 |
+| **Tórax** | **10** | 10 de 10 | disponible | 211 | 197 (93 %) | 199 |
 | Tórax › Pared torácica | 3 | 3 de 3 | disponible | 43 | 35 (81 %) | 37 |
 | Tórax › Mama | 1 | 1 de 1 | disponible | 5 | 1 (20 %) | 1 |
 | Tórax › Diafragma | 1 | 1 de 1 | disponible | 2 | 1 (50 %) | 1 |
 | Tórax › Mediastino | 4 | 4 de 4 | disponible | 100 | 99 (99 %) | 99 |
 | Tórax › Corazón | 1 | 1 de 1 | disponible | 27 | 27 (100 %) | 27 |
-| Tórax › Pulmones y pleura | 3 | 3 de 3 | disponible | 80 | 80 (100 %) | 80 |
-| **Abdomen** | **8** | 8 de 8 | disponible | 172 | 95 (55 %) | 113 |
+| Tórax › Pulmones y pleura | 3 | 3 de 3 | disponible | 81 | 81 (100 %) | 81 |
+| **Abdomen** | **9** | 9 de 9 | disponible | 174 | 119 (68 %) | 134 |
 | Abdomen › Pared abdominal | 1 | 1 de 1 | disponible | 19 | 12 (63 %) | 15 |
 | Abdomen › Cavidad abdominal y peritoneo | 2 | 2 de 2 | disponible | 4 | 4 (100 %) | 4 |
 | Abdomen › Órganos abdominales | 3 | 3 de 3 | disponible | 28 | 27 (96 %) | 28 |
-| Abdomen › Riñones y retroperitoneo | 2 | 2 de 2 | disponible | 4 | 4 (100 %) | 4 |
-| Abdomen › Vasos y nervios del abdomen | 1 | 1 de 1 | disponible | 117 | 48 (41 %) | 62 |
-| **Pelvis y periné** | **7** | 7 de 7 | disponible | 124 | 91 (73 %) | 101 |
+| Abdomen › Riñones y retroperitoneo | 3 | 3 de 3 | disponible | 4 | 4 (100 %) | 4 |
+| Abdomen › Vasos y nervios del abdomen | 2 | 2 de 2 | disponible | 119 | 72 (61 %) | 83 |
+| **Pelvis y periné** | **7** | 7 de 7 | disponible | 128 | 94 (73 %) | 104 |
 | Pelvis y periné › Pelvis ósea | 1 | 1 de 1 | disponible | 15 | 10 (67 %) | 13 |
 | Pelvis y periné › Suelo pélvico | 1 | 1 de 1 | disponible | 5 | 3 (60 %) | 4 |
 | Pelvis y periné › Órganos pélvicos | 3 | 3 de 3 | disponible | 15 | 12 (80 %) | 15 |
 | Pelvis y periné › Periné y genitales externos | 3 | 3 de 3 | disponible | 38 | 16 (42 %) | 19 |
-| Pelvis y periné › Vasos y nervios de la pelvis | 2 | 2 de 2 | disponible | 53 | 52 (98 %) | 52 |
+| Pelvis y periné › Vasos y nervios de la pelvis | 2 | 2 de 2 | disponible | 57 | 55 (96 %) | 55 |
 | **Miembro superior** | **13** | 13 de 13 | disponible | 312 | 149 (48 %) | 167 |
 | Miembro superior › Cintura escapular | 2 | 2 de 2 | disponible | 24 | 15 (63 %) | 16 |
 | Miembro superior › Hombro | 2 | 2 de 2 | disponible | 38 | 22 (58 %) | 24 |
@@ -66,17 +66,17 @@ Generado por `node scripts/biblioteca.mjs` (no editar a mano). Cuenta las leccio
 | Miembro superior › Antebrazo | 3 | 2 de 2 | disponible | 72 | 36 (50 %) | 42 |
 | Miembro superior › Muñeca | 1 | 1 de 1 | disponible | 47 | 8 (17 %) | 10 |
 | Miembro superior › Mano | 3 | 2 de 2 | disponible | 93 | 37 (40 %) | 43 |
-| **Miembro inferior** | **14** | 14 de 14 | disponible | 336 | 159 (47 %) | 186 |
+| **Miembro inferior** | **15** | 15 de 15 | disponible | 341 | 163 (48 %) | 190 |
 | Miembro inferior › Cintura pélvica | 1 | 1 de 1 | disponible | 13 | 8 (62 %) | 11 |
 | Miembro inferior › Región glútea | 2 | 1 de 1 | disponible | 30 | 17 (57 %) | 17 |
 | Miembro inferior › Cadera | 1 | 1 de 1 | disponible | 20 | 17 (85 %) | 17 |
-| Miembro inferior › Muslo | 4 | 3 de 3 | disponible | 63 | 33 (52 %) | 38 |
-| Miembro inferior › Rodilla | 3 | 2 de 2 | disponible | 43 | 16 (37 %) | 23 |
+| Miembro inferior › Muslo | 5 | 4 de 4 | disponible | 68 | 37 (54 %) | 42 |
+| Miembro inferior › Rodilla | 4 | 3 de 3 | disponible | 43 | 16 (37 %) | 23 |
 | Miembro inferior › Pierna | 4 | 3 de 3 | disponible | 50 | 27 (54 %) | 30 |
 | Miembro inferior › Tobillo | 1 | 1 de 1 | disponible | 27 | 7 (26 %) | 13 |
 | Miembro inferior › Pie | 3 | 2 de 2 | disponible | 118 | 49 (42 %) | 55 |
 | Todo el cuerpo (sin región) | 10 | 10 de 10 | disponible | — | — | — |
-| **Total (lecciones únicas)** | **84** | 84 de 84 | disponible | 1718 | 1059 | 1195 |
+| **Total (lecciones únicas)** | **87** | 87 de 87 | disponible | 1747 | 1112 | 1253 |
 
 ## Por sistema
 
@@ -86,8 +86,8 @@ Generado por `node scripts/biblioteca.mjs` (no editar a mano). Cuenta las leccio
 | Articulaciones y ligamentos | 14 | 13 de 13 | disponible | 291 | 93 (32 %) | 137 |
 | Sistema muscular | 23 | 23 de 23 | disponible | 292 | 204 (70 %) | 226 |
 | Sistema nervioso | 24 | 22 de 22 | disponible | 296 | 201 (68 %) | 221 |
-| Sistema cardiovascular | 18 | 18 de 18 | disponible | 422 | 248 (59 %) | 282 |
-| Sistema linfático | 6 | 6 de 6 | disponible | 98 | 41 (42 %) | 46 |
+| Sistema cardiovascular | 18 | 18 de 18 | disponible | 422 | 248 (59 %) | 284 |
+| Sistema linfático | 9 | 9 de 9 | disponible | 127 | 94 (74 %) | 102 |
 | Sistema respiratorio | 7 | 7 de 7 | disponible | 44 | 44 (100 %) | 44 |
 | Sistema digestivo | 7 | 7 de 7 | disponible | 56 | 51 (91 %) | 54 |
 | Sistema urinario | 2 | 2 de 2 | disponible | 5 | 5 (100 %) | 5 |
@@ -101,7 +101,7 @@ Generado por `node scripts/biblioteca.mjs` (no editar a mano). Cuenta las leccio
 
 | Recorrido | Módulos | Lecciones disponibles | Previstas | Minutos disponibles | Estado | Alcance comprobado |
 | --- | ---: | ---: | ---: | ---: | --- | --- |
-| Primeros pasos: el cuerpo por sistemas | 2 | 16 | 16 | 165 | disponible | — |
+| Primeros pasos: el cuerpo por sistemas | 2 | 16 | 16 | 171 | disponible | — |
 | Todos los huesos del cuerpo | 4 | 13 | 13 | 208 | disponible | 123 de 123 estructuras de tipo hueso (100 %) |
 | Accidentes óseos | 1 | 7 | 7 | 116 | disponible | — |
 | Músculos por región | 4 | 19 | 19 | 324 | disponible | — |
@@ -124,7 +124,7 @@ Generado por `node scripts/biblioteca.mjs` (no editar a mano). Cuenta las leccio
 | `sis-muscular` El músculo esquelético: origen, inserción, acción e inervación | Todo el cuerpo | muscular | 1 | 11 | 6 | 10 | disponible |
 | `sis-nervioso` Organización del sistema nervioso | Todo el cuerpo | nervioso | 1 | 11 | 6 | 10 | disponible |
 | `sis-cardiovascular` Corazón y circulación | Todo el cuerpo | cardiovascular | 1 | 12 | 6 | 11 | disponible |
-| `sis-linfatico` El sistema linfático | Todo el cuerpo | linfatico | 1 | 9 | 5 | 9 | disponible |
+| `sis-linfatico` El sistema linfático | Todo el cuerpo | linfatico | 1 | 15 | 7 | 16 | disponible |
 | `sis-respiratorio` Vías respiratorias y pulmones | Cuello › Laringe, faringe y tiroides; Tórax › Pulmones y pleura | respiratorio | 1 | 11 | 6 | 9 | disponible |
 | `sis-digestivo` Tubo digestivo y glándulas anexas | Abdomen › Órganos abdominales; Cabeza › Boca y cavidad oral | digestivo | 1 | 12 | 6 | 11 | disponible |
 | `sis-urinario` Riñones, uréteres, vejiga y uretra | Abdomen › Riñones y retroperitoneo; Pelvis y periné › Órganos pélvicos | urinario | 1 | 9 | 5 | 8 | disponible |
@@ -154,6 +154,7 @@ Generado por `node scripts/biblioteca.mjs` (no editar a mano). Cuenta las leccio
 | `cue-musculos` Músculos del cuello y hueso hioides | Cuello › Músculos del cuello | muscular, oseo | 2 | 17 | 8 | 21 | disponible |
 | `cue-visceras` Vísceras del cuello: laringe, faringe, tráquea y tiroides | Cuello › Laringe, faringe y tiroides | respiratorio, digestivo, endocrino | 2 | 20 | 7 | 20 | disponible |
 | `cue-vasos` Carótidas y yugulares | Cuello › Vasos y nervios del cuello | cardiovascular | 2 | 16 | 6 | 12 | disponible |
+| `cue-ganglios` Nodos linfáticos de la cabeza y el cuello | Cuello › Vasos y nervios del cuello; Cabeza › Cara | linfatico | 2 | 18 | 8 | 19 | disponible |
 | `esp-columna` Columna vertebral | Espalda y columna › Columna vertebral | oseo, articular | 1 | 18 | 9 | 22 | disponible |
 | `esp-musculos` Músculos de la espalda | Espalda y columna › Músculos de la espalda | muscular | 2 | 18 | 7 | 23 | disponible |
 | `esp-medula` Médula espinal, meninges y nervios espinales | Espalda y columna › Médula espinal | nervioso | 2 | 20 | 8 | 15 | disponible |
@@ -161,16 +162,17 @@ Generado por `node scripts/biblioteca.mjs` (no editar a mano). Cuenta las leccio
 | `tor-respiracion` Músculos de la respiración: diafragma e intercostales | Tórax › Diafragma; Tórax › Pared torácica | muscular, respiratorio | 2 | 17 | 6 | 15 | disponible |
 | `tor-corazon` El corazón: cavidades, válvulas y vasos coronarios | Tórax › Corazón | cardiovascular | 2 | 18 | 8 | 24 | disponible |
 | `tor-pulmones` Pulmones, bronquios y pleura | Tórax › Pulmones y pleura | respiratorio | 2 | 18 | 6 | 12 | disponible |
-| `tor-mediastino` El mediastino | Tórax › Mediastino | cardiovascular, respiratorio, digestivo, nervioso, linfatico | 3 | 18 | 6 | 12 | disponible |
+| `tor-mediastino` El mediastino | Tórax › Mediastino | cardiovascular, respiratorio, digestivo, nervioso, linfatico | 3 | 18 | 6 | 14 | disponible |
 | `tor-pared-vasos` Vasos y nervios de la pared del tórax | Tórax › Pared torácica; Tórax › Mediastino | cardiovascular, nervioso | 3 | 20 | 9 | 38 | disponible |
 | `tor-segmentos` Segmentos broncopulmonares: bronquios, arterias y venas | Tórax › Pulmones y pleura; Tórax › Mediastino | respiratorio, cardiovascular | 3 | 20 | 8 | 32 | disponible |
-| `tor-linfaticos` Nodos linfáticos del tórax | Tórax › Mediastino | linfatico | 3 | 18 | 7 | 26 | disponible |
+| `tor-linfaticos` Nodos linfáticos del tórax | Tórax › Mediastino | linfatico | 3 | 18 | 8 | 30 | disponible |
 | `abd-pared` Pared abdominal anterolateral | Abdomen › Pared abdominal | muscular | 2 | 16 | 7 | 18 | disponible |
 | `abd-tubo-digestivo` El tubo digestivo en el abdomen | Abdomen › Órganos abdominales; Abdomen › Cavidad abdominal y peritoneo | digestivo | 2 | 18 | 7 | 13 | disponible |
 | `abd-higado-pancreas` Hígado, vesícula biliar, páncreas y bazo | Abdomen › Órganos abdominales | digestivo, linfatico | 2 | 22 | 9 | 26 | disponible |
 | `abd-rinones` Riñones y glándulas suprarrenales | Abdomen › Riñones y retroperitoneo | urinario, endocrino | 2 | 18 | 7 | 16 | disponible |
 | `abd-vasos` Aorta abdominal, vena cava inferior y vena porta | Abdomen › Vasos y nervios del abdomen | cardiovascular | 3 | 18 | 6 | 14 | disponible |
 | `abd-peritoneo` La cavidad abdominal y el peritoneo | Abdomen › Cavidad abdominal y peritoneo | digestivo | 2 | 20 | 9 | 24 | disponible |
+| `abd-linfaticos` Nodos lumbares y viscerales del abdomen, cisterna del quilo | Abdomen › Vasos y nervios del abdomen; Abdomen › Riñones y retroperitoneo | linfatico | 3 | 18 | 7 | 18 | disponible |
 | `pel-pelvis-osea` Pelvis ósea | Pelvis y periné › Pelvis ósea; Miembro inferior › Cintura pélvica | oseo, articular | 1 | 16 | 8 | 17 | disponible |
 | `pel-suelo` Suelo pélvico y periné | Pelvis y periné › Suelo pélvico; Pelvis y periné › Periné y genitales externos | muscular | 2 | 18 | 6 | 16 | disponible |
 | `pel-vasos` Arterias y venas de la pelvis | Pelvis y periné › Vasos y nervios de la pelvis | cardiovascular | 3 | 20 | 9 | 42 | disponible |
@@ -199,6 +201,7 @@ Generado por `node scripts/biblioteca.mjs` (no editar a mano). Cuenta las leccio
 | `mi-pie-musculos` Músculos del pie | Miembro inferior › Pie | muscular | 2 | 18 | 6 | 14 | disponible |
 | `mi-nervios` Nervios del miembro inferior | Miembro inferior › Región glútea; Miembro inferior › Muslo; Miembro inferior › Pierna; Miembro inferior › Pie | nervioso | 2 | 20 | 8 | 19 | disponible |
 | `mi-vasos` Arterias y venas del miembro inferior | Miembro inferior | cardiovascular | 2 | 18 | 7 | 14 | disponible |
+| `mi-ganglios` Nodos inguinales y poplíteos: el drenaje del miembro inferior | Miembro inferior › Muslo; Miembro inferior › Rodilla | linfatico | 2 | 16 | 8 | 15 | disponible |
 | `comp-miembro-superior` Confusiones frecuentes del miembro superior | Miembro superior | muscular, oseo, nervioso, cardiovascular | 2 | 16 | 7 | 21 | disponible |
 | `comp-miembro-inferior` Confusiones frecuentes del miembro inferior | Miembro inferior | muscular, oseo, nervioso, cardiovascular, articular | 2 | 16 | 7 | 19 | disponible |
 

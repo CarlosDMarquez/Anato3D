@@ -14,7 +14,7 @@ export const GRUPOS_ESTRUCTURA = [
   { id: 'musculos', tipos: ['musculo', 'tendon', 'vaina', 'fascia'] },
   { id: 'arterias', tipos: ['arteria'] },
   { id: 'venas', tipos: ['vena'] },
-  { id: 'linfatico', tipos: ['nodo'] },
+  { id: 'linfatico', tipos: ['nodo', 'linfatico'] },
   { id: 'nervios', tipos: ['nervio', 'ganglio', 'snc'] },
   { id: 'organos', tipos: ['organo', 'glandula', 'corazon', 'piel'] },
 ];

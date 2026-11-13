@@ -526,7 +526,7 @@ const VISC_TEJIDO = {
   gland_f: ["Bartholin's_gland"], mammary: ['Mammary_gland'], duct_f: ['Lactiferous_duct'], fat: ['Breast'],
   thyroid: ['Thyroid', 'Endocrine_gland'], parathyroid: ['Parathyroid_gland'], adrenal: ['Adrenal_gland', 'Endocrine_gland'],
   pituitary: ['Pituitary_gland'], pineal: ['Pineal_gland', 'Endocrine_gland'], spleen: ['Spleen'], thymus: ['Thymus'], tonsil: ['Tonsil'],
-  node: ['Lymph_node'],
+  node: ['Lymph_node'], lymph_vessel: ['Lymphatic_vessel'],
 };
 const VISC = {
   Trachea: ['Trachea', 'Tracheotomy'], Right_main_bronchus: ['Bronchus', 'Pulmonary_aspiration'], Left_main_bronchus: ['Bronchus'],

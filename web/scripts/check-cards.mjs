@@ -5,7 +5,9 @@
 // Además, el contenido de estudio (src/content): cada ficha de módulo contra su esquema y los modelos (campos
 // obligatorios, textos genéricos, fuentes de terminología y de contenido para cada afirmación, piezas que existen en los
 // modelos declarados y en ningún otro, estado de revisión). Informa también de cuántas piezas muestran una descripción
-// genérica en cada sistema (solo informa: es el contenido que falta escribir). Comprueba también que las etiquetas cortas
+// genérica en cada sistema (solo informa: es el contenido que falta escribir). Y las fichas del sistema linfático
+// (src/data/linfatico/): cada frase con fuente, cada cita comprobada palabra por palabra (scripts/linfatico-citas.mjs),
+// cada término de la TA2 existente y cada clave en los modelos o en el contrato de piezas nuevas. Comprueba también que las etiquetas cortas
 // (tipo de pieza, lado, tejido, sistemas y capas) tengan traducción en i18n/textos.js. Termina con código 1 si algo falla.
 import fs from 'fs';
 import path from 'path';
@@ -17,6 +19,9 @@ import { MODULOS } from '../src/content/index.js';
 import { revisarFicha, revisarModulo, GENERICOS } from '../src/content/schema.js';
 import { FUENTES } from '../src/content/fuentes.js';
 import { LIMITACIONES, revisarLimitaciones } from '../src/data/limitaciones.js';
+import { FICHAS_LINF, GRUPOS_LINF, REPETIDAS_LINF, ARCHIVOS_LINF, CONTRATO_LINF, revisarFichasLinf } from '../src/data/linfatico/index.js';
+import { CITAS_LINF } from '../src/data/linfatico/comprobadas.js';
+import { huellaCita } from './biblioteca/fuentes.mjs';
 
 // --models <carpeta>: revisa otra carpeta (build_all.sh revisa así el candidato antes de publicarlo).
 const flag = process.argv.indexOf('--models');
@@ -44,6 +49,7 @@ if (sinTraducir.length) {
   console.log(`sistemas y capas sin traducción (i18n/textos.js): ${[...new Set(sinTraducir)].join(', ')}`);
 }
 const nombres = {};                                   // modelo → Set de nombres de pieza (para la aplicabilidad)
+const linf = {};                                      // modelo → { piezas linfáticas, con ficha linfática propia }
 // --model: solo ese modelo (build_all.sh revisa el que construye; con «base» cambian los dos y revisa ambos).
 const only = process.argv.indexOf('--model');
 for (const model of only > 0 ? [process.argv[only + 1]] : ['male', 'female']) {
@@ -61,7 +67,8 @@ for (const model of only > 0 ? [process.argv[only + 1]] : ['male', 'female']) {
       c.piezas++;
       nombres[model].add(name);
       const d = info.entry?.descripcion ?? '';
-      if (GENERICOS.some((g) => g.test(d))) genericas[classify(x).system] = (genericas[classify(x).system] ?? 0) + 1;
+      if (x.system === 'lymphatic') { linf[model] ??= { piezas: 0, propia: 0 }; linf[model].piezas++; if (info.linfatico && !info.generica) linf[model].propia++; }
+      if (info.generica || GENERICOS.some((g) => g.test(d))) genericas[classify(x).system] = (genericas[classify(x).system] ?? 0) + 1;
       if (!info.title || /_/.test(info.title)) malos.titulo.push(name);
       if (!info.latin) malos.latin.push(name);
       if (RARO.test(`${info.title} ${info.latin ?? ''} ${info.entry?.descripcion ?? ''}`)) malos.raro.push(name);
@@ -89,6 +96,26 @@ const problemasLimites = revisarLimitaciones(LIMITACIONES, { piezasDe: (m) => no
 console.log(`limitaciones conocidas del modelo: ${LIMITACIONES.length} (${LIMITACIONES.map((l) => `${l.piezas.join('+')}: ${l.tipo}, ${l.estado}`).join('; ')})`);
 for (const p of problemasLimites) console.log(`  ${p.nivel}: ${p.texto}`);
 fallos += problemasLimites.filter((p) => p.nivel === 'error').length;
+// Fichas del sistema linfático.
+{
+  const ta2 = (() => {
+    const f = path.join(path.dirname(fileURLToPath(import.meta.url)), '../../sources/z-anatomy/TA2.csv');
+    if (!fs.existsSync(f)) return null;                // sources/ no va en git: sin la tabla no se comprueban los números
+    return new Set(fs.readFileSync(f, 'utf8').split('\n').map((l) => parseInt(l.replace(/^"/, ''), 10)).filter(Number.isFinite));
+  })();
+  const piezas = new Set(Object.values(nombres).flatMap((s) => [...s].map((n) => n.replace(/_[LR]$/, ''))));
+  const problemas = revisarFichasLinf(FICHAS_LINF, GRUPOS_LINF, { piezas, citas: CITAS_LINF, huella: huellaCita, ta2 });
+  for (const [k, a] of REPETIDAS_LINF) problemas.push({ nivel: 'error', texto: `ficha ${k}: está en varios archivos (${a.join(', ')})` });
+  const errores = problemas.filter((p) => p.nivel === 'error');
+  const avisos = problemas.filter((p) => p.nivel === 'aviso');
+  const porArchivo = Object.entries(ARCHIVOS_LINF).map(([a, f]) => `${a} ${Object.keys(f).length}`).join(', ');
+  const nuevas = Object.keys(CONTRATO_LINF).filter((k) => !piezas.has(k));
+  console.log(`fichas linfáticas: ${Object.keys(FICHAS_LINF).length} (${porArchivo}), ${Object.keys(GRUPOS_LINF).length} grupos; citas comprobadas: ${Object.values(CITAS_LINF).reduce((n, v) => n + v.length, 0)}${ta2 ? '' : ' (sin TA2.csv: números de la TA2 sin comprobar)'}`);
+  console.log(`  piezas linfáticas con ficha propia: ${Object.entries(linf).map(([m, c]) => `${m} ${c.propia}/${c.piezas}`).join(', ')}; piezas del contrato aún no construidas: ${nuevas.length}${nuevas.length ? ` (${nuevas.slice(0, 8).join(', ')}${nuevas.length > 8 ? '…' : ''})` : ''}`);
+  for (const p of errores) console.log(`  error: ${p.texto}`);
+  for (const p of avisos) console.log(`  aviso: ${p.texto}`);
+  fallos += errores.length;
+}
 // Contenido de estudio.
 for (const modulo of MODULOS) {
   const ids = new Set(modulo.estructuras.map((f) => f.id));

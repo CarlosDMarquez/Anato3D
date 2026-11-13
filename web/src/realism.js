@@ -237,6 +237,8 @@ const P = {
   fat: { rough: 0.45, cc: 0.2, ccr: 0.3, spec: 0.45, pat: 1, s: 180, alb: 0.06, bump: 0.0001, rv: 0.08, dark: ['#c99a40', 0.35], sss: [0.9, 0.75, 0.35, 0.65] },
   organ: { rough: 0.4, cc: 0.3, ccr: 0.2, spec: 0.5, pat: 0, s: 180, alb: 0.07, bump: 0.00003, rv: 0.08, sss: [0.6, 0.15, 0.12, 0.4] },
   node: { rough: 0.45, cc: 0.15, ccr: 0.32, spec: 0.45, pat: 0, s: 400, alb: 0.06, bump: 0.00003, rv: 0.08, sss: [0.45, 0.6, 0.3, 0.45] },
+  // Vasos, troncos y conductos linfáticos: pared fina y translúcida (más brillo y más luz dispersada que una vena).
+  lymph: { rough: 0.36, cc: 0.3, ccr: 0.22, spec: 0.5, pat: 0, s: 300, alb: 0.04, bump: 0.00002, rv: 0.06, sss: [0.75, 0.85, 0.5, 0.55] },
   glossy: { rough: 0.3, cc: 0.3, ccr: 0.15, spec: 0.55, pat: 0, s: 300, alb: 0.04, bump: 0.00002, rv: 0.06, sss: [0.6, 0.6, 0.65, 0.45] },
   membrane: { rough: 0.35, cc: 0.2, ccr: 0.25, spec: 0.5, pat: 0, s: 200, alb: 0.04, bump: 0, rv: 0.05, sss: [0.7, 0.7, 0.75, 0.4] },
   // Piel (patrón 5): skin = rojeces, palidez y variación de brillo por grasa. Luz dispersada más cálida y envolvente que en
@@ -254,6 +256,7 @@ const BY_NAME = [
   [/Tendon|Taenia|Aponeurosis/, 'tendon'],
   [/Muscle/, 'muscle'],
   [/Myocardium/, 'heart'],
+  [/MAT_Lymph_(Vessel|Duct)/, 'lymph'],                           // antes que «Vein|Duct…» (vasos linfáticos)
   [/Pulmonary_Vein|Artery/, 'artery'],
   [/Vein|Pulmonary_Artery/, 'vein'],
   [/Nerve|Ganglion/, 'nerve'],

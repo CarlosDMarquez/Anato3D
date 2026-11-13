@@ -1,29 +1,80 @@
 {
- "release": "20261109T035801-af87149",
- "generated": "2026-11-09T03:58:01+00:00",
+ "release": "20261113T023446-aec19a9",
+ "generated": "2026-11-13T02:34:46+00:00",
  "note": "Versión de los modelos de la web: un archivo solo es de esta versión si su SHA-256 coincide.",
  "builds": {
   "male": {
-   "date": "2026-11-09T03:58:01+00:00",
+   "date": "2026-11-13T02:34:46+00:00",
    "systems": [
-    "base",
-    "muscular",
-    "connective",
-    "vascular",
-    "nervous",
     "visceral"
    ],
    "git": {
-    "commit": "af87149",
+    "commit": "aec19a9",
     "uncommitted_changes": [
-     "M tools/audit_models.py",
-     " M tools/fix_neck.py",
+     "M tools/build_visceral.py",
+     " M web/scripts/biblioteca/clasificar.mjs",
+     " M web/scripts/biblioteca/fuentes.mjs",
+     " M web/scripts/check-cards.mjs",
+     " M web/scripts/extract-icons.mjs",
+     " M web/scripts/paquete-revision.mjs",
+     " M web/scripts/pet-prueba.mjs",
+     " M web/src/biblioteca/buscar.js",
+     " M web/src/biblioteca/datos.js",
+     " M web/src/biblioteca/eventos.js",
+     " M web/src/biblioteca/filtros.js",
+     " M web/src/biblioteca/formato.js",
+     " M web/src/biblioteca/lecciones/cab-senos-venosos.js",
+     " M web/src/biblioteca/taxonomia.js",
+     " M web/src/data/fuentes.js",
+     " M web/src/data/grupos.js",
+     " M web/src/data/resolve.js",
+     " M web/src/data/visceras.js",
+     " M web/src/i18n/textos-biblioteca.js",
+     " M web/src/i18n/textos-pet.js",
+     " M web/src/i18n/textos.js",
+     " M web/src/main.js",
+     " M web/src/pet/conversacion.js",
+     " M web/src/pet/local.js",
+     " M web/src/pet/protocolo.js",
+     " M web/src/pet/recorridos.js",
+     " M web/src/pet/trabajos.js",
      " M web/src/realism.js",
-     "?? tools/piel_musculos.py"
+     " M web/src/styles.css",
+     " M web/src/systems.js",
+     " M web/src/ui/biblioteca/explorar.js",
+     " M web/src/ui/biblioteca/index.js",
+     " M web/src/ui/biblioteca/leccion.js",
+     " M web/src/ui/biblioteca/mis-lecciones.js",
+     " M web/src/ui/biblioteca/mis-recorridos.js",
+     " M web/src/ui/biblioteca/pet.js",
+     " M web/src/ui/biblioteca/portada.js",
+     " M web/src/ui/biblioteca/preguntas.js",
+     " M web/src/ui/biblioteca/privacidad.js",
+     " M web/src/ui/icon-data.js",
+     " M web/src/ui/info.js",
+     "?? tools/checks/linfatico_capturas.py",
+     "?? tools/checks/linfatico_glb.py",
+     "?? tools/lymphatics.py",
+     "?? web/scripts/estimar-coste.mjs",
+     "?? web/scripts/linfatico-citas.mjs",
+     "?? web/scripts/paquete.mjs",
+     "?? web/scripts/presupuesto.mjs",
+     "?? web/scripts/proveedor-simulado.mjs",
+     "?? web/scripts/prueba-minima.mjs",
+     "?? web/src/data/linfatico-rutas.js",
+     "?? web/src/data/linfatico/",
+     "?? web/src/pet/dispositivo.js",
+     "?? web/src/pet/perfil.js",
+     "?? web/src/pet/planificador.js",
+     "?? web/src/pet/ruta.js",
+     "?? web/src/pet/sesiones.js",
+     "?? web/src/ui/biblioteca/mis-sesiones.js",
+     "?? web/src/ui/biblioteca/sesion-logica.js",
+     "?? web/src/ui/biblioteca/sesion-neuri.js"
     ]
    },
    "tools": {
-    "blender": "Blender 5.4.0 Alpha (c31386f6fc84)",
+    "blender": "Blender 5.4.0 Alpha",
     "python": "3.14.2",
     "node": "v26.12.1"
    },
@@ -53,47 +104,86 @@
      "sha256": "f50459187fac1ef0154d57193e482b1758cb80d6a3823e55cfa42790caa5e9ba"
     }
    },
-   "checks": "validate_models: 28 archivos correctos; check-cards: todo correcto",
+   "checks": "validate_models y check-cards en el ensayo (build/ensayo-linfatico); linfatico_glb: 30 piezas de vasos, 0 cabos sin declarar",
    "audit": {
     "file": "build/audit.json",
-    "sha256": "3ac9e27ed797ce04e7018a75d10198276b3eb216ee593dfa61f02489355cc52a",
-    "modified": "2026-11-09T03:11:56+00:00",
+    "sha256": "83c60f43b90c329021215e57c5b6cab41428e5bf78213d6f5e8c32af7394a33e",
+    "modified": "2026-11-09T04:00:21+00:00",
     "note": "Auditoría más reciente de build/; no se ejecuta en cada construcción, así que puede no corresponder a estos archivos."
    }
   },
   "female": {
-   "date": "2026-11-08T22:16:04+00:00",
+   "date": "2026-11-13T02:34:46+00:00",
    "systems": [
-    "muscular",
-    "connective",
-    "vascular",
-    "nervous",
     "visceral"
    ],
    "git": {
-    "commit": "898b4f1",
+    "commit": "aec19a9",
     "uncommitted_changes": [
-     "M tools/anato3d_fit.py",
-     " M tools/build_muscular.py",
-     " M tools/huesos_invertidos.py",
+     "M tools/build_visceral.py",
+     " M web/scripts/biblioteca/clasificar.mjs",
+     " M web/scripts/biblioteca/fuentes.mjs",
+     " M web/scripts/check-cards.mjs",
+     " M web/scripts/extract-icons.mjs",
      " M web/scripts/paquete-revision.mjs",
-     " M web/src/content/brazo.js",
-     " M web/src/content/fuentes.js",
-     " M web/src/content/index.js",
-     " M web/src/content/schema.js",
-     " M web/src/data/anatomia.js",
+     " M web/scripts/pet-prueba.mjs",
+     " M web/src/biblioteca/buscar.js",
+     " M web/src/biblioteca/datos.js",
+     " M web/src/biblioteca/eventos.js",
+     " M web/src/biblioteca/filtros.js",
+     " M web/src/biblioteca/formato.js",
+     " M web/src/biblioteca/lecciones/cab-senos-venosos.js",
+     " M web/src/biblioteca/taxonomia.js",
      " M web/src/data/fuentes.js",
+     " M web/src/data/grupos.js",
      " M web/src/data/resolve.js",
-     " M web/src/i18n/contenido.js",
+     " M web/src/data/visceras.js",
+     " M web/src/i18n/textos-biblioteca.js",
+     " M web/src/i18n/textos-pet.js",
      " M web/src/i18n/textos.js",
      " M web/src/main.js",
+     " M web/src/pet/conversacion.js",
+     " M web/src/pet/local.js",
+     " M web/src/pet/protocolo.js",
+     " M web/src/pet/recorridos.js",
+     " M web/src/pet/trabajos.js",
+     " M web/src/realism.js",
      " M web/src/styles.css",
+     " M web/src/systems.js",
+     " M web/src/ui/biblioteca/explorar.js",
+     " M web/src/ui/biblioteca/index.js",
+     " M web/src/ui/biblioteca/leccion.js",
+     " M web/src/ui/biblioteca/mis-lecciones.js",
+     " M web/src/ui/biblioteca/mis-recorridos.js",
+     " M web/src/ui/biblioteca/pet.js",
+     " M web/src/ui/biblioteca/portada.js",
+     " M web/src/ui/biblioteca/preguntas.js",
+     " M web/src/ui/biblioteca/privacidad.js",
+     " M web/src/ui/icon-data.js",
      " M web/src/ui/info.js",
-     "?? web/scripts/recorrido.js"
+     "?? tools/checks/linfatico_capturas.py",
+     "?? tools/checks/linfatico_glb.py",
+     "?? tools/lymphatics.py",
+     "?? web/scripts/estimar-coste.mjs",
+     "?? web/scripts/linfatico-citas.mjs",
+     "?? web/scripts/paquete.mjs",
+     "?? web/scripts/presupuesto.mjs",
+     "?? web/scripts/proveedor-simulado.mjs",
+     "?? web/scripts/prueba-minima.mjs",
+     "?? web/src/data/linfatico-rutas.js",
+     "?? web/src/data/linfatico/",
+     "?? web/src/pet/dispositivo.js",
+     "?? web/src/pet/perfil.js",
+     "?? web/src/pet/planificador.js",
+     "?? web/src/pet/ruta.js",
+     "?? web/src/pet/sesiones.js",
+     "?? web/src/ui/biblioteca/mis-sesiones.js",
+     "?? web/src/ui/biblioteca/sesion-logica.js",
+     "?? web/src/ui/biblioteca/sesion-neuri.js"
     ]
    },
    "tools": {
-    "blender": "Blender 5.4.0 Alpha (c31386f6fc84)",
+    "blender": "Blender 5.4.0 Alpha",
     "python": "3.14.2",
     "node": "v26.12.1"
    },
@@ -123,11 +213,11 @@
      "sha256": "0964ef45cf3ae08e5c163805b783766d9021aee7d687824aee115deeab6d181f"
     }
    },
-   "checks": "validate_models: 23 archivos correctos; check-cards: todo correcto",
+   "checks": "validate_models y check-cards en el ensayo (build/ensayo-linfatico); linfatico_glb: 30 piezas de vasos, 0 cabos sin declarar",
    "audit": {
     "file": "build/audit.json",
-    "sha256": "04b6a2b99ba915b946e89fa1cdbecb6f77bd9e6f10392a380f2ada2f90170fb3",
-    "modified": "2026-11-08T22:14:03+00:00",
+    "sha256": "83c60f43b90c329021215e57c5b6cab41428e5bf78213d6f5e8c32af7394a33e",
+    "modified": "2026-11-09T04:00:21+00:00",
     "note": "Auditoría más reciente de build/; no se ejecuta en cada construcción, así que puede no corresponder a estos archivos."
    }
   }
@@ -166,8 +256,8 @@
    "sha256": "5e996ee9d1f158d2b25841746494d45d751a988fa73e35b922258df560c3d1c8"
   },
   "female-index.json": {
-   "bytes": 531356,
-   "sha256": "37cd68f20ab83a526f134b3690b0bef519ce2ea0b9d0f4e3b55dfb6ef5f554fe"
+   "bytes": 541840,
+   "sha256": "d0de6d85aab954a251e65c8309ce8eebc5d29767c1b94efccd950c44fa708427"
   },
   "female-integumentary.glb": {
    "bytes": 182456,
@@ -178,12 +268,12 @@
    "sha256": "d181e80bc5b8ca0ab05e7a561e6b29e9a739ca90f42cd59341294bada853440e"
   },
   "female-lymphatic.glb": {
-   "bytes": 832996,
-   "sha256": "e712ff7fb46b81f71327a02b4e16c83ab184781997562d2f63ed513c4c5a45b4"
+   "bytes": 777420,
+   "sha256": "f6dbfffa58457af0ce4e7d44007b8a484d670802fec0ad0be322bf1e8cd5f36d"
   },
   "female-lymphatic.json": {
-   "bytes": 1075,
-   "sha256": "bcf82a8254e81b4fdab3709d9e83a4771f7ac885e9d82577786a5c8ec107c966"
+   "bytes": 1298,
+   "sha256": "dc6dc8eb07285dfa1ffdd3f8571d71bd98f30eefa16033eb7a97dab08cfc2ec8"
   },
   "female-muscular.glb": {
    "bytes": 3034760,
@@ -270,8 +360,8 @@
    "sha256": "fa1ce63a8375e45300d8c22cc4baa38da444b0d370df75c4921f2ac217a5c1b8"
   },
   "male-index.json": {
-   "bytes": 526145,
-   "sha256": "ba2aa4c00a30b294aed9db9b5ca3181541b1e5b02b7bf6f4694944ff8042fbc8"
+   "bytes": 536629,
+   "sha256": "b3dac38be055cfd079359a8caaea5c0dcc1cff973c7061ded06022c7be595225"
   },
   "male-integumentary.glb": {
    "bytes": 173676,
@@ -282,12 +372,12 @@
    "sha256": "d181e80bc5b8ca0ab05e7a561e6b29e9a739ca90f42cd59341294bada853440e"
   },
   "male-lymphatic.glb": {
-   "bytes": 822680,
-   "sha256": "52175cbfa10c5f9ddd05c4f20b70b630849d9a0c844c2c5632d58a9aedeac91f"
+   "bytes": 779964,
+   "sha256": "bc86c50b4ab8349a0dd68836beae6c52674cd6e2988818b2f9f577ad6509cfac"
   },
   "male-lymphatic.json": {
-   "bytes": 1075,
-   "sha256": "bcf82a8254e81b4fdab3709d9e83a4771f7ac885e9d82577786a5c8ec107c966"
+   "bytes": 1298,
+   "sha256": "dc6dc8eb07285dfa1ffdd3f8571d71bd98f30eefa16033eb7a97dab08cfc2ec8"
   },
   "male-muscular.glb": {
    "bytes": 3016400,

@@ -72,12 +72,18 @@ export const SYSTEMS = [
     ],
   },
   {
+    // «Completo» primero: es la capa que sale al pulsar el botón (antes salían solo los órganos y los nodos, que son casi
+    // todo el sistema, quedaban en la segunda). Los ids 'all', 'nodes' y 'organs' los usan las lecciones.
+    // 'vessels' son los vasos linfáticos (tissue 'lymph_vessel'); los conductos y troncos llevan major.
     id: 'lymphatic', label: 'Linfático', color: '#8fbf5a',
     stages: [
-      { id: 'organs', label: 'Órganos', filter: (p) => p.subsystem === 'organs' },
-      { id: 'nodes', label: 'Nodos', filter: (p) => p.subsystem === 'nodes' },
       { id: 'all', label: 'Completo', filter: all },
+      { id: 'nodes', label: 'Nodos y vasos', filter: (p) => p.subsystem === 'nodes' || p.subsystem === 'vessels' },
+      { id: 'ducts', label: 'Conductos y troncos', filter: (p) => p.subsystem === 'vessels' && p.major },
+      { id: 'organs', label: 'Órganos', filter: (p) => p.subsystem === 'organs' },
     ],
+    // Sin contexto de otros sistemas: Carlos no quiere que al encender el linfático aparezcan las venas (12 nov 2026).
+    // Quien quiera ver la yugular o el ángulo venoso enciende el sistema venoso (las lecciones lo hacen con sus capas).
   },
   {
     id: 'nervous', label: 'Nervioso', color: '#e8c547',

@@ -39,6 +39,14 @@
   "Thoracic_lymph_nodes": {
    "nombre": "Nodos del tórax",
    "latin": "Nodi lymphoidei thoracis"
+  },
+  "Lymphatic_trunks_and_ducts": {
+   "nombre": "Troncos y conductos linfáticos",
+   "latin": "Trunci et ductus lymphatici"
+  },
+  "Lymphatic_vessels": {
+   "nombre": "Vasos linfáticos",
+   "latin": "Vasa lymphatica"
   }
  }
 }

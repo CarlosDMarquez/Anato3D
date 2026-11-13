@@ -1,6 +1,8 @@
 import { GRUPOS } from './grupos.js';
 import { latinEtymology } from './musculos.js';
 import { fuentesViscera } from './fuentes.js';
+import { FICHAS_LINF, CAMPOS_LINF, CONTRATO_LINF, frasesDe, textoDe, evidenciasFrase, latinLinf, claveLinf } from './linfatico/index.js';
+import { FUENTES_LINF } from './linfatico/comprobadas.js';
 
 // Fichas de los sistemas respiratorio, digestivo, urogenital, endocrino y linfático. Cada tejido tiene una descripción general; los órganos
 // principales tienen ficha propia (clave: nombre inglés de Z-Anatomy con «_»).
@@ -52,9 +54,12 @@ const TEJIDO = {
   spleen: { tipo: 'Órgano linfoide', descripcion: 'Órgano que filtra la sangre y participa en la defensa del cuerpo.' },
   thymus: { tipo: 'Órgano linfoide', descripcion: 'Órgano donde maduran los linfocitos T.' },
   tonsil: { tipo: 'Órgano linfoide', descripcion: 'Acúmulo de tejido linfoide en la garganta.' },
+  // Vasos, troncos y conductos linfáticos (piezas generadas para Anato3D); sin este tejido caerían en «Mucosa».
+  lymph_vessel: { tipo: 'Vaso linfático', descripcion: 'Vaso de pared fina que lleva la linfa. Tiene válvulas que impiden que la linfa retroceda.' },
+  // Lo ve un nodo solo si falta la ficha general del nodo (linfatico/centrales.js, Lymph_node), que es la que se usa.
   node: {
     tipo: 'Nodo linfático',
-    descripcion: 'Grupo de nodos linfáticos, también llamados ganglios linfáticos: pequeños órganos con forma de riñón u ovalados, de 2 a 25 mm de largo. Su función principal es filtrar la linfa para detectar y combatir las infecciones.',
+    descripcion: 'Grupo de nodos (ganglios) linfáticos: pequeños órganos con forma de riñón u ovalados, de 2 a 25 mm de largo. Su función principal es filtrar la linfa para detectar y combatir las infecciones.',
     datos: ['Cuando aumentan de tamaño algunos pueden notarse al tacto; que crezcan los de una sola zona puede indicar una infección o un tumor en esa zona.', 'Muchos cánceres pueden extenderse a los nodos cercanos; por eso su estado es muy importante para saber en qué fase está el cáncer.'],
   },
 };
@@ -145,7 +150,8 @@ export const VISCERAS = {
   Adenohypophysis: { descripcion: 'Lóbulo anterior de la hipófisis. Produce las hormonas que controlan la tiroides, las suprarrenales y las gónadas, además de la hormona del crecimiento y la prolactina.', datos: ['El hipotálamo la controla mediante una red propia de vasos sanguíneos (sistema porta hipofisario).', 'La hipófisis descansa en la silla turca del hueso esfenoides.'] },
   Neurohypophysis: { descripcion: 'Lóbulo posterior de la hipófisis, formado por prolongaciones de neuronas del hipotálamo. Libera a la sangre la oxitocina y la hormona antidiurética (vasopresina).', datos: ['La hormona antidiurética hace que el riñón ahorre agua.'] },
   Pineal_gland: { descripcion: 'Pequeña glándula con forma de piña en el centro del encéfalo, detrás del tercer ventrículo. Produce melatonina, que ayuda a regular el ciclo de sueño y vigilia.', datos: ['Su secreción aumenta en la oscuridad.', 'Con la edad suele calcificarse y se ve en las radiografías.'] },
-  // ── Linfático ──
+  // ── Linfático ── (la app usa las fichas de data/linfatico/, con cita por frase; estas quedan como texto anterior,
+  // y los puntos clave de los nodos se siguen viendo en los grupos que aún no tienen ficha propia)
   Spleen: { descripcion: 'Órgano de 7 a 14 cm de largo, bajo la parte izquierda del diafragma, por debajo de las costillas 9.ª a 11.ª. Filtra la sangre, retira los glóbulos rojos viejos y participa en la defensa frente a infecciones.', datos: ['Su extirpación (esplenectomía) aumenta el riesgo de algunas infecciones graves, como la sepsis.'] },
   Left_lobe_of_thymus: { descripcion: 'Lóbulo del timo, órgano linfoide situado en la parte alta y anterior del tórax, detrás del esternón y delante del corazón. En él maduran los linfocitos T.', datos: ['Desde el comienzo de la adolescencia se reduce y su tejido se va sustituyendo por grasa.'] },
   Palatine_tonsil: { descripcion: 'Masa de tejido linfoide a cada lado de la garganta, entre los arcos del paladar. Es la «amígdala» que se ve al abrir la boca; en la terminología anatómica se llama tonsila palatina.', datos: ['Forma parte del anillo de Waldeyer, a la entrada de las vías respiratoria y digestiva, que protege al cuerpo de lo que entra por las mucosas.', 'Su inflamación es la amigdalitis.'] },
@@ -170,10 +176,97 @@ const parse = (s) => {
   try { return JSON.parse(s || '[]'); } catch { return []; }
 };
 
+// ── Fichas del sistema linfático (data/linfatico/): cada frase con el número de sus fuentes ──
+const TA2_LINF = { texto: 'Terminologia Anatomica, 2.ª ed. (FIPAT, 2019)', url: 'https://ta2viewer.openanatomy.org/' };
+/** Fuente de una evidencia de ficha linfática: página de Wikipedia (en la versión leída) o término de la TA2. */
+function fuenteLinf(e) {
+  if (e.ta2) return { id: `ta2:${e.ta2}`, tipo: 'ta2', termino: e.ta2, texto: `${TA2_LINF.texto}, término n.º ${e.ta2}`, url: TA2_LINF.url };
+  const i = e.f.indexOf(':');
+  const tipo = e.f.slice(0, i);
+  const pagina = e.f.slice(i + 1);
+  const reg = FUENTES_LINF[e.f];
+  const titulo = reg?.titulo ?? pagina.replace(/_/g, ' ');
+  const host = tipo === 'wpes' ? 'es' : 'en';
+  return { id: e.f, tipo, titulo, texto: `Wikipedia (en ${tipo === 'wpes' ? 'español' : 'inglés'}): «${titulo}»`, url: reg?.url ?? `https://${host}.wikipedia.org/wiki/${encodeURIComponent(pagina)}` };
+}
+
+/**
+ * Ficha de una pieza linfática con ficha propia (o la general del nodo). Además de los campos de siempre (descripción,
+ * campos, puntos clave y fuentes, que usan el buscador, Neuri y las traducciones), devuelve `linfatico`: cada frase con
+ * los números de sus fuentes y las citas literales, para que la ficha diga qué fuente respalda cada frase.
+ */
+function fichaLinfatica(ficha, { key, side, x, group, tejido, extra }) {
+  const refs = new Map();                                  // id → { n, ...fuente, citas }
+  const frases = (campo) => frasesDe(campo).map((fr) => {
+    const ev = evidenciasFrase(fr);
+    const nums = [];
+    const citas = [];
+    for (const e of ev) {
+      if (e.modelo) continue;
+      const f = fuenteLinf(e);
+      if (!refs.has(f.id)) refs.set(f.id, { n: refs.size + 1, ...f, citas: [] });
+      const r = refs.get(f.id);
+      if (!nums.includes(r.n)) nums.push(r.n);
+      if (e.c) { citas.push(e.c); if (!r.citas.includes(e.c)) r.citas.push(e.c); }
+    }
+    return { texto: fr[0].trim(), refs: nums, citas, modelo: ev.some((e) => e.modelo) };
+  });
+  const descripcion = frases(ficha.descripcion);
+  const campos = CAMPOS_LINF.map(([k, label]) => ({ clave: k, label, frases: frases(ficha[k]) })).filter((c) => c.frases.length);
+  const notas = frases(ficha.notas);
+  // Puntos clave antiguos de la víscera (comprobados por página, sin cita por frase): se conservan con sus páginas.
+  for (const d of extra?.datos ?? []) {
+    const nums = (extra.paginas ?? []).map((p) => {
+      const f = fuenteLinf({ f: `wp:${p}` });
+      if (!refs.has(f.id)) refs.set(f.id, { n: refs.size + 1, ...f, citas: [] });
+      return refs.get(f.id).n;
+    });
+    notas.push({ texto: d, refs: nums, citas: [], modelo: false });
+  }
+  const contrato = CONTRATO_LINF[claveLinf(key)];
+  const latin = ficha.latin ?? latinLinf(x.name_la) ?? contrato?.la ?? null;
+  // Término de la TA2 del nombre (no en la ficha general del nodo: el suyo es el de «nodo linfático», no el del grupo).
+  const terminos = ficha.generica ? [] : [].concat(ficha.ta2 ?? []);
+  const nombre = terminos.map((n) => ({ papel: 'Nombre', texto: `${TA2_LINF.texto}, término n.º ${n}`, url: TA2_LINF.url }));
+  const lista = [...refs.values()];
+  return {
+    key: x.name_en ?? key,
+    side,
+    title: cap(x.name_es || contrato?.es || x.name_en || key.replace(/_/g, ' ')),
+    latin,
+    tissue: null,
+    chips: [tejido.tipo, ...(ficha.chips ?? []), side && (side === 'L' ? 'Lado izquierdo' : 'Lado derecho')].filter(Boolean),
+    fields: [
+      group && { label: 'Región', value: group.nombreEs ?? group.nombre },
+      ...campos.map((c) => ({ label: c.label, value: c.frases.map((f) => f.texto).join(' ') })),
+    ].filter(Boolean),
+    entry: { descripcion: descripcion.map((f) => f.texto).join(' '), etimologia: latinEtymology(latin) },
+    datos: notas.map((f) => f.texto),
+    source: x.source ?? null,
+    fuentes: {
+      lista: [...nombre, ...lista.map((r) => ({ papel: r.tipo === 'ta2' ? 'Nombre' : 'Ficha', texto: r.texto, url: r.url }))],
+      nota: 'Cada frase lleva el número de la fuente que la respalda; al pasar el puntero por el número se ve la cita literal. Las páginas se enlazan en la versión que se leyó.',
+    },
+    generica: !!ficha.generica,
+    linfatico: { descripcion, campos, notas, refs: lista, nombre: terminos, latinFormado: !!ficha.latinFormado },
+  };
+}
+
 export function resolveVisceral(name, x) {
   const side = /_L$/.test(name) ? 'L' : /_R$/.test(name) ? 'R' : null;
   const region = parse(x.region);
   const key = String(x.name_en ?? '').replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '');
+  if (x.system === 'lymphatic') {
+    // Ficha propia por la clave sin lado (nombre inglés, o el de la pieza); un nodo sin ficha propia ve la general.
+    const propia = FICHAS_LINF[claveLinf(key)] ?? FICHAS_LINF[claveLinf(name)];
+    const ficha = propia ?? (x.tissue === 'node' ? FICHAS_LINF.Lymph_node : null);
+    if (ficha) {
+      const tejido = TEJIDO[x.tissue] ?? TEJIDO.node;
+      const group = [...region].reverse().map((g) => GRUPOS[g]).find(Boolean);
+      const viejo = !propia && VISCERAS[key]?.datos?.length ? { datos: VISCERAS[key].datos, paginas: fuentesViscera(key, 'node', false)?.lista.map((f) => f.url.split('/wiki/')[1]) ?? [] } : null;
+      return fichaLinfatica(ficha, { key: claveLinf(key || name), side, x, group, tejido, extra: viejo });
+    }
+  }
   const own = VISCERAS[key] ?? null;
   const tejidoKey = TEJIDO[x.tissue] ? x.tissue : 'mucosa';
   const tejido = TEJIDO[tejidoKey];

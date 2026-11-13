@@ -31,7 +31,16 @@ function ribClass(n) {
   return { chip: 'Costilla flotante', dato: 'Costilla flotante: solo se une a las vértebras; su extremo anterior termina libre.' };
 }
 
-export const sideOf = (name) => splitSide(name).side;
+/**
+ * Lado de una malla para el visor y el buscador. «_L»/«_R» al final siempre es el lado. «Left_»/«Right_» al principio
+ * solo lo es cuando las dos piezas comparten ficha (Left_Eyeball/Right_Eyeball → «Globo ocular»): en el resto el lado
+ * ya está en el nombre (Left_subclavian_vein, «vena subclavia izquierda») o no es un lado del cuerpo (Left_colic_nodes,
+ * Right_gastric_nodes, Right_lymphatic_duct), y marcarlo con «izq.»/«der.» sería redundante o falso.
+ */
+export const sideOf = (name) => {
+  const { base, side } = splitSide(name);
+  return /_(L|R)$/.test(name) || ANATOMIA[base] ? side : null;
+};
 
 export function resolvePart(name, extras = {}) {
   // Latín que no trae la traducción de Z-Anatomy (fuentes.js): entra como si viniera en el modelo, con su fuente.

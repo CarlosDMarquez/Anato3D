@@ -49,6 +49,7 @@ export const PLAN = [
   P('cue-musculos', 'Músculos del cuello y hueso hioides', [['cuello', 'musculos-cuello']], ['muscular', 'oseo'], 'estructuras', ['musculos', 'huesos']),
   P('cue-visceras', 'Vísceras del cuello: laringe, faringe, tráquea y tiroides', [['cuello', 'visceras-cuello']], ['respiratorio', 'digestivo', 'endocrino'], 'topografia', ['organos']),
   P('cue-vasos', 'Carótidas y yugulares', [['cuello', 'vasos-nervios-cuello']], ['cardiovascular'], 'trayectos', ['arterias-venas']),
+  P('cue-ganglios', 'Nodos linfáticos de la cabeza y el cuello', [['cuello', 'vasos-nervios-cuello'], ['cabeza', 'cara']], ['linfatico'], 'topografia', ['organos']),
   // Espalda
   P('esp-columna', 'Columna vertebral', [['espalda', 'columna']], ['oseo', 'articular'], 'estructuras', ['huesos', 'accidentes-oseos', 'articulaciones']),
   P('esp-musculos', 'Músculos de la espalda', [['espalda', 'musculos-espalda']], ['muscular'], 'estructuras', ['musculos']),
@@ -69,6 +70,7 @@ export const PLAN = [
   P('abd-rinones', 'Riñones y glándulas suprarrenales', [['abdomen', 'retroperitoneo']], ['urinario', 'endocrino'], 'topografia', ['organos']),
   P('abd-vasos', 'Aorta abdominal, vena cava inferior y vena porta', [['abdomen', 'vasos-nervios-abdomen']], ['cardiovascular'], 'trayectos', ['arterias-venas']),
   P('abd-peritoneo', 'La cavidad abdominal y el peritoneo', [['abdomen', 'peritoneo']], ['digestivo'], 'topografia', ['organos']),
+  P('abd-linfaticos', 'Nodos lumbares y viscerales del abdomen y cisterna del quilo', [['abdomen', 'vasos-nervios-abdomen'], ['abdomen', 'retroperitoneo']], ['linfatico'], 'topografia', ['organos']),
   // Pelvis y periné
   P('pel-pelvis-osea', 'Pelvis ósea', [['pelvis', 'pelvis-osea'], [MI, 'cintura-pelvica']], ['oseo', 'articular'], 'estructuras', ['huesos', 'accidentes-oseos']),
   P('pel-suelo', 'Suelo pélvico y periné', [['pelvis', 'suelo-pelvico'], ['pelvis', 'perine']], ['muscular'], 'estructuras', ['musculos']),
@@ -100,6 +102,7 @@ export const PLAN = [
   P('mi-pie-musculos', 'Músculos del pie', [[MI, 'pie']], ['muscular'], 'estructuras', ['musculos']),
   P('mi-nervios', 'Nervios del miembro inferior', [[MI, null]], ['nervioso'], 'trayectos', ['nervios']),
   P('mi-vasos', 'Arterias y venas del miembro inferior', [[MI, null]], ['cardiovascular'], 'trayectos', ['arterias-venas']),
+  P('mi-ganglios', 'Nodos inguinales y poplíteos: el drenaje del miembro inferior', [[MI, 'muslo'], [MI, 'rodilla']], ['linfatico'], 'topografia', ['organos']),
   // Comparación
   P('comp-miembro-superior', 'Confusiones frecuentes del miembro superior', [[MS, null]], ['muscular', 'oseo', 'nervioso', 'cardiovascular'], 'comparacion', ['confusiones']),
   P('comp-miembro-inferior', 'Confusiones frecuentes del miembro inferior', [[MI, null]], ['muscular', 'oseo', 'cardiovascular'], 'comparacion', ['confusiones']),
