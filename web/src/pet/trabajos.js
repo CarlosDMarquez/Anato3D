@@ -21,6 +21,24 @@ import { pedirJSON, leerFlujo, leerJSON, cortar, motivo, nuevoId } from './red.j
 
 export const CLAVE_TRABAJOS = 'anato3d.trabajos';
 export const MAX_TRABAJOS = 20;
+/**
+ * Paradas que no son fallos: la cuota de creaciones (`limite`, por dirección; `ocupado`, la de todos) y el tope de gasto
+ * (`sin-presupuesto`). El servidor no gastó nada en esa petición y dice cuánto falta (`espera`, en segundos), que aquí
+ * se guarda como `hasta` (ms). El mismo trabajo se puede seguir después: `reanudable`.
+ */
+// También el cupo diario de creaciones de este dispositivo (`cupo`: 429 con `cupo.renueva`, la hora a la que se renueva,
+// y `espera` en milisegundos): se sigue a esa hora.
+export const PAUSAS = ['limite', 'ocupado', 'sin-presupuesto', 'cupo'];
+const pausa = (r, d, ahora) => {
+  if (d?.error === 'cupo') {
+    const renueva = Date.parse(d.cupo?.renueva ?? '');
+    if (Number.isFinite(renueva) && renueva > ahora()) return renueva;
+    const ms = Number(d.espera);
+    return Number.isFinite(ms) && ms > 0 ? ahora() + Math.min(ms, 48 * 3600 * 1000) : null;
+  }
+  const s = Number(d?.espera ?? r?.headers?.get?.('retry-after'));
+  return Number.isFinite(s) && s > 0 ? ahora() + Math.min(s, 40 * 24 * 3600) * 1000 : null;
+};
 export const EN_CURSO = ['planificando', 'fuentes', 'redactando', 'comprobando', 'corrigiendo', 'guardando'];
 export const FINALES = ['guardada', 'no-guardada', 'aclaracion', 'limitacion', 'error', 'interrumpida'];
 export const PLAZOS_TRABAJO = { planificar: 150_000, conectar: 30_000, inactividad: 60_000 };
@@ -34,9 +52,11 @@ const porque = (control, err) => (motivo(control) === 'cancelada' ? 'cancelada' 
  * `comun()`: lo que va en toda petición ({ v, idioma, progreso, propias, contexto }); `historial()`: los turnos de la
  * conversación (para planificar con su contexto); `guardarLeccion(L)` → { ok, error? } (la guarda en «Mis lecciones»);
  * `basePropia(id)`: la lección propia entera que se adapta (las de la biblioteca las tiene el servidor). `ahora` y
- * `plazos`: el reloj y los plazos (las pruebas los cambian).
+ * `plazos`: el reloj y los plazos (las pruebas los cambian). `alCupo(cupo)`: el cupo diario que trae cada respuesta del
+ * servidor (para enseñar el saldo; en la app, la conversación: conversacion.anotarCupo).
  */
-export function crearTrabajos({ fetch = globalThis.fetch?.bind(globalThis), url = '/api/pet', almacen = null, comun, historial = () => [], guardarLeccion, basePropia = () => null, ahora = Date.now, plazos = PLAZOS_TRABAJO }) {
+export function crearTrabajos({ fetch = globalThis.fetch?.bind(globalThis), url = '/api/pet', almacen = null, comun, historial = () => [], guardarLeccion, basePropia = () => null, ahora = Date.now, plazos = PLAZOS_TRABAJO, alCupo = null }) {
+  const cupoDe = (d) => { if (d?.cupo) { try { alCupo?.(d.cupo); } catch { /* el saldo nunca para una creación */ } } };
   let lista = leer(almacen, ahora);
   const oyentes = new Set();
   const conexiones = new Map();        // id → AbortController de la conexión abierta en esta pestaña
@@ -100,6 +120,7 @@ export function crearTrabajos({ fetch = globalThis.fetch?.bind(globalThis), url 
     const mensajes = t.unidad ? [] : historial();
     try {
       const { r, d } = await pedirJSON(fetch, url, { method: 'POST', headers: JSON_H, body: JSON.stringify({ ...comun(), modo: 'planificar', mensajes, solicitud: t.solicitud, trabajo: t.id, ...(base ? { base } : {}) }) }, plazos.planificar, control);
+      cupoDe(d);
       if (motivo(control) === 'cancelada') return false;
       if (r.ok && d?.ok && d.tipo === 'plan' && limpiarPlan(d.plan)) {
         const plan = { ...limpiarPlan(d.plan), accion: d.plan.accion, base: d.plan.base ?? null };
@@ -110,7 +131,10 @@ export function crearTrabajos({ fetch = globalThis.fetch?.bind(globalThis), url 
         poner(t, { estado: d.tipo === 'aclaracion' ? 'aclaracion' : 'limitacion', codigo: d.codigo ?? null, errores: d.errores ?? null, mensaje: String(d.mensaje ?? '').slice(0, LIMITES.pet) || null });
         return false;
       }
-      poner(t, { estado: 'error', error: codigoError(r, d) });
+      const error = codigoError(r, d);
+      // Cuota o tope de gasto: no se planificó nada (no costó); el mismo trabajo sigue cuando se pueda.
+      if (PAUSAS.includes(error)) poner(t, { estado: 'error', error, hasta: pausa(r, d, ahora), reanudable: true });
+      else poner(t, { estado: 'error', error });
     } catch (err) {
       const por = porque(control, err);
       if (por !== 'cancelada') poner(t, { estado: 'error', error: por, reanudable: true });
@@ -134,11 +158,16 @@ export function crearTrabajos({ fetch = globalThis.fetch?.bind(globalThis), url 
       try { r = await fetch(url, { method: 'POST', headers: { ...JSON_H, accept: 'application/x-ndjson' }, body: JSON.stringify(cuerpo), signal: control.signal }); } finally { clearTimeout(reloj); }
       if (!r.ok) {
         const d = await leerJSON(r);
+        cupoDe(d);
         if (retomar && d?.error === 'trabajo-desconocido') return poner(t, { estado: 'interrumpida', reanudable: false });
-        return poner(t, { estado: 'error', error: codigoError(r, d), reanudable: false });
+        const error = codigoError(r, d);
+        // Cuota o tope de gasto antes de empezar a redactar: el servidor no lo empezó; el mismo trabajo sigue después.
+        if (PAUSAS.includes(error)) return poner(t, { estado: 'error', error, hasta: pausa(r, d, ahora), reanudable: true });
+        return poner(t, { estado: 'error', error, reanudable: false });
       }
       await leerFlujo(r, (e) => {
         if (e.estado === 'latido' || motivo(control)) return;
+        cupoDe(e);                                       // (el primer evento lleva el cupo)
         ultimo = e;
         if (e.estado === 'lista') return;             // se guarda abajo
         if (!ESTADOS.has(e.estado)) return;
@@ -219,7 +248,7 @@ export function crearTrabajos({ fetch = globalThis.fetch?.bind(globalThis), url 
         return t;
       }
       if (t.reanudable) {
-        poner(t, { estado: t.plan ? 'fuentes' : 'planificando', error: null, reanudable: false });
+        poner(t, { estado: t.plan ? 'fuentes' : 'planificando', error: null, hasta: null, reanudable: false });
         ejecutar(t);
         return t;
       }

@@ -52,7 +52,7 @@ export async function renderMapa(ctx, { foco = null, aviso = null } = {}) {
         <li class="mapa-hab-${h.estado}">
           <div class="mapa-hab-cab"><b>${esc(t(`hab.${h.id}`))}</b><span class="mapa-chip">${esc(t(`hab.estado.${h.estado}`))}</span></div>
           ${h.intentos ? `${barra(h.recientes.aciertos, h.recientes.n, t('bib.mapa.recientes', { a: h.recientes.aciertos, n: h.recientes.n }))}
-            <p class="mapa-hab-d">${esc(t('bib.mapa.recientes', { a: h.recientes.aciertos, n: h.recientes.n }))}${h.consolidadas ? ` · ${esc(tn('bib.mapa.consolidadas', h.consolidadas))}` : ''}</p>` : `<p class="mapa-hab-d">${esc(t(`hab.${h.id}.como`))}</p>`}
+            <p class="mapa-hab-d">${esc(t('bib.mapa.recientes', { a: h.recientes.aciertos, n: h.recientes.n }))}${h.consolidadas ? ` · ${esc(tn('bib.mapa.consolidadas', h.consolidadas))}` : ''}${h.conAyuda ? ` · ${esc(tn('bib.mapa.conAyuda', h.conAyuda))}` : ''}</p>` : `<p class="mapa-hab-d">${esc(t(`hab.${h.id}.como`))}</p>`}
         </li>`).join('')}
       </ul>
 

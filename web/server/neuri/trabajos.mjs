@@ -61,7 +61,7 @@ export function crearRegistro({ maximo = 8, porIp = 2, ahora = Date.now, latidoM
       j.latido.unref?.();
       Promise.resolve()
         .then(() => trabajo((e) => emitir(j, e), j.control.signal))
-        .catch((err) => { if (!j.control.signal.aborted) console.error('[pet] Error en un trabajo:', err); emitir(j, { estado: 'error', error: j.control.signal.aborted ? 'cancelada' : 'servidor' }); })
+        .catch((err) => { if (!j.control.signal.aborted) console.error(`[pet] Error en un trabajo (${err?.codigo ?? err?.name ?? 'error'}).`); emitir(j, { estado: 'error', error: j.control.signal.aborted ? 'cancelada' : 'servidor' }); })
         .finally(() => { if (!j.final) emitir(j, { estado: 'error', error: j.control.signal.aborted ? 'cancelada' : 'incompleta' }); });
       return { trabajo: j };
     },

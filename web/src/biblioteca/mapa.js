@@ -4,7 +4,9 @@
 //
 // Lo que cuenta como evidencia: las respuestas en evaluaciones, repasos y prácticas. No cuentan las comprobaciones
 // dentro de una lección (se responden con el contenido a la vista), ni lo que no se pudo mostrar o seleccionar en el
-// modelo (técnico), ni abrir o tener abierta una lección.
+// modelo (técnico), ni abrir o tener abierta una lección. Lo acertado tras una pista o en un segundo intento (dentro de
+// una sesión con Neuri: el intento lleva la ayuda 'pista' o 'segundo-intento', preguntas.js) es práctica, no evidencia
+// de que se sabe: cuenta como intento, pero no como acierto (no demuestra la habilidad).
 //
 // Estados de una habilidad (reconocer, localizar, relacionar, explicar, comparar):
 //   sin-datos     aún no hay respuestas de ese tipo;
@@ -22,6 +24,10 @@ const DIA = 24 * 3600 * 1000;
 
 /** ¿Es este intento evidencia de lo que se sabe? */
 export const cuenta = (i) => CUENTAN.has(i.m) && ['acierto', 'duda', 'fallo'].includes(i.r);
+/** ¿Se respondió con ayuda de la sesión (tras una pista o en el segundo intento)? */
+export const conAyuda = (i) => Array.isArray(i.a) && (i.a.includes('pista') || i.a.includes('segundo-intento'));
+/** ¿Es un acierto que demuestra algo? (bien, y sin la pista ni el segundo intento). */
+export const acierto = (i) => i.r !== 'fallo' && !conAyuda(i);
 
 /**
  * El mapa. `catalogo`: lecciones del catálogo (para contar lecciones y no hablar de lo que ya no existe);
@@ -39,14 +45,14 @@ export function calcularMapa(data, { catalogo = [], ahora = Date.now(), invalida
   const habilidades = P.HABILIDADES.map((h) => {
     const de = validos.filter((i) => i.h === h);
     const recientes = de.slice(-VENTANA);
-    const bien = (xs) => xs.filter((i) => i.r !== 'fallo').length;
+    const bien = (xs) => xs.filter(acierto).length;
     const items = Object.entries(data.items).filter(([id]) => existe.has(id.slice(0, id.indexOf('/'))))
       .filter(([id]) => de.some((i) => `${i.l}/${i.q}` === id));
     const consolidadas = items.filter(([, e]) => e.caja >= P.CAJA_DOMINIO).length;
     const ratio = recientes.length ? bien(recientes) / recientes.length : 0;
     const demostrada = recientes.length >= MIN_RECIENTES && ratio >= P.UMBRAL_DEMOSTRADA;
     const estado = !de.length ? 'sin-datos' : demostrada && consolidadas >= MIN_CONSOLIDADAS ? 'consolidada' : demostrada ? 'demostrada' : 'practicando';
-    return { id: h, estado, intentos: de.length, aciertos: bien(de), recientes: { n: recientes.length, aciertos: bien(recientes) }, preguntas: items.length, consolidadas };
+    return { id: h, estado, intentos: de.length, aciertos: bien(de), conAyuda: de.filter((i) => i.r !== 'fallo' && conAyuda(i)).length, recientes: { n: recientes.length, aciertos: bien(recientes) }, preguntas: items.length, consolidadas };
   });
 
   // Lecciones: visitadas, terminadas, con aprendizaje demostrado y consolidadas (cada cosa por separado).

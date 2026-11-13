@@ -9,11 +9,23 @@
 //   adaptar     una lección existente según la petición (tras pulsar «Crear la adaptación»)
 //   trabajo     volver a conectarse a una creación en curso o terminada (tras recargar la página)
 //   cancelar    detener una creación en curso
+//   sesion      planificar una sesión de estudio con lo que ya existe (repaso, lecciones o partes, práctica); la
+//               sesión vive en el navegador: el servidor nunca la guarda
 // Todo lo que llega de fuera (de la app o del modelo) se recorta y se comprueba aquí.
+//
+// Lo que se añadió sin subir la versión (todo opcional para lo antiguo):
+//   cabecera «x-anato3d-dispositivo» (ID_DISPOSITIVO): el cupo diario por dispositivo; nunca va en el cuerpo
+//   cupo        en toda respuesta JSON de /api/pet (limpiarCupo); 429 { error: 'cupo', de, cupo, espera } al agotarse
+//   perfil      lo que la app resume del aprendizaje (orientar y sesion; limpiarPerfil): sin fechas ni respuestas
+//   enfoque     dónde está la persona al preguntar (lección, paso, si es una sesión; limpiarEnfoque)
+//   mostrar     estructuras que Orientar propone ver en 3D; sesion_pedida: la persona pide una sesión de estudio
+
+import { HABILIDADES } from '../biblioteca/progreso.js';
+import { REGION_POR_ID, SISTEMA_POR_ID } from '../biblioteca/taxonomia.js';
 
 export const VERSION = 2;
 export const IDIOMAS = ['es', 'en', 'de', 'fr', 'it'];
-export const MODOS = ['orientar', 'planificar', 'redactar', 'adaptar', 'trabajo', 'cancelar'];
+export const MODOS = ['orientar', 'planificar', 'redactar', 'adaptar', 'trabajo', 'cancelar', 'sesion'];
 
 export const LIMITES = {
   mensajes: 12,        // turnos de la conversación que se envían (los más recientes)
@@ -33,6 +45,14 @@ export const LIMITES = {
   largo: 600,          // caracteres de un campo largo (objetivo, enfoque, resumen…)
   cuerpo: 64 * 1024,   // bytes de la petición (con el plan o la lección base)
   leccionBase: 200 * 1024, // bytes de una lección propia que se adapta
+  mensajesSesion: 6,   // turnos que se envían al planificar una sesión (pueden faltar)
+  bloquesSesion: 6,    // bloques de una sesión de estudio
+  minutosBloque: 60,   // minutos de un bloque
+  mostrar: 3,          // estructuras que Orientar propone ver en 3D
+  intereses: 4,        // regiones o sistemas del perfil
+  dificultades: 6,     // dificultades del perfil
+  tituloSesion: 80,    // caracteres del título de la última sesión en el perfil
+  vencidas: 999,       // repasos vencidos que se cuentan
 };
 
 export const ID_PROPIA = /^neuri-[a-z0-9-]{3,80}$/;
@@ -40,6 +60,24 @@ export const ID_PROPIA = /^neuri-[a-z0-9-]{3,80}$/;
 export const ID_TRABAJO = /^[a-z0-9][a-z0-9-]{15,63}$/;
 /** Identificador de un recorrido personal: también lo genera la app (otro UUID; no es el de ningún trabajo). */
 export const ID_RECORRIDO = ID_TRABAJO;
+/**
+ * Identificador del dispositivo para el cupo diario: lo genera la app una vez (UUID aleatorio, en localStorage
+ * «anato3d.dispositivo») y viaja solo en la cabecera «x-anato3d-dispositivo»; nunca en el cuerpo, al modelo ni a los registros.
+ */
+export const ID_DISPOSITIVO = ID_TRABAJO;
+/** Estados de una habilidad en el mapa de aprendizaje (src/biblioteca/mapa.js). */
+export const ESTADOS_HABILIDAD = ['sin-datos', 'practicando', 'demostrada', 'consolidada'];
+/** Por qué cuesta algo (las dificultades del mapa de aprendizaje). */
+export const MOTIVOS_DIFICULTAD = ['confusion', 'nolose', 'fallo'];
+/** Bloques de una sesión de estudio y qué parte de una lección se hace en un bloque. */
+export const TIPOS_BLOQUE = ['repaso', 'leccion', 'practica'];
+export const PARTES_LECCION = ['entera', 'inicio', 'continuar'];
+/** Clave de una estructura del inventario 3D (la misma forma que en los planes de lección). */
+const CLAVE_ESTRUCTURA = /^[A-Za-z0-9_()'.,-]{2,120}$/;
+/** Identificador de un paso de una lección. */
+const ID_PASO = /^[a-z0-9-]{1,60}$/;
+/** Forma de un identificador de lección, cuando no se tiene la lista de las que existen. */
+const ID_LECCION = /^[a-z0-9-]{2,100}$/;
 /**
  * Estado de una unidad de un recorrido personal (src/pet/recorridos.js lo deduce de su lección y de su trabajo):
  * lista (validada y guardada en «Mis lecciones»), preparando, pendiente, error, interrumpida y sin-guardar (validada,
@@ -204,6 +242,150 @@ export function limpiarPlan(p) {
   };
 }
 
+/** ¿Es `id` una lección que existe? Sin la lista (`idsLecciones` nulo), basta con que tenga la forma de una. */
+const leccionValida = (id, idsLecciones) => typeof id === 'string' && (idsLecciones ? idsLecciones.has(id) : ID_LECCION.test(id));
+/** Un entero acotado: los que se pasan del rango se llevan al borde (lo que no es un entero, nulo). */
+const acotado = (n, min, max) => (Number.isInteger(n) ? Math.min(max, Math.max(min, n)) : null);
+
+/** Un contador del cupo: { limite, usadas, quedan } (quedan nunca pasa de limite − usadas). Null si no sirve. */
+function contadorCupo(c) {
+  if (!c || typeof c !== 'object') return null;
+  const limite = entero(c.limite, 0, 1e6);
+  const usadas = entero(c.usadas, 0, 1e6);
+  if (limite == null || usadas == null) return null;
+  const libres = Math.max(0, limite - usadas);
+  const quedan = entero(c.quedan, 0, 1e6);
+  return { limite, usadas, quedan: quedan == null ? libres : Math.min(quedan, libres) };
+}
+
+/**
+ * El cupo diario del dispositivo que acompaña a las respuestas de /api/pet:
+ * { preguntas: { limite, usadas, quedan }, creaciones: { … }, renueva: ISO 8601 }. Null si no sirve.
+ */
+export function limpiarCupo(c) {
+  if (!c || typeof c !== 'object') return null;
+  const preguntas = contadorCupo(c.preguntas);
+  const creaciones = contadorCupo(c.creaciones);
+  const renueva = typeof c.renueva === 'string' && c.renueva.length <= 40
+    && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})$/.test(c.renueva) && !Number.isNaN(Date.parse(c.renueva)) ? c.renueva : null;
+  if (!preguntas || !creaciones || !renueva) return null;
+  return { preguntas, creaciones, renueva };
+}
+
+/** Lo que cuesta, del mapa de aprendizaje: lección, estructura (o null), motivo y cuántos fallos (1-9). */
+function limpiarDificultad(d, idsLecciones) {
+  if (!d || typeof d !== 'object' || !leccionValida(d.leccion, idsLecciones) || !MOTIVOS_DIFICULTAD.includes(d.motivo)) return null;
+  return {
+    leccion: d.leccion, estructura: typeof d.estructura === 'string' && CLAVE_ESTRUCTURA.test(d.estructura) ? d.estructura : null,
+    motivo: d.motivo, fallos: acotado(d.fallos, 1, 9) ?? 1,
+  };
+}
+
+/** La última sesión de estudio: título (≤80), bloques hechos y totales, y si se terminó. Null si no sirve. */
+function limpiarUltima(u) {
+  if (!u || typeof u !== 'object') return null;
+  const titulo = texto(u.titulo, LIMITES.tituloSesion);
+  const bloques = u.bloques >= 1 ? acotado(u.bloques, 1, 12) : null;
+  if (!titulo || !bloques) return null;
+  return { titulo, hechos: Math.min(bloques, acotado(u.hechos, 0, 12) ?? 0), bloques, terminada: u.terminada === true };
+}
+
+/**
+ * El perfil de aprendizaje que la app calcula en el dispositivo (para orientar y planificar sesiones): nivel, minutos,
+ * intereses (regiones o sistemas de la taxonomía), estado de cada habilidad, hasta 6 dificultades, repasos vencidos y
+ * la última sesión. Sin fechas, sin respuestas y sin texto libre salvo el título de esa sesión. Null si no dice nada.
+ */
+export function limpiarPerfil(p, idsLecciones = null) {
+  if (!p || typeof p !== 'object' || Array.isArray(p)) return null;
+  const habilidades = {};
+  if (p.habilidades && typeof p.habilidades === 'object') {
+    for (const h of HABILIDADES) if (ESTADOS_HABILIDAD.includes(p.habilidades[h])) habilidades[h] = p.habilidades[h];
+  }
+  const vistas = new Set();
+  const perfil = {
+    nivel: entero(p.nivel, 1, 3), minutos: entero(p.minutos, 3, 240),
+    intereses: Array.isArray(p.intereses)
+      ? [...new Set(p.intereses.filter((x) => typeof x === 'string' && (REGION_POR_ID.has(x) || SISTEMA_POR_ID.has(x))))].slice(0, LIMITES.intereses)
+      : [],
+    habilidades,
+    // (Sin repetir la misma estructura de la misma lección.)
+    dificultades: lista(p.dificultades, Infinity, (d) => limpiarDificultad(d, idsLecciones))
+      .filter((d) => { const k = `${d.leccion}|${d.estructura}`; return vistas.has(k) ? false : vistas.add(k); })
+      .slice(0, LIMITES.dificultades),
+    vencidas: acotado(p.vencidas, 0, LIMITES.vencidas) ?? 0,
+    ultima: limpiarUltima(p.ultima),
+  };
+  const vacio = perfil.nivel == null && perfil.minutos == null && !perfil.intereses.length && !Object.keys(habilidades).length
+    && !perfil.dificultades.length && !perfil.vencidas && !perfil.ultima;
+  return vacio ? null : perfil;
+}
+
+/** Dónde está la persona al preguntar: { leccion, paso (o null), sesion }. Null si la lección no existe. */
+export function limpiarEnfoque(e, idsLecciones = null) {
+  if (!e || typeof e !== 'object' || !leccionValida(e.leccion, idsLecciones)) return null;
+  return { leccion: e.leccion, paso: typeof e.paso === 'string' && ID_PASO.test(e.paso) ? e.paso : null, sesion: e.sesion === true };
+}
+
+/**
+ * Lo que la persona pide al planificar una sesión: { objetivo (1-600), minutos (5-120), nivel (1-3 o null), modelo }.
+ * Null si falta algo o se sale de rango (la petición se rechaza con 'pedido').
+ */
+export function limpiarPedidoSesion(p) {
+  if (!p || typeof p !== 'object' || Array.isArray(p)) return null;
+  if (typeof p.objetivo !== 'string' || p.objetivo.length > LIMITES.largo * 2) return null;
+  const objetivo = texto(p.objetivo, LIMITES.largo);
+  const minutos = entero(p.minutos, 5, 120);
+  const nivel = p.nivel == null ? null : entero(p.nivel, 1, 3);
+  if (!objetivo || minutos == null || (p.nivel != null && nivel == null) || !['male', 'female'].includes(p.modelo)) return null;
+  return { objetivo, minutos, nivel, modelo: p.modelo };
+}
+
+/** Un bloque de una sesión: repaso, lección (entera, el inicio o continuar) o práctica de una lección. Null si no sirve. */
+function limpiarBloque(b, idsLecciones) {
+  if (!b || typeof b !== 'object' || !TIPOS_BLOQUE.includes(b.tipo)) return null;
+  // (Los minutos se acotan: un bloque de «90 minutos» es un bloque largo, no uno que no dice cuánto dura.)
+  const minutos = Number.isInteger(b.minutos) && b.minutos > 0 ? Math.min(LIMITES.minutosBloque, b.minutos) : null;
+  if (minutos == null) return null;
+  const motivo = texto(b.motivo, LIMITES.motivo);
+  if (b.tipo === 'repaso') return { tipo: 'repaso', minutos, motivo };
+  if (!leccionValida(b.leccion, idsLecciones)) return null;
+  if (b.tipo === 'practica') return { tipo: 'practica', leccion: b.leccion, minutos, motivo };
+  return { tipo: 'leccion', leccion: b.leccion, parte: PARTES_LECCION.includes(b.parte) ? b.parte : 'entera', minutos, motivo };
+}
+
+/**
+ * El plan de una sesión de estudio (lo devuelve el modo «sesion» o lo arma la app sin IA): título, mensaje, objetivo y
+ * de 1 a 6 bloques con lecciones que existen. Forma, no contenido: el servidor revisa el resto y la app, otra vez, al
+ * guardarla. Null si no queda ningún bloque.
+ */
+export function limpiarPlanSesion(plan, idsLecciones = null) {
+  if (!plan || typeof plan !== 'object' || Array.isArray(plan)) return null;
+  const titulo = texto(plan.titulo, LIMITES.campo);
+  const bloques = lista(plan.bloques, LIMITES.bloquesSesion, (b) => limpiarBloque(b, idsLecciones));
+  if (!titulo || !bloques.length) return null;
+  return { titulo, mensaje: texto(plan.mensaje, LIMITES.largo), objetivo: texto(plan.objetivo, LIMITES.largo), bloques };
+}
+
+/** Estructuras que Orientar propone ver en 3D: [{ clave, nombre }] sin repetir, como mucho 3. */
+function limpiarMostrar(l) {
+  if (!Array.isArray(l)) return [];
+  const out = [];
+  for (const m of l) {
+    if (!m || typeof m !== 'object' || typeof m.clave !== 'string' || !CLAVE_ESTRUCTURA.test(m.clave) || out.some((x) => x.clave === m.clave)) continue;
+    out.push({ clave: m.clave, nombre: texto(m.nombre, LIMITES.campo) || m.clave });
+    if (out.length === LIMITES.mostrar) break;
+  }
+  return out;
+}
+
+/** La persona pide una sesión de estudio en la conversación: { objetivo, minutos (5-120 o null), nivel }. Null si no. */
+function limpiarSesionPedida(s) {
+  if (!s || typeof s !== 'object') return null;
+  const objetivo = texto(s.objetivo, LIMITES.largo);
+  if (!objetivo) return null;
+  return { objetivo, minutos: Number.isInteger(s.minutos) && s.minutos > 0 ? Math.min(120, Math.max(5, s.minutos)) : null, nivel: entero(s.nivel, 1, 3) };
+}
+
 /**
  * Comprueba y recorta una petición de la app. Devuelve { ok: true, peticion } o { ok: false, error }.
  * `ids`: { lecciones: Set, recorridos: Set } (los de la biblioteca; las propias se añaden desde la petición).
@@ -222,7 +404,9 @@ export function validarPeticion(cuerpo, ids) {
   const idsLecciones = new Set([...ids.lecciones, ...propias.map((p) => p.id)]);
 
   const mensajes = [];
-  for (const m of Array.isArray(cuerpo.mensajes) ? cuerpo.mensajes.slice(-LIMITES.mensajes) : []) {
+  // (Al planificar una sesión bastan los últimos turnos; pueden faltar.)
+  const maxMensajes = modo === 'sesion' ? LIMITES.mensajesSesion : LIMITES.mensajes;
+  for (const m of Array.isArray(cuerpo.mensajes) ? cuerpo.mensajes.slice(-maxMensajes) : []) {
     if (m?.rol === 'usuario') {
       if (typeof m.texto !== 'string' || m.texto.length > LIMITES.usuario * 2) return { ok: false, error: 'largo' };
       const t = texto(m.texto, LIMITES.usuario);
@@ -249,6 +433,17 @@ export function validarPeticion(cuerpo, ids) {
   const idsRecorridos = new Set(recorridos.map((r) => r.id));
   const peticion = { modo, idioma, mensajes, progreso, propias, recorridos, contexto: limpiarContexto(cuerpo.contexto), trabajo };
 
+  // Perfil de aprendizaje y enfoque (dónde está la persona): opcionales; solo viajan si sirven.
+  if (modo === 'orientar' || modo === 'sesion') {
+    const perfil = limpiarPerfil(cuerpo.perfil, idsLecciones);
+    if (perfil) peticion.perfil = perfil;
+    const enfoque = limpiarEnfoque(cuerpo.enfoque, idsLecciones);
+    if (enfoque) peticion.enfoque = enfoque;
+  }
+  if (modo === 'sesion') {
+    peticion.pedido = limpiarPedidoSesion(cuerpo.pedido);
+    if (!peticion.pedido) return { ok: false, error: 'pedido' };
+  }
   if (modo === 'planificar') {
     peticion.solicitud = limpiarSolicitud(cuerpo.solicitud, idsLecciones, idsRecorridos);
     if (!peticion.solicitud) return { ok: false, error: 'solicitud' };
@@ -264,6 +459,9 @@ export function validarPeticion(cuerpo, ids) {
     if (!peticion.plan || peticion.plan.estructuras.length < 1 || peticion.plan.pasos.length < 4) return { ok: false, error: 'plan' };
     if ((modo === 'adaptar') !== (peticion.plan.accion === 'adaptar')) return { ok: false, error: 'plan' };
   }
+  // El día de la persona (AAAA-MM-DD, su calendario local): la fecha de la lección que se cree. El servidor solo lo
+  // acepta si está a un día como mucho del suyo (server/pet.mjs, fechaPedagogica); nunca cuenta para el gasto.
+  if (typeof cuerpo.hoy === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(cuerpo.hoy)) peticion.hoy = cuerpo.hoy;
   // La lección propia que se adapta viaja entera (la biblioteca la tiene el servidor; las propias, solo el navegador).
   const base = modo === 'adaptar' ? peticion.plan.base : modo === 'planificar' ? peticion.solicitud.leccion_base : null;
   if (base) {
@@ -303,5 +501,8 @@ export function limpiarRespuesta(r, ids) {
     solicitud,
     contexto: limpiarContexto(r.contexto),
     sugerencias,
+    // Estructuras para «Ver en 3D» (el servidor comprueba que estén en el inventario) y la sesión de estudio que pide la persona.
+    mostrar: limpiarMostrar(r.mostrar),
+    sesion_pedida: limpiarSesionPedida(r.sesion_pedida),
   };
 }

@@ -1,0 +1,6 @@
+# Se copia al paquete como .dockerignore: lo que NO entra en la imagen.
+# datos/ es la carpeta que crea el servidor al probarlo en local (tope de gasto, reportes): nunca a la imagen.
+datos
+*.log
+.env
+.env.*

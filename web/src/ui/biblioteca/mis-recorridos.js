@@ -36,7 +36,7 @@ function item(ctx, R) {
   const unidades = R.unidades.map((u, k) => {
     const e = res.estados[k];
     const L = e.leccion && ctx.porId.get(e.leccion);
-    const ic = e.estado === 'lista' ? icono('check') : e.estado === 'preparando' ? '<i class="neuri-giro" aria-hidden="true"></i>' : ['error', 'interrumpida', 'sin-guardar'].includes(e.estado) ? icono('info') : '<i class="neuri-unidad-vacio" aria-hidden="true"></i>';
+    const ic = e.estado === 'lista' ? icono('check') : e.estado === 'preparando' ? '<i class="neuri-giro" aria-hidden="true"></i>' : e.estado === 'detenida' ? icono('clock') : ['error', 'interrumpida', 'sin-guardar'].includes(e.estado) ? icono('info') : '<i class="neuri-unidad-vacio" aria-hidden="true"></i>';
     return `<li class="mis-rec-u ${esc(e.estado)}">
       <span class="neuri-unidad-n" aria-hidden="true">${k + 1}</span>
       <span class="mis-rec-u-txt"><b><span class="sr-only">${esc(t('pet.rec.unidadN', { n: k + 1 }))}: </span>${esc(u.titulo)}</b>

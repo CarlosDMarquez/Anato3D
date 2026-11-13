@@ -8,15 +8,20 @@ import { cargarLecciones } from '../../scripts/biblioteca/fuentes.mjs';
 import { MODULOS } from '../../src/content/index.js';
 import { deModulo } from '../../src/biblioteca/modulos.js';
 
-/** `raiz`: la carpeta web/. Las páginas están en build/biblioteca (fuera de git; se rehacen con los scripts). */
-export async function cargarRecursos({ raiz, fetch = globalThis.fetch, registro = console } = {}) {
-  const build = path.join(raiz, '../build/biblioteca');
-  const dirNeuri = path.join(build, 'fuentes-neuri');
-  const inventario = cargarInventario();
+/**
+ * En desarrollo: `raiz`, la carpeta web/; las páginas están en build/biblioteca (fuera de git; se rehacen con los
+ * scripts). En producción (server/produccion.mjs), lo que trae el paquete: `fuentes` (carpetas de páginas), `lecciones`
+ * (las de la biblioteca, ya leídas), `inventario` (sus datos) y `dirNeuri` (dónde se guardan las páginas que baja Neuri:
+ * la carpeta de datos, no el paquete).
+ */
+export async function cargarRecursos({ raiz = null, fetch = globalThis.fetch, registro = console, fuentes = null, dirNeuri: dirN = null, lecciones: dadas = null, inventario: datosInventario = null } = {}) {
+  const build = raiz ? path.join(raiz, '../build/biblioteca') : null;
+  const dirNeuri = dirN ?? path.join(build, 'fuentes-neuri');
+  const inventario = datosInventario ? cargarInventario(datosInventario) : cargarInventario();
   const corpus = crearCorpus();
-  const paginas = paginasGuardadas([path.join(build, 'fuentes'), dirNeuri]);
+  const paginas = paginasGuardadas([...(fuentes ?? [path.join(build, 'fuentes')]), dirNeuri]);
   for (const p of paginas) corpus.añadirFuente(p.f, p.meta, p.texto);
-  const nuevas = await cargarLecciones();
+  const nuevas = dadas ?? await cargarLecciones();
   for (const L of nuevas.values()) corpus.añadirLeccion(L);
   const antiguas = new Map(MODULOS.map(deModulo).filter(Boolean).map((L) => [L.id, L]));
   const lecciones = new Map([...antiguas, ...nuevas]);
@@ -35,7 +40,7 @@ export async function cargarRecursos({ raiz, fetch = globalThis.fetch, registro 
         if (p) corpus.añadirFuente(p.f, p.meta, p.texto);
         return p;
       } catch (err) {
-        registro.error?.(`[pet] No se pudo bajar «${titulo}» de Wikipedia: ${err.message}`);
+        registro.error?.(`[pet] No se pudo bajar una página de Wikipedia (${err?.code ?? err?.name ?? 'error'}).`);   // sin el título: lo eligió el modelo a partir de lo que pidió la persona
         return null;
       }
     },

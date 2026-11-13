@@ -14,7 +14,12 @@
     "check": "node scripts/check-cards.mjs && node scripts/contenido-i18n.mjs --comprobar && node scripts/biblioteca.mjs --comprobar && node scripts/neuri-datos.mjs --comprobar",
     "biblioteca": "node scripts/biblioteca.mjs",
     "fuentes": "node scripts/biblioteca/fuentes.mjs",
-    "pet:prueba": "node scripts/pet-prueba.mjs"
+    "pet:prueba": "node scripts/pet-prueba.mjs",
+    "presupuesto": "node scripts/presupuesto.mjs",
+    "coste": "node scripts/estimar-coste.mjs",
+    "paquete": "node scripts/paquete.mjs",
+    "servidor": "node scripts/paquete.mjs && cd ../build/paquete && node servidor.mjs",
+    "proveedor-simulado": "node scripts/proveedor-simulado.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.7.0",

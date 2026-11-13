@@ -16,8 +16,16 @@
 //   preparando   su trabajo está en curso, con su etapa real
 //   sin-guardar  validada, pero el navegador no la pudo guardar (se puede volver a guardar o descargar)
 //   error        no se pudo crear (con su código)
-//   interrumpida el servidor ya no tiene su trabajo (tras recargar la página más de media hora después…)
+//   interrumpida el servidor ya no tiene su trabajo (tras recargar la página más de media hora después…); volver a
+//                crearla puede costar otra vez, así que la persona lo confirma (crearUnidad(…, { confirmado: true }))
+//   detenida     en pausa, sin fallo: la cuota de creaciones por hora (`motivo: 'cuota'`, con la hora a la que se puede
+//                seguir), el cupo diario de creaciones de este dispositivo (`motivo: 'cupo'`, hasta su renovación) o
+//                el tope de gasto (`motivo: 'presupuesto'`); el servidor no gastó nada en ella
 //   pendiente    nada creado ni en marcha (también tras cancelarla o quitar su lección de «Mis lecciones»)
+//
+// La cola no se para por una pausa: espera (`pausa: { motivo, hasta }`) y sigue sola a la hora que dijo el servidor
+// (mientras la página esté abierta; si no, al volver), empezando por la unidad detenida. Las unidades listas se pueden
+// estudiar mientras tanto. Al servidor y a Neuri, una unidad detenida se cuenta como pendiente.
 //
 // Se guarda en localStorage (CLAVE_RECORRIDOS) con formato versionado: { formato, version, recorridos }. Lo que no se
 // puede leer (dañado o de una versión más nueva) se aparta tal cual antes de escribir (CLAVE_RECORRIDOS_APARTADOS); si
@@ -25,7 +33,7 @@
 // es otra decisión de la persona, aparte y con confirmación).
 import { LIMITES, ID_RECORRIDO, ID_TRABAJO, ID_PROPIA, limpiarRecorrido } from './protocolo.js';
 import { pedirJSON, cortar, motivo, nuevoId } from './red.js';
-import { FINALES } from './trabajos.js';
+import { FINALES, PAUSAS } from './trabajos.js';
 
 export const CLAVE_RECORRIDOS = 'anato3d.recorridos';
 export const CLAVE_RECORRIDOS_APARTADOS = 'anato3d.recorridos.apartados';
@@ -40,6 +48,8 @@ const ID_UNIDAD = /^u[a-z0-9]{6,20}$/;
 const JSON_H = { 'content-type': 'application/json', accept: 'application/json' };
 const texto = (s, max) => (typeof s === 'string' ? s.replace(/\s+/g, ' ').trim().slice(0, max) : '');
 const idUnidad = () => `u${nuevoId().replace(/[^a-z0-9]/g, '').slice(0, 12)}`;
+/** Al servidor (y a Neuri), una unidad en pausa es una pendiente: su protocolo no tiene más estados. */
+const paraServidor = (e) => (e === 'detenida' ? 'pendiente' : e);
 
 /**
  * `comun()`: lo que va en toda petición ({ v, idioma, progreso, propias, recorridos, contexto }); `historial()`: los
@@ -51,10 +61,12 @@ const idUnidad = () => `u${nuevoId().replace(/[^a-z0-9]/g, '').slice(0, 12)}`;
 export function crearRecorridos({
   fetch = globalThis.fetch?.bind(globalThis), url = '/api/pet', almacen = null, comun, historial = () => [], trabajos,
   existeLeccion = () => false, espacio = () => Infinity, alIniciar = null, ahora = Date.now, plazos = PLAZOS_RECORRIDO,
+  programar = (fn, ms) => setTimeout(fn, ms), alCupo = null,
 }) {
   let { lista, apartar: porApartar } = leer(almacen);
   const oyentes = new Set();
   const planificando = new Map();     // id → AbortController de la planificación en curso en esta pestaña
+  const relojes = new Map();          // id → hora (ms) a la que está programado seguir una cola en pausa
 
   const avisar = (R) => { for (const fn of oyentes) { try { fn(R); } catch { /* un oyente roto no para nada */ } } };
   const buscar = (id) => lista.find((R) => R.id === id) ?? null;
@@ -90,6 +102,9 @@ export function crearRecorridos({
       if (t.estado === 'no-guardada') return { estado: 'sin-guardar', trabajo: t, codigo: t.error ?? 'almacenamiento' };
       if (t.estado === 'interrumpida') return { estado: 'interrumpida', trabajo: t, codigo: 'interrumpida' };
       if (t.estado === 'error' && t.error === 'cancelada') return { estado: 'pendiente', motivo: 'cancelada', trabajo: t };
+      // Cuota de creaciones o tope de gasto: en pausa, no es un fallo.
+      // (Motivos: 'cuota' por hora, 'cupo' diario de este dispositivo —sigue al renovarse— o 'presupuesto'.)
+      if (t.estado === 'error' && PAUSAS.includes(t.error)) return { estado: 'detenida', motivo: t.error === 'sin-presupuesto' ? 'presupuesto' : t.error === 'cupo' ? 'cupo' : 'cuota', hasta: t.hasta ?? null, trabajo: t };
       return { estado: 'error', trabajo: t, codigo: t.estado === 'error' ? (t.error ?? 'servidor') : t.estado === 'limitacion' ? (t.codigo ?? 'limitacion') : t.estado };
     }
     return u.leccion ? { estado: 'pendiente', motivo: 'quitada' } : { estado: 'pendiente' };
@@ -99,9 +114,12 @@ export function crearRecorridos({
   function resumen(R) {
     const estados = R.unidades.map(estadoUnidad);
     const cuenta = (e) => estados.filter((x) => x.estado === e).length;
-    const i = estados.findIndex((x) => x.estado === 'pendiente');
+    // La siguiente: la que está en pausa (se sigue por ella) o la primera pendiente.
+    const d = estados.findIndex((x) => x.estado === 'detenida');
+    const i = d >= 0 ? d : estados.findIndex((x) => x.estado === 'pendiente');
     return {
-      total: R.unidades.length, listas: cuenta('lista'), preparando: cuenta('preparando'), pendientes: cuenta('pendiente'),
+      total: R.unidades.length, listas: cuenta('lista'), preparando: cuenta('preparando'), pendientes: cuenta('pendiente') + cuenta('detenida'),
+      detenidas: cuenta('detenida'),
       problemas: cuenta('error') + cuenta('interrumpida') + cuenta('sin-guardar'),
       minutos: R.unidades.reduce((n, u) => n + (u.minutos ?? 0), 0),
       siguiente: i >= 0 ? R.unidades[i] : null, nSiguiente: i + 1,
@@ -119,18 +137,20 @@ export function crearRecorridos({
   });
 
   /**
-   * Crea una unidad (pendiente, con error o interrumpida): un trabajo de creación como cualquier otro. Si ya tenía un
-   * plan, el mismo (no se vuelve a planificar); tras un corte de red, el mismo trabajo. Devuelve { ok, trabajo?, error? }:
-   * 'ya' (lista, en preparación o sin guardar), 'ocupado' (otra unidad del recorrido se está preparando: de una en una),
-   * 'planificando', 'lleno' (no cabe en «Mis lecciones») o 'no-existe'.
+   * Crea una unidad (pendiente, en pausa, con error o interrumpida): un trabajo de creación como cualquier otro. Si ya
+   * tenía un plan, el mismo (no se vuelve a planificar); tras un corte de red o una pausa, el mismo trabajo. Una unidad
+   * interrumpida (el servidor la olvidó) puede volver a costar: solo con `confirmado`. Devuelve { ok, trabajo?, error? }:
+   * 'ya' (lista, en preparación o sin guardar), 'confirmar', 'ocupado' (otra unidad del recorrido se está preparando: de
+   * una en una), 'planificando', 'lleno' (no cabe en «Mis lecciones») o 'no-existe'.
    */
-  function crearUnidad(id, uid) {
+  function crearUnidad(id, uid, { confirmado = false } = {}) {
     const R = buscar(id);
     const u = R?.unidades.find((x) => x.id === uid);
     if (!R || !u) return { ok: false, error: 'no-existe' };
     if (estadoRecorrido(R) === 'planificando') return { ok: false, error: 'planificando' };
     const e = estadoUnidad(u);
-    if (!['pendiente', 'error', 'interrumpida'].includes(e.estado)) return { ok: false, error: 'ya' };
+    if (!['pendiente', 'detenida', 'error', 'interrumpida'].includes(e.estado)) return { ok: false, error: 'ya' };
+    if (e.estado === 'interrumpida' && !confirmado) return { ok: false, error: 'confirmar' };
     if (R.unidades.some((x) => x !== u && estadoUnidad(x).estado === 'preparando')) return { ok: false, error: 'ocupado' };
     if (!(espacio() >= 1)) { tocar(R, { aviso: { codigo: 'lleno' } }); return { ok: false, error: 'lleno' }; }
     const prev = e.trabajo;
@@ -150,14 +170,46 @@ export function crearRecorridos({
     return u ? crearUnidad(id, u.id) : { ok: false, error: 'nada' };
   }
 
-  /** La cola de «todas»: la siguiente que nunca se intentó, cuando no hay ninguna en preparación; si no queda, se apaga. */
-  function seguirCola(R) {
+  /**
+   * La cola de «todas»: cuando no hay ninguna en preparación, primero la unidad en pausa (si ya es la hora) y si no, la
+   * siguiente que nunca se intentó; si no queda ninguna, se apaga. En pausa, espera a la hora que dijo el servidor (con
+   * un reloj mientras la página está abierta; si no, al volver). `ya`: la persona pulsó «Seguir» (no espera a la hora).
+   */
+  function seguirCola(R, { ya = false } = {}) {
     if (!R?.cola || estadoRecorrido(R) === 'planificando') return;
-    if (R.unidades.some((x) => estadoUnidad(x).estado === 'preparando')) return;
+    const estados = R.unidades.map(estadoUnidad);
+    if (estados.some((x) => x.estado === 'preparando')) return;
+    const k = estados.findIndex((x) => x.estado === 'detenida');
+    if (k >= 0) {
+      const hasta = estados[k].hasta;
+      // Sin hora (tope de gasto sin fecha de renovación): solo cuando la persona lo pide.
+      if (!ya && (!hasta || hasta > ahora())) {
+        if (!R.pausa || R.pausa.hasta !== hasta || R.pausa.motivo !== estados[k].motivo) tocar(R, { pausa: { motivo: estados[k].motivo, hasta: hasta ?? null, unidad: R.unidades[k].id } });
+        if (hasta) despertar(R, hasta);
+        return;
+      }
+      tocar(R, { pausa: null });
+      const r = crearUnidad(R.id, R.unidades[k].id);
+      if (!r.ok) tocar(R, { cola: false, aviso: { codigo: r.error } });
+      return;
+    }
+    if (R.pausa) tocar(R, { pausa: null });
     const u = R.unidades.find((x) => !x.trabajo && !x.leccion);
     if (!u) { tocar(R, { cola: false }); return; }
     const r = crearUnidad(R.id, u.id);
     if (!r.ok) tocar(R, { cola: false, aviso: { codigo: r.error } });
+  }
+  /** Un reloj para seguir la cola a la hora de la pausa (uno por recorrido; un segundo de margen). */
+  function despertar(R, hasta) {
+    if (relojes.get(R.id) === hasta) return;
+    relojes.set(R.id, hasta);
+    try {
+      programar(() => {
+        if (relojes.get(R.id) !== hasta) return;
+        relojes.delete(R.id);
+        seguirCola(buscar(R.id));
+      }, Math.max(0, hasta - ahora()) + 1000);
+    } catch { /* sin relojes: sigue al volver a abrir la app */ }
   }
 
   // Lo que pasa con las creaciones de las unidades: el trabajo nuevo de un reintento sustituye al anterior en su unidad;
@@ -175,8 +227,14 @@ export function crearRecorridos({
       cambia = true;
     }
     if (x.estado === 'guardada' && x.leccionId && u.leccion !== x.leccionId) { u.leccion = x.leccionId; cambia = true; }
+    // Una pausa (cuota o tope de gasto) no para la cola: espera y sigue a su hora.
+    if (x.estado === 'error' && PAUSAS.includes(x.error) && R.cola) {
+      if (cambia) tocar(R);
+      queueMicrotask(() => seguirCola(buscar(R.id)));
+      return;
+    }
     if (FINALES.includes(x.estado) && R.cola && x.estado !== 'guardada') {
-      tocar(R, { cola: false, aviso: { codigo: x.estado === 'error' && x.error === 'cancelada' ? 'cancelada' : 'parada', unidad: u.id } });
+      tocar(R, { cola: false, pausa: null, aviso: { codigo: x.estado === 'error' && x.error === 'cancelada' ? 'cancelada' : 'parada', unidad: u.id } });
       return;
     }
     if (cambia) tocar(R); else avisar(R);
@@ -186,7 +244,7 @@ export function crearRecorridos({
   /** Lo que la app manda al servidor para cambiar un recorrido: cómo es ahora, con el estado real de cada unidad. */
   const baseDe = (R) => ({
     id: R.id, titulo: R.titulo, objetivo: R.objetivo ?? '',
-    unidades: R.unidades.map((u) => ({ titulo: u.titulo, objetivo: u.objetivo ?? '', enfoque: u.enfoque ?? '', nivel: u.nivel ?? null, minutos: u.minutos ?? null, terminos: u.terminos ?? [], estado: estadoUnidad(u).estado })),
+    unidades: R.unidades.map((u) => ({ titulo: u.titulo, objetivo: u.objetivo ?? '', enfoque: u.enfoque ?? '', nivel: u.nivel ?? null, minutos: u.minutos ?? null, terminos: u.terminos ?? [], estado: paraServidor(estadoUnidad(u).estado) })),
   });
 
   /** Pone los cambios y empieza a planificar; avisa después, para que ya se vea «planificando». */
@@ -204,6 +262,8 @@ export function crearRecorridos({
     try {
       const cuerpo = { ...comun(), modo: 'planificar', mensajes: historial(), solicitud, ...(base ? { baseRecorrido: base } : {}) };
       const { r, d } = await pedirJSON(fetch, url, { method: 'POST', headers: JSON_H, body: JSON.stringify(cuerpo) }, plazos.planificar, control);
+      // El cupo diario que trae la respuesta (`alCupo`: para enseñar el saldo; nunca para nada).
+      if (d?.cupo) { try { alCupo?.(d.cupo); } catch { /* nada */ } }
       if (motivo(control) === 'cancelada' || buscar(R.id) !== R) return;
       planificando.delete(R.id);
       const plan = r.ok && d?.ok && d.tipo === 'recorrido' ? limpiarRecorrido(d.recorrido) : null;
@@ -312,7 +372,7 @@ export function crearRecorridos({
       const R = buscar(id);
       if (!R || !R.unidades.length) return { ok: false, error: 'no-existe' };
       if (estadoRecorrido(R) === 'planificando') return { ok: false, error: 'planificando' };
-      if (!resumen(R).nuevas) return { ok: false, error: 'nada' };
+      if (!resumen(R).nuevas && !resumen(R).detenidas) return { ok: false, error: 'nada' };
       tocar(R, { cola: true, aviso: null });
       seguirCola(R);
       return R.cola || R.unidades.some((u) => estadoUnidad(u).estado === 'preparando') ? { ok: true } : { ok: false, error: R.aviso?.codigo ?? 'nada' };
@@ -321,8 +381,19 @@ export function crearRecorridos({
     parar(id) {
       const R = buscar(id);
       if (!R?.cola) return false;
-      tocar(R, { cola: false });
+      tocar(R, { cola: false, pausa: null });
       return true;
+    },
+    /**
+     * «Seguir ahora» con una unidad en pausa: lo intenta ya (si la cuota o el tope siguen sin dejar, el servidor lo dice
+     * sin gastar nada y vuelve a quedar en pausa). Con la cola parada, la pone en marcha.
+     */
+    seguir(id) {
+      const R = buscar(id);
+      if (!R || !resumen(R).detenidas) return { ok: false, error: 'nada' };
+      tocar(R, { cola: true, pausa: null, aviso: null });
+      seguirCola(R, { ya: true });
+      return { ok: true };
     },
     /** Quita un aviso del recorrido (lo cerró la persona). */
     olvidarAviso(id) { const R = buscar(id); if (R && (R.aviso || R.salen?.length)) tocar(R, { aviso: null, salen: [] }); },
@@ -362,14 +433,14 @@ export function crearRecorridos({
     resumenes() {
       return lista.filter((R) => R.unidades.length).slice(0, LIMITES.recorridos).map((R) => ({
         id: R.id, titulo: R.titulo,
-        unidades: R.unidades.map((u) => { const e = estadoUnidad(u); return { titulo: u.titulo, estado: e.estado, leccion: e.estado === 'lista' ? e.leccion : null }; }),
+        unidades: R.unidades.map((u) => { const e = estadoUnidad(u); return { titulo: u.titulo, estado: paraServidor(e.estado), leccion: e.estado === 'lista' ? e.leccion : null }; }),
       }));
     },
     /** Lo que se recuerda de un recorrido en la conversación (para que Neuri sepa qué hay aunque se quite). */
     instantanea(R) {
       return {
         estado: estadoRecorrido(R), titulo: R.titulo, error: R.error ?? null, codigo: R.codigo ?? null, mensaje: R.mensaje ?? null,
-        unidades: R.unidades.map((u) => { const e = estadoUnidad(u); return { titulo: u.titulo, estado: e.estado, leccion: e.leccion ?? null }; }),
+        unidades: R.unidades.map((u) => { const e = estadoUnidad(u); return { titulo: u.titulo, estado: paraServidor(e.estado), leccion: e.leccion ?? null }; }),
       };
     },
     /** Al abrir la app: una cola que quedó a medias sigue (la creación en curso la retoma src/pet/trabajos.js). */

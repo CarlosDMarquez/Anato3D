@@ -45,5 +45,115 @@ export function limitadasEn(textos, inventario) {
   });
 }
 
+/**
+ * Las piezas del registro que el inventario sitúa en unas regiones (ids de primer nivel de la taxonomía) o en unos
+ * sistemas. Sirve para repartir un recorrido: así no se planifica una unidad centrada en una pieza que el modelo muestra
+ * mal. Las unidades se crean después por el camino de siempre, que además las quita de forma determinista.
+ */
+export function limitadasEnZona(inventario, { regiones = [], sistemas = [] } = {}) {
+  return [...new Set(LIMITACIONES.flatMap((l) => l.piezas))].filter((k) => {
+    const e = inventario?.estructuras?.[k];
+    return !!e && ((e.lugares ?? []).some(([r]) => regiones.includes(r)) || sistemas.includes(e.sistema));
+  });
+}
+
 /** Claves del inventario de todas las piezas de una lección (de cada estructura, todas sus piezas, sin el lado). */
 export const clavesDeLeccion = (L) => Object.values(L?.estructuras ?? {}).flatMap((e) => (e.piezas ?? []).map((p) => String(p).replace(/_[LR]$/, '')));
+
+// ── Recorridos: lo que una unidad no puede pedir con una pieza limitada ──
+// Verbos de localizar o reconocer y palabras de trayecto, en los cinco idiomas (sobre el texto normalizado: minúsculas,
+// sin acentos, palabras separadas por un espacio). Solo se miran en las unidades que nombran una pieza limitada.
+const LOCALIZAR = / (localiz|ubic|situ|senal|encuentr|encontr|identific|reconoc|toca|toque|tocar|marca|locat|identif|find|point|recogni|spot|pinpoint|tap|lokalis|finde|zeig|erkenn|bestimm|trouv|reconna|montr|indique|individu|trov|ricono|indica)\w* /;
+const TRAYECTO = / (recorrido|trayect|rama|ramas|ramific|sigue|seguir|traza|course|path|branch|branches|trace|follow|verlauf|verfolg|aste|trajet|parcours|branche|branches|suivre|decorso|percorso|ramo|rami|segui)\w* /;
+// Cómo lo muestra mal el modelo, para la ronda de corrección (en español).
+const COMO = { ubicacion: 'fuera de sitio', identidad: 'con un nombre dudoso' };
+// La frase con la que se acota una unidad, en el idioma de la persona («esta pieza»: vale para cualquier estructura).
+const ACOTADO = {
+  ubicacion: {
+    es: (n) => `Explicar con fuentes «${n}»: en el modelo 3D esta pieza está fuera de sitio, así que no se pide localizarla.`,
+    en: (n) => `Explain “${n}” with sources: in the 3D model this piece is misplaced, so locating it is not asked.`,
+    de: (n) => `„${n}“ mit Quellen erklären: Im 3D-Modell ist dieses Teil falsch platziert, deshalb wird nicht verlangt, es zu lokalisieren.`,
+    fr: (n) => `Expliquer « ${n} » avec des sources : dans le modèle 3D, cette pièce est mal placée, on ne demande donc pas de la localiser.`,
+    it: (n) => `Spiegare «${n}» con le fonti: nel modello 3D questo pezzo è fuori posto, quindi non si chiede di localizzarlo.`,
+  },
+  identidad: {
+    es: (n) => `Explicar con fuentes «${n}»: en el modelo 3D esta pieza tiene un nombre dudoso, así que no se pide reconocerla.`,
+    en: (n) => `Explain “${n}” with sources: in the 3D model this piece has a doubtful name, so recognizing it is not asked.`,
+    de: (n) => `„${n}“ mit Quellen erklären: Im 3D-Modell hat dieses Teil einen fraglichen Namen, deshalb wird nicht verlangt, es zu erkennen.`,
+    fr: (n) => `Expliquer « ${n} » avec des sources : dans le modèle 3D, cette pièce porte un nom douteux, on ne demande donc pas de la reconnaître.`,
+    it: (n) => `Spiegare «${n}» con le fonti: nel modello 3D questo pezzo ha un nome dubbio, quindi non si chiede di riconoscerlo.`,
+  },
+  trayecto: {
+    es: (n) => `Señalar el tramo visible de «${n}» y explicar su recorrido con fuentes: el modelo 3D solo muestra una parte.`,
+    en: (n) => `Point out the visible segment of “${n}” and explain its course with sources: the 3D model shows only part of it.`,
+    de: (n) => `Den sichtbaren Abschnitt von „${n}“ zeigen und den Verlauf mit Quellen erklären: Das 3D-Modell zeigt nur einen Teil.`,
+    fr: (n) => `Montrer le segment visible de « ${n} » et expliquer son trajet avec des sources : le modèle 3D n’en montre qu’une partie.`,
+    it: (n) => `Indicare il tratto visibile di «${n}» e spiegarne il decorso con le fonti: il modello 3D ne mostra solo una parte.`,
+  },
+};
+
+/**
+ * Las piezas limitadas que nombra cada unidad de un recorrido y lo que pide con ellas que el modelo no deja: localizarla
+ * o reconocerla (si su limitación lo restringe) o seguir un trayecto que no se ve (pieza incompleta). Devuelve, por
+ * unidad, { n, piezas, problemas: [{ clave, tipo: 'localizar'|'trayecto', limitacion }] }.
+ */
+export function limitesDeUnidades(unidades, inventario) {
+  return (unidades ?? []).map((u, i) => {
+    const piezas = limitadasEn([u.titulo, u.objetivo, u.enfoque, ...(u.terminos ?? [])], inventario);
+    const pide = ` ${normalizar(`${u.titulo ?? ''} ${u.objetivo ?? ''} ${u.enfoque ?? ''}`)} `;
+    const problemas = [];
+    for (const clave of piezas) {
+      for (const l of limitacionesDe(clave)) {
+        if (l.restringe.some((x) => x === 'localizar' || x === 'identificar') && LOCALIZAR.test(pide)) problemas.push({ clave, tipo: 'localizar', limitacion: l });
+        else if (l.tipo === 'incompleta' && TRAYECTO.test(pide)) problemas.push({ clave, tipo: 'trayecto', limitacion: l });
+      }
+    }
+    return { n: i + 1, piezas, problemas };
+  });
+}
+
+/** Los problemas de las unidades, para la ronda de corrección de Claude (en español, como el resto de instrucciones). */
+export function erroresDeUnidades(lim, inventario) {
+  return lim.flatMap(({ n, problemas }) => problemas.map(({ clave, tipo, limitacion: l }) => {
+    const nombre = inventario?.nombre?.(clave, 'es') ?? clave;
+    return tipo === 'localizar'
+      ? `unidad ${n}: pide localizar o reconocer «${nombre}» (${clave}), que el modelo 3D muestra ${COMO[l.tipo] ?? 'mal'}: replantéala para explicarla con fuentes, sin pedir que se busque, se toque ni se reconozca en el modelo`
+      : `unidad ${n}: pide seguir el recorrido o las ramas de «${nombre}» (${clave}), pero el modelo 3D solo muestra un tramo: que la actividad se limite al tramo visible y el recorrido se explique con fuentes`;
+  }));
+}
+
+/**
+ * Lo que, aun después de la corrección, pide evaluar en el modelo lo que este muestra mal se acota aquí, sin la IA: el
+ * objetivo de la unidad pasa a una frase fija en el idioma de la persona y el enfoque, que lo repetía, se vacía.
+ * Devuelve cuántas unidades se acotaron.
+ */
+export function acotarUnidades(recorrido, lim, inventario, idioma = 'es') {
+  let n = 0;
+  for (const { n: k, problemas } of lim) {
+    if (!problemas.length) continue;
+    const u = recorrido.unidades[k - 1];
+    const { clave, tipo, limitacion: l } = problemas[0];
+    const nombre = inventario?.nombre?.(clave, idioma) ?? clave;
+    const frases = ACOTADO[tipo === 'trayecto' ? 'trayecto' : l.tipo === 'identidad' ? 'identidad' : 'ubicacion'];
+    const f = frases[idioma] ?? frases.es;
+    u.objetivo = f(nombre);
+    u.enfoque = '';
+    n++;
+  }
+  return n;
+}
+
+/**
+ * Las notas de un recorrido sobre las piezas limitadas que nombran sus unidades (el aviso del registro, en el idioma de
+ * la persona), delante de las que ya traiga; como mucho `max`.
+ */
+export function notasDeLimites(lim, idioma = 'es', otras = [], max = 6) {
+  const vistas = new Set();
+  const notas = [];
+  for (const { piezas } of lim) for (const k of piezas) for (const l of limitacionesDe(k)) {
+    if (vistas.has(l.id)) continue;
+    vistas.add(l.id);
+    notas.push(textoLimitacion(l, 'aviso', idioma));
+  }
+  return [...notas, ...(otras ?? []).filter((x) => !notas.includes(x))].slice(0, max);
+}

@@ -1,0 +1,50 @@
+# Fly.io: el servidor de Anato3D (la web, Neuri y los reportes) en UNA Machine con un volumen. Plantilla SIN PROBAR en
+# Fly (no se ha abierto ninguna cuenta). Va dentro del paquete (npm run paquete → build/paquete) y `fly deploy` se
+# ejecuta en esa carpeta. Pasos, secretos y reversión: docs/estudio/activacion.md. Por qué Fly: docs/estudio/despliegue.md.
+
+app = "anato3d"                # el nombre creado con `fly apps create` (único en Fly), o `fly deploy --app <nombre>`
+primary_region = "iad"         # la región más barata
+kill_signal = "SIGTERM"        # el servidor termina lo que está en marcha (hasta 10 s) y se cierra
+kill_timeout = 15
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  ANATO3D_DATOS = "/datos"                      # el volumen: tope de gasto, interruptor IA-APAGADA y reportes
+  ANATO3D_IP_DE = "fly-client-ip"               # la pone el proxy de Fly: el navegador no puede inventarla
+  ANATO3D_PRESUPUESTO_ZONA = "America/Tijuana"  # el día y el mes del tope, en hora de Mexicali
+  # ANATO3D_ORIGEN = "https://anato3d.fly.dev"  # con un dominio propio, ese origen
+  # La clave y los topes NO van aquí: fly secrets set (docs/estudio/activacion.md).
+  # Tampoco ANATO3D_CUPO_SAL, el secreto de la clave HMAC del cupo diario (16 caracteres o más, al azar):
+  #   fly secrets set ANATO3D_CUPO_SAL="$(openssl rand -hex 32)" --stage --app anato3d
+  # Sin él, los contadores del cupo del día vuelven a empezar en cada reinicio (el registro lo avisa).
+
+# Un volumen solo se monta en una Machine: una sola instancia, como exige el cerrojo del tope de gasto. No escalar a dos.
+[mounts]
+  source = "anato3d_datos"
+  destination = "/datos"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "off"   # siempre encendida: una creación dura minutos y sigue aunque el navegador se vaya
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 150
+    hard_limit = 200
+
+  [[http_service.checks]]
+    grace_period = "15s"
+    interval = "30s"
+    method = "GET"
+    path = "/salud"
+    timeout = "5s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

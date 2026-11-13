@@ -145,7 +145,7 @@ export default leccion({
         ['Muchas personas tienen un intervalo lúcido tras el golpe antes de empeorar.', W('Epidural_hematoma', 'Many people with epidural hematomas experience a lucid period immediately following the injury, with a delay before symptoms become evident.')],
       ],
       vista: { ver: ['meningea-media'], contexto: ['sagital-superior'], fantasma: ['craneo'], camara: 'lateral', lado: 'R' },
-      actividad: { tipo: 'vistas', texto: 'Sigue la arteria por dentro del cráneo, de lado y desde arriba.', vistas: [{ nombre: 'De lado', camara: 'lateral' }, { nombre: 'Desde arriba', camara: 'superior' }, { nombre: 'De frente', camara: 'anterior' }] },
+      actividad: { tipo: 'vistas', texto: 'Mira de lado, desde arriba y de frente el tramo que sube hasta la base del cráneo: en el modelo, sus ramas por dentro de la bóveda no están.', vistas: [{ nombre: 'De lado', camara: 'lateral' }, { nombre: 'Desde arriba', camara: 'superior' }, { nombre: 'De frente', camara: 'anterior' }] },
       comprobar: 'fun-epidural',
     },
     {

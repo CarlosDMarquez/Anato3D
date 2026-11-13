@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { TEXTOS, ETIQUETAS } from '../src/i18n/textos.js';
-import { IDIOMAS, PREDETERMINADO, CLAVE, t, tn, etiqueta, idioma, leerIdioma, fijarIdioma } from '../src/i18n/idioma.js';
+import { IDIOMAS, DISPONIBLES, PREDETERMINADO, CLAVE, t, tn, etiqueta, idioma, leerIdioma, fijarIdioma } from '../src/i18n/idioma.js';
 import { nombrePieza, nombreGrupo, ponerTabla } from '../src/i18n/nombres.js';
 import { huella, ponerMemoria, tr, traducido, trCita } from '../src/i18n/contenido.js';
 
@@ -15,16 +15,19 @@ const memoria = (inicial = {}) => {
   return { getItem: (k) => s[k] ?? null, setItem: (k, v) => { s[k] = String(v); }, datos: s };
 };
 
-test('los cinco idiomas, con el inglés por defecto', () => {
+test('los cinco idiomas, con el inglés por defecto; solo español e inglés se pueden elegir', () => {
   assert.deepEqual(IDS, ['es', 'en', 'de', 'fr', 'it']);
+  assert.deepEqual(DISPONIBLES, ['es', 'en']);
   assert.equal(PREDETERMINADO, 'en');
   assert.equal(idioma(), 'en');
 });
 
-test('cada texto está en los cinco idiomas, con las mismas marcas {x} y la misma forma (texto o singular/plural)', () => {
+test('cada texto está en español e inglés (alemán, francés e italiano, si los tiene), con las mismas marcas {x} y la misma forma', () => {
   const vaciosEs = new Set(['ficha.traduccion', 'estudio.traduccion']);   // avisos de traducción: en español no se muestran
   for (const [clave, e] of Object.entries(TEXTOS)) {
     for (const id of IDS) {
+      // Desde el 12 nov 2026 lo nuevo solo se escribe en español e inglés (de/fr/it, «próximamente»).
+      if (!DISPONIBLES.includes(id) && !(id in e)) continue;
       assert.ok(id in e, `${clave}: falta ${id}`);
       if (id === 'es' && vaciosEs.has(clave)) continue;
       const v = e[id];
@@ -43,8 +46,8 @@ test('todas las claves data-t* del HTML existen', () => {
   for (const c of claves) assert.ok(TEXTOS[c], `index.html: ${c} no está en textos.js`);
 });
 
-test('cada etiqueta corta tiene inglés, alemán, francés e italiano', () => {
-  for (const [es, e] of Object.entries(ETIQUETAS)) for (const id of ['en', 'de', 'fr', 'it']) assert.ok(e[id]?.trim(), `${es}: falta ${id}`);
+test('cada etiqueta corta tiene inglés (y alemán, francés e italiano, si los tiene, no vacíos)', () => {
+  for (const [es, e] of Object.entries(ETIQUETAS)) for (const id of ['en', 'de', 'fr', 'it']) if (id === 'en' || id in e) assert.ok(e[id]?.trim(), `${es}: falta ${id}`);
 });
 
 test('t, tn y etiqueta en el idioma actual; {X} pone mayúscula; un idioma desconocido no cambia nada', () => {
@@ -69,9 +72,10 @@ test('t, tn y etiqueta en el idioma actual; {X} pone mayúscula; un idioma desco
 test('el idioma se guarda y se lee de este navegador; sin almacenamiento o con un valor raro, inglés', () => {
   const st = memoria();
   assert.equal(leerIdioma(st), 'en');
-  fijarIdioma('it', st);
-  assert.equal(st.datos[CLAVE], 'it');
-  assert.equal(leerIdioma(st), 'it');
+  fijarIdioma('es', st);
+  assert.equal(st.datos[CLAVE], 'es');
+  assert.equal(leerIdioma(st), 'es');
+  assert.equal(leerIdioma(memoria({ [CLAVE]: 'it' })), 'en');          // «próximamente»: vuelve al predeterminado
   assert.equal(leerIdioma(memoria({ [CLAVE]: 'klingon' })), 'en');
   assert.equal(leerIdioma({ getItem: () => { throw new Error('bloqueado'); } }), 'en');
   fijarIdioma('en');
@@ -120,11 +124,12 @@ test('contenido: traducción por la huella del texto español, español si falta
   fijarIdioma('en');
 });
 
-test('las memorias de contenido publicadas tienen las mismas huellas en los cuatro idiomas, sin textos vacíos', () => {
+test('las memorias de contenido publicadas: el inglés lo tiene todo; alemán, francés e italiano («próximamente»), solo huellas del inglés; sin textos vacíos', () => {
   const leer = (id) => JSON.parse(readFileSync(new URL(`../public/i18n/contenido-${id}.json`, import.meta.url), 'utf8'));
   const [en, ...otros] = ['en', 'de', 'fr', 'it'].map(leer);
   const claves = Object.keys(en).sort();
   assert.ok(claves.length > 2600, `solo ${claves.length} textos`);
-  for (const m of otros) assert.deepEqual(Object.keys(m).sort(), claves);
+  // Desde el 12 nov 2026 solo se traduce al inglés: los demás conservan lo que tenían, sin huellas que el inglés no tenga.
+  for (const m of otros) for (const k of Object.keys(m)) assert.ok(k in en, `huella ${k} sin inglés`);
   for (const m of [en, ...otros]) for (const v of Object.values(m)) assert.ok(v.trim());
 });

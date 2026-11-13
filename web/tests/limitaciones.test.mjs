@@ -431,3 +431,64 @@ test('limitaciones: al orientar, Neuri recibe la nota solo si la persona nombra 
   assert.deepEqual(limitadasEn(['el lóbulo paracentral', 'solco centrale', ''], INV), []);
   assert.deepEqual(limitadasEn(['Sulcus temporalis inferior'], INV), ['Inferior_temporal_sulcus']);
 });
+
+test('recorridos: el plan de un curso no ofrece localizar lo que el modelo 3D muestra mal ni seguir un trayecto que no se ve; si la IA lo ignora dos veces, el servidor lo acota', async () => {
+  const UNIDADES = [
+    { titulo: 'Surcos de la cara medial', objetivo: 'Localiza el surco paracentral junto al lóbulo paracentral.', enfoque: 'Tócalo en el modelo.', nivel: 2, minutos: 12, terminos: ['paracentral sulcus'], relacionadas: [], conserva: null },
+    { titulo: 'La cara inferior del lóbulo temporal', objetivo: 'Identifica el surco temporal inferior en el modelo.', enfoque: '', nivel: 2, minutos: 12, terminos: [], relacionadas: [], conserva: null },
+    { titulo: 'La arteria meníngea media', objetivo: 'Sigue el recorrido de la arteria meníngea media y sus ramas por el cráneo.', enfoque: '', nivel: 2, minutos: 12, terminos: ['middle meningeal artery'], relacionadas: [], conserva: null },
+    { titulo: 'El surco central', objetivo: 'Localiza el surco central y los giros que lo rodean.', enfoque: '', nivel: 2, minutos: 12, terminos: ['central sulcus'], relacionadas: [], conserva: null },
+  ];
+  const RECORRIDO = { titulo: 'Surcos y meninges', resumen: 'Cuatro unidades.', objetivo: 'Conocer los surcos del cerebro.', nivel: 2, unidades: UNIDADES, supuestos: [], limitaciones: ['Una nota de la IA.'] };
+  const sol = { accion: 'recorrido', tema: 'Neuroanatomía de los surcos y la arteria meníngea media', objetivo: 'Conocer los surcos del cerebro', nivel: 2, minutos: 15, leccion_base: null, enfoque: '', supuestos: [], terminos: ['paracentral sulcus', 'middle meningeal artery'], explicita: true, suficiente: true, unidades: 4, recorrido_base: null };
+  const pedir = (idioma) => peticion({ v: 2, modo: 'planificar', idioma, mensajes: [{ rol: 'usuario', texto: 'Créame un curso de neuroanatomía' }], solicitud: sol });
+  // La IA devuelve lo mismo las dos veces (ignora las instrucciones y la corrección).
+  const { api, llamadas } = apiGuion(() => ({ tipo: 'recorrido', mensaje: 'Cuatro unidades.', recorrido: RECORRIDO, sugerencias: [] }));
+  const manejar = crearManejador({ catalogo: CATALOGO, cliente: api, recursos: () => recursosFalsos(), registro: silencio });
+  const d = await (await manejar(pedir('es'))).json();
+  // Lo enviado: las notas de las tres piezas (las nombran la solicitud o la zona), en el bloque variable, no en el fijo.
+  const [fijo, variable] = textoSistema(llamadas[0]);
+  for (const k of ['Paracentral_sulcus', 'Inferior_temporal_sulcus', 'Middle_meningeal_artery']) assert.ok(variable.includes(`- ${k}:`), k);
+  assert.ok(!fijo.includes('LIMITACIÓN DEL MODELO 3D'));
+  // La corrección dice cada problema, concreto; el surco central (el control) no tiene ninguno.
+  assert.equal(llamadas.length, 2);
+  const corr = llamadas[1].messages.at(-1).content;
+  assert.match(corr, /unidad 1: pide localizar o reconocer «Surco paracentral» \(Paracentral_sulcus\), que el modelo 3D muestra fuera de sitio/);
+  assert.match(corr, /unidad 2: pide localizar o reconocer «Surco temporal inferior» \(Inferior_temporal_sulcus\), que el modelo 3D muestra con un nombre dudoso/);
+  assert.match(corr, /unidad 3: pide seguir el recorrido o las ramas de «Arteria meníngea media» \(Middle_meningeal_artery\)/);
+  assert.ok(!/unidad 4/.test(corr));
+  // Lo que llega a la tarjeta del curso: acotado, con los avisos del registro delante de las notas de la IA.
+  assert.equal(d.tipo, 'recorrido');
+  const u = d.recorrido.unidades;
+  assert.equal(u[0].objetivo, 'Explicar con fuentes «Surco paracentral»: en el modelo 3D esta pieza está fuera de sitio, así que no se pide localizarla.');
+  assert.equal(u[0].enfoque, '', 'el enfoque, que pedía tocarlo, se vacía');
+  assert.match(u[1].objetivo, /esta pieza tiene un nombre dudoso, así que no se pide reconocerla\.$/);
+  assert.match(u[2].objetivo, /^Señalar el tramo visible de «Arteria meníngea media» y explicar su recorrido con fuentes/);
+  assert.equal(u[3].objetivo, UNIDADES[3].objetivo, 'el control, tal cual');
+  const aviso = (id, i = 'es') => textoLimitacion(LIMITACIONES.find((l) => l.id === id), 'aviso', i);
+  assert.deepEqual(d.recorrido.limitaciones, [aviso('surco-paracentral-fuera-de-sitio'), aviso('surco-temporal-inferior-nombre-dudoso'), aviso('arteria-meningea-media-incompleta'), 'Una nota de la IA.']);
+  // En inglés, en inglés.
+  const en = await (await manejar(pedir('en'))).json();
+  assert.match(en.recorrido.unidades[0].objetivo, /^Explain “Paracentral sulcus” with sources: in the 3D model this piece is misplaced/);
+  assert.equal(en.recorrido.limitaciones[0], aviso('surco-paracentral-fuera-de-sitio', 'en'));
+  // Si la IA lo corrige bien, se queda su texto (no se acota nada).
+  const buena = { ...RECORRIDO, unidades: [{ ...UNIDADES[0], objetivo: 'Explicar con fuentes dónde está el surco paracentral: en la cara medial, junto al lóbulo paracentral.', enfoque: '' }, { ...UNIDADES[1], objetivo: 'Explicar con fuentes qué separa el surco temporal inferior.' }, { ...UNIDADES[2], objetivo: 'Señalar el tramo de la arteria meníngea media junto al esfenoides y explicar con fuentes qué irriga.' }, UNIDADES[3]] };
+  const g2 = apiGuion((params, n) => ({ tipo: 'recorrido', mensaje: 'Cuatro unidades.', recorrido: n === 1 ? RECORRIDO : buena, sugerencias: [] }));
+  const d2 = await (await crearManejador({ catalogo: CATALOGO, cliente: g2.api, recursos: () => recursosFalsos(), registro: silencio })(pedir('es'))).json();
+  assert.deepEqual(d2.recorrido.unidades.map((x) => x.objetivo), buena.unidades.map((x) => x.objetivo));
+  assert.equal(d2.recorrido.limitaciones.length, 4, 'los avisos siguen: las piezas se nombran');
+  // Un plan de control (miembro superior): ni notas, ni corrección, ni avisos.
+  const control = { ...RECORRIDO, titulo: 'Miembro superior', unidades: [{ ...UNIDADES[3], titulo: 'Huesos del brazo', objetivo: 'Localiza el húmero.', terminos: ['humerus'] }, { ...UNIDADES[3], titulo: 'Músculos del brazo', objetivo: 'Localiza el bíceps braquial.', terminos: ['biceps'] }], limitaciones: [] };
+  const g3 = apiGuion(() => ({ tipo: 'recorrido', mensaje: 'Dos unidades.', recorrido: control, sugerencias: [] }));
+  const d3 = await (await crearManejador({ catalogo: CATALOGO, cliente: g3.api, recursos: () => recursosFalsos(), registro: silencio })(peticion({ v: 2, modo: 'planificar', idioma: 'es', mensajes: [{ rol: 'usuario', texto: 'Créame un curso del miembro superior' }], solicitud: { ...sol, tema: 'Miembro superior', objetivo: 'Conocer el brazo', terminos: ['upper limb'] } }))).json();
+  assert.equal(g3.llamadas.length, 1);
+  assert.ok(!textoSistema(g3.llamadas[0])[1].includes('LIMITACIONES DEL MODELO 3D'));
+  assert.deepEqual([d3.recorrido.unidades.map((x) => x.objetivo), d3.recorrido.limitaciones], [['Localiza el húmero.', 'Localiza el bíceps braquial.'], []]);
+  // Y la unidad creada: su lección no pregunta ni pide tocar en 3D la pieza limitada, conserva las citas comprobadas y
+  // queda en borrador (ensamblar.mjs, determinista).
+  const { ev } = await crearConLimitada();
+  const L = ev.at(-1).leccion;
+  assert.ok(!L.preguntas.some((q) => ['identificar', 'localizar'].includes(q.tipo) && q.estructura === 'paracentral-sulcus'));
+  assert.deepEqual(validarLeccion(L, { inventario: INV, citaEnFuente: recursosFalsos().corpus.citaEnFuente, fuentes: {} }).errores, []);
+  assert.equal(L.revision.estado, 'borrador');
+});

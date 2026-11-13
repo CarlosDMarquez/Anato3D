@@ -1,5 +1,6 @@
-// Portada de la biblioteca: buscador, continuar, repasos pendientes, sesión según el tiempo, prácticas, recorridos
-// recomendados, explorar por región, sistema u objetivo y lo guardado.
+// Portada de la biblioteca: buscador, continuar, repasos pendientes, sesión según el tiempo (una sesión guardada con
+// Neuri, planificada en la app: sesion-neuri.js), prácticas, recorridos recomendados, explorar por región, sistema u
+// objetivo y lo guardado.
 import * as P from '../../biblioteca/progreso.js';
 import * as F from '../../biblioteca/filtros.js';
 import { REGIONES, SISTEMAS, TEMAS, NIVELES } from '../../biblioteca/taxonomia.js';
@@ -11,6 +12,7 @@ import { enlazarTarjetas, empezarPractica, abrirLeccion } from './explorar.js';
 import { tr } from '../../i18n/contenido.js';
 import { svgNeuri } from './neuri-svg.js';
 import { htmlPreparacion, enlazarPreparacion } from './preparacion.js';
+import { proponerSesion, seguirSesion, tituloSesion } from './sesion-neuri.js';
 
 const MINUTOS = [10, 15, 20, 30, 45];
 
@@ -42,6 +44,9 @@ export function renderPortada(ctx) {
   const favR = RECORRIDOS.filter((R) => data.favoritos.includes(R.id));
   const cuenta = (pred) => lecciones.filter(pred).length;
   const minutosSesion = ctx.busqueda.minutos ?? pref?.minutos ?? 15;
+  // La sesión con Neuri sin terminar (la activa o la última pausada o sin empezar), para seguirla desde aquí.
+  const sesion = ctx.sesiones.activa();
+  const nSesiones = ctx.sesiones.lista.length;
   // Las seis acciones de la entrada (especificación, sección 3).
   const acciones = [
     { id: 'seguir', icono: 'play', titulo: t('bib.acc.seguir'), sub: seguir ? tr(seguir.titulo) : t('bib.acc.seguirNada') },
@@ -86,10 +91,13 @@ export function renderPortada(ctx) {
         </div>
         <div class="bib-bloque">
           <p class="bib-bloque-t">${icono('timer')}${esc(t('bib.sesionTiempo'))}</p>
+          ${sesion ? `<button class="btn primary bib-seguir-sesion" type="button" data-seguir-sesion>${icono('play')}<span>${esc(t(sesion.estado === 'planificada' && !sesion.resultados.length && !sesion.posicion ? 'ses.empezarLa' : 'ses.continuarLa', { x: tituloSesion(sesion) }))}</span></button>
+          <p class="bib-bloque-d">${esc(t('ses.bloqueDe', { a: Math.min(sesion.i + 1, sesion.bloques.length), b: sesion.bloques.length }))} · ${esc(t(`ses.estado.${sesion.estado}`))}</p>` : ''}
           <div class="bib-minutos" role="radiogroup" aria-label="${esc(t('bib.cuantoTiempo'))}">
             ${MINUTOS.map((m) => `<button type="button" role="radio" aria-checked="${m === minutosSesion}" class="bib-chip ${m === minutosSesion ? 'on' : ''}" data-min="${m}">${esc(t('bib.minutos', { n: m }))}</button>`).join('')}
           </div>
-          <button class="btn" data-sesion>${esc(t('bib.proponer'))}</button>
+          <button class="btn${sesion ? '' : ' primary'}" type="button" data-sesion>${esc(t('bib.proponer'))}</button>
+          ${nSesiones ? `<p class="bib-bloque-d"><button class="link" type="button" data-mis-sesiones>${esc(tn('ses.misN', nSesiones))}</button></p>` : ''}
         </div>
         <div class="bib-bloque">
           <p class="bib-bloque-t">${icono('target')}${esc(t('bib.practicar'))}</p>
@@ -183,7 +191,10 @@ export function renderPortada(ctx) {
     ctx.busqueda.minutos = Number(b.dataset.min);
     body.querySelectorAll('[data-min]').forEach((x) => { x.classList.toggle('on', x === b); x.setAttribute('aria-checked', String(x === b)); });
   }));
-  body.querySelector('[data-sesion]').addEventListener('click', () => ctx.ir({ tipo: 'sesion', minutos: ctx.busqueda.minutos ?? 15 }));
+  // «Proponer una sesión»: una sesión guardada con el planificador de la app (sin IA), que se abre para empezarla.
+  body.querySelector('[data-sesion]').addEventListener('click', () => proponerSesion(ctx, ctx.busqueda.minutos ?? minutosSesion));
+  body.querySelector('[data-seguir-sesion]')?.addEventListener('click', () => seguirSesion(ctx, sesion.id));
+  body.querySelector('[data-mis-sesiones]')?.addEventListener('click', () => ctx.ir({ tipo: 'sesiones' }));
   enlazarPropias(ctx, body.querySelector('#bib-propias'));
   // Cuando una creación avanza o termina (o cambia en otra pestaña), solo se rehace esta sección, sin mover el foco.
   ctx.repintarPropias = () => {

@@ -40,6 +40,9 @@ export const TIPOS = {
   generacion_fallida: { codigo: esCodigo, etapa: esCodigo },
   generacion_completada: { segundos: esNum, guardada: esBool },
   leccion_personal_abierta: {},
+  // Sesiones de estudio con Neuri (src/pet/sesiones.js): de dónde salió el plan y cómo terminó; nunca el tema.
+  sesion_creada: { origen: esCodigo, bloques: esNum, minutos: esNum },
+  sesion_terminada: { origen: esCodigo, bloques: esNum, hechos: esNum, aciertos: esNum, total: esNum, completa: esBool },
   problema_reportado: { categoria: esCodigo, vista: esCodigo },
   error_tecnico: { codigo: esCodigo, donde: esCodigo },
 };

@@ -1,6 +1,8 @@
 // Lección guiada: cada paso muestra en 3D lo que explica (selección, contexto, transparencia y cámara), con sus
 // actividades (localizar, comparar, otras vistas), una pregunta de comprobación cuando la hay, «Saber más» y las fuentes
-// de cada frase. Al terminar: evaluarse, la lección siguiente o seguir con la sesión.
+// de cada frase. Al terminar: evaluarse o la lección siguiente.
+// Dentro de una sesión con Neuri (`vista.sesion`: { id, bloque }), solo los pasos de ese bloque: el último lleva a
+// «Continuar la sesión», y la lección solo queda completada si se han visto todos sus pasos (sesion-neuri.js).
 import * as P from '../../biblioteca/progreso.js';
 import { mallas, estructuraUtil, sinPiezasLimitadas, avisosDePasos } from '../../biblioteca/formato.js';
 import { frases, evidencias } from '../../biblioteca/formato.js';
@@ -12,7 +14,9 @@ import { tr, trCita } from '../../i18n/contenido.js';
 import { botonReportar, enlazarReportar } from './reportar.js';
 import { crearCronometro } from '../../biblioteca/eventos.js';
 import { esc, icono, fechaDia } from './comun.js';
-import { abrirLeccion, evaluarLeccion, siguienteDeSesion, avanzarSesion } from './explorar.js';
+import { abrirLeccion, evaluarLeccion } from './explorar.js';
+import { pasosDeBloque } from './sesion-logica.js';
+import { terminarBloqueLeccion, anotarPaso, tituloSesion } from './sesion-neuri.js';
 
 const CAMARA = (nombre) => t(`camara.${nombre}`);
 
@@ -73,8 +77,15 @@ export async function renderLeccion(ctx) {
   const { body, vista, api } = ctx;
   const L = await ctx.cargarLeccion(vista.id);
   if (!L) return ctx.volver();
-  if (vista.fin) return renderFin(ctx, L);
-  const i = Math.max(0, Math.min(vista.paso ?? 0, L.pasos.length - 1));
+  // En una sesión: los pasos del bloque (si la sesión ya no está, la lección sigue como siempre).
+  const S = vista.sesion ? ctx.sesiones.buscar(vista.sesion.id) : null;
+  if (vista.sesion && !S) delete vista.sesion;
+  const bloque = S?.bloques[vista.sesion.bloque] ?? null;
+  const delBloque = bloque ? pasosDeBloque(L, bloque) : L.pasos.map((_, k) => k);
+  if (vista.fin && !S) return renderFin(ctx, L);
+  const pedido = Math.max(0, Math.min(vista.paso ?? 0, L.pasos.length - 1));
+  const i = delBloque.includes(pedido) ? pedido : delBloque[0];
+  const enBloque = delBloque.indexOf(i);
   const s = L.pasos[i];
   // Estadísticas (si se activaron): empezar o retomar la lección, una vez por apertura, y su tiempo activo.
   if (!vista.registrada) {
@@ -89,8 +100,10 @@ export async function renderLeccion(ctx) {
   ctx.crono = vista.crono;
   P.verPaso(ctx.data, L, i);
   ctx.guardar();
+  if (S) anotarPaso(ctx, vista.sesion, enBloque);
   const prog = ctx.data.lecciones[L.id];
-  const ultimo = i === L.pasos.length - 1;
+  const ultimo = enBloque === delBloque.length - 1;
+  const parcial = S && delBloque.length < L.pasos.length;
   const modelo = api.modelo();
   const fueraDeModelo = !L.modelos.includes(modelo);
   const v = s.vista;
@@ -108,14 +121,16 @@ export async function renderLeccion(ctx) {
   if (cq) todasEv.push(...(cq.q.evidencia ?? []));
 
   body.innerHTML = `
-    <button class="link back" data-salir>${icono('chevron')}<span>${esc(t('bib.biblioteca'))}</span></button>
+    <button class="link back" data-salir>${icono('chevron')}<span>${esc(t(S ? 'ses.volverSesion' : 'bib.biblioteca'))}</span></button>
+    ${S ? `<p class="ses-en-curso">${icono('timer')}<span>${esc(t('ses.enSesion', { x: tituloSesion(S), a: vista.sesion.bloque + 1, b: S.bloques.length }))}</span></p>` : ''}
     <p class="bib-leccion-t">${esc(tr(L.titulo))}</p>
-    <nav class="bib-pasos" aria-label="${esc(t('bib.pasosLeccion'))}">${L.pasos.map((p, k) => {
+    <nav class="bib-pasos" aria-label="${esc(t('bib.pasosLeccion'))}">${delBloque.map((k) => {
+      const p = L.pasos[k];
       const visto = prog.vistos.includes(p.id);
       return `<button class="bib-punto ${k === i ? 'actual' : visto ? 'visto' : ''}" data-ir-paso="${k}" ${visto || k === i ? '' : 'disabled'}
         aria-label="${esc(t('bib.irPaso', { n: k + 1, titulo: tr(p.titulo) }))}" ${k === i ? 'aria-current="step"' : ''}></button>`;
     }).join('')}</nav>
-    <p class="step-count">${esc(t('estudio.paso', { n: i + 1, total: L.pasos.length }))} · ${esc(t(`paso.${s.tipo}`))}</p>
+    <p class="step-count">${esc(t('estudio.paso', { n: enBloque + 1, total: delBloque.length }))} · ${esc(t(`paso.${s.tipo}`))}${parcial ? ` <small>· ${esc(t('ses.parteLeccion', { a: delBloque[0] + 1, b: delBloque.at(-1) + 1, n: L.pasos.length }))}</small>` : ''}</p>
     <h3 class="step-title" tabindex="-1">${esc(tr(s.titulo))}</h3>
     ${fueraDeModelo ? `<p class="mod-note">${esc(t(`bib.soloModelo.${L.modelos[0]}`))}</p>` : ''}
     <div class="bib-aviso-vista" aria-live="polite"></div>
@@ -126,12 +141,13 @@ export async function renderLeccion(ctx) {
       <ul class="bib-chips">${verIds.map((id) => `<li><button class="bib-chip resaltada" data-resaltar="${esc(id)}">${esc(nombreE(L, id))}</button></li>`).join('')}${ctxIds.map((id) => `<li><button class="bib-chip" data-resaltar="${esc(id)}">${esc(nombreE(L, id))}</button></li>`).join('')}</ul></div>` : ''}
     ${s.actividad ? htmlActividad(L, s.actividad, modelo) : ''}
     ${cq ? htmlComprobar(L, cq) : ''}
-    ${v ? `<p class="bib-vista-acc"><button class="link" data-recuperar>${icono('restart')}${esc(t('bib.recuperarVista'))}</button></p>` : ''}
+    <p class="bib-vista-acc">${v ? `<button class="link" data-recuperar>${icono('restart')}${esc(t('bib.recuperarVista'))}</button>` : ''}
+      <button class="link" type="button" data-preguntar-neuri ${cq && !cq.r ? 'hidden' : ''}>${icono('pregunta')}${esc(t('ses.preguntarPaso'))}</button></p>
     ${htmlFuentes(ctx, todasEv, L)}
     <p class="bib-rep-fila">${botonReportar()}</p>
     <div class="step-nav">
-      <button class="btn" data-paso="anterior" ${i ? '' : 'disabled'}>${esc(t('estudio.anterior'))}</button>
-      <button class="btn primary" data-paso="siguiente">${esc(t(ultimo ? 'estudio.terminar' : 'estudio.siguiente'))}</button>
+      <button class="btn" data-paso="anterior" ${enBloque ? '' : 'disabled'}>${esc(t('estudio.anterior'))}</button>
+      <button class="btn primary" data-paso="siguiente">${esc(t(ultimo ? (S ? 'ses.continuarSesion' : 'estudio.terminar') : 'estudio.siguiente'))}</button>
     </div>`;
 
   // ── 3D ──
@@ -151,9 +167,15 @@ export async function renderLeccion(ctx) {
   // ── Eventos ──
   body.querySelector('[data-salir]').addEventListener('click', () => { api.alTocar(null); ctx.volver(); });
   body.querySelectorAll('[data-ir-paso]').forEach((b) => b.addEventListener('click', () => irPaso(Number(b.dataset.irPaso))));
-  body.querySelector('[data-paso="anterior"]').addEventListener('click', () => irPaso(i - 1));
+  body.querySelector('[data-paso="anterior"]').addEventListener('click', () => irPaso(delBloque[enBloque - 1]));
+  // Neuri con el enfoque en este paso; «Volver» deja la lección exactamente aquí.
+  body.querySelector('[data-preguntar-neuri]').addEventListener('click', () => {
+    api.alTocar(null);
+    ctx.neuri.abrirEn({ enfoque: { leccion: L.id, paso: s.id, sesion: !!S }, volver: t('ses.volverPaso', { x: tr(s.titulo) }) });
+  });
   body.querySelector('[data-paso="siguiente"]').addEventListener('click', () => {
-    if (!ultimo) return irPaso(i + 1);
+    if (!ultimo) return irPaso(delBloque[enBloque + 1]);
+    if (S) return terminarBloqueLeccion(ctx, vista, L, vista.crono?.segundos() ?? 0);
     P.completar(ctx.data, L);
     ctx.guardar();
     ctx.evento?.('leccion_completada', { leccion: L.id, version: L.version, segundosActivos: vista.crono?.segundos() ?? 0, propia: !!L.origen?.neuri }, { clave: `${L.id}:${L.version}` });
@@ -255,6 +277,8 @@ function enlazarComprobar(ctx, L, s, cq, body) {
   body.querySelectorAll('[data-cq]').forEach((b) => b.addEventListener('click', () => {
     const opcion = Number(b.dataset.cq);
     cq.r = { opcion, resultado: corregir(cq.q, opcion) };
+    // Con la comprobación del paso sin responder, Neuri no se ofrece (podría dar la respuesta); ya respondida, sí.
+    body.querySelector('[data-preguntar-neuri]')?.removeAttribute('hidden');
     // Práctica dentro de la lección (con el contenido a la vista): se anota, pero no cuenta para el repaso ni el dominio.
     P.registrarIntento(ctx.data, { leccion: L.id, version: L.version, pregunta: cq.q.id, tipo: cq.q.tipo, objetivo: cq.q.objetivo, resultado: cq.r.resultado, elegida: cq.q.opciones[opcion]?.texto ?? null, modo: 'leccion' });
     ctx.guardar();
@@ -268,7 +292,6 @@ function enlazarComprobar(ctx, L, s, cq, body) {
 function renderFin(ctx, L) {
   const { body } = ctx;
   const sig = (L.siguiente ?? []).filter((id) => ctx.porId.has(id));
-  const sesion = siguienteDeSesion(ctx);
   ctx.api.alTocar(null);
   body.innerHTML = `
     <button class="link back" data-salir>${icono('chevron')}<span>${esc(t('bib.biblioteca'))}</span></button>
@@ -276,14 +299,12 @@ function renderFin(ctx, L) {
     <h3 class="step-title" tabindex="-1">${icono('check')} ${esc(t('bib.leccionTerminada'))}</h3>
     <p class="step-text">${esc(t('bib.finExplica'))}</p>
     <div class="bib-acciones bib-col">
-      ${sesion ? `<button class="btn primary" data-sesion>${esc(sesion)}</button>` : ''}
-      <button class="btn ${sesion ? '' : 'primary'}" data-evaluar>${esc(t('bib.evaluarmeAhora'))}</button>
+      <button class="btn primary" data-evaluar>${esc(t('bib.evaluarmeAhora'))}</button>
       ${sig.map((id) => `<button class="btn" data-sig="${esc(id)}">${esc(t('bib.siguienteLeccion', { titulo: tr(ctx.porId.get(id).titulo) }))}</button>`).join('')}
       <button class="btn" data-repetir>${esc(t('bib.repasarPasos'))}</button>
     </div>
     <p class="muted small">${esc(t('bib.finNota'))}</p>`;
   body.querySelector('[data-salir]').addEventListener('click', () => ctx.volver());
-  body.querySelector('[data-sesion]')?.addEventListener('click', () => avanzarSesion(ctx));
   body.querySelector('[data-evaluar]').addEventListener('click', () => evaluarLeccion(ctx, L.id));
   body.querySelectorAll('[data-sig]').forEach((b) => b.addEventListener('click', () => abrirLeccion(ctx, b.dataset.sig, { paso: 0 })));
   body.querySelector('[data-repetir]').addEventListener('click', () => ctx.ir({ tipo: 'leccion', id: L.id, paso: 0 }, { reemplazar: true }));

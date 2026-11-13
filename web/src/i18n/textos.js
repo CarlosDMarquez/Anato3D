@@ -134,6 +134,7 @@ export const TEXTOS = {
 
   // ── Ajustes ──
   'ajustes.idioma': { es: 'Idioma', en: 'Language', de: 'Sprache', fr: 'Langue', it: 'Lingua' },
+  'ajustes.proximamente': { es: '{lengua} (próximamente)', en: '{lengua} (coming soon)' },
   'ajustes.calidad': {
     es: 'Alta calidad (resolución, sombras y fondo degradado)', en: 'High quality (resolution, shadows and gradient background)',
     de: 'Hohe Qualität (Auflösung, Schatten und Hintergrundverlauf)', fr: 'Haute qualité (résolution, ombres et fond dégradé)',
@@ -309,6 +310,16 @@ export const TEXTOS = {
   'fuente.ta2': { es: 'Terminologia Anatomica, 2.ª ed.', en: 'Terminologia Anatomica, 2nd ed.', de: 'Terminologia Anatomica, 2. Aufl.', fr: 'Terminologia Anatomica, 2e éd.', it: 'Terminologia Anatomica, 2ª ed.' },
   'fuente.codigo': { es: 'código {c}', en: 'code {c}', de: 'Code {c}', fr: 'code {c}', it: 'codice {c}' },
   'fuente.wikipediaEn': { es: 'Wikipedia (en inglés)', en: 'Wikipedia (English)', de: 'Wikipedia (englisch)', fr: 'Wikipédia (en anglais)', it: 'Wikipedia (in inglese)' },
+  'fuente.wikipediaEs': { es: 'Wikipedia (en español)', en: 'Wikipedia (Spanish)', de: 'Wikipedia (spanisch)', fr: 'Wikipédia (en espagnol)', it: 'Wikipedia (in spagnolo)' },
+  // Fichas del sistema linfático (ui/info.js: linfaBody).
+  'ficha.linf.nombre': { es: 'Nombre latino', en: 'Latin name', de: 'Lateinischer Name', fr: 'Nom latin', it: 'Nome latino' },
+  'ficha.linf.nota': {
+    es: 'Cada frase lleva el número de la fuente que la respalda; al pasar el puntero por el número se ve la cita literal. Las páginas se enlazan en la versión que se leyó. Lo que dice «En este modelo» describe el modelo 3D, no a una persona.',
+    en: 'Each sentence carries the number of the source that supports it; hover over the number to see the exact quote. Pages are linked in the version that was read. “In this model” describes the 3D model, not a person.',
+    de: 'Jeder Satz trägt die Nummer der Quelle, die ihn stützt; beim Darüberfahren mit dem Zeiger erscheint das wörtliche Zitat. Die Seiten sind in der gelesenen Version verlinkt. „In diesem Modell“ beschreibt das 3D-Modell, nicht einen Menschen.',
+    fr: 'Chaque phrase porte le numéro de la source qui l’étaye ; en survolant le numéro, on voit la citation exacte. Les pages sont liées dans la version lue. « Dans ce modèle » décrit le modèle 3D, pas une personne.',
+    it: 'Ogni frase porta il numero della fonte che la sostiene; passando il puntatore sul numero si vede la citazione esatta. Le pagine sono collegate nella versione letta. «In questo modello» descrive il modello 3D, non una persona.',
+  },
   'fuente.wiktionaryEn': { es: 'Wiktionary (en inglés)', en: 'Wiktionary (English)', de: 'Wiktionary (englisch)', fr: 'Wiktionnaire (en anglais)', it: 'Wikizionario (in inglese)' },
   'fuente.titulo': { es: '«{titulo}»', en: '“{titulo}”', de: '„{titulo}“', fr: '« {titulo} »', it: '«{titulo}»' },
 
@@ -448,6 +459,10 @@ export const ETIQUETAS = {
   'Principales': { en: 'Main vessels', de: 'Hauptgefäße', fr: 'Principaux', it: 'Principali' },
   'Órganos': { en: 'Organs', de: 'Organe', fr: 'Organes', it: 'Organi' },
   'Nodos': { en: 'Nodes', de: 'Lymphknoten', fr: 'Nœuds', it: 'Linfonodi' },
+  // Capas del linfático (systems.js). Solo español e inglés por decisión del dueño (2026-11-12): de/fr/it repiten el inglés
+  // hasta que se traduzcan (la prueba de idiomas exige los cuatro campos).
+  'Nodos y vasos': { en: 'Nodes and vessels', de: 'Nodes and vessels', fr: 'Nodes and vessels', it: 'Nodes and vessels' },
+  'Conductos y troncos': { en: 'Ducts and trunks', de: 'Ducts and trunks', fr: 'Ducts and trunks', it: 'Ducts and trunks' },
   'Central': { en: 'Central', de: 'Zentral', fr: 'Central', it: 'Centrale' },
   'Encéfalo profundo': { en: 'Deep brain', de: 'Tiefe Hirnstrukturen', fr: 'Encéphale profond', it: 'Encefalo profondo' },
   'Periférico': { en: 'Peripheral', de: 'Peripher', fr: 'Périphérique', it: 'Periferico' },
@@ -567,6 +582,16 @@ Object.assign(ETIQUETAS, {
   'Inserciones': { en: 'Attachments', de: 'Befestigungen', fr: 'Insertions', it: 'Inserzioni' },
   'Papel mecánico': { en: 'Mechanical role', de: 'Mechanische Aufgabe', fr: 'Rôle mécanique', it: 'Ruolo meccanico' },
   'Localización': { en: 'Location', de: 'Lage', fr: 'Localisation', it: 'Localizzazione' },
+  // Fichas del sistema linfático (data/linfatico/formato.js: CAMPOS_LINF y CHIPS_LINF; data/visceras.js: TEJIDO.lymph_vessel).
+  'Reparo': { en: 'Landmark', de: 'Leitstruktur', fr: 'Repère', it: 'Punto di repere' },
+  'Recibe': { en: 'Receives from', de: 'Zuflüsse', fr: 'Reçoit', it: 'Riceve da' },
+  'Drena en': { en: 'Drains to', de: 'Abfluss', fr: 'Se draine vers', it: 'Drena in' },
+  'En este modelo': { en: 'In this model', de: 'In diesem Modell', fr: 'Dans ce modèle', it: 'In questo modello' },
+  'Vaso linfático': { en: 'Lymphatic vessel', de: 'Lymphgefäß', fr: 'Vaisseau lymphatique', it: 'Vaso linfatico' },
+  'Conducto linfático': { en: 'Lymphatic duct', de: 'Lymphgang', fr: 'Conduit lymphatique', it: 'Dotto linfatico' },
+  'Tronco linfático': { en: 'Lymphatic trunk', de: 'Lymphstamm', fr: 'Tronc lymphatique', it: 'Tronco linfatico' },
+  'Trazado esquemático': { en: 'Schematic course', de: 'Schematischer Verlauf', fr: 'Tracé schématique', it: 'Decorso schematico' },
+  'Variante elegida': { en: 'Chosen variant', de: 'Gewählte Variante', fr: 'Variante choisie', it: 'Variante scelta' },
   'Descripción': { en: 'Description', de: 'Beschreibung', fr: 'Description', it: 'Descrizione' },
   'Borrador · sin revisar por un especialista': { en: 'Draft · not reviewed by a specialist', de: 'Entwurf · nicht von Fachleuten geprüft', fr: 'Brouillon · non relu par un spécialiste', it: 'Bozza · non rivista da uno specialista' },
   'Revisado por un especialista': { en: 'Reviewed by a specialist', de: 'Von Fachleuten geprüft', fr: 'Relu par un spécialiste', it: 'Rivista da uno specialista' },

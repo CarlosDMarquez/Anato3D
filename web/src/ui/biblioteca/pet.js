@@ -11,23 +11,36 @@
 // Lo que no cabe en una lección es un recorrido personal (src/pet/recorridos.js): Neuri lo planifica por unidades y la
 // tarjeta del recorrido enseña el estado real de cada una (lista, en preparación, pendiente, error, interrumpida…).
 // Cada unidad se crea aparte, cuando la persona lo decide; si pidió «créame un curso…», también la primera.
+//
+// Las sesiones de estudio (src/pet/sesiones.js, vista sesion-neuri.js): Neuri las crea en la app cuando el tema está claro
+// y con la IA (modo «sesion») cuando es ambiguo; aquí se enseña su tarjeta («Empezar», «Ver el plan») y, al abrir Neuri
+// con una sin terminar, un saludo de la app (sin IA) que ofrece seguirla. Neuri en contexto: desde un paso, una pregunta
+// ya respondida o una sesión se abre con el enfoque puesto («Sobre: …», se puede quitar) y un botón para volver justo
+// ahí. «Ver en 3D» enseña en el visor una estructura de la respuesta sin cerrar el panel. El cupo diario de IA de este
+// dispositivo se ve arriba, discreto; al agotarse, todo lo local sigue.
 import * as P from '../../biblioteca/progreso.js';
 import { RECORRIDOS, RECORRIDO_POR_ID } from '../../biblioteca/recorridos.js';
 import { resumenPropia, contarGuardadas } from '../../biblioteca/propias.js';
 import { crearConversacion } from '../../pet/conversacion.js';
-import { crearTrabajos, FINALES, CLAVE_TRABAJOS } from '../../pet/trabajos.js';
+import { conDispositivo } from '../../pet/dispositivo.js';
+import { puenteSesiones } from '../../pet/planificador.js';
+import { construirPerfil } from '../../pet/perfil.js';
+import { motivoNoDisponible } from '../../biblioteca/evaluar.js';
+import { seguirSesion, vistaSesion, tituloSesion, mensajeSesion, minutosSesion, textoOrigen, tituloBloque, detalleBloque, estadoBloque, crearSesion } from './sesion-neuri.js';
+import { crearTrabajos, FINALES, CLAVE_TRABAJOS, PAUSAS } from '../../pet/trabajos.js';
 import { crearRecorridos, CLAVE_RECORRIDOS } from '../../pet/recorridos.js';
 import { MAX_PROPIAS } from '../../biblioteca/propias.js';
 import { responderLocal } from '../../pet/local.js';
+import { decidirRuta } from '../../pet/ruta.js';
 import { LIMITES, ID_PROPIA } from '../../pet/protocolo.js';
 import { t, tn, idioma } from '../../i18n/idioma.js';
 import { tr } from '../../i18n/contenido.js';
-import { esc, icono, tarjetaLeccion, tarjetaRecorrido, nomLugar, nomSistema, nomTema, nomNivel, descargarArchivo } from './comun.js';
+import { esc, icono, tarjetaLeccion, tarjetaRecorrido, nomLugar, nomSistema, nomTema, nomNivel, descargarArchivo, fecha } from './comun.js';
 import { enlazarTarjetas, abrirLeccion } from './explorar.js';
 import { svgNeuri, gesto } from './neuri-svg.js';
 
 // Vistas del catálogo, donde está el lanzador (en las lecciones y las preguntas, el modelo necesita el sitio).
-const CON_LANZADOR = new Set(['portada', 'resultados', 'recorrido', 'info', 'sesion', 'propias', 'mapa', 'examen', 'datos']);
+const CON_LANZADOR = new Set(['portada', 'resultados', 'recorrido', 'info', 'sesion-neuri', 'sesiones', 'propias', 'mapa', 'examen', 'datos']);
 const CLAVE_VISTO = 'anato3d.neuri.visto';
 // Etapas de una creación tal como se enseñan (las reales del servidor; «corrigiendo» se enseña como comprobación).
 const ETAPAS = ['planificando', 'fuentes', 'redactando', 'comprobando', 'guardando'];
@@ -37,7 +50,8 @@ const almacenSesion = () => { try { return sessionStorage; } catch { return null
 const almacenLocal = () => { try { return localStorage; } catch { return null; } };
 const parrafos = (s) => String(s).split(/\n+/).map((p) => p.trim()).filter(Boolean).map((p) => `<p>${esc(p)}</p>`).join('');
 // Códigos de error y de límite con texto propio; los demás, el genérico.
-const CODIGOS = new Set(['sin-ia', 'limite', 'ocupado', 'cancelada', 'interrumpida', 'sin-recursos', 'sin-estructuras', 'pocas-evidencias', 'plan-invalido', 'validacion', 'limitacion', 'local', 'tiempo', 'conexion', 'sin-servidor', 'sin-saldo', 'servidor', 'aclaracion', 'recorrido-invalido', 'lleno-recorridos']);
+const CODIGOS = new Set(['sin-ia', 'limite', 'ocupado', 'cancelada', 'interrumpida', 'sin-recursos', 'sin-estructuras', 'pocas-evidencias', 'plan-invalido', 'validacion', 'limitacion', 'local', 'tiempo', 'conexion', 'sin-servidor', 'sin-saldo', 'sin-presupuesto', 'servidor', 'aclaracion', 'recorrido-invalido', 'lleno-recorridos',
+  'cupo', 'sin-cupo', 'sesion', 'sesion-vacia', 'ya', 'nada', 'confirmar', 'incompleta']);
 const textoError = (c) => t(`pet.error.${CODIGOS.has(c) ? c : c === 'trabajo-desconocido' ? 'interrumpida' : 'generico'}`);
 // Límites del plan en sí (no del momento): reintentar daría lo mismo; lo que sirve es cambiar el plan.
 const SIN_REINTENTO = new Set(['pocas-evidencias', 'limitacion', 'plan', 'base', 'sin-estructuras', 'plan-invalido', 'sin-servidor']);
@@ -49,6 +63,9 @@ export function crearNeuri(ctx, panel) {
   let relojBurbuja = null;
   let idiomaPintado = null;
   let repintar = 0;
+  let confirmandoRecrear = null;  // «recorrido:unidad» de la unidad interrumpida cuya nueva creación se está confirmando
+  let volverA = null;             // { vista, etiqueta }: a dónde vuelve «Volver» (el paso, la pregunta o la sesión de donde se vino)
+  let cupoVisto = 0;              // cuándo se preguntó el cupo por última vez (al abrir la conversación, como mucho cada minuto)
   // Lo que la persona abrió o cerró (el plan de una creación, las fuentes de una respuesta): se conserva al repintar.
   const desplegados = new Map();
   const abierto = (clave, porDefecto = false) => ((desplegados.get(clave) ?? porDefecto) ? ' open' : '');
@@ -61,19 +78,49 @@ export function crearNeuri(ctx, panel) {
     get lecciones() { return new Set(ctx.porId.keys()); }, recorridos: new Set(RECORRIDOS.map((R) => R.id)),
     get personales() { return new Set(recorridos?.lista.map((R) => R.id) ?? []); },
   };
+  // Toda petición a /api/pet lleva el identificador aleatorio de este dispositivo (solo para el cupo diario), en cabecera.
+  const pedir = conDispositivo(globalThis.fetch?.bind(globalThis), almacenLocal());
+  // El puente con las sesiones de estudio: el plan de la app si el tema está claro; si no, Neuri (modo «sesion»).
+  const puente = puenteSesiones({
+    sesiones: ctx.sesiones,
+    catalogo: () => ctx.catalogo?.lecciones ?? [], data: () => ctx.data,
+    buscar: (texto, opciones) => ctx.buscador.buscar(texto, opciones), cargar: (id) => ctx.cargarLeccion(id),
+    modelo: () => ctx.api.modelo(), idioma, idsLecciones: () => new Set(ctx.porId.keys()),
+    estado: (L) => ctx.estado(L), t, zonas: () => t('pet.ses.temas').split('|'),
+  });
   const conv = crearConversacion({
-    ids, idioma, almacen: almacenSesion(),
+    ids, idioma, almacen: almacenSesion(), fetch: pedir, memoria: almacenLocal(),
     local: (texto) => responderLocal(texto, entornoLocal()),
+    // Lo que se resuelve aquí (saludos, «el segundo», búsquedas que encajan, tiempo, repaso, «muéstrame X», pedir o
+    // seguir una sesión con un tema claro) no gasta IA.
+    decidir: (texto, estado) => {
+      const e = entornoLocal();
+      return decidirRuta(texto, { ...estado, e, local: (x) => responderLocal(x, e), piezas: () => ctx.estructuras?.lista ?? [] });
+    },
     progreso: resumenProgreso,
     propias: () => ctx.propias.map(resumenPropia),
     recorridos: () => recorridos?.resumenes() ?? [],
+    perfil: perfilDeAprendizaje,
+    sesiones: {
+      ...puente,
+      // Al crear una sesión desde la conversación, también se anota (estadísticas, si están activadas).
+      async crear(plan, opciones) {
+        const r = await puente.crear(plan, opciones);
+        if (r.ok) ctx.evento?.('sesion_creada', { origen: r.sesion.origen, bloques: r.sesion.bloques.length, minutos: r.sesion.minutos });
+        return r;
+      },
+    },
   });
+  /** El saldo de IA que traen las respuestas de las creaciones y los recorridos: lo mismo que el de la conversación. */
+  const alCupo = (c) => { conv.anotarCupo(c); if (enConversacion()) pintarModo(); };
   const basePropia = (id) => (id && ID_PROPIA.test(id) ? ctx.propias.find((L) => L.id === id) ?? null : null);
   const trabajos = crearTrabajos({
+    fetch: pedir, alCupo,
     almacen: almacenLocal(), comun: conv.comun, historial: conv.historial, basePropia,
     guardarLeccion: (L) => ctx.guardarPropia(L),
   });
   recorridos = crearRecorridos({
+    fetch: pedir, alCupo,
     almacen: almacenLocal(), comun: conv.comun, historial: conv.historial, trabajos,
     existeLeccion: (id) => ctx.propias.some((L) => L.id === id),
     // Lo que cabe aún en «Mis lecciones», contando las creaciones en curso (cada una ocupará un sitio).
@@ -107,6 +154,11 @@ export function crearNeuri(ctx, panel) {
     }
     programarRepintado();
   });
+  // Una sesión de estudio cambia (avanza, termina, se quita): lo que se recuerda de ella en la conversación y lo que se ve.
+  ctx.sesiones.suscribir((S) => {
+    if (S && conv.tieneSesion(S.id)) conv.resumirSesion(S.id, ctx.sesiones.instantanea(S));
+    programarRepintado();
+  });
   /** Repintar lo que se vea (una vez por fotograma), sin mover el foco: la conversación, la portada o «Mis lecciones». */
   function programarRepintado() {
     if (repintar) return;
@@ -130,6 +182,8 @@ export function crearNeuri(ctx, panel) {
 
   /** Estadísticas (si la persona las activó): cómo terminó una creación, sin títulos ni textos. */
   function eventoFin(tr, etapa) {
+    // Una pausa (cuota o tope de gasto) no es un fallo: no se cuenta como tal (sigue después, sin perder nada).
+    if (tr.estado === 'error' && PAUSAS.includes(tr.error)) return;
     if (tr.estado === 'guardada' || tr.estado === 'no-guardada') ctx.evento?.('generacion_completada', { segundos: Math.round(((tr.actualizado ?? 0) - (tr.creado ?? 0)) / 1000), guardada: tr.estado === 'guardada' }, { clave: tr.id });
     else if (tr.error === 'cancelada') ctx.evento?.('generacion_cancelada', { etapa }, { clave: tr.id });
     else ctx.evento?.('generacion_fallida', { codigo: tr.error ?? tr.codigo ?? tr.estado, etapa }, { clave: tr.id });
@@ -137,7 +191,7 @@ export function crearNeuri(ctx, panel) {
 
   /** Al terminar una creación: si no se está mirando la conversación, un aviso; siempre, el anuncio accesible. */
   function avisarFin(tr) {
-    const texto = tr.estado === 'guardada' ? t('pet.listaToast', { titulo: tr.titulo }) : t('pet.noCreada', { titulo: tr.titulo });
+    const texto = tr.estado === 'guardada' ? t('pet.listaToast', { titulo: tr.titulo }) : PAUSAS.includes(tr.error) ? t('pet.pausadaToast', { titulo: tr.titulo }) : t('pet.noCreada', { titulo: tr.titulo });
     if (enConversacion()) { anunciar(texto); return; }
     if (tr.estado === 'guardada' && tr.leccionId) ctx.toast(texto, 0, { label: t('pet.abrirLeccion'), run: () => ctx.mostrar({ tipo: 'info', id: tr.leccionId }) });
     else if (tr.error !== 'cancelada') ctx.toast(texto, 0, { label: t('pet.verComoVa'), run: () => verTrabajo(tr.id) });
@@ -230,6 +284,21 @@ export function crearNeuri(ctx, panel) {
     return { terminadas, enCurso, repasos, guardadas };
   }
 
+  /**
+   * El perfil de aprendizaje que va a Neuri al orientar y al planificar una sesión (src/pet/perfil.js): calculado aquí,
+   * sin respuestas ni fechas. Los intentos de preguntas que el modelo muestra mal no cuentan (como en el mapa).
+   */
+  function perfilDeAprendizaje() {
+    if (!ctx.catalogo) return null;
+    const modelo = ctx.api.modelo();
+    const invalida = (i) => {
+      const L = ctx.lecciones.get(i.l);
+      const q = L?.preguntas?.find((x) => x.id === i.q);
+      return !!q && motivoNoDisponible(L, q, modelo) === 'limitacion';
+    };
+    return construirPerfil({ data: ctx.data, catalogo: ctx.catalogo.lecciones, modelo, sesiones: ctx.sesiones.lista, invalida, estado: (L) => ctx.estado(L) });
+  }
+
   function entornoLocal() {
     const p = resumenProgreso();
     return {
@@ -240,14 +309,37 @@ export function crearNeuri(ctx, panel) {
     };
   }
 
-  /** Abre la conversación. `texto`: se envía (viene de una búsqueda sin resultados); `borrador`: se deja escrito. */
-  function abrir(texto = null, { borrador = null } = {}) {
+  /**
+   * Abre la conversación. `texto`: se envía (viene de una búsqueda sin resultados); `borrador`: se deja escrito.
+   * Desde el lanzador o la portada, sin enfoque (no se está en ninguna lección).
+   */
+  function abrir(texto = null, { borrador = null, enContexto = false } = {}) {
     anotar(CLAVE_VISTO, '1');
     lanzador.classList.remove('llamada');
     ocultarBurbuja();
+    if (!enContexto) { conv.quitarEnfoque(); volverA = null; }
     pendiente = texto ? { texto } : borrador ? { borrador } : null;
     if (ctx.vista.tipo === 'neuri') { aplicarPendiente(); return; }
     ctx.ir({ tipo: 'neuri' });
+  }
+
+  /**
+   * Abre la conversación desde donde está la persona (un paso, una pregunta ya respondida, una sesión): con el enfoque
+   * puesto (lo que Neuri sabe de dónde se le pregunta) y «Volver» a esa misma vista. `volver`: el texto del botón.
+   */
+  function abrirEn({ enfoque = null, volver = null, borrador = null } = {}) {
+    if (!(enfoque && conv.establecerEnfoque(enfoque))) conv.quitarEnfoque();
+    volverA = volver && ctx.vista.tipo !== 'neuri' ? { vista: ctx.vista, etiqueta: volver } : null;
+    abrir(null, { borrador, enContexto: true });
+  }
+
+  /** Vuelve a la vista de donde se abrió la conversación (el paso, la pregunta o la sesión, tal como estaban). */
+  function volverDeConversacion() {
+    const a = volverA;
+    volverA = null;
+    if (a && ctx.pila.at(-1) === a.vista) return ctx.volver();
+    if (a) return ctx.ir(a.vista, { reemplazar: true });
+    return ctx.volver();
   }
   function aplicarPendiente() {
     const p = pendiente;
@@ -296,10 +388,12 @@ export function crearNeuri(ctx, panel) {
             <h3 id="neuri-h" tabindex="-1">Neuri</h3>
             <p class="neuri-lema">${esc(t('pet.lema'))}</p>
             <p class="neuri-modo" hidden></p>
+            <p class="neuri-cupo" hidden></p>
           </div>
         </div>
         <div class="neuri-log" role="log" aria-live="off" aria-label="${esc(t('pet.conversacion'))}" tabindex="0"></div>
         <p class="neuri-anuncio sr-only" aria-live="polite" aria-atomic="true"></p>
+        <div class="neuri-contexto"></div>
         <form class="neuri-form">
           <label class="sr-only" for="neuri-q">${esc(t('pet.escribe'))}</label>
           <textarea id="neuri-q" rows="1" maxlength="${LIMITES.usuario}" placeholder="${esc(t('pet.placeholder'))}" enterkeyhint="send" autocomplete="off"></textarea>
@@ -327,7 +421,7 @@ export function crearNeuri(ctx, panel) {
       if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); enviar(ta.value); }
     });
     ctx.body.querySelector('.neuri-form').addEventListener('submit', (e) => { e.preventDefault(); enviar(ta.value); });
-    ctx.body.querySelector('[data-atras]').addEventListener('click', () => ctx.volver());
+    ctx.body.querySelector('[data-atras]').addEventListener('click', () => volverDeConversacion());
     ctx.body.querySelector('[data-nueva]').addEventListener('click', () => {
       // También con una pregunta en curso: se corta y se descarta (las creaciones siguen; están en «Mis lecciones»).
       conv.reiniciar();
@@ -338,7 +432,11 @@ export function crearNeuri(ctx, panel) {
     });
 
     pintarModo();
-    conv.comprobar().then(() => { if (enConversacion()) { pintarModo(); pintarMensajes(); } });
+    pintarContexto();
+    // Al abrir se pregunta el estado y el saldo de hoy (un GET: no gasta nada), como mucho una vez por minuto.
+    const forzar = Date.now() - cupoVisto > 60_000;
+    if (forzar) cupoVisto = Date.now();
+    conv.comprobar({ forzar }).then(() => { if (enConversacion()) { pintarModo(); pintarMensajes(); } });
     pintarMensajes();
     if (conv.ocupada) ponerGesto('pensando');
     aplicarPendiente();
@@ -350,15 +448,75 @@ export function crearNeuri(ctx, panel) {
     const nota = ctx.body.querySelector('.neuri-nota');
     if (!modo) return;
     const e = conv.servicio.estado;
-    const [clase, ic, texto, notaT] = e === 'disponible' ? [' ia', 'sparkles', 'pet.conIa', 'pet.nota']
+    const [clase, ic, texto, notaT] = e === 'disponible' ? [' ia', 'sparkles', conv.servicio.simulado ? 'pet.servicio.simulado' : 'pet.conIa', 'pet.nota']
       : e === 'desconocido' ? [' comprobando', 'sparkles', 'pet.servicio.comprobando', null]
+        : e === 'sin-presupuesto' ? [' caida', 'info', 'pet.servicio.sinPresupuesto', 'pet.notaSinPresupuesto']
+        : e === 'sin-cupo' ? [' agotado', 'clock', 'pet.servicio.sinCupo', 'pet.notaSinCupo']
         : ['no-disponible', 'sin-saldo'].includes(e) ? [' caida', 'info', 'pet.servicio.noDisponible', 'pet.notaNoDisponible']
-          : ['', 'search', 'pet.sinIa', 'pet.notaLocal'];
+          : ['limite', 'ocupado'].includes(e) ? [' caida', 'clock', 'pet.servicio.ocupado', 'pet.notaOcupado']
+            : ['', 'search', 'pet.sinIa', 'pet.notaLocal'];
     modo.className = `neuri-modo${clase}`;
     modo.innerHTML = `${icono(ic)}<span>${esc(t(texto))}</span>`;
     modo.hidden = false;
-    nota.textContent = notaT ? t(notaT) : '';
+    const c = conv.cupo;
+    const renueva = c ? Date.parse(c.renueva) : NaN;
+    nota.textContent = notaT ? t(notaT, { cuando: Number.isFinite(renueva) ? cuando(renueva) : '' }) : '';
     nota.hidden = !notaT;
+    // El saldo de hoy (si el servidor lleva cupo): discreto, bajo el estado. Las respuestas de la app no gastan.
+    const saldo = ctx.body.querySelector('.neuri-cupo');
+    if (saldo) {
+      const ver = !!c && Number.isFinite(renueva) && ['disponible', 'sin-cupo'].includes(e);
+      saldo.hidden = !ver;
+      saldo.textContent = ver ? t('pet.cupo.saldo', { n: c.preguntas.quedan, m: c.preguntas.limite, cuando: cuando(renueva) }) : '';
+      saldo.title = ver ? t('pet.cupo.detalle', { a: c.creaciones.quedan, b: c.creaciones.limite }) : '';
+      saldo.classList.toggle('pocas', ver && c.preguntas.quedan <= Math.max(3, Math.round(c.preguntas.limite * 0.1)));
+    }
+  }
+
+  /**
+   * Encima del campo de escribir: el enfoque («Sobre: lección · paso», que se puede quitar), «Volver» a donde se estaba y
+   * la sesión sin terminar (si la hay), para seguirla sin buscarla.
+   */
+  function pintarContexto() {
+    const cont = ctx.body.querySelector('.neuri-contexto');
+    if (!cont) return;
+    const enfoque = conv.enfoque;
+    const L = enfoque ? ctx.porId.get(enfoque.leccion) ?? ctx.lecciones.get(enfoque.leccion) : null;
+    const paso = enfoque?.paso ? ctx.lecciones.get(enfoque.leccion)?.pasos?.find((p) => p.id === enfoque.paso) : null;
+    const sobre = L ? [tr(L.titulo), paso ? tr(paso.titulo) : ''].filter(Boolean).join(' · ') : '';
+    const S = sesionAbierta();
+    const partes = [];
+    if (sobre) {
+      partes.push(`<p class="neuri-enfoque" role="note"><span class="neuri-enfoque-t">${icono('target')}<span>${esc(t('pet.enfoque.sobre', { x: sobre }))}</span></span>
+        <button class="neuri-enfoque-x" type="button" data-quitar-enfoque aria-label="${esc(t('pet.enfoque.quitar', { x: sobre }))}">${icono('close')}</button></p>`);
+    }
+    if (volverA) partes.push(`<button class="btn neuri-volver" type="button" data-volver-a>${icono('undo')}<span>${esc(volverA.etiqueta)}</span></button>`);
+    // (Sin mensajes, el saludo ya ofrece seguirla; con mensajes, aquí, a mano, salvo si su tarjeta acaba de salir: sería
+    // el mismo botón dos veces y taparía la tarjeta.)
+    else if (S && conv.mensajes.length && !conv.mensajes.slice(-2).some((m) => m.sesionId === S.id || m.sesionCreada === S.id)) {
+      const nueva = sinEmpezar(S);
+      partes.push(`<p class="neuri-ses-barra" role="note">${icono('timer')}<span>${esc(t(nueva ? 'pet.ses.barraNueva' : 'pet.ses.barra', { x: tituloSesion(S), a: Math.min(S.i + 1, S.bloques.length), b: S.bloques.length }))}</span>
+        <button class="btn" type="button" data-seguir-sesion="${esc(S.id)}">${esc(t(nueva ? 'ses.empezar' : 'ses.continuar'))}</button></p>`);
+    }
+    cont.innerHTML = partes.join('');
+    cont.hidden = !partes.length;
+    cont.querySelector('[data-quitar-enfoque]')?.addEventListener('click', () => {
+      conv.quitarEnfoque();
+      pintarContexto();
+      anunciar(t('pet.enfoque.quitado'));
+      ctx.body.querySelector('#neuri-q')?.focus();
+    });
+    cont.querySelector('[data-volver-a]')?.addEventListener('click', () => volverDeConversacion());
+    cont.querySelector('[data-seguir-sesion]')?.addEventListener('click', (ev) => seguirSesion(ctx, ev.currentTarget.dataset.seguirSesion));
+  }
+
+  /** ¿Aún sin empezar? (preparada: ni un bloque hecho ni una posición anotada). */
+  const sinEmpezar = (S) => S.estado === 'planificada' && !S.resultados.length && !S.posicion;
+
+  /** La sesión de estudio sin terminar más reciente (para seguirla desde aquí), o null. */
+  function sesionAbierta() {
+    const S = ctx.sesiones.activa();
+    return S && S.estado !== 'finalizada' ? S : null;
   }
 
   // ── Mensajes ──
@@ -377,12 +535,30 @@ export function crearNeuri(ctx, panel) {
     }).join('')}</ul></details>`;
   }
 
+  /**
+   * Por qué no se puede crear ahora (sin el botón): el tope de gasto, el cupo de creaciones de hoy de este dispositivo o
+   * que esta web no tiene la IA. Null si se puede.
+   */
+  function sinCrear() {
+    if (conv.servicio.estado === 'sin-presupuesto') return t('pet.necesitaIaPresupuesto');
+    if (conv.crear === false) return t('pet.necesitaIa');
+    const c = conv.cupo;
+    const renueva = c ? Date.parse(c.renueva) : NaN;
+    if (c && c.creaciones.quedan === 0 && Number.isFinite(renueva) && renueva > Date.now()) return t('pet.cupo.sinCreaciones', { cuando: cuando(renueva) });
+    return null;
+  }
+  /** Cuántas creaciones quedan hoy (si el servidor lleva cupo), para decirlo junto al botón de crear. */
+  function quedanCreaciones() {
+    const c = conv.cupo;
+    return c ? `<p class="neuri-plan-nota">${esc(t('pet.cupo.creaciones', { a: c.creaciones.quedan, b: c.creaciones.limite }))}</p>` : '';
+  }
+
   /** La propuesta de un recorrido personal (o de un cambio en uno): lo que entendió Neuri y el botón para planificarlo. */
   function htmlSolicitudRecorrido(m, i) {
     const s = m.solicitud;
     const base = s.recorrido_base ? recorridos.buscar(s.recorrido_base) : null;
     const fila = (k, v) => (v ? `<dt>${esc(t(`pet.campo.${k}`))}</dt><dd>${esc(v)}</dd>` : '');
-    const puede = conv.crear !== false;
+    const puede = !sinCrear();
     return `<div class="neuri-tarjeta neuri-propuesta">
       <p class="neuri-tarjeta-t">${icono('route')}<span>${esc(t(base ? 'pet.rec.propuestaCambio' : 'pet.rec.propuesta'))}</span></p>
       <dl class="neuri-campos">
@@ -392,7 +568,8 @@ export function crearNeuri(ctx, panel) {
         ${fila(base ? 'cambio' : 'enfoque', s.enfoque)}${fila('supuestos', s.supuestos.join(' · '))}
       </dl>
       ${m.errorRec ? `<p class="neuri-aviso-t" role="alert">${esc(textoError(m.errorRec))}</p>` : ''}
-      ${!puede ? `<p class="neuri-aviso-t">${esc(t('pet.necesitaIa'))}</p>` : m.iniciado ? '' : `<p class="neuri-plan-nota">${esc(t(base ? 'pet.rec.propuestaCambioNota' : 'pet.rec.propuestaNota'))}</p>
+      ${m.iniciado && recorridos.buscar(m.iniciado) ? `<p class="neuri-plan-nota neuri-iniciada">${icono('check')}<span>${esc(t(base ? 'pet.rec.cambioIniciado' : 'pet.rec.iniciado'))}</span></p>`
+        : !puede ? `<p class="neuri-aviso-t">${esc(sinCrear() ?? t('pet.necesitaIa'))}</p>` : `<p class="neuri-plan-nota">${esc(t(base ? 'pet.rec.propuestaCambioNota' : 'pet.rec.propuestaNota'))}</p>
       <div class="neuri-acciones">
         <button class="btn primary" type="button" data-crear-sol="${i}">${icono('route')}<span>${esc(t(base ? 'pet.rec.cambiarRecorrido' : 'pet.rec.planificar'))}</span></button>
         <button class="btn" type="button" data-cambiar>${esc(t('pet.cambiar'))}</button>
@@ -406,7 +583,7 @@ export function crearNeuri(ctx, panel) {
     const adaptar = s.accion === 'adaptar';
     const base = s.leccion_base && ctx.porId.get(s.leccion_base);
     const fila = (k, v) => (v ? `<dt>${esc(t(`pet.campo.${k}`))}</dt><dd>${esc(v)}</dd>` : '');
-    const puede = conv.crear !== false;
+    const no = sinCrear();
     const iniciada = m.iniciado && trabajos.buscar(m.iniciado);
     return `<div class="neuri-tarjeta neuri-propuesta">
       <p class="neuri-tarjeta-t">${icono('sparkles')}<span>${esc(t(adaptar ? 'pet.propuestaAdaptar' : 'pet.propuestaCrear'))}</span></p>
@@ -415,10 +592,11 @@ export function crearNeuri(ctx, panel) {
         ${fila('nivel', s.nivel ? nomNivel(s.nivel) : '')}${fila('minutos', s.minutos ? t('bib.minutos', { n: s.minutos }) : '')}
         ${fila('enfoque', s.enfoque)}${fila('supuestos', s.supuestos.join(' · '))}
       </dl>
-      ${!puede ? `<p class="neuri-aviso-t">${esc(t('pet.necesitaIa'))}</p>` : iniciada ? '' : `<div class="neuri-acciones">
+      ${iniciada ? `<p class="neuri-plan-nota neuri-iniciada">${icono('check')}<span>${esc(t('pet.creacionIniciada'))}</span></p>`
+        : no ? `<p class="neuri-aviso-t">${esc(no)}</p>` : `<div class="neuri-acciones">
         <button class="btn primary" type="button" data-crear-sol="${i}">${icono('sparkles')}<span>${esc(t(adaptar ? 'pet.crearAdaptacion' : 'pet.crearLeccion'))}</span></button>
         <button class="btn" type="button" data-cambiar>${esc(t('pet.cambiar'))}</button>
-      </div>`}
+      </div>${quedanCreaciones()}`}
     </div>`;
   }
 
@@ -484,7 +662,7 @@ export function crearNeuri(ctx, panel) {
       return `<div class="neuri-tarjeta neuri-gen mal" data-trabajo="${esc(x.id)}">
         <p class="neuri-tarjeta-t">${icono('info')}<span>${esc(t('pet.noCreada', { titulo: x.titulo }))}</span></p>
         ${x.mensaje && (x.estado === 'aclaracion' || x.estado === 'limitacion') ? `<div class="neuri-globo neuri-globo-in">${parrafos(x.mensaje)}</div>` : ''}
-        <p>${esc(textoError(codigo))}</p>
+        <p>${esc(textoError(codigo))}${codigo === 'cupo' && x.hasta && x.hasta > Date.now() ? ` ${esc(t('pet.cupo.sigue', { cuando: cuando(x.hasta) }))}` : ''}</p>
         ${x.errores?.length ? `<details class="neuri-detalles" data-abre="errores-${esc(x.id)}"${abierto(`errores-${x.id}`)}><summary>${esc(t('pet.detalles'))}</summary><ul>${x.errores.map((e) => `<li>${esc(e)}</li>`).join('')}</ul></details>` : ''}
         ${plan}
         ${unidad ? '' : `<div class="neuri-acciones">${cambiar
@@ -547,11 +725,35 @@ export function crearNeuri(ctx, panel) {
       <button class="neuri-rec-x" type="button" data-rec-aviso-x="${esc(R.id)}" aria-label="${esc(t('pet.rec.cerrarAviso'))}">${icono('close')}</button></div>`;
   }
 
+  /** «a las 11:05» o, si no es hoy, «el 12 nov a las 00:00» (en el idioma de la interfaz). */
+  function cuando(ms) {
+    const d = new Date(ms);
+    const hora = d.toLocaleTimeString(idioma(), { hour: '2-digit', minute: '2-digit' });
+    return d.toDateString() === new Date().toDateString() ? t('pet.rec.horaHoy', { hora }) : t('pet.rec.horaOtroDia', { dia: fecha(ms), hora });
+  }
+  /** El texto de una unidad en pausa: la cuota de creaciones (con la hora a la que sigue) o el tope de gasto. */
+  function textoPausa(e) {
+    if (e.motivo === 'presupuesto') return t('pet.rec.estado.presupuesto');
+    if (e.motivo === 'cupo') return e.hasta && e.hasta > Date.now() ? t('pet.rec.estado.cupo', { cuando: cuando(e.hasta) }) : t('pet.rec.estado.cuotaYa');
+    return e.hasta && e.hasta > Date.now() ? t('pet.rec.estado.cuota', { cuando: cuando(e.hasta) }) : t('pet.rec.estado.cuotaYa');
+  }
+  /** El aviso de un recorrido en pausa: qué pasa, cuándo sigue y que lo listo se puede estudiar mientras tanto. */
+  function htmlPausa(R) {
+    const p = R.pausa;
+    if (!p) return '';
+    const txt = p.motivo === 'presupuesto'
+      ? (p.hasta ? t('pet.rec.pausaPresupuestoHasta', { cuando: cuando(p.hasta) }) : t('pet.rec.pausaPresupuesto'))
+      : p.motivo === 'cupo' && p.hasta && p.hasta > Date.now() ? t('pet.rec.pausaCupo', { cuando: cuando(p.hasta) })
+      : p.hasta && p.hasta > Date.now() ? t(R.cola ? 'pet.rec.pausaCuotaCola' : 'pet.rec.pausaCuota', { cuando: cuando(p.hasta) }) : t('pet.rec.estado.cuotaYa');
+    return `<div class="neuri-rec-aviso" role="status">${icono('clock')}<p>${esc(txt)}</p></div>`;
+  }
+
   /** El texto del estado real de una unidad. */
   function textoUnidad(R, u, e) {
     if (e.estado === 'lista') return t('pet.estado.guardada');
     if (e.estado === 'preparando') return etiquetaEtapa(e.trabajo);
     if (e.estado === 'sin-guardar') return t('pet.noGuardadaCorto');
+    if (e.estado === 'detenida') return textoPausa(e);
     if (e.estado === 'interrumpida') return t('pet.rec.estado.interrumpida');
     if (e.estado === 'error') return t('pet.rec.estado.error');
     if (R.cola && !u.trabajo && !u.leccion) return t('pet.rec.enCola');
@@ -559,15 +761,25 @@ export function crearNeuri(ctx, panel) {
   }
 
   /** Una unidad: su número, título, objetivo y estado real; sus botones y, si tiene creación, sus detalles. */
-  function htmlUnidad(R, u, k, e, { planificando, ocupado, puede }) {
+  function htmlUnidad(R, u, k, e, { planificando, ocupado, puede, enPausa = false }) {
     const n = k + 1;
     const L = e.leccion && ctx.porId.get(e.leccion);
-    const icono_ = e.estado === 'lista' ? icono('check') : e.estado === 'preparando' ? '<i class="neuri-giro" aria-hidden="true"></i>' : ['error', 'interrumpida', 'sin-guardar'].includes(e.estado) ? icono('info') : '<i class="neuri-unidad-vacio" aria-hidden="true"></i>';
+    const icono_ = e.estado === 'lista' ? icono('check') : e.estado === 'preparando' ? '<i class="neuri-giro" aria-hidden="true"></i>' : e.estado === 'detenida' ? icono('clock') : ['error', 'interrumpida', 'sin-guardar'].includes(e.estado) ? icono('info') : '<i class="neuri-unidad-vacio" aria-hidden="true"></i>';
     const libre = puede && !planificando && !ocupado;
+    // En pausa (cuota hasta una hora o tope de gasto), crear otra no serviría: la pausa dice cuándo y cómo se sigue.
+    const libreCrear = libre && !enPausa;
+    const clave = `${R.id}:${u.id}`;
     let acc = '';
     if (e.estado === 'lista' && L) acc = `<button class="btn" type="button" data-abrir-leccion="${esc(L.id)}" aria-label="${esc(t('pet.rec.abrirDe', { titulo: u.titulo }))}">${esc(t('pet.rec.abrir'))}</button>`;
-    else if (e.estado === 'pendiente' && libre) acc = `<button class="btn" type="button" data-rec-crear="${esc(`${R.id}:${u.id}`)}" aria-label="${esc(t('pet.rec.crearDe', { n, titulo: u.titulo }))}">${esc(t('pet.rec.crear'))}</button>`;
-    else if ((e.estado === 'error' || e.estado === 'interrumpida') && libre) {
+    else if (e.estado === 'pendiente' && libreCrear) acc = `<button class="btn" type="button" data-rec-crear="${esc(clave)}" aria-label="${esc(t('pet.rec.crearDe', { n, titulo: u.titulo }))}">${esc(t('pet.rec.crear'))}</button>`;
+    // En pausa: «Seguir ahora» cuando ya es la hora (o con el tope de gasto, para probar); antes, el texto dice cuándo.
+    else if (e.estado === 'detenida' && libre && (e.motivo === 'presupuesto' || !e.hasta || e.hasta <= Date.now())) acc = `<button class="btn" type="button" data-rec-seguir="${esc(R.id)}" aria-label="${esc(t('pet.rec.seguirAhoraDe', { n, titulo: u.titulo }))}">${esc(t('pet.rec.seguirAhora'))}</button>`;
+    // El servidor ya no la tiene: volver a crearla puede costar otra vez, así que se confirma antes.
+    else if (e.estado === 'interrumpida' && libre) {
+      acc = confirmandoRecrear === clave
+        ? `<p class="neuri-unidad-conf">${esc(t('pet.rec.confirmarRecrear'))}</p><button class="btn primary" type="button" data-rec-recrear-si="${esc(clave)}">${esc(t('pet.rec.recrearSi'))}</button><button class="btn" type="button" data-rec-recrear-no>${esc(t('pet.rec.recrearNo'))}</button>`
+        : `<button class="btn" type="button" data-rec-recrear="${esc(clave)}" aria-label="${esc(t('pet.rec.reintentarDe', { n, titulo: u.titulo }))}">${esc(t('pet.rec.recrear'))}</button>`;
+    } else if (e.estado === 'error' && libre) {
       const cambiar = SIN_REINTENTO.has(e.codigo) || e.codigo === 'limitacion' || e.codigo === 'aclaracion';
       acc = cambiar
         ? `<button class="btn" type="button" data-cambiar="${esc(`unidad:${R.id}:${u.id}`)}" aria-label="${esc(t('pet.rec.cambiarDe', { n }))}">${esc(t('pet.cambiar'))}</button>`
@@ -638,31 +850,110 @@ export function crearNeuri(ctx, panel) {
       <p class="bib-meta"><span>${esc(nomNivel(R.nivel ?? 1))}</span><span>${icono('clock')}${esc(t('pet.rec.minTotal', { n: res.minutos }))}</span><span>${esc(t('pet.rec.avance', { listas: res.listas, total: res.total }))}</span></p>
       ${planificando ? `<p class="neuri-rec-cambiando"><i class="neuri-giro" aria-hidden="true"></i><span>${esc(t('pet.rec.cambiando'))}</span> <button class="link" type="button" data-rec-cancelar="${esc(R.id)}">${esc(t('pet.cancelar'))}</button></p>` : ''}
       ${!planificando && est !== 'listo' ? `<div class="neuri-rec-aviso mal" role="status">${icono('info')}<div><p>${esc(t('pet.rec.noCambiado'))} ${esc(textoPlanRecorrido(R, est))}</p><div class="neuri-acciones">${botonesPlanRecorrido(R, est)}</div></div></div>` : ''}
+      ${htmlPausa(R)}
       ${htmlAvisoRecorrido(R)}
-      <ol class="neuri-unidades" aria-label="${esc(t('pet.rec.unidades'))}">${R.unidades.map((u, k) => htmlUnidad(R, u, k, res.estados[k], { planificando, ocupado, puede })).join('')}</ol>
+      <ol class="neuri-unidades" aria-label="${esc(t('pet.rec.unidades'))}">${R.unidades.map((u, k) => htmlUnidad(R, u, k, res.estados[k], { planificando, ocupado, puede, enPausa: res.estados.some((x) => x.estado === 'detenida' && (x.motivo === 'presupuesto' || x.hasta > Date.now())) })).join('')}</ol>
       ${R.cola && res.nuevas ? `<p class="neuri-informe">${esc(tn('pet.rec.colaActiva', res.nuevas))}</p>` : ''}
-      ${!puede ? `<p class="neuri-aviso-t">${esc(t('pet.necesitaIa'))}</p>` : ''}
+      ${!puede ? `<p class="neuri-aviso-t">${esc(sinCrear() ?? t('pet.necesitaIa'))}</p>` : ''}
       ${acciones.length ? `<div class="neuri-acciones">${acciones.join('')}</div>` : ''}
       <p class="neuri-plan-nota">${esc(t('pet.rec.nota'))}${res.pendientes > libres ? ` ${esc(libres ? tn('pet.rec.caben', libres) : t('pet.rec.lleno', { max: MAX_PROPIAS }))}` : ''}</p>
       ${mas ? `<details class="neuri-detalles" data-abre="rec-mas-${esc(R.id)}"${abierto(`rec-mas-${R.id}`)}><summary>${esc(t('pet.rec.verMas'))}</summary>${mas}</details>` : ''}
     </div>`;
   }
 
-  function htmlSesion(s) {
-    const lecciones = s.lecciones.map((id) => ctx.porId.get(id)).filter(Boolean);
-    const total = lecciones.reduce((n, L) => n + L.minutos, 0);
+  /**
+   * Las lecciones que Neuri propuso en orden para un tiempo (respuesta de «orientar», `sesion`: { lecciones, minutos }):
+   * con «Empezar la sesión» se convierten en una sesión guardada de bloques de lección (sin pasarse de los minutos), que
+   * se sigue y se reanuda como cualquier otra. Ya convertida, se enseña la tarjeta de esa sesión.
+   */
+  function htmlSesion(m, i, ultimoDeSesion) {
+    if (m.sesionCreada && ctx.sesiones.buscar(m.sesionCreada)) return htmlSesionNeuri({ sesionId: m.sesionCreada, resumen: {} }, ultimoDeSesion.get(m.sesionCreada) === i);
+    const { bloques, total } = bloquesDeLecciones(m.sesion);
+    if (!bloques.length) return '';
     return `<div class="neuri-tarjeta neuri-sesion">
       <p class="neuri-tarjeta-t">${icono('timer')}<span>${esc(t('pet.sesionTitulo', { n: total }))}</span></p>
-      <ol class="neuri-lista">${lecciones.map((L) => `<li><button class="link" type="button" data-ficha="${esc(L.id)}">${esc(tr(L.titulo))}</button> <small>${esc(t('bib.minutos', { n: L.minutos }))}</small></li>`).join('')}</ol>
-      ${lecciones[0] ? `<div class="neuri-acciones"><button class="btn primary" type="button" data-abrir-leccion="${esc(lecciones[0].id)}">${esc(t('pet.sesionEmpezar'))}</button></div>` : ''}
+      <ol class="neuri-lista">${bloques.map((b) => { const L = ctx.porId.get(b.leccion); return `<li><button class="link" type="button" data-ficha="${esc(L.id)}">${esc(tr(L.titulo))}</button> <small>${esc(t('bib.minutos', { n: b.minutos }))}${b.parte === 'inicio' ? ` · ${esc(t('pet.ses.motivo.inicio'))}` : ''}</small></li>`; }).join('')}</ol>
+      <div class="neuri-acciones"><button class="btn primary" type="button" data-crear-sesion="${i}">${icono('play')}<span>${esc(t('pet.sesionEmpezar'))}</span></button></div>
+      <p class="neuri-plan-nota">${esc(t('pet.ses.guardadaNota'))}</p>
     </div>`;
   }
 
-  function htmlMensaje(m, i, ultimo, ultimoRecorrido) {
+  /** Los bloques de lección de una propuesta de lecciones en orden, sin pasarse de sus minutos (la primera, al menos su inicio). */
+  function bloquesDeLecciones(s) {
+    const tope = Number.isInteger(s?.minutos) && s.minutos > 0 ? s.minutos : Infinity;
+    const bloques = [];
+    let total = 0;
+    for (const id of s?.lecciones ?? []) {
+      const L = ctx.porId.get(id);
+      if (!L || bloques.length >= LIMITES.bloquesSesion) continue;
+      if (total + L.minutos <= tope) { bloques.push({ tipo: 'leccion', leccion: id, parte: 'entera', minutos: Math.min(L.minutos, 60), motivo: '' }); total += L.minutos; continue; }
+      if (!bloques.length) { const m = Math.max(1, Math.min(60, tope)); bloques.push({ tipo: 'leccion', leccion: id, parte: 'inicio', minutos: m, motivo: '', motivoClave: { clave: 'pet.ses.motivo.inicio', datos: {} } }); total += m; }
+      break;
+    }
+    return { bloques, total };
+  }
+
+  /** «Empezar la sesión» de una propuesta de lecciones: la sesión guardada (una vez) y su primer bloque. */
+  async function crearDeLecciones(m) {
+    if (m.sesionCreada && ctx.sesiones.buscar(m.sesionCreada)) return seguirSesion(ctx, m.sesionCreada);
+    const { bloques, total } = bloquesDeLecciones(m.sesion);
+    if (!bloques.length) return;
+    const textos = { titulo: { clave: 'pet.ses.tituloGeneral', datos: { m: total } }, mensaje: { clave: 'pet.ses.mensaje', datos: { m: total, n: bloques.length } } };
+    const plan = { titulo: t('pet.ses.tituloGeneral', { m: total }), mensaje: t('pet.ses.mensaje', { m: total, n: bloques.length }), objetivo: '', bloques, textos };
+    const r = await crearSesion(ctx, plan, { origen: 'neuri', minutos: total });
+    if (!r.ok) { anunciar(textoError(r.error === 'vacia' ? 'sesion-vacia' : 'sesion')); ctx.toast(textoError(r.error === 'vacia' ? 'sesion-vacia' : 'sesion'), 6000); return; }
+    m.sesionCreada = r.sesion.id;
+    conv.resumirSesion(r.sesion.id, ctx.sesiones.instantanea(r.sesion));
+    seguirSesion(ctx, r.sesion.id);
+  }
+
+  /**
+   * La tarjeta de una sesión de estudio en la conversación: título, origen, minutos, sus bloques con su estado y
+   * «Empezar» / «Continuar» y «Ver el plan». Solo la última vez que sale va entera (como los recorridos).
+   */
+  function htmlSesionNeuri(m, ultimo) {
+    const S = ctx.sesiones.buscar(m.sesionId);
+    const snap = m.resumen ?? {};
+    const cab = `<p class="neuri-tarjeta-t">${icono('timer')}<span>${esc(t('pet.ses.tarjeta'))}</span></p>`;
+    if (!ultimo) return `<div class="neuri-tarjeta neuri-ses neuri-rec-ref">${cab}<p>${esc(t('pet.ses.masAbajo', { x: S ? tituloSesion(S) : snap.titulo ?? '' }))}</p></div>`;
+    if (!S) return `<div class="neuri-tarjeta neuri-ses mal">${cab}<h4 class="neuri-plan-t">${esc(snap.titulo ?? '')}</h4><p>${esc(t('pet.ses.yaNo'))}</p></div>`;
+    const fin = S.estado === 'finalizada';
+    const empezada = S.estado !== 'planificada' || S.resultados.length || S.posicion;
+    const r = fin ? ctx.sesiones.resumen(S.id) : null;
+    const MARCA = { hecho: 'circleCheck', actual: 'circleDot', saltado: 'skip', perdido: 'skip', pendiente: 'circle', 'sin-hacer': 'circle' };
+    return `<div class="neuri-tarjeta neuri-ses" data-sesion-tarjeta="${esc(S.id)}">${cab}
+      <h4 class="neuri-plan-t">${esc(tituloSesion(S))}</h4>
+      <p class="bib-meta"><span>${icono(S.origen === 'neuri' ? 'sparkles' : 'search')}${esc(textoOrigen(S))}</span><span>${icono('clock')}${esc(t('bib.minutos', { n: minutosSesion(S) }))}</span>
+        <span>${esc(fin ? t('ses.estado.finalizada') : t('ses.bloqueDe', { a: Math.min(S.i + 1, S.bloques.length), b: S.bloques.length }))}</span></p>
+      <ol class="neuri-ses-bloques" aria-label="${esc(t('ses.bloques'))}">${S.bloques.map((b, k) => {
+        const e = estadoBloque(S, k);
+        return `<li class="${e}">${icono(MARCA[e])}<span class="neuri-ses-b"><span class="sr-only">${esc(t(`ses.estado.${e}`))}: </span>${esc(tituloBloque(ctx, b))}</span><small>${esc(detalleBloque(ctx, b))} · ${esc(t('bib.minutos', { n: b.minutos }))}</small></li>`;
+      }).join('')}</ol>
+      ${m.quitados ? `<p class="neuri-informe">${esc(tn('ses.quitados', m.quitados))}</p>` : ''}
+      ${r ? `<p class="neuri-informe">${esc([t('ses.bloquesHechos', { a: r.hechos, b: r.total }), r.preguntas ? t('ses.res.aciertos', { a: r.aciertos, n: r.preguntas }) : '', r.conAyuda ? tn('ses.res.conAyuda', r.conAyuda) : ''].filter(Boolean).join(' · '))}</p>` : ''}
+      <div class="neuri-acciones">${fin ? '' : `<button class="btn primary" type="button" data-seguir-sesion="${esc(S.id)}">${icono('play')}<span>${esc(t(empezada ? 'ses.continuar' : 'ses.empezar'))}</span></button>`}
+        <button class="btn" type="button" data-ver-sesion="${esc(S.id)}">${esc(t(fin ? 'ses.verResumen' : 'ses.verPlan'))}</button></div>
+    </div>`;
+  }
+
+  /** «Ver en 3D»: botones para enseñar en el visor las estructuras de una respuesta (sin cerrar el panel). */
+  const htmlVer3d = (lista) => (lista?.length ? `<p class="neuri-ver3d" role="group" aria-label="${esc(t('pet.ver3dGrupo'))}">${lista.map((x) => `<button class="btn" type="button" data-ver3d-clave="${esc(x.clave)}" data-ver3d-nombre="${esc(x.nombre)}">${icono('cubo')}<span>${esc(t('pet.ver3d', { x: x.nombre }))}</span></button>`).join('')}</p>` : '');
+
+  function htmlMensaje(m, i, ultimo, ultimoRecorrido, ultimoDeSesion) {
     if (m.rol === 'usuario') {
       return `<div class="neuri-msg yo${m.cancelada ? ' cancelada' : ''}"><p><span class="sr-only">${esc(t('pet.tu'))}: </span>${esc(m.texto)}</p>${m.cancelada ? `<small class="neuri-cancelada">${esc(t('pet.cancelada'))}</small>` : ''}</div>`;
     }
     if (m.tipo === 'recorrido') return `<div class="neuri-msg pet">${htmlRecorrido(m, ultimoRecorrido.get(m.recorrido) === i)}</div>`;
+    if (m.tipo === 'sesion') {
+      // Lo que dice Neuri al proponerla (el de la app, en el idioma de ahora) y la tarjeta de la sesión.
+      const S = ctx.sesiones.buscar(m.sesionId);
+      const dice = m.seguir ? m.texto : S && S.textos?.mensaje ? mensajeSesion(S) : m.texto;
+      return `<div class="neuri-msg pet">
+        ${dice || m.aviso ? `<div class="neuri-globo"><span class="sr-only">Neuri: </span>${parrafos(dice ?? '')}
+          ${m.aviso ? `<p class="neuri-aviso">${esc(t(`pet.aviso.${m.aviso}`))}</p>` : ''}
+          ${m.origen === 'buscador' ? `<p class="neuri-origen">${icono('search')}<span>${esc(t('pet.origenLocal'))}</span></p>` : ''}</div>` : ''}
+        ${htmlSesionNeuri(m, ultimoDeSesion.get(m.sesionId) === i)}</div>`;
+    }
     if (m.tipo === 'trabajo') return `<div class="neuri-msg pet">${htmlTrabajo(m.trabajo) || htmlGeneracionAntigua({ generacion: m.resumen?.estado && FINALES.includes(m.resumen.estado) ? m.resumen : { ...m.resumen, estado: 'error', error: 'interrumpida' } })}</div>`;
     if (m.tipo === 'plan') return `<div class="neuri-msg pet">${m.texto ? `<div class="neuri-globo">${parrafos(m.texto)}</div>` : ''}${htmlPlan(m, i)}</div>`;
     if (m.tipo === 'generacion') return `<div class="neuri-msg pet">${htmlGeneracionAntigua(m)}</div>`;
@@ -676,12 +967,13 @@ export function crearNeuri(ctx, panel) {
     return `<div class="neuri-msg pet">
       <div class="neuri-globo"><span class="sr-only">Neuri: </span>${parrafos(texto)}
         ${m.aviso === 'sin-evidencia' ? `<p class="neuri-aviso">${esc(t('pet.sinEvidencia'))}</p>` : m.aviso && m.aviso !== 'sin-respaldo' ? `<p class="neuri-aviso">${esc(t(`pet.aviso.${m.aviso}`))}</p>` : ''}
-        ${m.origen === 'buscador' && conv.ia !== false ? `<p class="neuri-origen">${icono('search')}<span>${esc(t('pet.origenBuscador'))}</span></p>` : ''}
+        ${m.origen === 'buscador' && (m.ruta || conv.ia !== false) ? `<p class="neuri-origen">${icono('search')}<span>${esc(t(m.ruta ? 'pet.origenLocal' : 'pet.origenBuscador'))}</span></p>` : ''}
       </div>
       ${htmlEvidencias(m.evidencias, i)}
       ${m.solicitud ? htmlSolicitud(m, i) : ''}
       ${m.lecciones?.length ? `<div class="neuri-recs" role="group" aria-label="${esc(t('pet.leccionesSugeridas'))}">${tarjetas(m.lecciones)}</div>` : ''}
-      ${m.sesion ? htmlSesion(m.sesion) : ''}
+      ${m.sesion?.lecciones?.length ? htmlSesion(m, i, ultimoDeSesion) : ''}
+      ${htmlVer3d(m.mostrar)}
       ${R ? `<div class="neuri-recs" role="group" aria-label="${esc(t('pet.recorridoSugerido'))}">${tarjetaRecorrido(R, ctx.resumenRecorrido(R), fav(R.id))}</div>` : ''}
       ${ultimo ? sugerencias(m.sugerencias) : ''}
     </div>`;
@@ -708,7 +1000,15 @@ export function crearNeuri(ctx, panel) {
     const alFinal = log.scrollHeight - log.scrollTop - log.clientHeight < 40;
     const antes = log.childElementCount;
     const ms = conv.mensajes;
-    const hola = `<div class="neuri-msg pet"><div class="neuri-globo"><p>${esc(t('pet.hola'))}</p></div>${ms.length ? '' : sugerencias(t('pet.ejemplos').split('|'))}</div>`;
+    // El saludo es de la app (sin IA). Con una sesión sin terminar, ofrece seguirla.
+    const S = ms.length ? null : sesionAbierta();
+    const hola = S
+      ? `<div class="neuri-msg pet"><div class="neuri-globo"><p>${esc(t(sinEmpezar(S) ? 'pet.ses.holaNueva' : 'pet.ses.hola', { x: tituloSesion(S), a: Math.min(S.i + 1, S.bloques.length), b: S.bloques.length }))}</p>
+          <p class="neuri-origen">${icono('search')}<span>${esc(t('pet.origenLocal'))}</span></p></div>
+          <div class="neuri-acciones"><button class="btn primary" type="button" data-seguir-sesion="${esc(S.id)}">${icono('play')}<span>${esc(t(sinEmpezar(S) ? 'ses.empezar' : 'ses.continuar'))}</span></button>
+          <button class="btn" type="button" data-ver-sesion="${esc(S.id)}">${esc(t('ses.verPlan'))}</button></div>
+          ${sugerencias(t('pet.ejemplos').split('|'))}</div>`
+      : `<div class="neuri-msg pet"><div class="neuri-globo"><p>${esc(t('pet.hola'))}</p></div>${ms.length ? '' : sugerencias(t('pet.ejemplos').split('|'))}</div>`;
     const escribiendo = conv.ocupada
       ? `<div class="neuri-msg pet neuri-pensando"><div class="neuri-globo"><span class="neuri-puntos" aria-hidden="true"><i></i><i></i><i></i></span><span class="sr-only">${esc(t('pet.pensando'))}</span></div>
           <button class="link" type="button" data-cancelar-pregunta>${esc(t('pet.cancelar'))}</button></div>`
@@ -716,7 +1016,10 @@ export function crearNeuri(ctx, panel) {
     // De cada recorrido, el último mensaje que lo nombra (solo ese lleva la tarjeta entera).
     const ultimoRecorrido = new Map();
     ms.forEach((m, i) => { if (m.tipo === 'recorrido') ultimoRecorrido.set(m.recorrido, i); });
-    log.innerHTML = hola + ms.map((m, i) => htmlMensaje(m, i, i === ms.length - 1, ultimoRecorrido)).join('') + escribiendo;
+    // De cada sesión de estudio, igual: solo el último mensaje que la nombra lleva su tarjeta entera.
+    const ultimoDeSesion = new Map();
+    ms.forEach((m, i) => { if (m.tipo === 'sesion') ultimoDeSesion.set(m.sesionId, i); else if (m.sesionCreada) ultimoDeSesion.set(m.sesionCreada, i); });
+    log.innerHTML = hola + ms.map((m, i) => htmlMensaje(m, i, i === ms.length - 1, ultimoRecorrido, ultimoDeSesion)).join('') + escribiendo;
     if (activo) {
       const t2 = tarjeta && `[data-trabajo="${CSS.escape(tarjeta)}"]`;
       // En un recorrido: si el botón ya no está (se pulsó «Crear»), el foco se queda en la fila de esa unidad (su «Ver
@@ -763,6 +1066,15 @@ export function crearNeuri(ctx, panel) {
     // Recorridos personales: crear una unidad, la siguiente o todas (en cola), parar la cola, volver a planificar…
     const tras = (r) => { if (r?.ok) ponerGesto('pensando', 3000); pintarMensajes(); };
     log.querySelectorAll('[data-rec-crear]').forEach((b) => b.addEventListener('click', () => { const [rid, uid] = b.dataset.recCrear.split(':'); tras(recorridos.crearUnidad(rid, uid)); }));
+    log.querySelectorAll('[data-rec-seguir]').forEach((b) => b.addEventListener('click', () => tras(recorridos.seguir(b.dataset.recSeguir))));
+    // Una unidad que el servidor olvidó: primero se pregunta (puede volver a costar).
+    log.querySelectorAll('[data-rec-recrear]').forEach((b) => b.addEventListener('click', () => { confirmandoRecrear = b.dataset.recRecrear; pintarMensajes(); }));
+    log.querySelectorAll('[data-rec-recrear-no]').forEach((b) => b.addEventListener('click', () => { confirmandoRecrear = null; pintarMensajes(); }));
+    log.querySelectorAll('[data-rec-recrear-si]').forEach((b) => b.addEventListener('click', () => {
+      const [rid, uid] = b.dataset.recRecrearSi.split(':');
+      confirmandoRecrear = null;
+      tras(recorridos.crearUnidad(rid, uid, { confirmado: true }));
+    }));
     log.querySelectorAll('[data-rec-siguiente]').forEach((b) => b.addEventListener('click', () => tras(recorridos.crearSiguiente(b.dataset.recSiguiente))));
     log.querySelectorAll('[data-rec-todas]').forEach((b) => b.addEventListener('click', () => tras(recorridos.crearTodas(b.dataset.recTodas))));
     log.querySelectorAll('[data-rec-parar]').forEach((b) => b.addEventListener('click', () => { recorridos.parar(b.dataset.recParar); pintarMensajes(); }));
@@ -771,6 +1083,11 @@ export function crearNeuri(ctx, panel) {
     log.querySelectorAll('[data-rec-aviso-x]').forEach((b) => b.addEventListener('click', () => { recorridos.olvidarAviso(b.dataset.recAvisoX); pintarMensajes(); }));
     log.querySelectorAll('[data-rec-quitar-vacio]').forEach((b) => b.addEventListener('click', () => { quitarRecorrido(b.dataset.recQuitarVacio); pintarMensajes(); }));
     log.querySelectorAll('[data-abrir-leccion]').forEach((b) => b.addEventListener('click', () => abrirLeccion(ctx, b.dataset.abrirLeccion)));
+    // Sesiones de estudio: empezar o seguir (en su bloque exacto), ver el plan, o convertir una propuesta de lecciones.
+    log.querySelectorAll('[data-seguir-sesion]').forEach((b) => b.addEventListener('click', () => { volverA = null; seguirSesion(ctx, b.dataset.seguirSesion); }));
+    log.querySelectorAll('[data-ver-sesion]').forEach((b) => b.addEventListener('click', () => { volverA = null; ctx.ir(vistaSesion(b.dataset.verSesion)); }));
+    log.querySelectorAll('[data-crear-sesion]').forEach((b) => b.addEventListener('click', () => { volverA = null; crearDeLecciones(conv.mensajes[+b.dataset.crearSesion]); }));
+    log.querySelectorAll('[data-ver3d-clave]').forEach((b) => b.addEventListener('click', () => verEn3D(b.dataset.ver3dClave, b.dataset.ver3dNombre)));
     log.querySelectorAll('[data-ficha]').forEach((b) => b.addEventListener('click', () => ctx.ir({ tipo: 'info', id: b.dataset.ficha })));
     log.querySelectorAll('[data-ir-paso]').forEach((b) => b.addEventListener('click', async () => {
       const L = await ctx.cargarLeccion(b.dataset.irPaso);
@@ -789,6 +1106,25 @@ export function crearNeuri(ctx, panel) {
     const boton = ctx.body.querySelector('.neuri-enviar');
     const ta = ctx.body.querySelector('#neuri-q');
     if (boton && ta) boton.disabled = !ta.value.trim() || conv.ocupada;
+    pintarContexto();
+  }
+
+  /**
+   * «Ver en 3D»: la estructura en el visor, del modelo de ahora (con sus dos lados si los tiene), resaltada y con su
+   * ficha, sin cerrar el panel. Si este modelo no la tiene, se dice.
+   */
+  async function verEn3D(clave, nombre) {
+    try { await ctx.cargarEstructuras?.(); } catch { /* sin lista: se prueba igual con el nombre */ }
+    const p = (ctx.estructuras?.lista ?? []).find((x) => x.clave === clave);
+    if (!p) { const s = t('aviso.noEnModelo'); anunciar(s); ctx.toast(s); return; }
+    const L = { id: 'neuri-ver', modelos: [ctx.api.modelo()], estructuras: { x: { nombre: nombre || p.nombre, piezas: [clave], lado: /_[LR]$/.test(p.id) ? 'ambos' : 'exacto' } } };
+    // La conversación se estrecha (como en una lección) para dejar el modelo a la vista; vuelve a su ancho al salir.
+    panel.classList.add('mirando');
+    ctx.api.ajustar();
+    const ok = await ctx.api.resaltar(L, ['x'], { lado: 'R', ficha: true });
+    const s = ok ? t('pet.ver3dHecho', { x: nombre || p.nombre }) : t('aviso.noEnModelo');
+    anunciar(s);
+    if (!ok) ctx.toast(s);
   }
 
   // ── Acciones ──
@@ -809,8 +1145,9 @@ export function crearNeuri(ctx, panel) {
     pintarModo();
     if (m) arrancarSiPedida(m);
     pintarMensajes();
-    if (m) anunciar(`Neuri: ${m.tipo === 'error' ? textoError(m.codigo) : m.aviso === 'sin-respaldo' ? t('pet.explicacionRetirada') : m.texto}`);
-    const bien = m && (m.lecciones?.length || m.recorrido || m.sesion || m.solicitud || m.evidencias?.length);
+    if (m) anunciar(m.tipo === 'sesion' && !m.seguir ? `${t('ses.anuncio.creada')} ${tituloSesion(ctx.sesiones.buscar(m.sesionId) ?? m.resumen ?? {})}`
+      : `Neuri: ${m.tipo === 'error' ? textoError(m.codigo) : m.aviso === 'sin-respaldo' ? t('pet.explicacionRetirada') : m.texto}`);
+    const bien = m && (m.lecciones?.length || m.recorrido || m.sesion || m.sesionId || m.solicitud || m.evidencias?.length || m.mostrar?.length);
     ponerGesto(bien ? 'contento' : 'dudando', bien ? 2600 : 3400);
     ctx.body.querySelector('#neuri-q')?.focus({ preventScroll: true });
   }
@@ -822,7 +1159,9 @@ export function crearNeuri(ctx, panel) {
 
   /** Empieza la creación de una propuesta (una sola vez): planifica y redacta seguido, con sus etapas a la vista. */
   function crearDesde(m) {
-    if (!m?.solicitud || m.iniciado) return;
+    // (Si la creación de antes ya no existe —se quitó tras fallar—, el botón vuelve y se puede crear otra vez.)
+    const sigue = m?.iniciado && (m.solicitud?.accion === 'recorrido' ? recorridos.buscar(m.iniciado) : trabajos.buscar(m.iniciado));
+    if (!m?.solicitud || sigue) return;
     if (m.solicitud.accion === 'recorrido') { planificarRecorrido(m); return; }
     const x = trabajos.iniciar({ solicitud: m.solicitud, titulo: m.solicitud.tema });
     ctx.evento?.('generacion_solicitada', { accion: m.solicitud.accion === 'adaptar' ? 'adaptar' : 'crear' }, { clave: x.id });
@@ -914,6 +1253,7 @@ export function crearNeuri(ctx, panel) {
     actualizar,
     renderVista,
     abrir,
+    abrirEn,
     /** Las creaciones (para «Mis lecciones» en la portada). */
     trabajos,
     verTrabajo,
@@ -925,7 +1265,7 @@ export function crearNeuri(ctx, panel) {
     /** ¿Se pueden crear lecciones ahora? (false si se sabe que no hay IA; null si aún no se sabe). */
     puedeCrear: () => conv.crear !== false,
     /** «Borrar mis datos»: para las creaciones en curso y olvida los recorridos y la conversación. */
-    olvidarTodo() { trabajos.olvidar(); recorridos.olvidar(); enMarcha.clear(); planesVistos.clear(); conv.reiniciar(); desplegados.clear(); },
+    olvidarTodo() { trabajos.olvidar(); recorridos.olvidar(); ctx.sesiones.olvidar(); enMarcha.clear(); planesVistos.clear(); conv.reiniciar({ sinMemoria: true }); conv.olvidarMemoria(); conv.quitarEnfoque(); volverA = null; desplegados.clear(); },
     etiquetaEtapa,
     textoError,
     textoUnidad,

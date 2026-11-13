@@ -1,10 +1,11 @@
-// Explorar la biblioteca: resultados de búsqueda con filtros y orden, recorridos, ficha de una lección y la sesión
-// según el tiempo disponible. También las acciones comunes de las tarjetas y el arranque de las prácticas.
+// Explorar la biblioteca: resultados de búsqueda con filtros y orden, recorridos y ficha de una lección. También las
+// acciones comunes de las tarjetas y el arranque de las prácticas. (La sesión según el tiempo es ahora una sesión
+// guardada con Neuri: sesion-neuri.js.)
 import * as P from '../../biblioteca/progreso.js';
 import * as F from '../../biblioteca/filtros.js';
 import { REGIONES, SISTEMAS, FORMATOS, TEMAS, NIVELES, DURACIONES, SUBREGION_POR_ID } from '../../biblioteca/taxonomia.js';
 import { RECORRIDOS, RECORRIDO_POR_ID, MODULO_BIB_POR_ID } from '../../biblioteca/recorridos.js';
-import { proponer, itemsDePractica, sinRepetirRecientes } from '../../biblioteca/sesion.js';
+import { itemsDePractica, sinRepetirRecientes } from '../../biblioteca/sesion.js';
 import { preguntaDeItem, planEvaluacion, instanciar, disponibleEn, motivoNoDisponible, barajar } from '../../biblioteca/evaluar.js';
 import { t, tn, idioma } from '../../i18n/idioma.js';
 import { botonReportar, enlazarReportar } from './reportar.js';
@@ -12,7 +13,7 @@ import { tr } from '../../i18n/contenido.js';
 import { SYSTEM_BY_ID } from '../../systems.js';
 import { etiqueta } from '../../i18n/idioma.js';
 import {
-  esc, icono, fecha, fechaDia, tarjetaLeccion, tarjetaRecorrido, barra, etiquetaEstado, chipsMeta, vacio, enEsteIdioma,
+  esc, icono, fecha, fechaDia, tarjetaLeccion, tarjetaRecorrido, barra, etiquetaEstado, chipsMeta, enEsteIdioma,
   nomRegion, nomSub, nomSistema, nomFormato, nomTema, nomNivel, nomLugar, nombreIdioma,
 } from './comun.js';
 import { svgNeuri } from './neuri-svg.js';
@@ -113,7 +114,7 @@ export async function renderResultados(ctx) {
   const ampliar = !lecciones.length && activos.length ? F.ampliar(base, b.filtros, ctxF, t, nombreIdioma) : [];
   const entendido = r ? [
     ...r.lugares.map((l) => nomLugar([l.region, l.sub])),
-    ...r.materias.map((m) => (m.sistema ? nomSistema(m.sistema) : nomTema(m.tema))),
+    ...r.materias.filter((m) => !m.generico).map((m) => (m.sistema ? nomSistema(m.sistema) : nomTema(m.tema))),
   ] : [];
   const nombreLecciones = (ids) => ids.filter((id) => ctx.porId.has(id)).map((id) => `<button class="link" data-info="${esc(id)}">${esc(tr(ctx.porId.get(id).titulo))}</button>`).join(', ');
 
@@ -365,7 +366,7 @@ export function renderInfo(ctx) {
       ctx.toast(t('estudio.reiniciada'));
       return renderInfo(ctx);
     }
-    if (a === 'adaptar') return ctx.neuri.abrir(null, { borrador: t('pet.adaptarBorrador', { titulo: tr(L.titulo) }) });
+    if (a === 'adaptar') return ctx.neuri.abrir(null, { borrador: t(L.propia ? 'pet.adaptarMiBorrador' : 'pet.adaptarBorrador', { titulo: tr(L.titulo) }) });
     if (a === 'quitar') { body.querySelector('.mod-confirm-propia').hidden = false; body.querySelector('.mod-confirm-propia .danger').focus(); return; }
     if (a === 'quitar-no') { body.querySelector('.mod-confirm-propia').hidden = true; return; }
     if (a === 'quitar-si') { ctx.borrarPropia(L.id); ctx.toast(t('pet.quitada')); ctx.pila = ctx.pila.filter((v) => v.id !== L.id); return ctx.volver(); }
@@ -374,59 +375,4 @@ export function renderInfo(ctx) {
     if (a === 'borrar-si') { P.borrarLeccion(ctx.data, L.id); ctx.guardar(); ctx.toast(t('estudio.borrado')); renderInfo(ctx); }
   }));
   requestAnimationFrame(() => body.querySelector('.bib-tit')?.focus());
-}
-
-// ── Sesión según el tiempo disponible ──
-export function renderSesion(ctx) {
-  const { body, vista } = ctx;
-  vista.bloques ??= proponer({ minutos: vista.minutos, catalogo: ctx.catalogo.lecciones, data: ctx.data, modelo: ctx.api.modelo(), estadoDe: (L) => ctx.estado(L) });
-  const total = vista.bloques.reduce((n, b) => n + b.minutos, 0);
-  body.innerHTML = `
-    ${atras(t('bib.biblioteca'))}
-    <h3 class="bib-tit" tabindex="-1">${esc(t('bib.tuSesion', { n: vista.minutos }))}</h3>
-    <p class="bib-resumen">${esc(t('bib.sesionExplica'))}</p>
-    <div class="bib-minutos" role="radiogroup" aria-label="${esc(t('bib.cuantoTiempo'))}">
-      ${[10, 15, 20, 30, 45].map((m) => `<button type="button" role="radio" aria-checked="${m === vista.minutos}" class="bib-chip ${m === vista.minutos ? 'on' : ''}" data-min="${m}">${esc(t('bib.minutos', { n: m }))}</button>`).join('')}
-    </div>
-    ${vista.bloques.length ? `<ol class="bib-lista bib-sesion">${vista.bloques.map((bq, i) => {
-      const L = bq.id && ctx.porId.get(bq.id);
-      const texto = bq.tipo === 'repaso' ? tn('bib.bloqueRepaso', bq.preguntas) : `${t(bq.motivo === 'seguir' ? 'bib.bloqueSeguir' : 'bib.bloqueNueva')}: ${tr(L.titulo)}`;
-      return `<li><span class="bib-fila-t">${icono(bq.tipo === 'repaso' ? 'repeat' : 'book')}${esc(texto)}</span><span class="bib-fila-m">${esc(t('bib.minutos', { n: bq.minutos }))}</span>
-        <button class="icon-btn" data-quitar-bloque="${i}" aria-label="${esc(t('bib.quitarBloque'))}">${icono('close')}</button></li>`;
-    }).join('')}</ol>
-    <p class="bib-cuenta">${esc(t('bib.totalSesion', { n: total, m: vista.minutos }))}</p>
-    <div class="bib-acciones"><button class="btn primary" data-empezar-sesion>${esc(t('bib.empezarSesion'))}</button></div>`
-    : vacio(t('bib.sesionVacia'))}`;
-  body.querySelector('[data-atras]').addEventListener('click', () => ctx.volver());
-  body.querySelectorAll('[data-min]').forEach((b) => b.addEventListener('click', () => {
-    ctx.busqueda.minutos = Number(b.dataset.min);
-    ctx.ir({ tipo: 'sesion', minutos: Number(b.dataset.min) }, { reemplazar: true });
-  }));
-  body.querySelectorAll('[data-quitar-bloque]').forEach((b) => b.addEventListener('click', () => { vista.bloques.splice(Number(b.dataset.quitarBloque), 1); renderSesion(ctx); }));
-  body.querySelector('[data-empezar-sesion]')?.addEventListener('click', () => {
-    ctx.sesionActiva = { bloques: [...vista.bloques], i: 0 };
-    seguirSesion(ctx);
-  });
-  requestAnimationFrame(() => body.querySelector('.bib-tit')?.focus());
-}
-
-/** Abre el bloque actual de la sesión en curso (o la cierra si no quedan). */
-export function seguirSesion(ctx) {
-  const s = ctx.sesionActiva;
-  const bq = s?.bloques[s.i];
-  if (!bq) { ctx.sesionActiva = null; ctx.toast(t('bib.sesionTerminada')); return ctx.ir({ tipo: 'portada' }); }
-  if (bq.tipo === 'repaso') return empezarPractica(ctx, 'vencidas');
-  return abrirLeccion(ctx, bq.id);
-}
-
-/** Pasa al siguiente bloque de la sesión, si hay una en curso. Devuelve el texto del botón o null. */
-export function siguienteDeSesion(ctx) {
-  const s = ctx.sesionActiva;
-  if (!s) return null;
-  const bq = s.bloques[s.i + 1];
-  return bq ? (bq.tipo === 'repaso' ? t('bib.sesionRepaso') : t('bib.sesionSiguiente', { titulo: tr(ctx.porId.get(bq.id)?.titulo ?? '') })) : t('bib.sesionFin');
-}
-export function avanzarSesion(ctx) {
-  ctx.sesionActiva.i++;
-  seguirSesion(ctx);
 }

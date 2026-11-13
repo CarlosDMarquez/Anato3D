@@ -1,0 +1,14 @@
+# Cloudflare Workers (plan Free): la web estática (Workers Static Assets) y el reenvío de /api/* al servidor de Fly.
+# Plantilla SIN PROBAR en Cloudflare. Va dentro del paquete (worker/); desde la carpeta del paquete:
+#   npx wrangler deploy --config worker/wrangler.toml
+# El secreto, nunca aquí:  npx wrangler secret put ANATO3D_PROXY_SECRETO --config worker/wrangler.toml
+name = "anato3d"
+main = "worker.mjs"
+compatibility_date = "2026-11-01"
+
+[assets]
+directory = "../publico"
+binding = "ASSETS"
+
+[vars]
+ANATO3D_API = "https://anato3d.fly.dev"   # el servidor de Fly (fly.toml), sin barra al final

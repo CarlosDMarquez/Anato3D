@@ -3,9 +3,12 @@
 //   node scripts/contenido-i18n.mjs              estado: textos y traducciones que faltan por idioma
 //   node scripts/contenido-i18n.mjs --lote N     los N siguientes textos sin traducir, en JSON { huella: español }
 //                                     (con --donde, cada texto lleva detrás las piezas en las que sale)
-//   node scripts/contenido-i18n.mjs --unir F     añade un lote traducido (F: { huella: [en, de, fr, it] })
+//   node scripts/contenido-i18n.mjs --unir F     añade un lote traducido (F: { huella: [en] } o { huella: [en, de, fr, it] })
 //   node scripts/contenido-i18n.mjs --limpiar    quita las traducciones de textos que ya no existen (también al unir)
-//   node scripts/contenido-i18n.mjs --comprobar  termina con código 1 si falta alguna traducción
+//   node scripts/contenido-i18n.mjs --comprobar  termina con código 1 si falta alguna traducción al inglés
+//
+// Desde el 12 nov 2026 solo se exige el inglés: alemán, francés e italiano están «próximamente» y conservan lo que ya
+// tenían (lo que les falte se muestra en español si algún día se activan).
 //
 // Los textos son los que muestra la app en español: los de las fichas de todas las piezas de los dos modelos (como las
 // construye resolvePart, con los grupos de los metadatos), las descripciones de los grupos, el glosario latino de las
@@ -30,6 +33,7 @@ const WEB = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MODELS = path.join(WEB, 'public/models');
 const I18N = path.join(WEB, 'public/i18n');
 export const DESTINOS = ['en', 'de', 'fr', 'it'];
+export const REQUERIDOS = ['en'];
 
 function nodes(file) {
   const b = fs.readFileSync(path.join(MODELS, file));
@@ -133,8 +137,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     let n = 0;
     for (const [h, tr] of Object.entries(lote)) {
       if (!textos.has(h)) throw new Error(`huella desconocida en el lote: ${h}`);
-      if (!Array.isArray(tr) || tr.length !== 4 || tr.some((s) => typeof s !== 'string' || !s.trim())) throw new Error(`${h}: se esperan 4 traducciones`);
-      DESTINOS.forEach((id, i) => (memorias[id][h] = tr[i].trim()));
+      if (!Array.isArray(tr) || ![1, 4].includes(tr.length) || tr.some((s) => typeof s !== 'string' || !s.trim())) throw new Error(`${h}: se esperan [en] o [en, de, fr, it]`);
+      tr.forEach((t, i) => (memorias[DESTINOS[i]][h] = t.trim()));
       n++;
     }
     console.log(`lote unido: ${n} textos`);
@@ -153,7 +157,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     if (sobran.length) console.log(`traducciones sin uso quitadas: ${sobran.length}`);
   } else if (sobran.length) console.log(`traducciones sin uso: ${sobran.length} (se quitan con --limpiar o al unir un lote)`);
 
-  const falta = [...textos.entries()].filter(([h]) => DESTINOS.some((id) => !memorias[id][h]));
+  const falta = [...textos.entries()].filter(([h]) => REQUERIDOS.some((id) => !memorias[id][h]));
   if (arg('--lote')) {
     const donde = process.argv.includes('--donde');
     const ver = (v) => (donde && v.donde.length ? `${v.es}  ⟨${v.donde.join('; ')}⟩` : v.es);

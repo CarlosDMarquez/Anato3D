@@ -684,6 +684,13 @@ body.saliendo .start { opacity: 0; }
 
 /* La conversación: ocupa el panel; los mensajes se desplazan y lo de escribir queda abajo. */
 .panel-study.ancho.chat { height: calc(100% - var(--dock-h, 86px) - 34px); display: flex; flex-direction: column; overflow: hidden; padding-bottom: 12px; }
+/* Tras «Ver en 3D» desde la conversación: el panel se estrecha (en el móvil, baja) para dejar el modelo a la vista. */
+.panel-study.ancho.chat.mirando { width: 360px; }
+@media (max-width: 760px) {
+  .panel-study.ancho.chat.mirando { width: auto; top: 46%; }
+  /* En la hoja de abajo solo cabe la conversación: sin la presentación ni las notas. */
+  .panel-study.chat.mirando .study-aviso, .panel-study.chat.mirando .neuri-presenta, .panel-study.chat.mirando .neuri-nota { display: none; }
+}
 /* Móvil con el teclado abierto (pantalla baja) en la conversación de Neuri: se esconde la barra de sistemas y la
    presentación se reduce, para que la conversación siga a la vista mientras se escribe. */
 @media (max-height: 560px) and (max-width: 720px) {
@@ -1039,6 +1046,11 @@ body.saliendo .start { opacity: 0; }
 .neuri-unidad-det > .neuri-tarjeta { margin-top: 6px; }
 .neuri-unidad-acc { flex: none; display: flex; align-items: center; gap: 6px; }
 .neuri-unidad-acc .btn { padding: 5px 12px; font-size: 12.5px; }
+/* En pausa (cuota o tope de gasto): no es un fallo, en azul; y la confirmación antes de volver a crear una unidad. */
+.neuri-unidad.detenida .neuri-unidad-e, .mis-rec-u.detenida .mis-rec-u-txt small { color: #bfe0ff; }
+.neuri-unidad:has(.neuri-unidad-conf) { flex-wrap: wrap; }
+.neuri-unidad-acc:has(.neuri-unidad-conf) { flex: 1 1 100%; flex-wrap: wrap; padding-left: 34px; }
+.neuri-unidad-conf { flex: 1 1 100%; margin: 0; font-size: 12.5px; line-height: 1.5; color: #f0c27a; }
 .neuri-rec-aviso { display: flex; gap: 8px; align-items: flex-start; padding: 8px 10px; border-radius: 10px; border: 1px solid rgba(240, 180, 80, 0.3); background: rgba(240, 180, 80, 0.06); font-size: 12.5px; line-height: 1.5; color: var(--text-2); }
 .neuri-rec-aviso > .ui-icon { width: 14px; height: 14px; flex: none; margin-top: 3px; color: #f0c27a; }
 .neuri-rec-aviso > p, .neuri-rec-aviso > div { flex: 1; min-width: 0; }
@@ -1072,3 +1084,128 @@ body.saliendo .start { opacity: 0; }
 .mis-confirmar-nota { margin: 0 0 8px !important; font-size: 12px; color: #ffb3b3; }
 .bib-prep-txt small.bib-prep-de { color: var(--muted); }
 @media (max-width: 520px) { .mis-recs { grid-template-columns: 1fr; } }
+
+/* ── Sesiones de estudio con Neuri (ui/biblioteca/sesion-neuri.js, mis-sesiones.js) ───────────── */
+.panel .ses h3.bib-tit { margin: 4px 0 2px; font-size: 19px; font-weight: 600; line-height: 1.3; letter-spacing: 0; text-transform: none; color: var(--text); overflow-wrap: anywhere; }
+.ses-objetivo { display: flex; align-items: flex-start; gap: 7px; margin: 6px 0 0; font-size: 13.5px; line-height: 1.5; color: var(--text); }
+.ses-objetivo .ui-icon { width: 15px; height: 15px; flex: none; margin-top: 3px; color: var(--accent); }
+.ses-meta { margin-top: 8px; }
+.ses-mensaje { display: flex; align-items: flex-start; gap: 10px; margin: 12px 0 0; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--raise); }
+.ses-mensaje svg.neuri { width: 30px; height: 30px; flex: none; }
+.ses-mensaje p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--text-2); }
+.ses-h4 { margin-top: 16px; }
+/* Sitio abajo para que el lanzador de Neuri (flotante) no tape los últimos botones. */
+.ses, .mis-sesiones-v { padding-bottom: 64px; }
+.ses-bloques { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.ses-bloque { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--raise); min-width: 0; }
+.ses-bloque.actual { border-color: rgba(77, 163, 255, 0.5); background: linear-gradient(180deg, rgba(77, 163, 255, 0.1), rgba(77, 163, 255, 0.03)); }
+.ses-bloque.hecho { border-color: rgba(90, 200, 140, 0.32); }
+.ses-bloque.saltado, .ses-bloque.perdido, .ses-bloque.sin-hacer { opacity: 0.72; }
+.ses-marca { flex: none; padding-top: 1px; color: var(--muted); }
+.ses-marca .ui-icon { width: 18px; height: 18px; }
+.ses-bloque.hecho .ses-marca { color: #8fe0b3; }
+.ses-bloque.actual .ses-marca { color: var(--accent); }
+.ses-bloque-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ses-bloque-t { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 13.5px; color: var(--text); overflow-wrap: anywhere; }
+.ses-bloque-t b { font-weight: 500; }
+.ses-bloque-t .ui-icon { width: 14px; height: 14px; flex: none; color: var(--muted); }
+.ses-bloque-m, .ses-bloque-r, .ses-bloque-res { margin: 0; font-size: 12px; line-height: 1.45; color: var(--muted); }
+.ses-bloque-r { color: var(--text-2); }
+.ses-bloque-res { color: #c9f0d9; }
+.ses-bloque-e { color: var(--text-2); }
+.ses-bloque button.ses-bloque-ficha { flex: none; font-size: 12px; align-self: center; }
+.ses-acciones { margin-top: 14px; }
+.ses-acciones .btn { display: inline-flex; align-items: center; gap: 6px; }
+.ses-acciones .btn .ui-icon { width: 15px; height: 15px; }
+.ses-nota { margin: 10px 0 0; }
+.ses-pie { margin: 12px 0 0; font-size: 12.5px; }
+.ses-pie .link { display: inline-flex; align-items: center; gap: 5px; }
+.ses-pie .ui-icon { width: 14px; height: 14px; }
+.ses-en-curso { display: flex; align-items: center; gap: 6px; margin: 6px 0 10px; font-size: 11.5px; line-height: 1.4; color: #bfe0ff; overflow-wrap: anywhere; }
+.ses-en-curso .ui-icon { width: 13px; height: 13px; flex: none; color: var(--accent); }
+/* Resumen al terminar */
+.ses-resumen { margin: 14px 0 0; padding: 12px 13px; border-radius: 12px; border: 1px solid rgba(90, 200, 140, 0.3); background: linear-gradient(180deg, rgba(90, 200, 140, 0.07), rgba(90, 200, 140, 0.01)); }
+.ses-resumen > .bib-h { margin-top: 0; }
+.ses-cifras { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 8px 0 4px; }
+.ses-cifra { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: var(--raise); }
+.ses-cifra b { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text); }
+.ses-cifra span { font-size: 11.5px; line-height: 1.3; color: var(--muted); }
+.ses-cifra.ok b { color: #8fe0b3; }
+.ses-cifra.mal b { color: #f0c27a; }
+.ses-h5 { margin: 12px 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.ses-repaso { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.ses-repasar { width: 100%; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 10px; padding: 7px 10px; border-radius: var(--r); border: 1px solid var(--line); background: var(--raise); text-align: left; font-size: 13px; color: var(--text); }
+.ses-repasar:hover { border-color: var(--line-strong); }
+.ses-repasar small { color: var(--muted); font-size: 11.5px; }
+.ses-cuando { display: inline-flex; align-items: center; gap: 4px; }
+.ses-cuando .ui-icon { width: 12px; height: 12px; }
+.ses-sig .btn { display: inline-flex; align-items: center; gap: 6px; text-align: left; }
+.ses-sig .btn .ui-icon { width: 15px; height: 15px; }
+@media (max-width: 520px) { .ses-cifras { grid-template-columns: repeat(2, minmax(0, 1fr)); } .ses-acciones .btn, .ses-sig .btn { flex: 1 1 100%; justify-content: center; } }
+/* Portada: seguir la sesión */
+.bib-seguir-sesion { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; text-align: left; }
+.bib-seguir-sesion span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bib-seguir-sesion .ui-icon { width: 15px; height: 15px; }
+/* «Mis sesiones» */
+.mis-sesiones { grid-template-columns: 1fr; }
+.mis-ses { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--raise); min-width: 0; }
+.mis-ses.activa { border-color: rgba(77, 163, 255, 0.45); }
+.mis-ses-t { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 14px; color: var(--text); overflow-wrap: anywhere; }
+.mis-ses-t b { font-weight: 500; }
+.mis-ses-t .ui-icon { width: 15px; height: 15px; flex: none; color: var(--accent); }
+.mis-ses-meta { margin: 2px 0 0; font-size: 12px; line-height: 1.45; color: var(--muted); }
+.mis-ses .mis-item-acc { align-items: center; }
+.mis-ses .mis-item-acc .btn { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; }
+.mis-ses .mis-item-acc .btn .ui-icon { color: inherit; }
+
+/* Preguntas dentro de una sesión: pista y segundo intento */
+.q-pista { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 0; padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(240, 180, 80, 0.35); background: rgba(240, 180, 80, 0.06); font-size: 13px; line-height: 1.5; color: var(--text-2); }
+.q-pista p { margin: 0; }
+.q-pista-t { display: flex; align-items: center; gap: 6px; font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: #f0c27a; }
+.q-pista-t b { font-weight: 600; }
+.q-pista-t .ui-icon { width: 15px; height: 15px; }
+.q-pista-senal { color: var(--text); }
+.q-pista-de { font-size: 12px; color: var(--muted); }
+.q-pista-cita { margin: 0; padding: 2px 0 2px 10px; border-left: 2px solid rgba(240, 180, 80, 0.5); font-family: var(--serif); font-size: 13.5px; color: var(--text); }
+.opt.quitada { border-style: dashed; opacity: 0.55; text-decoration: line-through; text-decoration-color: var(--muted); }
+.opt.quitada .ui-icon { color: #ff9f9f; }
+
+/* Neuri: saldo del cupo, contexto (enfoque y volver), sesión en curso, tarjeta de sesión y «Ver en 3D» */
+.neuri-cupo { margin: 4px 0 0; font-size: 11px; line-height: 1.4; color: var(--muted); font-variant-numeric: tabular-nums; }
+.neuri-cupo.pocas { color: #f0c27a; }
+.neuri-modo.agotado { color: #f0c27a; background: rgba(240, 180, 80, 0.1); }
+.neuri-contexto { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 0 0; }
+.neuri-contexto:empty { display: none; }
+.neuri-enfoque { display: inline-flex; align-items: center; gap: 4px; max-width: 100%; margin: 0; padding: 3px 4px 3px 9px; border-radius: 99px; border: 1px solid rgba(77, 163, 255, 0.4); background: var(--accent-soft); font-size: 12px; color: #bfe0ff; }
+.neuri-enfoque-t { display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
+.neuri-enfoque-t > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.neuri-enfoque .ui-icon { width: 13px; height: 13px; flex: none; }
+.neuri-enfoque-x { display: grid; place-items: center; width: 22px; height: 22px; flex: none; border-radius: 50%; color: var(--text-2); }
+.neuri-enfoque-x:hover { background: rgba(255, 255, 255, 0.1); color: var(--text); }
+.neuri-volver { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; font-size: 12px; max-width: 100%; }
+.neuri-volver span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.neuri-volver .ui-icon { width: 14px; height: 14px; }
+.neuri-ses-barra { display: flex; align-items: center; gap: 8px; width: 100%; margin: 0; padding: 6px 6px 6px 10px; border-radius: 10px; border: 1px solid rgba(77, 163, 255, 0.3); background: rgba(77, 163, 255, 0.05); font-size: 12px; color: var(--text-2); }
+.neuri-ses-barra > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.neuri-ses-barra .ui-icon { width: 14px; height: 14px; flex: none; color: var(--accent); }
+.neuri-ses-barra .btn { flex: none; padding: 4px 10px; font-size: 12px; }
+.neuri-ses-bloques { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.neuri-ses-bloques li { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center; font-size: 13px; color: var(--text); }
+.neuri-ses-bloques li .ui-icon { width: 15px; height: 15px; color: var(--muted); grid-row: span 2; align-self: start; margin-top: 2px; }
+.neuri-ses-bloques li.hecho .ui-icon { color: #8fe0b3; }
+.neuri-ses-bloques li.actual .ui-icon { color: var(--accent); }
+.neuri-ses-bloques li.saltado, .neuri-ses-bloques li.perdido, .neuri-ses-bloques li.sin-hacer { opacity: 0.7; }
+.neuri-ses-b { min-width: 0; overflow-wrap: anywhere; }
+.neuri-ses-bloques small { grid-column: 2; font-size: 11.5px; color: var(--muted); }
+.neuri-ses.mal { border-color: rgba(240, 180, 80, 0.35); background: rgba(240, 180, 80, 0.06); }
+.neuri-iniciada { display: flex; align-items: center; gap: 6px; }
+.neuri-iniciada .ui-icon { width: 14px; height: 14px; color: #8fe0b3; flex: none; }
+.neuri-ver3d { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 0; }
+.neuri-ver3d .btn { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; }
+.neuri-ver3d .btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.neuri-ver3d .ui-icon { width: 15px; height: 15px; color: var(--accent); }
+.bib-vista-acc { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.bib-vista-acc .link { display: inline-flex; align-items: center; gap: 5px; }
+.bib-vista-acc .link .ui-icon { width: 14px; height: 14px; }
+.step-nav .btn .ui-icon, .q-feedback .step-nav .btn .ui-icon { width: 15px; height: 15px; }
+.q-feedback .step-nav .btn { display: inline-flex; align-items: center; gap: 6px; }

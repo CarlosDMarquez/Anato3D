@@ -82,14 +82,17 @@ export function crearCorpus() {
   /**
    * Las frases de una lección con sus citas (ya comprobadas en la biblioteca). Cada frase se busca por su texto, sus
    * citas, el título de su paso y los nombres de lo que muestra ese paso (no los de toda la lección: así «nasales» no
-   * encuentra todas las frases de la lección de la cara por igual).
+   * encuentra todas las frases de la lección de la cara por igual). Solo con las citas que se pueden comprobar aquí (su
+   * página está cargada: por eso las páginas se añaden antes que las lecciones); una frase sin ninguna no se ofrece.
+   * Así, un despliegue sin las páginas de TeachMeAnatomy no ofrece frases que solo se apoyan en ellas (la lección que
+   * las usara no pasaría la comprobación).
    */
   function añadirLeccion(L) {
     for (const p of L.pasos ?? []) {
       const vista = p.vista ?? {};
       const nombres = [...(vista.ver ?? []), ...(vista.contexto ?? [])].map((k) => L.estructuras?.[k]?.nombre).filter(Boolean).join(' ');
       [...frases(p.texto), ...frases(p.detalle)].forEach((fr, k) => {
-        const citas = evidencias(fr).filter((e) => e.f && e.c).map((e) => ({ f: e.f, c: e.c }));
+        const citas = evidencias(fr).filter((e) => e.f && e.c && textos.has(e.f)).map((e) => ({ f: e.f, c: e.c }));
         if (!citas.length) return;
         añadir({ id: `L:${L.id}#${p.id}#${k}`, citas, texto: fr[0], leccion: L.id, paso: p.id, titulo: L.titulo },
           `${fr[0]} ${citas.map((x) => x.c).join(' ')} ${p.titulo} ${nombres}`);
@@ -123,7 +126,8 @@ export function crearCorpus() {
     return mejor?.w ?? q;
   }
 
-  function buscar(consulta, { nombres = [], max = 10, soloLecciones = false, soloPaginas = false, porFuente = 6, excluir = new Set() } = {}) {
+  // `leccion`: solo las frases de esa lección (la que tiene abierta la persona); `paso`: las de ese paso, primero.
+  function buscar(consulta, { nombres = [], max = 10, soloLecciones = false, soloPaginas = false, porFuente = 6, excluir = new Set(), leccion = null, paso = null } = {}) {
     const qs = [...new Set(palabras(consulta).map(corregir))];
     const N = entradas.length || 1;
     const medio = total / N || 1;
@@ -146,9 +150,9 @@ export function crearCorpus() {
     const cuenta = new Map();
     for (const [i, p] of [...puntos].sort((a, b) => b[1] - a[1])) {
       const e = entradas[i];
-      if (excluir.has(e.id) || (soloLecciones && !e.leccion) || (soloPaginas && e.leccion)) continue;
+      if (excluir.has(e.id) || (soloLecciones && !e.leccion) || (soloPaginas && e.leccion) || (leccion && e.leccion !== leccion)) continue;
       const texto = normalizarBusqueda(`${e.texto ?? ''} ${e.citas.map((x) => x.c).join(' ')}`);
-      const extra = frasesN.filter((n) => texto.includes(n)).length * 4;
+      const extra = frasesN.filter((n) => texto.includes(n)).length * 4 + (paso && e.paso === paso ? p * 0.5 : 0);
       out.push({ entrada: e, puntos: p + extra, cobertura: informacion ? cubre.get(i) / informacion : 0 });
     }
     out.sort((a, b) => b.puntos - a.puntos);

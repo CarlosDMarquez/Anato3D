@@ -35,7 +35,11 @@ export function createStart({ root, ajustes, creditos, onIniciar }) {
         original[prop] = input[prop];
         original.dispatchEvent(new Event('change'));
       });
-      copia.sincronizar = () => (input[prop] = original[prop]);
+      copia.sincronizar = () => {
+        // En la lista de idiomas, también los rótulos («… (próximamente)» cambia con el idioma).
+        if (input.tagName === 'SELECT') [...input.options].forEach((o, i) => (o.textContent = original.options[i].textContent));
+        input[prop] = original[prop];
+      };
     }
     return copia;
   });

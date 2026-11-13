@@ -7,11 +7,20 @@ import { CLAVE_EVENTOS, CLAVE_PRIVACIDAD, CLAVE_INVITADO } from './eventos.js';
 import { CLAVE_REPORTES } from './reportes.js';
 import { CLAVE_TRABAJOS } from '../pet/trabajos.js';
 import { CLAVE_RECORRIDOS, CLAVE_RECORRIDOS_APARTADOS, importarRecorridos, contarRecorridos } from '../pet/recorridos.js';
+import { CLAVE_SESIONES, CLAVE_SESIONES_APARTADAS, importarSesiones, contarSesiones } from '../pet/sesiones.js';
+import { CLAVE_DISPOSITIVO, leerDispositivo } from '../pet/dispositivo.js';
+import { CLAVE_MEMORIA } from '../pet/conversacion.js';
 
 export const FORMATO_DATOS = 'anato3d.mis-datos';
 export const VERSION_DATOS = 1;
-/** Todo lo de estudio que la app guarda en el navegador (los ajustes de la app, como el idioma, no son datos de estudio). */
-export const CLAVES_ESTUDIO = [P.CLAVE, P.CLAVE_V1, P.CLAVE_APARTADO, CLAVE_PROPIAS, CLAVE_APARTADAS, CLAVE_TRABAJOS, CLAVE_RECORRIDOS, CLAVE_RECORRIDOS_APARTADOS, CLAVE_REPORTES, CLAVE_EVENTOS, CLAVE_PRIVACIDAD, CLAVE_INVITADO, 'anato3d.neuri.visto'];
+/**
+ * Todo lo de estudio que la app guarda en el navegador (los ajustes de la app, como el idioma, no son datos de estudio).
+ * Todo se borra con «Borrar mis datos». El identificador del dispositivo (cupo diario de Neuri) y la memoria de la
+ * conversación (tema, objetivo, nivel y minutos) se ven y se borran, pero no se exportan: son de este dispositivo.
+ */
+export const CLAVES_ESTUDIO = [P.CLAVE, P.CLAVE_V1, P.CLAVE_APARTADO, CLAVE_PROPIAS, CLAVE_APARTADAS, CLAVE_TRABAJOS, CLAVE_RECORRIDOS, CLAVE_RECORRIDOS_APARTADOS, CLAVE_SESIONES, CLAVE_SESIONES_APARTADAS, CLAVE_REPORTES, CLAVE_EVENTOS, CLAVE_PRIVACIDAD, CLAVE_INVITADO, 'anato3d.neuri.visto', CLAVE_MEMORIA, CLAVE_DISPOSITIVO];
+/** Lo que nunca va en el archivo de «Mis datos» (es de este dispositivo, no del estudio). */
+export const CLAVES_DISPOSITIVO = [CLAVE_DISPOSITIVO, CLAVE_MEMORIA];
 export const CLAVES_SESION = ['anato3d.neuri'];
 
 const leer = (almacen, clave) => { try { return JSON.parse(almacen?.getItem(clave) ?? 'null'); } catch { return null; } };
@@ -23,6 +32,8 @@ export function exportarDatos({ almacen, data, ahora = Date.now }) {
     progreso: data, propias: cargarPropias(almacen), trabajos: leer(almacen, CLAVE_TRABAJOS) ?? [],
     // (Desde el 9 nov 2026: los recorridos personales, con su propio formato versionado; un archivo anterior no los trae.)
     recorridos: leer(almacen, CLAVE_RECORRIDOS),
+    // (Desde el 11 nov 2026: las sesiones de estudio con Neuri, también con su formato versionado.)
+    sesiones: leer(almacen, CLAVE_SESIONES),
     reportes: leer(almacen, CLAVE_REPORTES) ?? [], eventos: leer(almacen, CLAVE_EVENTOS) ?? [], privacidad: leer(almacen, CLAVE_PRIVACIDAD),
   }, null, 2);
 }
@@ -71,7 +82,8 @@ export function fusionarProgreso(aqui, otro) {
 /**
  * Importa un archivo de «Mis datos»: el progreso se combina (fusionarProgreso), las lecciones propias también
  * (importarPropias: sin duplicar ni sobrescribir) y los recorridos personales igual (importarRecorridos, después de las
- * lecciones, para que sus unidades encuentren las suyas). Devuelve { ok, data?, cambios?, propias?, recorridos?, error? };
+ * lecciones, para que sus unidades encuentren las suyas) y las sesiones de estudio (importarSesiones: la activa llega
+ * pausada). Devuelve { ok, data?, cambios?, propias?, recorridos?, sesiones?, error? };
  * `data` es el progreso combinado, que la app guarda.
  */
 export function importarDatos(texto, { almacen, data }) {
@@ -83,7 +95,8 @@ export function importarDatos(texto, { almacen, data }) {
   const fusion = progresoValido ? fusionarProgreso(data, prog) : { data, cambios: { lecciones: 0, items: 0, intentos: 0 } };
   const propias = Array.isArray(d.propias) && d.propias.length ? importarPropias(almacen, JSON.stringify(d.propias)) : { ok: true, añadidas: 0, copias: 0, iguales: 0, invalidas: 0, sinSitio: 0 };
   const recorridos = d.recorridos ? importarRecorridos(almacen, d.recorridos) : { ok: true, añadidos: 0, iguales: 0, invalidos: 0, sinSitio: 0 };
-  return { ok: true, data: fusion.data, cambios: fusion.cambios, propias, recorridos, progresoValido };
+  const sesiones = d.sesiones ? importarSesiones(almacen, d.sesiones) : { ok: true, añadidas: 0, iguales: 0, invalidas: 0, sinSitio: 0 };
+  return { ok: true, data: fusion.data, cambios: fusion.cambios, propias, recorridos, sesiones, progresoValido };
 }
 
 /** Cuánto hay guardado de cada cosa (para explicarlo en la vista). */
@@ -93,9 +106,11 @@ export function inventarioDatos({ almacen, data, sesion = null }) {
   try { conversacion = (JSON.parse(sesion?.getItem('anato3d.neuri') ?? 'null')?.mensajes ?? []).length; } catch { conversacion = 0; }
   return {
     lecciones: Object.keys(data.lecciones ?? {}).length, respuestas: (data.intentos ?? []).length, preguntas: Object.keys(data.items ?? {}).length,
-    propias: cargarPropias(almacen).length, trabajos: n(CLAVE_TRABAJOS), recorridos: contarRecorridos(almacen), reportes: n(CLAVE_REPORTES), eventos: n(CLAVE_EVENTOS),
+    propias: cargarPropias(almacen).length, trabajos: n(CLAVE_TRABAJOS), recorridos: contarRecorridos(almacen), sesiones: contarSesiones(almacen), reportes: n(CLAVE_REPORTES), eventos: n(CLAVE_EVENTOS),
     examen: !!data.examen, preferencias: !!data.preferencias, conversacion,
-    apartado: !!(leer(almacen, P.CLAVE_APARTADO) || n(CLAVE_APARTADAS) || n(CLAVE_RECORRIDOS_APARTADOS)),
+    // (Del dispositivo: el identificador del cupo diario y lo que Neuri recuerda entre visitas; no se exportan.)
+    dispositivo: !!leerDispositivo(almacen), memoria: !!leer(almacen, CLAVE_MEMORIA)?.contexto,
+    apartado: !!(leer(almacen, P.CLAVE_APARTADO) || n(CLAVE_APARTADAS) || n(CLAVE_RECORRIDOS_APARTADOS) || n(CLAVE_SESIONES_APARTADAS)),
   };
 }
 

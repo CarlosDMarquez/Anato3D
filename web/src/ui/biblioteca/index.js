@@ -21,9 +21,13 @@ import { huella, retirada, motivoNoDisponible, noEvaluables } from '../../biblio
 import { RECORRIDOS, leccionesDeRecorrido } from '../../biblioteca/recorridos.js';
 import { MODULOS } from '../../content/index.js';
 import { sinonimosDePieza } from '../../content/index.js';
-import { t } from '../../i18n/idioma.js';
+import { t, tn, idioma } from '../../i18n/idioma.js';
+import { ETIQUETAS } from '../../i18n/textos.js';
 import { renderPortada } from './portada.js';
-import { renderResultados, renderRecorrido, renderInfo, renderSesion } from './explorar.js';
+import { renderResultados, renderRecorrido, renderInfo } from './explorar.js';
+import { renderSesionNeuri, usarCatalogo, tituloSesion } from './sesion-neuri.js';
+import { renderMisSesiones } from './mis-sesiones.js';
+import { crearSesiones, CLAVE_SESIONES } from '../../pet/sesiones.js';
 import { renderLeccion } from './leccion.js';
 import { renderPreguntas, renderResultado, teclaPreguntas } from './preguntas.js';
 import { crearNeuri } from './pet.js';
@@ -37,7 +41,7 @@ import { enviarPendientes } from '../../biblioteca/reportes.js';
 
 const ARCHIVOS = import.meta.glob('../../biblioteca/lecciones/*.js');
 // Vistas que necesitan sitio (catálogo) y vistas que dejan el modelo a la vista (lección y preguntas).
-const ANCHAS = new Set(['portada', 'resultados', 'recorrido', 'info', 'sesion', 'neuri', 'propias', 'mapa', 'examen', 'datos']);
+const ANCHAS = new Set(['portada', 'resultados', 'recorrido', 'info', 'sesion-neuri', 'sesiones', 'neuri', 'propias', 'mapa', 'examen', 'datos']);
 
 export function createBiblioteca({ panel, body, storage, api, toast }) {
   const antiguas = new Map(MODULOS.map(deModulo).filter(Boolean).map((L) => [L.id, L]));
@@ -110,6 +114,19 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     if (n) ctx.guardar();
   }
   depurarCargadas();
+  // Las sesiones de estudio con Neuri (src/pet/sesiones.js): planes guardados en este navegador que se siguen donde se
+  // dejaron (sesion-neuri.js). Neuri las crea desde la conversación; la portada, con «Proponer una sesión».
+  // Si el navegador no deja guardarlas (lleno, bloqueado), se avisa; si para hacer sitio se quitan otras, también.
+  ctx.sesiones = crearSesiones({
+    almacen: storage,
+    alNoGuardar: () => toast(t('ses.noGuardada'), 8000),
+    alPodar: (quitadas) => {
+      const [a, b] = idioma() === 'es' ? ['«', '»'] : ['“', '”'];
+      const nombres = quitadas.map((S) => tituloSesion(S));
+      toast(tn('ses.podadas', quitadas.length, { x: quitadas.length === 1 ? nombres[0] : nombres.map((x) => `${a}${x}${b}`).join(', ') }), 10000);
+    },
+  });
+  usarCatalogo(() => ctx.porId ?? null);   // el tema y el objetivo de cada sesión, en el idioma de la interfaz
   // Estadísticas de uso (opcionales, desactivadas por defecto): eventos con forma controlada, solo en este navegador.
   ctx.eventos = crearRegistroEventos({ almacen: storage });
   ctx.evento = (tipo, props, opciones) => ctx.eventos.registrar(tipo, props, opciones);
@@ -133,6 +150,12 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
   // Otra pestaña guardó o quitó lecciones propias: el catálogo y, si está a la vista, la sección de la portada.
   try {
     addEventListener('storage', (e) => {
+      // Otra pestaña cambió las sesiones: se leen otra vez y, si se está viendo una, se repinta.
+      if (e.key === CLAVE_SESIONES) {
+        ctx.sesiones.recargar();
+        if (panel.classList.contains('open') && ['sesion-neuri', 'sesiones', 'portada'].includes(ctx.vista.tipo)) render();
+        return;
+      }
       if (e.key !== PR.CLAVE_PROPIAS) return;
       actualizarPropias();
       if (ctx.vista.tipo === 'portada' || ctx.vista.tipo === 'propias') ctx.repintarPropias?.();
@@ -163,7 +186,7 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     // Las lecciones retiradas mientras se revisa un reporte no se ofrecen (src/biblioteca/retiradas.js).
     ctx.catalogo = { ...base, lecciones: [...base.lecciones.filter((L) => !retirada(L.id)), ...ctx.propias.map((L, i) => PR.entradaCatalogo(L, 1000 + i, (id) => ids.has(id)))] };
     ctx.porId = new Map(ctx.catalogo.lecciones.map((L) => [L.id, L]));
-    ctx.buscador = crearBuscador({ lecciones: ctx.catalogo.lecciones, recorridos: RECORRIDOS, estructuras: ctx.estructuras?.lista ?? [] });
+    ctx.buscador = crearBuscador({ lecciones: ctx.catalogo.lecciones, recorridos: RECORRIDOS, estructuras: ctx.estructuras?.lista ?? [], etiquetas: ETIQUETAS, idioma });
   }
   ctx.actualizarPropias = actualizarPropias;
 
@@ -174,7 +197,7 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     const lista = await api.piezas();
     const conSinonimos = lista.map((e) => ({ ...e, sinonimos: sinonimosDePieza(e.clave, modelo) }));
     ctx.estructuras = { modelo, lista: conSinonimos };
-    ctx.buscador = crearBuscador({ lecciones: ctx.catalogo.lecciones, recorridos: RECORRIDOS, estructuras: conSinonimos });   // con las propias
+    ctx.buscador = crearBuscador({ lecciones: ctx.catalogo.lecciones, recorridos: RECORRIDOS, estructuras: conSinonimos, etiquetas: ETIQUETAS, idioma });   // con las propias
   }
   ctx.cargarEstructuras = cargarEstructuras;
 
@@ -219,13 +242,15 @@ export function createBiblioteca({ panel, body, storage, api, toast }) {
     await cargarCatalogo();
     const v = ctx.vista;
     panel.classList.toggle('ancho', ANCHAS.has(v.tipo));
+    panel.classList.remove('mirando');     // la conversación estrechada por «Ver en 3D» (pet.js) vuelve a su ancho
     ctx.neuri.actualizar(v);
     api.ajustar();
     if (!['preguntas'].includes(v.tipo)) { api.modoEvaluacion(false); api.alTocar(null); }
     if (v.tipo === 'resultados') return renderResultados(ctx);
     if (v.tipo === 'recorrido') return renderRecorrido(ctx);
     if (v.tipo === 'info') return renderInfo(ctx);
-    if (v.tipo === 'sesion') return renderSesion(ctx);
+    if (v.tipo === 'sesion-neuri') return renderSesionNeuri(ctx);
+    if (v.tipo === 'sesiones') return renderMisSesiones(ctx);
     if (v.tipo === 'leccion') return renderLeccion(ctx);
     if (v.tipo === 'preguntas') return renderPreguntas(ctx);
     if (v.tipo === 'resultado') return renderResultado(ctx);

@@ -9,6 +9,12 @@ export const IDIOMAS = [
   { id: 'fr', nombre: 'Français' },
   { id: 'it', nombre: 'Italiano' },
 ];
+/**
+ * Idiomas que se pueden elegir. Alemán, francés e italiano salen en la lista como «próximamente» (decisión de Carlos,
+ * 2026-11-12): sus textos se conservan, pero lo nuevo solo se escribe en español e inglés. Quien los tuviera guardados
+ * vuelve al predeterminado.
+ */
+export const DISPONIBLES = ['es', 'en'];
 export const PREDETERMINADO = 'en';
 export const CLAVE = 'anato3d.idioma';
 
@@ -22,7 +28,7 @@ export const idioma = () => actual;
 export function leerIdioma(storage) {
   try {
     const v = storage?.getItem(CLAVE);
-    if (valido(v)) return v;
+    if (DISPONIBLES.includes(v)) return v;
   } catch { /* sin almacenamiento */ }
   return PREDETERMINADO;
 }
@@ -93,4 +99,6 @@ export function traducirDom(root) {
   for (const el of root.querySelectorAll('[data-t-aria]')) el.setAttribute('aria-label', t(el.dataset.tAria));
   for (const el of root.querySelectorAll('[data-t-tip]')) el.dataset.tip = t(el.dataset.tTip);
   for (const el of root.querySelectorAll('[data-t-ph]')) el.placeholder = t(el.dataset.tPh);
+  // Idiomas aún no disponibles: «Deutsch (próximamente)» en el idioma de la interfaz.
+  for (const el of root.querySelectorAll('option[data-pronto]')) el.textContent = t('ajustes.proximamente', { lengua: el.dataset.pronto });
 }

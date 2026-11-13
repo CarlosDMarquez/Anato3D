@@ -587,6 +587,11 @@ async function asegurarPiezas(nombres) {
   return s === sessions.current;
 }
 
+// Número de la última orden de la biblioteca al visor (mostrar una vista o resaltar): cada una lo sube y, tras esperar una
+// descarga, solo se aplica si sigue siendo la última. Así un paso anterior (o una orden del chat) que termina tarde no
+// pisa la vista ni la cámara de la orden más nueva.
+let ordenVisor = 0;
+
 // Para cada sistema, una capa del visor que muestre todas esas piezas (si la actual no lo hace).
 function capasPara(parts) {
   for (const sysId of new Set(parts.map((p) => p.system))) {
@@ -600,9 +605,12 @@ function capasPara(parts) {
 /**
  * La vista de un paso o de una pregunta: `ver` resaltadas, `contexto` visibles, `fantasma` translúcidas y el esqueleto
  * entero si se pide, aisladas del resto, con la cámara en la dirección pedida. Sin vista, solo quita la selección.
- * Devuelve { ok, faltan }: las estructuras que no tienen piezas en este modelo (la lección lo explica).
+ * Devuelve { ok, faltan }: las estructuras que no tienen piezas en este modelo (la lección lo explica), o { ok: false,
+ * faltan: [], antigua: true } si mientras se descargaba llegó otra orden (que es la que vale).
  */
 async function mostrarVista(L, vista, { sinResaltar = false } = {}) {
+  const orden = ++ordenVisor;
+  const vigente = () => orden === ordenVisor;
   if (!vista) {
     viewer.select([]);
     current = null;
@@ -617,11 +625,13 @@ async function mostrarVista(L, vista, { sinResaltar = false } = {}) {
   const ids = [...new Set([...(vista.ver ?? []), ...vista.contexto, ...vista.fantasma])];
   const nombres = piezasLeccion(L, ids, lado);
   if (!(await asegurarPiezas(nombres))) return { ok: false, faltan: [] };
+  if (!vigente()) return { ok: false, faltan: [], antigua: true };
   // Sistemas enteros (visión general de un sistema): se encienden en su capa, sin aislar nada.
   if (vista.capas) {
     const s = sessions.current;
     for (const sys of Object.keys(vista.capas)) if (!(await ensureSystem(sys, { quiet: true }))) return { ok: false, faltan: [] };
     if (s !== sessions.current) return { ok: false, faltan: [] };
+    if (!vigente()) return { ok: false, faltan: [], antigua: true };
   }
   const faltan = ids.filter((id) => piezasLeccion(L, [id], lado).some((n) => !parte(n)));
   const ver = piezasLeccion(L, vista.ver ?? [], lado).map(parte).filter(Boolean);
@@ -651,9 +661,16 @@ async function mostrarVista(L, vista, { sinResaltar = false } = {}) {
 // Resalta unas estructuras de la lección (todas sus piezas) con la ficha de la primera y las encuadra; si no están a la
 // vista, las añade a lo que se ve. Si en ese lado no existen, prueba el otro.
 async function resaltar(L, ids, { lado = 'R', ficha = true, sinCamara = false } = {}) {
+  const orden = ++ordenVisor;
   let nombres = piezasLeccion(L, ids, lado);
   if (!(await asegurarPiezas(nombres))) return false;
-  if (!nombres.some(parte)) nombres = piezasLeccion(L, ids, lado === 'R' ? 'L' : 'R');
+  if (!nombres.some(parte)) {
+    // En ese lado no existe: el otro (que puede necesitar su propia descarga).
+    nombres = piezasLeccion(L, ids, lado === 'R' ? 'L' : 'R');
+    if (!(await asegurarPiezas(nombres))) return false;
+  }
+  // Mientras se descargaba llegó otra orden (otro paso, otra estructura): manda esa.
+  if (orden !== ordenVisor) return false;
   const parts = nombres.map(parte).filter(Boolean);
   if (!parts.length) return false;
   change(() => {
@@ -854,7 +871,10 @@ function loadPendingIndex() {
 
 // Texto en el que se busca una pieza: nombre, latín, inglés y, en español, los sinónimos de su ficha de módulo
 // («cubital» encuentra el nervio ulnar; «humeral», la arteria braquial).
+// En el linfático, «nodo» y «ganglio» son lo mismo («ganglios cervicales» encuentra los nodos cervicales).
+const comoGanglio = (s) => s.replace(/\bnodo/gi, 'ganglio').replace(/\blymph node/gi, 'lymph gland');
 const textoBuscable = (p) => norm(`${p.info.title} ${p.info.latin ?? ''} ${p.info.entry?.nombre ?? ''} ${p.info.en ?? ''}`
+  + (p.system === 'lymphatic' ? ` ${comoGanglio(p.info.title)} linfonodo` : '')
   + (idioma() === 'es' ? ` ${sinonimosDePieza(p.id, state.model).join(' ')}` : ''));
 
 function renderSearch(q) {

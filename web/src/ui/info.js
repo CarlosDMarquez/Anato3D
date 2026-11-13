@@ -6,6 +6,7 @@ import { FUENTES } from '../content/fuentes.js';
 import { t, tn, etiqueta, idioma } from '../i18n/idioma.js';
 import { tr, trCita, trEtimologia } from '../i18n/contenido.js';
 import { limitacionesDe, textoLimitacion, urlFuente } from '../data/limitaciones.js';
+import { FUENTES_LINF } from '../data/linfatico/comprobadas.js';
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
@@ -100,6 +101,59 @@ function studyBody(hit, info, entry, latines) {
     ${notaTraduccion()}`;
 }
 
+// Fichas del sistema linfático (data/linfatico/): cada frase lleva el número de las fuentes que la respaldan y, al pasar
+// el puntero, la cita literal. En español el número va tras cada frase; en otro idioma el campo se traduce entero
+// (i18n/contenido.js) y los números van al final del campo. Las frases sobre el modelo 3D no llevan número: están en
+// «En este modelo».
+const supRefs = (refs, citas) => (refs.length ? `<sup class="ref" title="${esc(citas.map((c) => `“${c}”`).join('\n'))}">${refs.join(', ')}</sup>` : '');
+function frasesLinf(frases) {
+  if (idioma() === 'es') return frases.map((f) => `${esc(f.texto)}${supRefs(f.refs, f.citas)}`).join(' ');
+  const refs = [...new Set(frases.flatMap((f) => f.refs))];
+  return `${esc(tr(frases.map((f) => f.texto).join(' ')))}${supRefs(refs, frases.flatMap((f) => f.citas))}`;
+}
+function fuenteLinfTexto(r) {
+  if (r.tipo === 'ta2') return `${t('fuente.ta2')}, ${t('ficha.termino', { n: r.termino })}`;
+  return `${t(r.tipo === 'wpes' ? 'fuente.wikipediaEs' : 'fuente.wikipediaEn')}${idioma() === 'fr' ? ' :' : ':'} ${t('fuente.titulo', { titulo: r.titulo })}`;
+}
+function linfaBody(info, entry, latines) {
+  const L = info.linfatico;
+  const region = (info.fields ?? []).find((f) => f.label === 'Región');
+  const nombre = L.nombre.map((n) => `${t('fuente.ta2')}, ${t('ficha.termino', { n })}`).join('; ');
+  return `
+    ${L.descripcion.length ? `<section><p class="lead">${frasesLinf(L.descripcion)}</p></section>` : ''}
+    <section><dl class="fields">
+      ${region ? `<dt>${esc(etiqueta(region.label))}</dt><dd>${esc(tr(region.value))}</dd>` : ''}
+      ${L.campos.map((c) => `<dt>${esc(etiqueta(c.label))}</dt><dd>${frasesLinf(c.frases)}</dd>`).join('')}
+    </dl></section>
+    ${entry?.etimologia ? `<section class="etym"><h3>${esc(t('ficha.etimologia'))}</h3><p>${esc(trEtimologia(entry.etimologia, latines))}</p></section>` : ''}
+    ${L.notas.length ? `<section><h3>${esc(t('ficha.puntosClave'))}</h3><ul class="facts">${L.notas.map((f) => `<li>${idioma() === 'es' ? esc(f.texto) : esc(tr(f.texto))}${supRefs(f.refs, f.citas)}</li>`).join('')}</ul></section>` : ''}
+    <details class="info-refs"><summary>${esc(t('ficha.fuentes'))}</summary>
+      <ol>${L.refs.map((r) => `
+        <li><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(fuenteLinfTexto(r))}</a>${r.citas.length ? `<br><small>${r.citas.map((c) => `“${esc(c)}”`).join(' · ')}</small>` : ''}</li>`).join('')}
+      </ol>
+      ${nombre ? `<p class="refs-group">${esc(t('ficha.linf.nombre'))}: ${esc(nombre)}</p>` : ''}
+      <p>${esc(t('ficha.linf.nota'))}</p>
+    </details>
+    ${info.source ? `<p class="info-source">${esc(t('ficha.modelo3d'))} ${esc(tr(info.source))}</p>` : ''}
+    ${notaTraduccion()}`;
+}
+
+// Fuentes de la descripción de un grupo del linfático (páginas de Wikipedia, en la versión leída).
+function fuentesGrupo(group) {
+  if (!group.fuentesLinf?.length) return '';
+  return `<details class="info-refs"><summary>${esc(t('ficha.fuentes'))}</summary><ul>${group.fuentesLinf.map((id) => {
+    const r = fuenteGrupo(id);
+    return `<li><a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(fuenteLinfTexto(r))}</a></li>`;
+  }).join('')}</ul></details>`;
+}
+const fuenteGrupo = (id) => {
+  const i = id.indexOf(':');
+  const tipo = id.slice(0, i);
+  const reg = FUENTES_LINF[id];
+  const pagina = id.slice(i + 1);
+  return { tipo, titulo: reg?.titulo ?? pagina.replace(/_/g, ' '), url: reg?.url ?? `https://${tipo === 'wpes' ? 'es' : 'en'}.wikipedia.org/wiki/${encodeURIComponent(pagina)}` };
+};
+
 // Ficha de la selección: una estructura o un grupo completo.
 // sel = { kind: 'part', part } | { kind: 'group', id, parts, members }
 // modelo: 'male' | 'female' (para las fichas de módulo); onFicha(id): abrir la estructura de una relación.
@@ -151,8 +205,9 @@ export function renderInfo(el, sel, { system, faded, collapsed, modelo, onAction
         <section><h3>${esc(t('ficha.contiene'))}</h3><ul class="members">${sel.members.map((m) => `
           <li><button data-member="${esc(m.id)}" data-kind="${m.kind}">${esc(m.label)}${m.count > 1 ? `<small>${m.count}</small>` : ''}${uiIcon('chevron')}</button></li>`).join('')}
         </ul></section>
+        ${fuentesGrupo(group)}
         ${group.descripcion ? notaTraduccion() : ''}
-      ` : study ? studyBody(study, info, entry, latines) : `
+      ` : study ? studyBody(study, info, entry, latines) : info.linfatico ? linfaBody(info, entry, latines) : `
         ${entry ? '' : `<section><p class="muted">${esc(t('ficha.enPreparacion'))}</p></section>`}
         ${entry ? `
           ${entry.descripcion ? `<section><p class="lead">${esc(tr(entry.descripcion))}</p></section>` : ''}

@@ -1,5 +1,7 @@
 // Prueba de Neuri con la IA de verdad, contra el servidor (server/pet.mjs) y sin navegador. GASTA DINERO de la cuenta
 // de Anthropic (poco con Haiku 5.5: la consola dice cuánto cada llamada y el total). Lee la clave de web/.env.local.
+// Pasa por el mismo tope de gasto que el servidor (ANATO3D_TOPE_DIARIO_USD y ANATO3D_TOPE_MENSUAL_USD, y el mismo
+// archivo): sin tope, no envía nada; con el servidor de desarrollo abierto, tampoco (comparten saldo: ciérralo antes).
 //
 //  1. Orientar: conversaciones de ejemplo en los cinco idiomas, explicaciones con evidencias, propuestas de crear y de
 //     adaptar, salud, fuera de tema y un intento de saltarse las reglas.
@@ -13,6 +15,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadEnv } from 'vite';
 import { crearManejador, elegirModelo } from '../server/pet.mjs';
+import { presupuestoDesdeEntorno, nanoAUsd } from '../server/neuri/presupuesto.mjs';
 import { cargarRecursos } from '../server/neuri/recursos.mjs';
 import { revisarLeccion } from '../src/biblioteca/formato.js';
 
@@ -23,9 +26,22 @@ if (!clave) {
   console.error('Falta la clave: pon ANTHROPIC_API_KEY=… en web/.env.local (ver .env.example).');
   process.exit(1);
 }
+// El tope de gasto, antes que nada: sin él (cero, sin poner o mal escrito), no sale ninguna llamada.
+const presupuesto = presupuestoDesdeEntorno(env, { raiz });
+if (!presupuesto.disponible || presupuesto.restante() <= 0) {
+  const motivo = presupuesto.motivo ?? 'agotado';
+  const consejo = {
+    'otro-proceso': 'El servidor de desarrollo tiene el tope abierto: ciérralo antes (comparten el saldo).',
+    apagado: 'Está el interruptor IA-APAGADA (npm run presupuesto -- encender).',
+  }[motivo] ?? 'Pon ANATO3D_TOPE_DIARIO_USD y ANATO3D_TOPE_MENSUAL_USD en web/.env.local (ver .env.example) o revisa npm run presupuesto.';
+  console.error(`Sin presupuesto para la IA (${motivo}): la prueba no envía nada. ${consejo}`);
+  presupuesto.cerrar();
+  process.exit(1);
+}
 const opcion = (n) => { const i = process.argv.indexOf(n); return i > 0 ? process.argv[i + 1] : null; };
-const modelo = elegirModelo(opcion('--modelo') ?? env.ANATO3D_PET_MODELO);
-const modeloLecciones = elegirModelo(opcion('--modelo') ?? (env.ANATO3D_PET_MODELO_LECCIONES || modelo));
+const permitirSonnet = env.ANATO3D_PERMITIR_SONNET?.trim() === '1';
+const modelo = elegirModelo(opcion('--modelo') ?? env.ANATO3D_PET_MODELO, console, { permitirSonnet });
+const modeloLecciones = elegirModelo(opcion('--modelo') ?? (env.ANATO3D_PET_MODELO_LECCIONES || modelo), console, { permitirSonnet });
 const catalogo = JSON.parse(fs.readFileSync(path.join(raiz, 'src/biblioteca/generado/catalogo.json'), 'utf8'));
 const minutos = new Map(catalogo.lecciones.map((L) => [L.id, L.minutos]));
 
@@ -35,7 +51,7 @@ const registro = {
   error: (s) => console.error(`   ${s}`),
 };
 const recursos = await cargarRecursos({ raiz, registro });
-const manejar = crearManejador({ catalogo, clave, modelo, modeloLecciones, recursos: () => recursos, registro, limites: { porIp: 1000, porHora: 1000 }, limitesLecciones: { porIp: 100, porHora: 100 } });
+const manejar = crearManejador({ catalogo, clave, modelo, modeloLecciones, recursos: () => recursos, registro, presupuesto, permitirSonnet, limites: { porIp: 1000, porHora: 1000 }, limitesLecciones: { porIp: 100, porHora: 100 } });
 
 // `validas`: lecciones que valen como primera recomendación; `tipo`: el tipo de respuesta esperado. Orientativas.
 const CASOS = [
@@ -124,3 +140,7 @@ if (process.argv.includes('--crear')) {
   console.log('   (guardada para revisarla en build/neuri-prueba.json)');
 }
 console.log(`\nGasto aproximado: ${gasto.toFixed(4)} US$.`);
+const r = presupuesto.resumen();
+const abiertas = r.abiertas.length ? `; ${r.abiertas.length} reserva(s) abierta(s): npm run presupuesto` : '';
+console.log(`Tope: hoy ${nanoAUsd(r.dia.gastado)} de ${nanoAUsd(r.dia.tope)} US$; este mes ${nanoAUsd(r.mes.gastado)} de ${nanoAUsd(r.mes.tope)} US$${abiertas}.`);
+presupuesto.cerrar();

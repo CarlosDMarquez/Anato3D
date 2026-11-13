@@ -64,6 +64,7 @@ export function renderMisLecciones(ctx, { foco = null, aviso = null } = {}) {
         <button class="btn" type="button" data-exportar ${entradas.length ? '' : 'disabled'}>${icono('download')}<span>${esc(t('pet.exportarTodas'))}</span></button>
         <button class="btn" type="button" data-importar>${icono('upload')}<span>${esc(t('pet.importar'))}</span></button>
         <input type="file" accept="application/json,.json" hidden data-archivo />
+        <button class="btn" type="button" data-mis-sesiones>${icono('timer')}<span>${esc(ctx.sesiones.lista.length ? tn('ses.misN', ctx.sesiones.lista.length) : t('ses.mis'))}</span></button>
       </div>
       <p class="mis-resultado" role="status" aria-live="polite">${aviso ? esc(aviso) : ''}</p>
       ${lleno ? `<p class="mis-aviso" role="note">${icono('info')}<span>${esc(t('pet.misLleno', { n: MAX_PROPIAS }))}</span></p>` : ''}
@@ -86,6 +87,7 @@ export function renderMisLecciones(ctx, { foco = null, aviso = null } = {}) {
   const repintar = (opciones) => renderMisLecciones(ctx, opciones);
   enlazarTarjetas(ctx, body);
   body.querySelector('[data-neuri]').addEventListener('click', () => ctx.neuri.abrir());
+  body.querySelector('[data-mis-sesiones]').addEventListener('click', () => ctx.ir({ tipo: 'sesiones' }));
   enlazarPreparacion(ctx, body.querySelector('#mis-prep'), () => repintar({ foco: '#mis-h' }));
   enlazarMisRecorridos(ctx, body.querySelector('#mis-rec'), { repintar, decir });
   // Lo que se prepara avanza solo: se repintan esas partes (sin mover el foco).
@@ -164,7 +166,7 @@ export function renderMisLecciones(ctx, { foco = null, aviso = null } = {}) {
     });
     li.querySelector('[data-adaptar]').addEventListener('click', () => {
       const L = ctx.porId.get(id);
-      ctx.neuri.abrir(null, { borrador: t('pet.adaptarBorrador', { titulo: L ? tr(L.titulo) : '' }) });
+      ctx.neuri.abrir(null, { borrador: t('pet.adaptarMiBorrador', { titulo: L ? tr(L.titulo) : '' }) });
     });
     li.querySelector('[data-descargar-l]').addEventListener('click', () => {
       const L = ctx.propias.find((x) => x.id === id);

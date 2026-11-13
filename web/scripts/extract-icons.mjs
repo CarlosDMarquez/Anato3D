@@ -27,6 +27,9 @@ const UI = {
   // Neuri, el pet de la biblioteca
   send: 'send-horizontal', sparkles: 'sparkles', newChat: 'message-square-plus',
   download: 'download', upload: 'upload', pencil: 'pencil', trash: 'trash', flag: 'flag', archive: 'archive',
+  // Sesiones de estudio con Neuri: estado de los bloques, saltar, preguntar en contexto, pista y «Ver en 3D»
+  skip: 'skip-forward', circle: 'circle', circleDot: 'circle-dot', circleCheck: 'circle-check', pregunta: 'message-circle-question-mark',
+  pista: 'lightbulb', cubo: 'box',
 };
 
 function pick(set, map) {

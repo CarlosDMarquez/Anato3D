@@ -64,7 +64,7 @@ export const REGIONES = [
   {
     id: 'pelvis', nombre: 'Pelvis y periné', ta2: 129, en: 'Pelvis', la: 'Pelvis', buscar: ['pelvico', 'perine', 'perineo'],
     sub: [
-      { id: 'pelvis-osea', nombre: 'Pelvis ósea', en: 'Bony pelvis', buscar: ['hueso coxal', 'cadera osea'] },
+      { id: 'pelvis-osea', nombre: 'Pelvis ósea', en: 'Bony pelvis', buscar: ['hueso coxal', 'cadera osea', 'huesos de la cadera', 'hip bone'] },
       { id: 'suelo-pelvico', nombre: 'Suelo pélvico', en: 'Pelvic floor', buscar: ['piso pelvico', 'diafragma pelvico'] },
       { id: 'organos-pelvicos', nombre: 'Órganos pélvicos', en: 'Pelvic organs', buscar: ['vejiga', 'recto', 'utero', 'prostata'] },
       { id: 'perine', nombre: 'Periné y genitales externos', ta2: 131, en: 'Perineum', la: 'Perineum', buscar: ['perineo', 'genitales'] },
@@ -108,7 +108,7 @@ export const SISTEMAS = [
   { id: 'muscular', nombre: 'Sistema muscular', corto: 'Muscular', ta2: 1974, en: 'Muscular system', la: 'Systema musculare', visor: ['muscular', 'connective'], buscar: ['musculo', 'musculos', 'miologia', 'muscle', 'muscles'] },
   {
     id: 'nervioso', nombre: 'Sistema nervioso', corto: 'Nervioso', ta2: 5363, en: 'Nervous system', la: 'Systema nervosum', visor: ['nervous'],
-    buscar: ['nervio', 'nervios', 'neuro', 'nerve', 'nerves'],
+    buscar: ['nervio', 'nervios', 'neuro', 'neuroanatomia', 'nerve', 'nerves', 'neuroanatomy'],
     sub: [{ id: 'central', nombre: 'Sistema nervioso central' }, { id: 'periferico', nombre: 'Sistema nervioso periférico' }, { id: 'autonomo', nombre: 'Sistema nervioso autónomo' }],
   },
   {
@@ -120,8 +120,8 @@ export const SISTEMAS = [
   { id: 'respiratorio', nombre: 'Sistema respiratorio', corto: 'Respiratorio', ta2: 3133, en: 'Respiratory system', la: 'Systema respiratorium', visor: ['respiratory'], buscar: ['respiracion', 'vias aereas', 'pulmones'] },
   { id: 'digestivo', nombre: 'Sistema digestivo', corto: 'Digestivo', en: 'Digestive system', visor: ['digestive'], buscar: ['digestion', 'tubo digestivo', 'aparato digestivo', 'alimentary'] },
   { id: 'urinario', nombre: 'Sistema urinario', corto: 'Urinario', ta2: 3357, en: 'Urinary system', la: 'Systema urinarium', visor: ['urogenital'], buscar: ['orina', 'renal', 'rinones'] },
-  { id: 'reproductor-masculino', nombre: 'Sistema reproductor masculino', corto: 'Reproductor masculino', en: 'Male genital system', visor: ['urogenital'], modelos: ['male'], buscar: ['genital masculino', 'aparato reproductor masculino', 'hombre'] },
-  { id: 'reproductor-femenino', nombre: 'Sistema reproductor femenino', corto: 'Reproductor femenino', en: 'Female genital system', visor: ['urogenital'], modelos: ['female'], buscar: ['genital femenino', 'aparato reproductor femenino', 'mujer'] },
+  { id: 'reproductor-masculino', nombre: 'Sistema reproductor masculino', corto: 'Reproductor masculino', en: 'Male genital system', visor: ['urogenital'], modelos: ['male'], buscar: ['genital masculino', 'aparato reproductor masculino', 'hombre', 'male reproductive', 'male genitals'] },
+  { id: 'reproductor-femenino', nombre: 'Sistema reproductor femenino', corto: 'Reproductor femenino', en: 'Female genital system', visor: ['urogenital'], modelos: ['female'], buscar: ['genital femenino', 'aparato reproductor femenino', 'mujer', 'female reproductive', 'female genitals'] },
   { id: 'endocrino', nombre: 'Sistema endocrino', corto: 'Endocrino', ta2: 3852, en: 'Endocrine glands', la: 'Glandulae endocrinae', visor: ['endocrine'], buscar: ['glandulas', 'hormonas', 'endocrine'] },
   { id: 'tegumentario', nombre: 'Sistema tegumentario', corto: 'Tegumentario', en: 'Integumentary system', visor: ['integumentary'], buscar: ['piel', 'tegumento', 'skin'] },
   { id: 'sentidos', nombre: 'Órganos de los sentidos', corto: 'Sentidos', en: 'Sense organs', visor: ['nervous', 'integumentary'], buscar: ['sentidos', 'vista', 'oido', 'vision', 'audicion'] },
@@ -143,7 +143,7 @@ export const TEMAS = [
   { id: 'huesos', nombre: 'Huesos', buscar: ['huesos', 'oseo'] },
   { id: 'accidentes-oseos', nombre: 'Accidentes óseos', buscar: ['accidentes', 'relieves oseos', 'reparos oseos', 'landmarks'] },
   { id: 'musculos', nombre: 'Músculos', buscar: ['musculos'] },
-  { id: 'movimientos', nombre: 'Movimientos', buscar: ['movimiento', 'movimientos', 'acciones', 'flexion', 'extension'] },
+  { id: 'movimientos', nombre: 'Movimientos', buscar: ['movimiento', 'movimientos', 'acciones', 'flexion', 'extension', 'move', 'moves', 'movement'] },
   { id: 'articulaciones', nombre: 'Articulaciones', buscar: ['articulaciones'] },
   { id: 'arterias-venas', nombre: 'Arterias y venas', buscar: ['arterias', 'venas', 'irrigacion', 'drenaje venoso'] },
   { id: 'nervios', nombre: 'Nervios y territorios', buscar: ['nervios', 'inervacion', 'territorios'] },

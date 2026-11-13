@@ -138,7 +138,7 @@ const TIPO_DE_PALABRA = new Map(Object.entries({
   vaso: 'arteria arterias artery arteries arterie arterien artere arteres vena venas vein veins vene venen veine veines vaso vasos vessel vessels gefass gefasse vaisseau vaisseaux vasi',
   nervio: 'nervio nervios nerve nerves nerv nerven nerf nerfs nervo nervi inervacion innervation',
   organo: 'organo organos organ organs organe organes viscera visceras eingeweide glandula glandulas gland glands druse drusen glande glandes ghiandola ghiandole',
-  nodo: 'linfatico linfaticos lymph lymphatic lymphknoten linfonodo linfonodi',
+  nodo: 'linfatico linfaticos linfatica linfaticas lymph lymphatic lymphatics lymphknoten lymphatisch lymphatique lymphatiques linfonodo linfonodi linfatici nodo nodos node nodes',
   snc: 'encefalo cerebro brain gehirn cerveau encephale cervello',
   corazon: 'corazon heart herz coeur cuore',
   piel: 'piel skin haut peau pelle',
@@ -146,6 +146,9 @@ const TIPO_DE_PALABRA = new Map(Object.entries({
   bolsa: 'bursa bursas bursae',
   vaina: 'vaina vainas sheath sheaths',
 }).flatMap(([tipo, ws]) => ws.split(' ').map((w) => [w, tipo])));
+// «Ganglio» es ambiguo: en anatomía, uno nervioso; en el habla de todos los días (y en «ganglios linfáticos»), un nodo
+// linfático. Pide los dos grupos (el lugar y el resto de palabras deciden). En francés, «ganglion» igual.
+for (const w of ['ganglio', 'ganglios', 'ganglion', 'ganglions']) TIPO_DE_PALABRA.set(w, ['nodo', 'ganglio']);
 // Temas de la biblioteca (taxonomía) → grupos de tipos.
 const TIPOS_DE_TEMA = {
   huesos: ['hueso'], 'accidentes-oseos': ['hueso'], musculos: ['musculo', 'tendon'], movimientos: ['musculo'], articulaciones: ['ligamento', 'hueso', 'bolsa'],

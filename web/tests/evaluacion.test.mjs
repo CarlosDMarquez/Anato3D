@@ -141,3 +141,26 @@ test('revisión de reportes: la cola sin repetidos con sus decisiones; retirar y
   assert.deepEqual(leerRetiradas(nuevo), { lecciones: ['cab-craneo'], preguntas: ['brazo/q2'] });
   assert.ok(nuevo.includes('// Contenido retirado temporalmente'), 'el comentario del archivo se conserva');
 });
+
+// Revisión adversarial del 12 nov 2026: lo acertado tras la pista o en el segundo intento de una sesión con Neuri
+// (preguntas.js: ayuda 'pista' / 'segundo-intento') es práctica, no evidencia: no demuestra la habilidad ni va así a Neuri.
+test('mapa: lo acertado con pista o en el segundo intento no demuestra la habilidad (ni en el perfil de Neuri); a la primera, sí', async () => {
+  const { construirPerfil } = await import('../src/pet/perfil.js');
+  const cat = [{ id: 'lec-x', pasos: 3, preguntas: 6, minutos: 5, modelos: ['male', 'female'], lugares: [], sistemas: [] }];
+  const conAyuda = P.vacio();
+  ['q1', 'q2', 'q3'].forEach((q, k) => {
+    P.anotar(conAyuda, `lec-x/${q}`, 'duda');
+    P.registrarIntento(conAyuda, { leccion: 'lec-x', pregunta: q, tipo: 'identificar', resultado: 'duda', modo: 'practica', ayuda: [k === 2 ? 'segundo-intento' : 'pista'] });
+  });
+  const h = calcularMapa(conAyuda, { catalogo: cat }).habilidades.find((x) => x.id === 'reconocer');
+  assert.deepEqual([h.estado, h.intentos, h.aciertos, h.conAyuda, h.recientes.aciertos], ['practicando', 3, 0, 3, 0]);
+  assert.equal(construirPerfil({ data: conAyuda, catalogo: cat }).habilidades.reconocer, 'practicando');
+  // Las mismas tres, bien a la primera (también «dudo» sin ayuda, o tras escribir): demostrada.
+  const primera = P.vacio();
+  ['q1', 'q2', 'q3'].forEach((q, k) => {
+    P.anotar(primera, `lec-x/${q}`, k ? 'acierto' : 'duda');
+    P.registrarIntento(primera, { leccion: 'lec-x', pregunta: q, tipo: 'identificar', resultado: k ? 'acierto' : 'duda', dudo: !k, modo: 'practica', ayuda: k === 2 ? ['escrita'] : null });
+  });
+  assert.equal(calcularMapa(primera, { catalogo: cat }).habilidades.find((x) => x.id === 'reconocer').estado, 'demostrada');
+  assert.equal(construirPerfil({ data: primera, catalogo: cat }).habilidades.reconocer, 'demostrada');
+});
