@@ -281,14 +281,14 @@ Que las piezas encajen dentro de la piel no demuestra que la anatomía sea corre
 
 | Código | Qué mirar | Dónde verlo en la app | Hombre | Mujer | Comentario |
 | --- | --- | --- | --- | --- | --- |
-| V1 | Pronador redondo: cabezas del epicóndilo medial y del proceso coronoides, e inserción en la mitad de la cara lateral del radio | Estudiar → Lección, paso 2 | Sin revisar | Sin revisar |  |
-| V2 | Flexor ulnar del carpo: cabezas humeral y ulnar (olécranon), y tendón hacia el pisiforme | Estudiar → Lección, paso 2 | Sin revisar | Sin revisar |  |
-| V3 | Flexor superficial de los dedos: cabezas humeroulnar y radial, y cuatro tendones hacia las falanges medias | Estudiar → Lección, paso 3 | Sin revisar | Sin revisar |  |
-| V4 | Flexor profundo de los dedos y flexor largo del pulgar: tendones hasta las falanges distales | Estudiar → Lección, paso 4 | Sin revisar | Sin revisar |  |
-| V5 | Pronador cuadrado entre las caras anteriores de la ulna y del radio, por debajo de los tendones flexores | Estudiar → Lección, paso 4 | Sin revisar | Sin revisar |  |
-| V6 | Arteria ulnar pasando entre las dos cabezas del flexor superficial de los dedos | Lección, pasos 3 y 5 | Sin revisar | Sin revisar |  |
-| V7 | Arteria radial justo por fuera del tendón del flexor radial del carpo, en la parte distal del antebrazo (lugar del pulso) | Lección, paso 5 | Sin revisar | Sin revisar |  |
-| V8 | Nervio interóseo anterior entre el flexor largo del pulgar y el flexor profundo de los dedos | Lección, paso 4 | Sin revisar | Sin revisar |  |
+| V1 | Pronador redondo: cabezas del epicóndilo medial y del proceso coronoides, e inserción en la mitad de la cara lateral del radio | Paso 3 · Capa superficial | Sin revisar | Sin revisar |  |
+| V2 | Flexor ulnar del carpo: cabezas humeral y ulnar (olécranon), y tendón hacia el pisiforme | Paso 3 · Capa superficial | Sin revisar | Sin revisar |  |
+| V3 | Flexor superficial de los dedos: cabezas humeroulnar y radial, y cuatro tendones hacia las falanges medias | Paso 4 · Capa intermedia | Sin revisar | Sin revisar |  |
+| V4 | Flexor profundo de los dedos y flexor largo del pulgar: tendones hasta las falanges distales | Paso 5 · Capa profunda | Sin revisar | Sin revisar |  |
+| V5 | Pronador cuadrado entre las caras anteriores de la ulna y del radio, por debajo de los tendones flexores | Paso 5 · Capa profunda | Sin revisar | Sin revisar |  |
+| V6 | Arteria ulnar pasando entre las dos cabezas del flexor superficial de los dedos | Paso 4 · Capa intermedia / Paso 6 · Arterias radial y ulnar | Sin revisar | Sin revisar |  |
+| V7 | Arteria radial justo por fuera del tendón del flexor radial del carpo, en la parte distal del antebrazo (lugar del pulso) | Paso 6 · Arterias radial y ulnar | Sin revisar | Sin revisar |  |
+| V8 | Nervio interóseo anterior entre el flexor largo del pulgar y el flexor profundo de los dedos | Paso 5 · Capa profunda | Sin revisar | Sin revisar |  |
 
 Los nervios y vasos del modelo femenino proceden del modelo masculino de Z-Anatomy ajustado al cuerpo femenino. **Pregunta abierta:** la app aún no está publicada; la inspección necesita una sesión en el ordenador del proyecto o una publicación limitada.
 

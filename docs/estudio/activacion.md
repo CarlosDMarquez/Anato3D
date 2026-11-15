@@ -63,6 +63,7 @@ npm run paquete
   - `fuentes -- comprobar` descarga, en su versión registrada, las páginas que citan las lecciones y que falten en `build/biblioteca/fuentes`. Necesita red; si ya están, no descarga nada.
   - `npm test` y `npm run check` comprueban que todo sigue bien.
   - `npm run paquete` crea el paquete.
+- **Con el dominio ya decidido:** `ANATO3D_ORIGEN=https://dominio npm run paquete` (con Fly sin dominio propio, `https://anato3d.fly.dev`). Así las páginas llevan las URL absolutas que piden las redes sociales y los buscadores: la imagen al compartir el enlace, `canonical` y, en la presentación, los `hreflang` de `/` (español) y `/en/` (inglés). Sin la variable todo funciona igual, pero al compartir un enlace puede salir sin imagen. Es otro uso de la misma variable del servidor (sección 2): allí, con `*.fly.dev`, se deja vacía.
 - **Resultado:** `build/paquete/` (unos 88 MB), con:
   - `publico/` (la web);
   - `servidor.mjs`;
@@ -103,7 +104,7 @@ Sin IA (Neuri responde con el buscador). Desde la carpeta del paquete:
 node servidor.mjs
 ```
 
-Abre http://localhost:8080.
+Abre http://localhost:8080: la presentación está en `/` (en inglés, en `/en/`) y la app en `/app/` (`/app` y `/en`, sin barra, redirigen a su carpeta).
 
 Con el proveedor simulado, en dos terminales. Primero el simulador, desde `web/`:
 

@@ -1,186 +1,507 @@
 <!doctype html>
-<html lang="es" class="sin-traducir">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0a0d11" />
-    <title>Anato3D · Anatomía humana en 3D</title>
-    <meta name="description" content="Atlas 3D del cuerpo humano: esqueleto, músculos, vasos, nervios y órganos, con nombres en español y latín y fichas de cada estructura." />
-    <meta property="og:title" content="Anato3D · Anatomía humana en 3D" />
-    <meta property="og:description" content="Atlas 3D del cuerpo humano: 12 sistemas, más de 2.800 estructuras con nombres en español y latín." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#070708" />
+    <title data-t="meta.titulo">Anato3D · Anatomía humana en 3D, gratis y en el navegador</title>
+    <meta name="description" content="Atlas 3D del cuerpo humano: 12 sistemas en un modelo de hombre y otro de mujer, fichas con el término latino y lecciones con fuentes. Gratis y sin cuenta." data-t-attr="content:meta.descripcion" />
+    <meta property="og:title" content="Anato3D · Anatomía humana en 3D" data-t-attr="content:meta.ogTitulo" />
+    <meta property="og:description" content="12 sistemas, un modelo de hombre y otro de mujer, fichas y lecciones con fuentes. Gratis y en el navegador." data-t-attr="content:meta.ogDescripcion" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/icon-512.png" />
-    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
-    <link rel="icon" href="/favicon-16.png" sizes="16x16" type="image/png" />
+    <meta property="og:locale" content="es_MX" data-t-attr="content:meta.ogIdioma" />
+    <meta property="og:locale:alternate" content="en_US" data-t-attr="content:meta.ogIdiomaOtro" />
+    <meta property="og:image" content="/presentacion/og-es-1200x630.jpg" data-loc />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Logotipo de Anato3D junto a la mitad superior del modelo 3D, con músculos, huesos, arterias, venas y nervios" data-t-attr="content:meta.ogImagenAlt" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon-32.png?v=2" sizes="32x32" type="image/png" />
+    <link rel="icon" href="/favicon-16.png?v=2" sizes="16x16" type="image/png" />
     <link rel="apple-touch-icon" href="/icon-180.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="preload" as="image" href="/presentacion/hero-1200.webp" imagesrcset="/presentacion/hero-720.webp 720w, /presentacion/hero-1200.webp 1200w" imagesizes="(min-width: 960px) 46vw, 92vw" media="(min-width: 600px)" fetchpriority="high" />
+    <!-- La página está en español (/) y en inglés (/en/, la genera vite.config.js con src/presentacion/traducir.mjs). Si en
+         este navegador se eligió el otro idioma (el mismo ajuste que la app), se pasa a esa página antes de pintar. -->
+    <script>
+      (function () {
+        var id = null;
+        try { id = localStorage.getItem('anato3d.idioma'); } catch (e) {}
+        if ((id === 'es' || id === 'en') && id !== document.documentElement.lang) {
+          location.replace((id === 'en' ? '/en/' : '/') + location.search + location.hash);
+        }
+      })();
+    </script>
   </head>
-  <body class="inicio">
-    <!-- Los textos llevan data-t* (i18n/idioma.js): main.js los pone en el idioma elegido (inglés por defecto). -->
-    <div id="app">
-      <div id="stage"></div>
+  <body>
+    <a class="saltar" href="#contenido" data-t="nav.saltar">Saltar al contenido</a>
 
-      <header class="brandbar">
-        <button id="btn-brand" class="brand" type="button" data-tip="Volver a la pantalla de inicio" aria-label="Volver a la pantalla de inicio"
-          data-t-tip="ajustes.volverInicio" data-t-aria="ajustes.volverInicio">Anato<b>3D</b></button>
-        <div id="model-switch" class="segmented" role="group" aria-label="Modelo" data-t-aria="modelo.aria">
-          <button data-model="male" data-sysicon="male" aria-label="Modelo masculino" data-t-aria="modelo.male.aria"><span data-t="modelo.male">Masculino</span></button>
-          <button data-model="female" data-sysicon="female" aria-label="Modelo femenino" data-t-aria="modelo.female.aria"><span data-t="modelo.female">Femenino</span></button>
-        </div>
-        <p id="model-detail" class="model-detail"></p>
-      </header>
-
-      <nav class="toolbar" aria-label="Herramientas" data-t-aria="barra.aria">
-        <button id="btn-home" data-icon="home" data-tip="Vista inicial" aria-label="Vista inicial" data-t-tip="barra.inicio" data-t-aria="barra.inicio"></button>
-        <button id="btn-undo" data-icon="undo" data-tip="Deshacer" aria-label="Deshacer" data-t-tip="barra.deshacer" data-t-aria="barra.deshacer"></button>
-        <hr />
-        <button data-panel="study" data-icon="study" data-tip="Estudiar" aria-label="Estudiar" data-t-tip="panel.estudiar" data-t-aria="panel.estudiar"></button>
-        <button data-panel="search" data-icon="search" data-tip="Buscar" aria-label="Buscar" data-t-tip="panel.buscar" data-t-aria="panel.buscar"></button>
-        <button data-panel="tools" data-icon="tools" data-tip="Herramientas" aria-label="Herramientas" data-t-tip="panel.herramientas" data-t-aria="panel.herramientas"></button>
-        <button data-panel="settings" data-icon="settings" data-tip="Ajustes" aria-label="Ajustes" data-t-tip="panel.ajustes" data-t-aria="panel.ajustes"></button>
-        <button data-panel="help" data-icon="help" data-tip="Ayuda" aria-label="Ayuda" data-t-tip="panel.ayuda" data-t-aria="panel.ayuda"></button>
-      </nav>
-
-      <section class="panel panel-study" id="panel-study" aria-label="Estudiar" data-t-aria="panel.estudiar">
-        <div class="panel-head"><h2 data-t="panel.estudiar">Estudiar</h2><button class="icon-btn" data-close aria-label="Cerrar" data-t-aria="comun.cerrar"></button></div>
-        <p id="study-aviso" class="study-aviso" data-t="estudio.traduccion" hidden></p>
-        <div id="study-body"></div>
-      </section>
-
-      <section class="panel" id="panel-search" aria-label="Buscar" data-t-aria="panel.buscar">
-        <div class="panel-head"><h2 data-t="panel.buscar">Buscar</h2><button class="icon-btn" data-close aria-label="Cerrar" data-t-aria="comun.cerrar"></button></div>
-        <label class="sr-only" for="search-input" data-t="buscar.etiqueta">Buscar una estructura, región o término latino</label>
-        <input id="search-input" type="search" placeholder="Estructura, región o término latino" data-t-ph="buscar.placeholder" autocomplete="off" />
-        <ul id="search-results" class="results"></ul>
-      </section>
-
-      <section class="panel" id="panel-tools" aria-label="Herramientas" data-t-aria="panel.herramientas">
-        <div class="panel-head"><h2 data-t="panel.herramientas">Herramientas</h2><button class="icon-btn" data-close aria-label="Cerrar" data-t-aria="comun.cerrar"></button></div>
-        <h3 data-t="herr.vistas">Vistas</h3>
-        <div class="grid-btns">
-          <button data-tool="anterior" data-t="herr.anterior">Anterior</button>
-          <button data-tool="posterior" data-t="herr.posterior">Posterior</button>
-          <button data-tool="derecha" data-t="herr.derecha">Lateral derecha</button>
-          <button data-tool="izquierda" data-t="herr.izquierda">Lateral izquierda</button>
-          <button data-tool="superior" data-t="herr.superior">Superior</button>
-          <button data-tool="rotate" data-t="herr.rotacion">Rotación automática</button>
-        </div>
-        <h3 data-t="herr.estructuras">Estructuras</h3>
-        <div class="grid-btns">
-          <button data-tool="show-all" class="wide" data-t="herr.restaurar">Restaurar ocultas y atenuadas</button>
-        </div>
-        <h3 data-t="herr.atajos">Atajos de teclado</h3>
-        <dl class="keys">
-          <dt><kbd>H</kbd></dt><dd data-t="accion.ocultar">Ocultar</dd>
-          <dt><kbd>I</kbd></dt><dd data-t="accion.aislar">Aislar</dd>
-          <dt><kbd>V</kbd></dt><dd data-t="accion.transparentar">Transparentar</dd>
-          <dt><kbd>F</kbd></dt><dd data-t="accion.centrar">Centrar</dd>
-          <dt><kbd>/</kbd></dt><dd data-t="panel.buscar">Buscar</dd>
-          <dt><kbd>⌘Z</kbd></dt><dd data-t="barra.deshacer">Deshacer</dd>
-        </dl>
-      </section>
-
-      <section class="panel" id="panel-settings" aria-label="Ajustes" data-t-aria="panel.ajustes">
-        <div class="panel-head"><h2 data-t="panel.ajustes">Ajustes</h2><button class="icon-btn" data-close aria-label="Cerrar" data-t-aria="comun.cerrar"></button></div>
-        <label class="switch"><span data-t="ajustes.idioma">Idioma</span>
-          <select id="set-idioma">
-            <option value="es" lang="es">Español</option>
-            <option value="en" lang="en">English</option>
-            <option value="de" lang="de" disabled data-pronto="Deutsch">Deutsch</option>
-            <option value="fr" lang="fr" disabled data-pronto="Français">Français</option>
-            <option value="it" lang="it" disabled data-pronto="Italiano">Italiano</option>
-          </select></label>
-        <label class="switch"><span data-t="ajustes.calidad">Alta calidad (resolución, sombras y fondo degradado)</span><input id="set-quality" type="checkbox" checked /></label>
-        <label class="switch"><span data-t="ajustes.resaltar">Resaltar al pasar el cursor</span><input id="set-hover" type="checkbox" checked /></label>
-        <label class="switch"><span data-t="ajustes.genitales">Mostrar genitales externos</span><input id="set-genitals" type="checkbox" checked /></label>
-        <p class="setting-note" data-t="ajustes.nota">Desactívalo para usar la app con público general: se ocultan la piel genital y los genitales externos (pene y escroto con su contenido; vulva y clítoris). Los órganos internos (próstata, útero, vejiga…) siguen visibles.</p>
-        <button id="btn-inicio" class="panel-action" type="button" data-icon="chevron"><span data-t="ajustes.volverInicio">Volver a la pantalla de inicio</span></button>
-      </section>
-
-      <section class="panel" id="panel-help" aria-label="Ayuda" data-t-aria="panel.ayuda">
-        <div class="panel-head"><h2 data-t="panel.ayuda">Ayuda</h2><button class="icon-btn" data-close aria-label="Cerrar" data-t-aria="comun.cerrar"></button></div>
-        <h3 data-t="ayuda.comoUsar">Cómo usar</h3>
-        <dl class="howto">
-          <dt data-t="ayuda.girar">Girar</dt><dd data-t="ayuda.girar.d">Arrastra con un dedo o con el ratón.</dd>
-          <dt data-t="ayuda.zoom">Zoom</dt><dd data-t="ayuda.zoom.d">Pellizca o usa la rueda.</dd>
-          <dt data-t="ayuda.desplazar">Desplazar</dt><dd data-t="ayuda.desplazar.d">Arrastra con dos dedos o con el botón derecho.</dd>
-          <dt data-t="ayuda.seleccionar">Seleccionar</dt><dd data-t="ayuda.seleccionar.d">Toca una estructura; con doble clic te acercas.</dd>
-          <dt data-t="ayuda.regiones">Regiones</dt><dd data-t="ayuda.regiones.d">Toca la ruta de la ficha para seleccionar el grupo completo.</dd>
-          <dt data-t="ayuda.sistemas">Sistemas</dt><dd data-t="ayuda.sistemas.d">Toca un sistema para pasar por sus capas; mantenlo presionado para elegir una.</dd>
-        </dl>
-        <h3 data-t="ayuda.creditos">Créditos</h3>
-        <div id="creditos">
-          <p class="small" data-t-html="creditos.neurofuture"><b>NeuroFuture</b> · Conciencia Cerebral Mexicali (Mexicali, B.C.). Contacto: concienciacerebromexicali@gmail.com</p>
-          <p class="small" data-t-html="creditos.modelos">Huesos, cartílagos, músculos, ligamentos, fascias, vasos, corazón, sistema nervioso, órganos de los sentidos y vísceras derivados de <b>Z-Anatomy</b> (CC BY-SA 4.0), basado en <b>BodyParts3D</b> © The Database Center for Life Science (DBCLS). Piel derivada de <b>MakeHuman</b>. Iconos de sistemas: <b>Health Icons</b>; iconos de interfaz: <b>Lucide</b>; tipografía <b>IBM Plex</b>.</p>
-          <p class="small" data-t-html="creditos.nombres"></p>
-          <p class="small muted" data-t="creditos.aviso">Anato3D es una herramienta educativa y no sustituye la consulta con profesionales de la salud.</p>
-        </div>
-      </section>
-
-      <aside id="info" class="info" aria-live="polite"></aside>
-
-      <div id="pin" class="pin" hidden>
-        <svg class="pin-lines"><polyline /></svg>
-        <span class="pin-dot"></span>
-        <div class="pin-label"><b></b><i></i></div>
-      </div>
-
-      <div id="status-pill" class="status-pill" hidden><span></span><button data-t="estado.restaurar">Restaurar</button></div>
-
-      <footer class="dock-wrap">
-        <div id="dock" class="dock" role="toolbar" aria-label="Sistemas" data-t-aria="dock.aria"></div>
-      </footer>
-
-      <div id="popover" class="popover" hidden></div>
-      <div id="tooltip" class="tooltip" hidden></div>
-      <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-      <div id="loader" class="loader">
-        <p class="brand big">Anato<b>3D</b></p>
-        <div class="loader-track"><div id="loader-bar"></div></div>
-        <p id="loader-label" role="status" aria-live="polite" data-t="carga.inicial">Cargando…</p>
-        <button id="loader-retry" class="loader-retry" type="button" data-t="comun.reintentar">Reintentar</button>
-      </div>
-
-      <!-- Pantalla de inicio (ui/start.js): nombre, menú y crédito a la izquierda; a la derecha, el visor con el esqueleto
-           del tórax hacia arriba. Configuración y Créditos reutilizan el contenido de «Ajustes» y «Ayuda». -->
-      <section id="start" class="start" aria-label="Inicio" data-t-aria="inicio.aria">
-        <div class="start-main">
-          <h1 class="start-brand">Anato<b>3D</b></h1>
-          <nav class="start-menu" aria-label="Menú de inicio" data-t-aria="inicio.menu">
-            <button class="start-item primary" type="button" data-start="iniciar" data-t="inicio.iniciar">Iniciar</button>
-            <button class="start-item" type="button" data-start="configuracion" data-t="inicio.configuracion">Configuración</button>
-            <button class="start-item" type="button" data-start="creditos" data-t="inicio.creditos">Créditos</button>
-            <button class="start-item" type="button" data-start="donar" data-t="inicio.donar">Donar</button>
-          </nav>
-          <div id="start-configuracion" class="start-view" hidden>
-            <button class="start-back" type="button" data-icon="chevron" data-volver><span data-t="comun.volver">Volver</span></button>
-            <h2 tabindex="-1" data-t="inicio.configuracion">Configuración</h2>
-            <div class="start-settings"></div>
+    <header class="cabecera">
+      <div class="contenedor cabecera-fila">
+        <a class="marca" href="#inicio" aria-label="Anato3D, inicio de la página" data-t-attr="aria-label:nav.marcaAria">
+          <img src="/presentacion/craneo-64.png" srcset="/presentacion/craneo-64.png 64w, /presentacion/craneo-128.png 128w" sizes="30px" width="30" height="30" alt="" />
+          <span class="marca-nombre">Anato<b>3D</b></span>
+        </a>
+        <nav class="nav" id="nav" aria-label="Secciones" data-t-attr="aria-label:nav.aria">
+          <a href="#que-es" data-t="nav.queEs">Qué es</a>
+          <a href="#sistemas" data-t="nav.sistemas">Sistemas</a>
+          <a href="#como-se-usa" data-t="nav.comoSeUsa">Cómo se usa</a>
+          <a href="#educacion" data-t="nav.educacion">Educación</a>
+          <a href="#contacto" data-t="nav.contacto">Contacto</a>
+          <a class="nav-abrir" href="/app/" data-abrir data-t="cta.abrir">Abrir Anato3D</a>
+        </nav>
+        <div class="cabecera-acciones">
+          <div class="idiomas" role="group" aria-label="Idioma" data-t-attr="aria-label:nav.idioma">
+            <a href="/" data-idioma="es" lang="es" hreflang="es" aria-label="Español" aria-current="true">ES</a>
+            <a href="/en/" data-idioma="en" lang="en" hreflang="en" aria-label="English">EN</a>
           </div>
-          <div id="start-creditos" class="start-view" hidden>
-            <button class="start-back" type="button" data-icon="chevron" data-volver><span data-t="comun.volver">Volver</span></button>
-            <h2 tabindex="-1" data-t="inicio.creditos">Créditos</h2>
-            <div class="start-credits"></div>
+          <a class="btn btn-primario btn-chico" href="/app/" data-abrir data-t="cta.abrir">Abrir Anato3D</a>
+          <button class="menu-boton" type="button" aria-expanded="false" aria-controls="nav" aria-label="Menú" data-t-attr="aria-label:nav.menu"><span></span></button>
+        </div>
+      </div>
+    </header>
+
+    <main id="contenido">
+      <!-- ── Portada ─────────────────────────────────────────── -->
+      <section class="portada" id="inicio" aria-labelledby="titulo">
+        <div class="contenedor portada-rejilla">
+          <div class="portada-texto">
+            <p class="antetitulo" data-t="hero.antetitulo">Atlas interactivo · Gratis</p>
+            <h1 id="titulo" data-t="hero.titulo">Anatomía humana en 3D</h1>
+            <p class="entrada" data-t="hero.entrada">Explora el cuerpo humano pieza por pieza en un modelo de hombre y otro de mujer, con 12 sistemas y los nombres de sus estructuras en español, inglés y latín.</p>
+            <div class="botones">
+              <a class="btn btn-primario" href="/app/" data-abrir><span data-t="cta.abrir">Abrir Anato3D</span><span data-icon="arrowRight"></span></a>
+              <a class="btn btn-secundario" href="#como-se-usa" data-t="hero.verComo">Ver cómo se usa</a>
+            </div>
+            <p class="nota" data-t="hero.nota">Gratis, sin anuncios y sin cuenta. Funciona en el navegador, sin instalar nada.</p>
+            <dl class="cifras">
+              <div><dt data-t="cifra.sistemas">sistemas</dt><dd><span data-num="12">12</span></dd></div>
+              <div><dt data-t="cifra.modelos">modelos: hombre y mujer</dt><dd><span data-num="2">2</span></dd></div>
+              <div><dt data-t="cifra.piezas">piezas 3D</dt><dd><span class="mas-es">+</span><span data-num="2900">2900</span><span class="mas-en">+</span></dd></div>
+              <div><dt data-t="cifra.lecciones">lecciones con fuentes</dt><dd><span data-num="87">87</span></dd></div>
+            </dl>
           </div>
-          <!-- Donar (src/donar.js): el enlace de PayPal.Me lo pone start.js; sin enlace, la opción no sale en la web publicada. -->
-          <div id="start-donar" class="start-view" hidden>
-            <button class="start-back" type="button" data-icon="chevron" data-volver><span data-t="comun.volver">Volver</span></button>
-            <h2 tabindex="-1" data-t="donar.titulo">Ayuda a mantener Anato3D</h2>
-            <div class="start-donar">
-              <p data-t="donar.texto">Anato3D es gratis y sin anuncios. Si te resulta útil, una donación ayuda a mantenerlo en línea y a seguir mejorándolo.</p>
-              <a class="donar-boton" data-icon="heart" target="_blank" rel="noopener noreferrer" data-t-aria="donar.boton.aria"><span data-t="donar.boton">Donar con PayPal</span></a>
-              <p class="small muted" data-t="donar.nota">Se abre PayPal en una pestaña nueva, donde eliges el importe. Anato3D no ve ni guarda tus datos de pago.</p>
-              <p class="small muted" data-t="donar.compartir">¿No puedes donar? Compartir Anato3D también ayuda.</p>
-              <p class="small donar-falta" hidden>Falta el enlace de PayPal.Me: ponlo en <code>web/src/donar.js</code>. Este aviso solo sale en desarrollo; en la web publicada, sin enlace, la opción «Donar» no aparece.</p>
+          <figure class="portada-imagen">
+            <img src="/presentacion/hero-1200.webp" srcset="/presentacion/hero-720.webp 720w, /presentacion/hero-1200.webp 1200w"
+              sizes="(min-width: 960px) 46vw, 92vw" width="1200" height="1467"
+              alt="Cabeza, tronco y miembros superiores del modelo de Anato3D: del lado derecho, los músculos; del izquierdo, el esqueleto con las arterias, las venas y los nervios."
+              data-t-attr="alt:hero.alt" />
+          </figure>
+        </div>
+      </section>
+
+      <!-- ── Qué es ───────────────────────────────────────────── -->
+      <section class="seccion" id="que-es" aria-labelledby="t-que-es">
+        <div class="contenedor">
+          <header class="seccion-cabeza">
+            <h2 id="t-que-es" data-t="que.titulo">Un atlas para explorar y para estudiar</h2>
+            <p class="entrada" data-t="que.entrada">Anato3D reúne un modelo 3D del cuerpo humano, fichas y lecciones. Puedes recorrerlo con libertad o seguir una lección que te enseña en el modelo lo que va explicando.</p>
+          </header>
+
+          <article class="funcion">
+            <figure class="captura">
+              <img src="/presentacion/ui-explorar-es-1600.webp" data-loc
+                srcset="/presentacion/ui-explorar-es-960.webp 960w, /presentacion/ui-explorar-es-1600.webp 1600w"
+                sizes="(min-width: 1100px) 640px, (min-width: 900px) 56vw, 92vw" width="1600" height="1216" loading="lazy" decoding="async"
+                alt="La app con la musculatura encendida y la cabeza larga del bíceps braquial izquierdo seleccionada: su ficha a la izquierda y su nombre sobre el modelo."
+                data-t-attr="alt:que.explorar.alt" />
+            </figure>
+            <div class="funcion-texto">
+              <h3 data-t="que.explorar.titulo">Explora el modelo y consulta sus fichas</h3>
+              <p data-t="que.explorar.texto">Gira, acerca y recorre el cuerpo completo. Enciende los sistemas que quieras, pasa por sus capas y oculta, aísla o transparenta cualquier estructura. Al tocar una pieza, su ficha te dice su nombre en latín, su región y qué es; en los músculos, también su origen, inserción y acción.</p>
+              <ul class="lista">
+                <li data-t="que.explorar.l1">12 sistemas; los músculos, en tres capas, de lo superficial a lo profundo</li>
+                <li data-t="que.explorar.l2">Vistas anterior, posterior, laterales y superior</li>
+                <li data-t="que.explorar.l3">Buscador por nombre, región o término latino</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="funcion invertida">
+            <figure class="captura">
+              <img src="/presentacion/ui-leccion-es-1600.webp" data-loc
+                srcset="/presentacion/ui-leccion-es-960.webp 960w, /presentacion/ui-leccion-es-1600.webp 1600w"
+                sizes="(min-width: 1100px) 640px, (min-width: 900px) 56vw, 92vw" width="1600" height="1216" loading="lazy" decoding="async"
+                alt="Un paso de la lección del brazo: el panel explica el compartimento anterior y el modelo resalta sus tres músculos."
+                data-t-attr="alt:que.estudiar.alt" />
+            </figure>
+            <div class="funcion-texto">
+              <h3 data-t="que.estudiar.titulo">Estudia con lecciones guiadas</h3>
+              <p data-t="que.estudiar.texto">Hay 87 lecciones, de los primeros pasos a cada región del cuerpo, y 11 recorridos para estudiarlas en orden. Cada paso te enseña en el modelo lo que explica, y cada afirmación lleva la frase de la fuente que la respalda.</p>
+              <ul class="lista">
+                <li data-t="que.estudiar.l1">Una evaluación al terminar cada lección</li>
+                <li data-t="que.estudiar.l2">Repaso espaciado de lo que te cuesta</li>
+                <li data-t="que.estudiar.l3">Un plan de estudio para tu examen</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="funcion">
+            <figure class="captura">
+              <img src="/presentacion/ui-neuri-es-1600.webp" data-loc
+                srcset="/presentacion/ui-neuri-es-960.webp 960w, /presentacion/ui-neuri-es-1600.webp 1600w"
+                sizes="(min-width: 1100px) 640px, (min-width: 900px) 56vw, 92vw" width="1600" height="1504" loading="lazy" decoding="async"
+                alt="Neuri propone una sesión de estudio de 10 minutos sobre el brazo, planificada en el dispositivo."
+                data-t-attr="alt:que.neuri.alt" />
+            </figure>
+            <div class="funcion-texto">
+              <h3 data-t="que.neuri.titulo">Neuri, tu tutor de anatomía</h3>
+              <p data-t="que.neuri.texto">Dile qué quieres estudiar y cuánto tiempo tienes: te prepara una sesión con lecciones y preguntas, te busca la lección que necesitas o te enseña una estructura en el modelo. Funciona en tu dispositivo, sin inteligencia artificial: lo que escribes no sale de él.</p>
+              <ul class="lista">
+                <li data-t="que.neuri.l1">Sesiones de estudio según tu tiempo</li>
+                <li data-t="que.neuri.l2">Pistas cuando no te sale una respuesta</li>
+                <li data-t="que.neuri.l3">Retoma la sesión donde la dejaste</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="funcion invertida">
+            <figure class="captura captura-sin-marco">
+              <img src="/presentacion/modelos-900.webp" width="900" height="840" loading="lazy" decoding="async"
+                alt="La musculatura del modelo masculino y la del femenino, de frente."
+                data-t-attr="alt:que.modelos.alt" />
+            </figure>
+            <div class="funcion-texto">
+              <h3 data-t="que.modelos.titulo">Un hombre y una mujer</h3>
+              <p data-t="que.modelos.texto">Cambia de modelo cuando quieras. Cada uno tiene los 12 sistemas y su anatomía propia, como la pelvis y los órganos genitales.</p>
+              <ul class="datos">
+                <li><span data-icon="check"></span><span data-t="que.dato1">Gratis y sin anuncios</span></li>
+                <li><span data-icon="check"></span><span data-t="que.dato2">Sin cuenta: tu progreso se guarda en tu navegador</span></li>
+                <li><span data-icon="check"></span><span data-t="que.dato3">Interfaz en español e inglés, con los términos en latín</span></li>
+                <li><span data-icon="check"></span><span data-t="que.dato4">Sin instalar nada: se abre en el navegador</span></li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ── Los 12 sistemas ──────────────────────────────────── -->
+      <section class="seccion" id="sistemas" aria-labelledby="t-sistemas">
+        <div class="contenedor">
+          <header class="seccion-cabeza">
+            <h2 id="t-sistemas" data-t="sis.titulo">Los 12 sistemas de Anato3D</h2>
+            <p class="entrada" data-t="sis.entrada">Cada sistema se enciende desde la barra de abajo y casi todos se dividen en capas. Están agrupados para explorar el modelo, no como en un tratado: el arterial y el venoso forman juntos el sistema cardiovascular, el urogenital une el urinario y el genital, y el tejido conjuntivo reúne articulaciones, fascias y bursas.</p>
+          </header>
+          <ul class="sistemas" aria-label="Los 12 sistemas" data-t-attr="aria-label:sis.listaAria">
+            <li class="sistema" style="--sis: #e6dcc6">
+              <img src="/presentacion/sis-skeletal.webp" width="560" height="700" loading="lazy" decoding="async" alt="El esqueleto completo, de frente." data-t-attr="alt:sis.skeletal.alt" />
+              <div class="sistema-texto">
+                <h3><span data-sysicon="skeletal"></span><span data-t="sis.skeletal.nombre">Esquelético</span></h3>
+                <p class="latin" lang="la">Systema skeletale</p>
+                <p data-t="sis.skeletal.funcion">Sostiene el cuerpo, protege órganos como el encéfalo, el corazón y los pulmones, y sirve de palanca a los músculos. En la médula ósea se forman las células de la sangre.</p>
+                <p class="sistema-modelo" data-t="sis.skeletal.modelo">Huesos y dientes.</p>
+                <p class="sistema-piezas"><span data-t="sis.piezas">Piezas</span> <b data-num="238">238</b></p>
+              </div>
+            </li>
+            <li class="sistema" style="--sis: #b9c4cf">
+              <img src="/presentacion/sis-connective.webp" width="560" height="700" loading="lazy" decoding="async" alt="La cadera izquierda con su cápsula articular y sus ligamentos." data-t-attr="alt:sis.connective.alt" />
+              <div class="sistema-texto">
+                <h3><span data-sysicon="connective"></span><span data-t="sis.connective.nombre">Tejido conjuntivo</span></h3>
+                <p class="latin" lang="la">Textus connectivus</p>
+                <p data-t="sis.connective.funcion">Une y sostiene: los ligamentos y las cápsulas mantienen unidas las articulaciones, los cartílagos y los discos amortiguan, las fascias envuelven los músculos y las bursas reducen el roce.</p>
+                <p class="sistema-modelo" data-t="sis.connective.modelo">Ligamentos, cápsulas, cartílagos, discos, fascias, bursas y vainas tendinosas.</p>
+                <p class="sistema-piezas"><span data-t="sis.piezas">Piezas</span> <b data-num="634">634</b></p>
+              </div>
+            </li>
+            <li class="sistema" style="--sis: #c8463d">
+              <img src="/presentacion/sis-muscular.webp" width="560" height="700" loading="lazy" decoding="async" alt="La musculatura superficial completa, de frente." data-t-attr="alt:sis.muscular.alt" />
+              <div class="sistema-texto">
+                <h3><span data-sysicon="muscular"></span><span data-t="sis.muscular.nombre">Muscular</span></h3>
+                <p class="latin" lang="la">Systema musculare</p>
+                <p data-t="sis.muscular.funcion">Los músculos esqueléticos mueven los huesos al contraerse, mantienen la postura y producen calor.</p>
+                <p class="sistema-modelo" data-t="sis.muscular.modelo">En tres capas: superficial, intermedia y profunda.</p>
+                <p class="sistema-piezas"><span data-t="sis.piezas">Piezas</span> <span data-t="sis.hombre">hombre</span> <b data-num="481">481</b> · <span data-t="sis.mujer">mujer</span> <b data-num="486">486</b></p>
+              </div>
+            </li>
+            <li class="sistema" style="--sis: #d23a3a">
+              <img src="/presentacion/sis-arterial.webp" width="560" height="700" loading="lazy" decoding="async" alt="Las arterias de todo el cuerpo y el corazón." data-t-attr="alt:sis.arterial.alt" />
+              <div class="sistema-texto">
+                <h3><span data-sysicon="arterial"></span><span data-t="sis.arterial.nombre">Arterial</span></h3>
+                <p class="latin" lang="la">Arteriae</p>
+                <p data-t="sis.arterial.funcion">El corazón impulsa la sangre y las arterias la reparten por todo el cuerpo. Las arterias pulmonares llevan a los pulmones sangre pobre en oxígeno: por eso, como en los atlas, se representan en azul.</p>
+                <p class="sistema-modelo" data-t="sis.arterial.modelo">Las arterias y el corazón, con sus cavidades y sus válvulas.</p>
+                <p class="sistema-piezas"><span data-t="sis.piezas">Piezas</span> <span data-t="sis.hombre">hombre</span> <b data-num="436">436</b> · <span data-t="sis.mujer">mujer</span> <b data-num="440">440</b></p>
+              </div>
+            </li>
+            <li class="sistema" style="--sis: #3d6fd1">
+              <img src="/presentacion/sis-venous.webp" width="560" height="700" loading="lazy" decoding="async" alt="Las venas de todo el cuerpo." data-t-attr="alt:sis.venous.alt" />
+              <div class="sistema-texto">
+                <h3><span data-sysicon="venous"></span><span data-t="sis.venous.nombre">Venoso</span></h3>
+                <p class="latin" lang="la">Venae</p>
+                <p data-t="sis.venous.funcion">Las venas devuelven la sangre al corazón. Las venas pulmonares traen sangre rica en oxígeno desde los pulmones: por eso se representan en rojo.</p>
+                <p class="sistema-modelo" data-t="sis.venous.modelo">Las venas del cuerpo y las del corazón.</p>
+                <p class="sistema-piezas"><span data-t="sis.piezas">Piezas</span> <span data-t="sis.hombre">hombre</span> <b data-num="230">230</b> · <span data-t="sis.mujer">mujer</span> <b data-num="232">232</b></p>
+              </div>
+            </li>
+            <li class="sistema" style="--sis: #8fbf5a">
+              <img src="/presentacion/sis-lymphatic.webp" width="560" height="700" loading="lazy" decoding="async" alt="Los nodos y vasos linfáticos de la cabeza, el cuello, el tronco y los miembros, con el bazo y el timo; el esqueleto, atenuado." data-t-attr="alt:sis.lymphatic.alt" />
+              <div class="sistema-texto">
+                <h3><span data-sysicon="lymphatic"></span><span data-t="sis.lymphatic.nombre">Linfático</span></h3>
+                <p class="latin" lang="la">Systema lymphoideum</p>
+                <p data-t="sis.lymphatic.funcion">Devuelve a la sangre el líquido que sale de los tejidos, la linfa, y participa en la defensa del cuerpo: los nodos linfáticos la filtran, y el bazo y el timo forman parte del sistema inmunitario.</p>
+                <p class="sistema-modelo" data-t="sis.lymphatic.modelo">Grupos de nodos linfáticos, el conducto torácico y los troncos, vasos colectores esquemáticos, el bazo, el timo y las amígdalas palatinas.</p>
+                <p class="sistema-piezas"><span data-t="sis.piezas">Piezas</span> <b data-num="193">193</b></p>
+              </div>
+            </li>
+            <li class="sistema" style="--sis: #e8c547">
+              <img src="/presentacion/sis-nervous.webp" width="560" height="700" loading="lazy" decoding="async" alt="El encéfalo, la médula espinal y los nervios del tronco y de los miembros." data-t-attr="alt:sis.nervous.alt" />
+              <div class="sistema-texto">
+                <h3><span data-sysicon="nervous"></span><span data-t="sis.nervous.nombre">Nervioso</span></h3>
+                <p class="latin" lang="la">Systema nervosum</p>
+                <p data-t="sis.nervous.funcion">Recibe la información de los sentidos, la procesa y envía órdenes a los músculos y las glándulas. El encéfalo y la médula espinal forman el sistema nervioso central; los nervios y los ganglios, el periférico.</p>
+                <p class="sistema-modelo" data-t="sis.nervous.modelo">Encéfalo, médula espinal, nervios craneales y espinales, el plexo braquial, el tronco simpático y los órganos de los sentidos: el ojo y el oído.</p>
+                <p class="sistema-piezas"><span data-t="sis.piezas">Piezas</span> <b data-num="580">580</b></p>
+              </div>
+            </li>
+            <li class="sistema" style="--sis: #e59ab0">
+              <img src="/presentacion/sis-respiratory.webp" width="560" height="700" loading="lazy" decoding="async" alt="Las vías respiratorias y los pulmones dentro del tórax, con el esqueleto atenuado." data-t-attr="alt:sis.respiratory.alt" />
+              <div class="sistema-texto">
+                <h3><span data-sysicon="respiratory"></span><span data-t="sis.respiratory.nombre">Respiratorio</span></h3>
+                <p class="latin" lang="la">Systema respiratorium</p>
+                <p data-t="sis.respiratory.funcion">Lleva el aire hasta los alvéolos de los pulmones, donde la sangre toma oxígeno y deja dióxido de carbono.</p>
+                <p class="sistema-modelo" data-t="sis.respiratory.modelo">Nariz, laringe, tráquea, bronquios hasta los segmentarios, los cinco lóbulos pulmonares y la pleura.</p>
+                <p class="sistema-piezas"><span data-t="sis.piezas">Piezas</span> <b data-num="48">48</b></p>
+              </div>
+            </li>
+            <li class="sistema" style="--sis: #d98a4e">
+              <img src="/presentacion/sis-digestive.webp" width="560" height="700" loading="lazy" decoding="async" alt="El tubo digestivo, el hígado y el páncreas, con el esqueleto atenuado." data-t-attr="alt:sis.digestive.alt" />
+              <div class="sistema-texto">
+                <h3><span data-sysicon="digestive"></span><span data-t="sis.digestive.nombre">Digestivo</span></h3>
+                <p class="latin" lang="la">Systema digestorium</p>
+                <p data-t="sis.digestive.funcion">Descompone los alimentos en nutrientes, que el intestino absorbe y pasan a la sangre, y elimina lo que no se aprovecha. Lo ayudan las glándulas salivales, el hígado y el páncreas.</p>
+                <p class="sistema-modelo" data-t="sis.digestive.modelo">Lengua, paladar blando, faringe, esófago, estómago, duodeno, yeyuno y colon; las glándulas salivales, el hígado con sus ocho segmentos, la vesícula biliar, el páncreas y pliegues del peritoneo: los omentos, el mesocolon y el mesoapéndice.</p>
+                <p class="sistema-piezas"><span data-t="sis.piezas">Piezas</span> <b data-num="47">47</b></p>
+              </div>
+            </li>
+            <li class="sistema" style="--sis: #b07fd6">
+              <img src="/presentacion/sis-endocrine.webp" width="560" height="700" loading="lazy" decoding="async" alt="La tiroides y las glándulas suprarrenales, con el cráneo, la columna y la pelvis atenuados." data-t-attr="alt:sis.endocrine.alt" />
+              <div class="sistema-texto">
+                <h3><span data-sysicon="endocrine"></span><span data-t="sis.endocrine.nombre">Endocrino</span></h3>
+                <p class="latin" lang="la">Glandulae endocrinae</p>
+                <p data-t="sis.endocrine.funcion">Sus glándulas liberan hormonas a la sangre: mensajeros químicos que regulan el crecimiento, el metabolismo, la reproducción y la respuesta al estrés.</p>
+                <p class="sistema-modelo" data-t="sis.endocrine.modelo">Hipófisis, glándula pineal, tiroides, paratiroides y suprarrenales.</p>
+                <p class="sistema-piezas"><span data-t="sis.piezas">Piezas</span> <b data-num="10">10</b></p>
+              </div>
+            </li>
+            <li class="sistema" style="--sis: #d4a63b">
+              <img src="/presentacion/sis-urogenital.webp" width="560" height="700" loading="lazy" decoding="async" alt="Los riñones, los uréteres, la vejiga, el útero y los ovarios del modelo femenino, con el esqueleto atenuado." data-t-attr="alt:sis.urogenital.alt" />
+              <div class="sistema-texto">
+                <h3><span data-sysicon="urogenital"></span><span data-t="sis.urogenital.nombre">Urogenital</span></h3>
+                <p class="latin" lang="la">Systema urinarium · Systemata genitalia</p>
+                <p data-t="sis.urogenital.funcion">Los riñones filtran la sangre y forman la orina, que sale por las vías urinarias. Las gónadas (testículos y ovarios) producen los gametos y, en la mujer, el útero aloja al embrión y al feto durante el embarazo.</p>
+                <p class="sistema-modelo" data-t="sis.urogenital.modelo">Riñones, uréteres, vejiga y uretra; los órganos genitales de cada modelo y, en la mujer, las mamas.</p>
+                <p class="sistema-piezas"><span data-t="sis.piezas">Piezas</span> <span data-t="sis.hombre">hombre</span> <b data-num="22">22</b> · <span data-t="sis.mujer">mujer</span> <b data-num="38">38</b></p>
+              </div>
+            </li>
+            <li class="sistema" style="--sis: #d9a58a">
+              <img src="/presentacion/sis-integumentary.webp" width="560" height="700" loading="lazy" decoding="async" alt="La piel de la espalda, los hombros y la cabeza, vista desde atrás." data-t-attr="alt:sis.integumentary.alt" />
+              <div class="sistema-texto">
+                <h3><span data-sysicon="integumentary"></span><span data-t="sis.integumentary.nombre">Tegumentario</span></h3>
+                <p class="latin" lang="la">Integumentum commune</p>
+                <p data-t="sis.integumentary.funcion">La piel cubre y protege el cuerpo, ayuda a regular la temperatura y tiene receptores del tacto, la presión, el calor, el frío y el dolor. Es su órgano más grande.</p>
+                <p class="sistema-modelo" data-t="sis.integumentary.modelo">La piel por regiones; los ojos se ven con ella para completar el aspecto exterior. La piel puede volverse translúcida para ver lo que cubre.</p>
+                <p class="sistema-piezas"><span data-t="sis.piezas">Piezas</span> <span data-t="sis.hombre">hombre</span> <b data-num="39">39</b> · <span data-t="sis.mujer">mujer</span> <b data-num="42">42</b></p>
+              </div>
+            </li>
+          </ul>
+          <p class="desliza" aria-hidden="true"><span data-t="sis.desliza">Desliza para ver los 12 sistemas</span><span data-icon="arrowRight"></span></p>
+          <p class="pie-nota" data-t="sis.nota">En el recuento de piezas 3D, cada lado cuenta aparte: el húmero derecho y el izquierdo son dos piezas.</p>
+        </div>
+      </section>
+
+      <!-- ── Cómo se usa ──────────────────────────────────────── -->
+      <section class="seccion" id="como-se-usa" aria-labelledby="t-como">
+        <div class="contenedor">
+          <header class="seccion-cabeza">
+            <h2 id="t-como" data-t="tut.titulo">Cómo se usa, en un minuto</h2>
+            <p class="entrada" data-t="tut.entrada">Abre Anato3D y pulsa «Iniciar». La primera vez, el modelo tarda unos segundos en descargarse.</p>
+          </header>
+          <div class="tutorial">
+            <figure class="captura tutorial-captura">
+              <img src="/presentacion/ui-tutorial-es-1600.webp" data-loc
+                srcset="/presentacion/ui-tutorial-es-960.webp 960w, /presentacion/ui-tutorial-es-1600.webp 1600w"
+                sizes="(min-width: 1100px) 720px, 92vw" width="1600" height="1000" loading="lazy" decoding="async"
+                alt="La interfaz de Anato3D con sus partes numeradas según los pasos del tutorial."
+                data-t-attr="alt:tut.alt" />
+              <span class="marca-paso" data-paso="1" style="--x: 24.5%; --y: 3.7%" aria-hidden="true">1</span>
+              <span class="marca-paso" data-paso="2" style="--x: 30.6%; --y: 87%" aria-hidden="true">2</span>
+              <span class="marca-paso" data-paso="3" style="--x: 45%; --y: 47%" aria-hidden="true">3</span>
+              <span class="marca-paso" data-paso="4" style="--x: 67.5%; --y: 17%" aria-hidden="true">4</span>
+              <span class="marca-paso" data-paso="5" style="--x: 28.5%; --y: 21%" aria-hidden="true">5</span>
+              <span class="marca-paso" data-paso="6" style="--x: 92.5%; --y: 17%" aria-hidden="true">6</span>
+            </figure>
+            <ol class="pasos">
+              <li data-paso="1"><b data-t="tut.p1.titulo">Elige el modelo</b><span data-t="tut.p1.texto">Masculino o femenino, arriba a la izquierda.</span></li>
+              <li data-paso="2"><b data-t="tut.p2.titulo">Enciende los sistemas</b><span data-t="tut.p2.texto">En la barra de abajo, cada toque lleva el sistema a su siguiente capa y, tras la última, lo apaga. Mantenlo presionado para elegir una capa.</span></li>
+              <li data-paso="3"><b data-t="tut.p3.titulo">Mueve el modelo</b><span data-t="tut.p3.texto">Arrastra para girarlo, usa la rueda o pellizca para acercarte y arrastra con el botón derecho o con dos dedos para desplazarlo.</span></li>
+              <li data-paso="4"><b data-t="tut.p4.titulo">Toca una estructura</b><span data-t="tut.p4.texto">Se resalta y aparece su nombre sobre el modelo. Con doble clic te acercas a ella.</span></li>
+              <li data-paso="5"><b data-t="tut.p5.titulo">Lee su ficha</b><span data-t="tut.p5.texto">Su nombre en latín, su sistema y su región, qué es y sus datos. Desde ahí la ocultas, la aíslas o la transparentas.</span></li>
+              <li data-paso="6"><b data-t="tut.p6.titulo">Busca y estudia</b><span data-t="tut.p6.texto">La lupa encuentra cualquier estructura por su nombre o su término latino, y el birrete abre las lecciones.</span></li>
+            </ol>
+          </div>
+
+          <div class="controles">
+            <div class="control">
+              <h3><span data-icon="mouse"></span><span data-t="tut.raton">Con ratón o trackpad</span></h3>
+              <dl>
+                <div><dt data-t="tut.girar">Girar</dt><dd data-t="tut.raton.girar">Arrastrar</dd></div>
+                <div><dt data-t="tut.acercar">Acercar</dt><dd data-t="tut.raton.acercar">Rueda o pellizco</dd></div>
+                <div><dt data-t="tut.desplazar">Desplazar</dt><dd data-t="tut.raton.desplazar">Arrastrar con el botón derecho</dd></div>
+                <div><dt data-t="tut.seleccionar">Seleccionar</dt><dd data-t="tut.raton.seleccionar">Clic; doble clic para acercarte</dd></div>
+              </dl>
+            </div>
+            <div class="control">
+              <h3><span data-icon="smartphone"></span><span data-t="tut.tactil">En pantalla táctil</span></h3>
+              <dl>
+                <div><dt data-t="tut.girar">Girar</dt><dd data-t="tut.tactil.girar">Arrastrar con un dedo</dd></div>
+                <div><dt data-t="tut.acercar">Acercar</dt><dd data-t="tut.tactil.acercar">Pellizcar</dd></div>
+                <div><dt data-t="tut.desplazar">Desplazar</dt><dd data-t="tut.tactil.desplazar">Arrastrar con dos dedos</dd></div>
+                <div><dt data-t="tut.seleccionar">Seleccionar</dt><dd data-t="tut.tactil.seleccionar">Tocar la estructura</dd></div>
+              </dl>
+              <p class="control-nota" data-t="tut.tactil.nota">En celulares y tabletas todavía está en pruebas.</p>
+            </div>
+            <div class="control">
+              <h3><span data-icon="keyboard"></span><span data-t="tut.teclado">Atajos de teclado</span></h3>
+              <dl class="teclas">
+                <div><dt><kbd>H</kbd></dt><dd data-t="tut.tecla.ocultar">Ocultar la selección</dd></div>
+                <div><dt><kbd>I</kbd></dt><dd data-t="tut.tecla.aislar">Aislarla</dd></div>
+                <div><dt><kbd>V</kbd></dt><dd data-t="tut.tecla.transparentar">Transparentarla</dd></div>
+                <div><dt><kbd>F</kbd></dt><dd data-t="tut.tecla.centrar">Centrarla</dd></div>
+                <div><dt><kbd>/</kbd></dt><dd data-t="tut.tecla.buscar">Buscar</dd></div>
+                <div><dt><kbd>Ctrl</kbd>&nbsp;<kbd>Z</kbd></dt><dd data-t="tut.tecla.deshacer">Deshacer (⌘ Z en Mac)</dd></div>
+              </dl>
             </div>
           </div>
         </div>
-        <p class="start-credit"><img src="/neurofuture.png" width="800" height="127" alt="NeuroFuture · Conciencia Cerebral Mexicali" /></p>
-        <div class="start-veil" aria-hidden="true"></div>
       </section>
-    </div>
-    <script type="module" src="/src/main.js"></script>
+
+      <!-- ── Educación ────────────────────────────────────────── -->
+      <section class="seccion" id="educacion" aria-labelledby="t-educacion">
+        <div class="contenedor">
+          <header class="seccion-cabeza">
+            <h2 id="t-educacion" data-t="edu.titulo">Para estudiar y para enseñar</h2>
+            <p class="entrada" data-t="edu.entrada">Anato3D está pensado para estudiantes de ciencias de la salud y para cualquiera con curiosidad por el cuerpo humano.</p>
+          </header>
+          <div class="perfiles">
+            <article class="perfil">
+              <h3><span data-icon="study"></span><span data-t="edu.estudias">Si estudias</span></h3>
+              <ul class="lista">
+                <li data-t="edu.e1">Lecciones paso a paso sobre el modelo, con la fuente de cada afirmación.</li>
+                <li data-t="edu.e2">Una evaluación al final de cada lección, con preguntas para identificar en 3D, localizar, relacionar, explicar la función, comparar y ordenar.</li>
+                <li data-t="edu.e3">Repaso espaciado: lo que fallas vuelve pronto y lo que dominas, más tarde.</li>
+                <li data-t="edu.e4">Un mapa de lo que te cuesta y un plan de estudio con tu temario y la fecha de tu examen.</li>
+                <li data-t="edu.e5">Sin cuenta: tu progreso se guarda en este navegador y puedes llevarlo a otro con un archivo.</li>
+              </ul>
+            </article>
+            <article class="perfil">
+              <h3><span data-icon="book"></span><span data-t="edu.ensenas">Si enseñas</span></h3>
+              <ul class="lista">
+                <li data-t="edu.d1">Proyéctalo en clase y muestra solo el sistema, la capa o la estructura de la que hablas.</li>
+                <li data-t="edu.d2">Tus estudiantes solo necesitan el enlace: no instalan nada ni crean cuentas.</li>
+                <li data-t="edu.d3">Para público general, desactiva «Mostrar genitales externos» en Configuración (pantalla de inicio) o en Ajustes.</li>
+                <li data-t="edu.d4">Si encuentras un error, «Reportar un problema» está en cada paso y cada pregunta de las lecciones.</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="recorridos">
+            <h3 data-t="edu.recorridos">Los 11 recorridos de estudio</h3>
+            <ul>
+              <li data-t="rec.primeros-pasos">Primeros pasos: el cuerpo por sistemas</li>
+              <li data-t="rec.todos-los-huesos">Todos los huesos del cuerpo</li>
+              <li data-t="rec.accidentes-oseos">Accidentes óseos</li>
+              <li data-t="rec.musculos-por-region">Músculos por región</li>
+              <li data-t="rec.movimientos">Movimientos</li>
+              <li data-t="rec.articulaciones">Articulaciones</li>
+              <li data-t="rec.arterias-venas">Arterias y venas</li>
+              <li data-t="rec.nervios-territorios">Nervios y territorios</li>
+              <li data-t="rec.organos-relaciones">Órganos y relaciones</li>
+              <li data-t="rec.compartimentos">Compartimentos de los miembros</li>
+              <li data-t="rec.confusiones">Estructuras que se confunden</li>
+            </ul>
+          </div>
+
+          <div class="aviso" role="note" aria-labelledby="t-aviso">
+            <h3 id="t-aviso"><span class="aviso-punto" aria-hidden="true"></span><span data-t="edu.aviso.titulo">Contenido en borrador</span></h3>
+            <p data-t="edu.aviso.texto">Las lecciones y las fichas son borradores: se redactaron con ayuda de inteligencia artificial a partir de fuentes citadas y ningún especialista las ha revisado todavía.</p>
+            <p data-t="edu.aviso.idiomas">Las lecciones están en español; las del brazo y el antebrazo, también en inglés. La interfaz está en español y en inglés.</p>
+            <p class="aviso-legal" data-t="edu.aviso.legal">Anato3D es una herramienta educativa y no sustituye la consulta con profesionales de la salud.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Contacto ─────────────────────────────────────────── -->
+      <section class="seccion" id="contacto" aria-labelledby="t-contacto">
+        <div class="contenedor">
+          <header class="seccion-cabeza">
+            <h2 id="t-contacto" data-t="con.titulo">Preguntas, errores o ideas</h2>
+            <p class="entrada" data-t="con.entrada">Si tienes una pregunta, encontraste un error o quieres usar Anato3D en tu escuela, escribe a este correo.</p>
+          </header>
+          <div class="contactos">
+            <article class="contacto">
+              <h3><span data-icon="send"></span><span data-t="con.correo">Correo</span></h3>
+              <p class="contacto-correo"><a href="mailto:concienciacerebromexicali@gmail.com?subject=Anato3D">concienciacerebromexicali@gmail.com</a></p>
+              <a class="btn btn-secundario" href="mailto:concienciacerebromexicali@gmail.com?subject=Anato3D" data-t="con.escribir">Escribir un correo</a>
+            </article>
+            <article class="contacto">
+              <h3><span data-icon="flag"></span><span data-t="con.reportar">Reportar un error</span></h3>
+              <p data-t="con.reportar.texto">En cada paso y cada pregunta de las lecciones está «Reportar un problema». El reporte dice dónde está el error, pero no lleva tu nombre ni tus respuestas.</p>
+            </article>
+            <article class="contacto">
+              <h3><span data-icon="heart"></span><span data-t="con.donar">Apoya Anato3D</span></h3>
+              <p data-t="con.donar.texto">Anato3D es gratis y sin anuncios. Si te resulta útil, una donación ayuda a mantenerlo en línea y a seguir mejorándolo.</p>
+              <a class="btn btn-secundario" href="https://paypal.me/krlos419" target="_blank" rel="noopener noreferrer"><span data-t="con.donar.boton">Donar con PayPal</span><span class="sr-only" data-t="con.pestana">(se abre en una pestaña nueva)</span></a>
+              <p class="pequeno" data-t="con.donar.nota">Se abre PayPal en una pestaña nueva, donde eliges el importe. Anato3D no ve ni guarda tus datos de pago.</p>
+              <p class="pequeno" data-t="con.donar.compartir">¿No puedes donar? Compartir Anato3D también ayuda.</p>
+            </article>
+          </div>
+          <div class="neurofuture">
+            <img src="/neurofuture.png" width="800" height="127" loading="lazy" decoding="async" alt="NeuroFuture · Conciencia Cerebral Mexicali" />
+            <p data-t="con.neurofuture">Anato3D es el primer proyecto de NeuroFuture, una iniciativa de divulgación científica en Mexicali, Baja California.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Llamada final ─────────────────────────────────────── -->
+      <section class="final" aria-labelledby="t-final">
+        <div class="contenedor final-fila">
+          <h2 id="t-final" data-t="final.titulo">El cuerpo humano, pieza por pieza.</h2>
+          <a class="btn btn-primario" href="/app/" data-abrir><span data-t="cta.abrir">Abrir Anato3D</span><span data-icon="arrowRight"></span></a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="pie">
+      <div class="contenedor">
+        <div class="pie-fila">
+          <div class="pie-marca">
+            <span class="marca-nombre">Anato<b>3D</b></span>
+            <p data-t="pie.lema">Anatomía humana en 3D, gratis y en el navegador.</p>
+          </div>
+          <nav class="pie-nav" aria-label="Secciones del pie de página" data-t-attr="aria-label:pie.navAria">
+            <a href="#que-es" data-t="nav.queEs">Qué es</a>
+            <a href="#sistemas" data-t="nav.sistemas">Sistemas</a>
+            <a href="#como-se-usa" data-t="nav.comoSeUsa">Cómo se usa</a>
+            <a href="#educacion" data-t="nav.educacion">Educación</a>
+            <a href="#contacto" data-t="nav.contacto">Contacto</a>
+            <a href="/app/" data-abrir data-t="cta.abrir">Abrir Anato3D</a>
+          </nav>
+        </div>
+        <div class="creditos">
+          <h2 data-t="pie.creditos">Créditos</h2>
+          <p data-t-html="pie.modelos">Huesos, cartílagos, músculos, ligamentos, fascias, vasos, corazón, sistema nervioso, órganos de los sentidos y vísceras derivados de <a href="https://www.z-anatomy.com/" target="_blank" rel="noopener noreferrer">Z-Anatomy</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/deed.es" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>), basado en <a href="https://lifesciencedb.jp/bp3d/" target="_blank" rel="noopener noreferrer">BodyParts3D</a> © The Database Center for Life Science (DBCLS). Piel y ojos derivados de <a href="http://www.makehumancommunity.org/" target="_blank" rel="noopener noreferrer">MakeHuman</a>. Se modelaron para Anato3D las mamas y los órganos genitales femeninos, los músculos del triángulo urogenital, los vasos ováricos y uterinos, la forma de los nodos linfáticos y los conductos, troncos y colectores linfáticos.</p>
+          <p data-t-html="pie.nombres">Nombres de las estructuras en español, inglés y latín: de la traducción oficial de Z-Anatomy. Iconos de sistemas: <a href="https://healthicons.org/" target="_blank" rel="noopener noreferrer">Health Icons</a>; iconos de interfaz: <a href="https://lucide.dev/" target="_blank" rel="noopener noreferrer">Lucide</a>; tipografía: <a href="https://www.ibm.com/plex/" target="_blank" rel="noopener noreferrer">IBM Plex</a>.</p>
+          <p class="pie-aviso" data-t="edu.aviso.legal">Anato3D es una herramienta educativa y no sustituye la consulta con profesionales de la salud.</p>
+        </div>
+        <div class="pie-fila pie-final">
+          <p>Anato3D · NeuroFuture · Mexicali, B.C.</p>
+          <div class="idiomas" role="group" aria-label="Idioma" data-t-attr="aria-label:nav.idioma">
+            <a href="/" data-idioma="es" lang="es" hreflang="es" aria-label="Español" aria-current="true">ES</a>
+            <a href="/en/" data-idioma="en" lang="en" hreflang="en" aria-label="English">EN</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script type="module" src="/src/presentacion/inicio.js"></script>
   </body>
 </html>

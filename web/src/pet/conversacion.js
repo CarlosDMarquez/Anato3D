@@ -152,6 +152,19 @@ export function crearConversacion({ ids, local, progreso, propias = () => [], re
     return servicio.estado === 'disponible';
   }
 
+  /**
+   * ¿Puede salir lo que escribió la persona? Solo si el servidor dijo que hay IA. Mientras no se sepa (al empezar) o sin
+   * clave o sin servidor (pasada la espera), antes se pregunta con un GET, sin cuerpo: sin IA, lo que se escribe no sale
+   * del dispositivo, como promete la interfaz («lo que escribes no sale de él»). En los demás estados la IA existe (falló,
+   * está ocupada o sin cupo): pasada la espera, se vuelve a probar con la pregunta misma, como siempre.
+   */
+  async function puedeEnviar() {
+    if (servicio.estado === 'disponible') return true;
+    if (servicio.estado === 'desconocido') return comprobar({ forzar: true });
+    if (['sin-clave', 'sin-servidor'].includes(servicio.estado)) return ahora() >= servicio.hasta ? comprobar({ forzar: true }) : false;
+    return iaUsable();
+  }
+
   // `hoy`: el día de la persona en su calendario (la fecha de las lecciones que cree; el servidor lo comprueba).
   const comun = () => ({ v: VERSION, idioma: idioma(), progreso: progreso(), propias: propias(), recorridos: recorridos(), contexto, hoy: diaLocal(ahora()) });
 
@@ -222,7 +235,7 @@ export function crearConversacion({ ids, local, progreso, propias = () => [], re
         let aviso = null;
         if (decision?.ruta === 'local' && decision.respuesta) {
           respuesta = { tipo: 'recomendacion', ...decision.respuesta, origen: 'buscador', ruta: decision.motivo };
-        } else if (iaUsable() && quedanPreguntas()) {
+        } else if (quedanPreguntas() && (await puedeEnviar()) && vigente(p)) {
           const marca = marcar();
           try {
             const { r, d } = await pedirJSON(fetch, url, { method: 'POST', headers: JSON_H, body: JSON.stringify({ ...comun(), ...extras(), modo: 'orientar', mensajes: historial() }) }, plazos.orientar, p.control);
@@ -312,7 +325,7 @@ export function crearConversacion({ ids, local, progreso, propias = () => [], re
     try { local = sesiones.planificar(pedido); } catch { local = null; }
     const valido = limpiarPedidoSesion({ ...pedido, modelo: sesiones.modelo?.() ?? 'male' });
     if (local?.preferir === 'ia' && valido) {
-      if (iaUsable() && quedanPreguntas()) {
+      if (quedanPreguntas() && (await puedeEnviar()) && vigente(p)) {
         const marca = marcar();
         try {
           const cuerpo = { ...comun(), ...extras(), modo: 'sesion', pedido: valido, mensajes: historial().slice(-LIMITES.mensajesSesion) };
@@ -367,7 +380,9 @@ export function crearConversacion({ ids, local, progreso, propias = () => [], re
     return (async () => {
       try {
         let m;
-        try {
+        // Sin IA confirmada, la solicitud no sale (como en preguntar).
+        if (!(await puedeEnviar())) m = { rol: 'pet', tipo: 'error', texto: '', codigo: 'sin-ia', origen: 'app' };
+        else try {
           const { r, d } = await pedirJSON(fetch, url, { method: 'POST', headers: JSON_H, body: JSON.stringify({ ...comun(), modo: 'planificar', mensajes: historial(), solicitud, ...(base ? { base } : {}) }) }, plazos.planificar, p.control);
           if (r.ok && d?.ok && d.tipo === 'plan' && limpiarPlan(d.plan)) {
             m = { rol: 'pet', tipo: 'plan', texto: String(d.mensaje ?? '').slice(0, LIMITES.pet), plan: { ...limpiarPlan(d.plan), accion: d.plan.accion, base: d.plan.base ?? null }, estructuras: d.estructuras ?? {}, paginas: d.paginas ?? [], sugerencias: [], origen: 'ia' };
@@ -420,7 +435,7 @@ export function crearConversacion({ ids, local, progreso, propias = () => [], re
     quitarEnfoque() { enfoque = null; },
     /** El cupo que trae otra respuesta del servidor (las creaciones de trabajos.js, los recorridos). */
     anotarCupo: (c) => anotarCupo(c),
-    comprobar, preguntar, planificar, cancelar, historial,
+    comprobar, puedeEnviar, preguntar, planificar, cancelar, historial,
     /**
      * Pide una sesión de estudio (un botón de la interfaz, sin escribir): { objetivo, minutos, nivel }. Como si la
      * persona la hubiera pedido: en la app si el tema está claro; si no, con Neuri. Devuelve el mensaje, o null.

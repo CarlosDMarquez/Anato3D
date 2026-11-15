@@ -114,13 +114,24 @@ export function crearNeuri(ctx, panel) {
   /** El saldo de IA que traen las respuestas de las creaciones y los recorridos: lo mismo que el de la conversación. */
   const alCupo = (c) => { conv.anotarCupo(c); if (enConversacion()) pintarModo(); };
   const basePropia = (id) => (id && ID_PROPIA.test(id) ? ctx.propias.find((L) => L.id === id) ?? null : null);
+  // Las creaciones y los recorridos llevan lo que pidió la persona: como en la conversación, solo salen si el servidor
+  // confirmó que hay IA (conv.puedeEnviar: un GET sin cuerpo si aún no se sabe). Cancelar una creación (solo lleva su
+  // identificador) sale siempre. Sin IA, la respuesta es la misma que daría el servidor: 503 «sin-ia».
+  const pedirConIa = async (url, init = {}) => {
+    let modo = null;
+    try { modo = init.method === 'POST' ? JSON.parse(init.body ?? '{}').modo ?? null : null; } catch { modo = null; }
+    if (init.method === 'POST' && modo !== 'cancelar' && !(await conv.puedeEnviar())) {
+      return new Response(JSON.stringify({ ok: false, error: 'sin-ia' }), { status: 503, headers: { 'content-type': 'application/json; charset=utf-8' } });
+    }
+    return pedir(url, init);
+  };
   const trabajos = crearTrabajos({
-    fetch: pedir, alCupo,
+    fetch: pedirConIa, alCupo,
     almacen: almacenLocal(), comun: conv.comun, historial: conv.historial, basePropia,
     guardarLeccion: (L) => ctx.guardarPropia(L),
   });
   recorridos = crearRecorridos({
-    fetch: pedir, alCupo,
+    fetch: pedirConIa, alCupo,
     almacen: almacenLocal(), comun: conv.comun, historial: conv.historial, trabajos,
     existeLeccion: (id) => ctx.propias.some((L) => L.id === id),
     // Lo que cabe aún en «Mis lecciones», contando las creaciones en curso (cada una ocupará un sitio).
@@ -263,6 +274,10 @@ export function crearNeuri(ctx, panel) {
     panel.classList.toggle('con-neuri', visible);
     panel.classList.toggle('chat', vista.tipo === 'neuri');
     if (!visible) { ocultarBurbuja(); return; }
+    // En la portada, saber si esta web tiene IA (un GET, sin gasto) para no prometer lo que Neuri no puede hacer.
+    if (vista.tipo === 'portada' && conv.servicio.estado === 'desconocido') {
+      conv.comprobar().then(() => { if (sinIaFija() && ctx.vista === vista) ctx.render(); });
+    }
     if (vista.tipo === 'portada' && !leer(CLAVE_VISTO)) {
       lanzador.classList.add('llamada');
       setTimeout(() => { if (ctx.vista === vista) burbuja('pet.burbuja', 10000); }, 900);
@@ -299,13 +314,18 @@ export function crearNeuri(ctx, panel) {
     return construirPerfil({ data: ctx.data, catalogo: ctx.catalogo.lecciones, modelo, sesiones: ctx.sesiones.lista, invalida, estado: (L) => ctx.estado(L) });
   }
 
+  // Esta web no tiene IA (sin clave o sin servidor de IA): es una decisión de quien la publica, no una caída pasajera.
+  const sinIaFija = () => ['sin-clave', 'sin-servidor'].includes(conv.servicio.estado);
+  const ejemplos = () => t(sinIaFija() ? 'pet.ejemplosSinIa' : 'pet.ejemplos').split('|');
+
   function entornoLocal() {
     const p = resumenProgreso();
     return {
+      sinIa: sinIaFija(),
       buscador: ctx.buscador, porId: ctx.porId, piezas: ctx.catalogo.piezas,
       progreso: { terminadas: new Set(p.terminadas), enCurso: new Set(p.enCurso), repasos: new Set(p.repasos) },
       t, tn, nombreLugar: nomLugar, nombreMateria: (m) => (m.sistema ? nomSistema(m.sistema) : nomTema(m.tema)),
-      sugerencias: t('pet.ejemplos').split('|'),
+      sugerencias: ejemplos(),
     };
   }
 
@@ -454,7 +474,9 @@ export function crearNeuri(ctx, panel) {
         : e === 'sin-cupo' ? [' agotado', 'clock', 'pet.servicio.sinCupo', 'pet.notaSinCupo']
         : ['no-disponible', 'sin-saldo'].includes(e) ? [' caida', 'info', 'pet.servicio.noDisponible', 'pet.notaNoDisponible']
           : ['limite', 'ocupado'].includes(e) ? [' caida', 'clock', 'pet.servicio.ocupado', 'pet.notaOcupado']
-            : ['', 'search', 'pet.sinIa', 'pet.notaLocal'];
+            : ['', 'search', 'pet.sinIa', sinIaFija() ? 'pet.notaSinIa' : 'pet.notaLocal'];
+    const lema = ctx.body.querySelector('.neuri-lema');
+    if (lema) lema.textContent = t(sinIaFija() ? 'pet.lemaSinIa' : 'pet.lema');
     modo.className = `neuri-modo${clase}`;
     modo.innerHTML = `${icono(ic)}<span>${esc(t(texto))}</span>`;
     modo.hidden = false;
@@ -1007,8 +1029,8 @@ export function crearNeuri(ctx, panel) {
           <p class="neuri-origen">${icono('search')}<span>${esc(t('pet.origenLocal'))}</span></p></div>
           <div class="neuri-acciones"><button class="btn primary" type="button" data-seguir-sesion="${esc(S.id)}">${icono('play')}<span>${esc(t(sinEmpezar(S) ? 'ses.empezar' : 'ses.continuar'))}</span></button>
           <button class="btn" type="button" data-ver-sesion="${esc(S.id)}">${esc(t('ses.verPlan'))}</button></div>
-          ${sugerencias(t('pet.ejemplos').split('|'))}</div>`
-      : `<div class="neuri-msg pet"><div class="neuri-globo"><p>${esc(t('pet.hola'))}</p></div>${ms.length ? '' : sugerencias(t('pet.ejemplos').split('|'))}</div>`;
+          ${sugerencias(ejemplos())}</div>`
+      : `<div class="neuri-msg pet"><div class="neuri-globo"><p>${esc(t(sinIaFija() ? 'pet.holaSinIa' : 'pet.hola'))}</p></div>${ms.length ? '' : sugerencias(ejemplos())}</div>`;
     const escribiendo = conv.ocupada
       ? `<div class="neuri-msg pet neuri-pensando"><div class="neuri-globo"><span class="neuri-puntos" aria-hidden="true"><i></i><i></i><i></i></span><span class="sr-only">${esc(t('pet.pensando'))}</span></div>
           <button class="link" type="button" data-cancelar-pregunta>${esc(t('pet.cancelar'))}</button></div>`
@@ -1262,6 +1284,8 @@ export function crearNeuri(ctx, panel) {
     recorridos,
     verRecorrido,
     quitarRecorrido,
+    /** ¿Esta web no tiene IA (sin clave o sin servidor de IA)? Es una decisión de quien la publica, no una caída. */
+    sinIa: () => sinIaFija(),
     /** ¿Se pueden crear lecciones ahora? (false si se sabe que no hay IA; null si aún no se sabe). */
     puedeCrear: () => conv.crear !== false,
     /** «Borrar mis datos»: para las creaciones en curso y olvida los recorridos y la conversación. */

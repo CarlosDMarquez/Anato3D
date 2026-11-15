@@ -1193,10 +1193,15 @@ test('robustez 2: tras un fallo pasajero la IA se vuelve a probar al cabo de un 
 });
 
 test('robustez 3: una comprobación inicial que llega tarde no pisa una respuesta buena más nueva', async () => {
+  // La primera comprobación se cuelga y al final falla; la que hace la pregunta (antes de enviar nada) dice que hay IA.
   let soltarGet;
+  let gets = 0;
   const { fetch: post } = fetchFalso(() => ({ datos: { ok: true, ...BIEN } }));
   const f = async (url, init = {}) => {
-    if (init.method === 'GET') { await new Promise((r) => { soltarGet = r; }); return new Response(JSON.stringify({ ok: false }), { status: 500 }); }
+    if (init.method === 'GET') {
+      if (++gets === 1) { await new Promise((r) => { soltarGet = r; }); return new Response(JSON.stringify({ ok: false }), { status: 500 }); }
+      return new Response(JSON.stringify({ ok: true, ia: true, crear: true }), { status: 200 });
+    }
     return post(url, init);
   };
   const c = conv(f);
@@ -1207,6 +1212,35 @@ test('robustez 3: una comprobación inicial que llega tarde no pisa una respuest
   await comprobando;
   assert.equal(c.servicio.estado, 'disponible');
   assert.equal(c.ia, true);
+});
+
+test('sin IA, lo que escribe la persona no sale del dispositivo: antes de enviar se pregunta con un GET sin cuerpo', async () => {
+  // Servidor sin clave: el GET dice ia:false. Nada de lo que se escribe viaja, ni al empezar ni pasada la espera.
+  let reloj = 2_000_000;
+  let ia = false;
+  const peticiones = [];
+  const f = async (url, init = {}) => {
+    peticiones.push({ metodo: init.method ?? 'GET', cuerpo: init.body ?? null });
+    if (init.method === 'GET') return new Response(JSON.stringify({ ok: true, ia, crear: ia, estado: ia ? 'configurada' : 'sin-clave' }), { status: 200 });
+    return new Response(JSON.stringify({ ok: true, ...BIEN }), { status: 200 });
+  };
+  const c = conv(f, memoria(), () => [], { ahora: () => reloj });
+  const m1 = await c.preguntar('mi rodilla secreta');
+  assert.equal(m1.origen, 'buscador');
+  assert.equal(c.servicio.estado, 'sin-clave');
+  reloj += ESPERAS.sinClave + 1;                               // pasada la espera, se vuelve a preguntar… con un GET
+  const m2 = await c.preguntar('otra cosa privada');
+  assert.equal(m2.origen, 'buscador');
+  const planificado = await c.planificar({ tema: 'rodilla' });
+  assert.equal(planificado.codigo, 'sin-ia');
+  assert.ok(peticiones.length >= 2 && peticiones.every((p) => p.metodo === 'GET' && p.cuerpo === null), `solo GET sin cuerpo: ${JSON.stringify(peticiones)}`);
+  assert.ok(!JSON.stringify(peticiones).includes('secreta'));
+  // Si después se configura la clave, la siguiente pregunta (pasada la espera) sí va a la IA.
+  ia = true;
+  reloj += ESPERAS.sinClave + 1;
+  const m3 = await c.preguntar('hombro');
+  assert.equal(m3.origen, 'ia');
+  assert.equal(peticiones.filter((p) => p.metodo === 'POST').length, 1);
 });
 
 test('robustez 4: si el buscador de la app también falla, un error que se puede volver a preguntar (nunca un silencio)', async () => {

@@ -131,7 +131,7 @@ const VIAS_LACUNAR = {
   recibe: ['Proximal_deep_inguinal_node', 'Intermediate_deep_inguinal_node'],
   drena: ['Medial_common_iliac_nodes', 'Intermediate_common_iliac_nodes', 'Lateral_common_iliac_nodes'],
 };
-const CLOQUET_SIN_IDENTIFICAR = ['Las fuentes libres consultadas no dicen a qué nodo de la Terminologia Anatomica corresponde el nodo de Cloquet (si al lacunar medial o al inguinal profundo proximal); aquí no se identifica con ninguno.', MODELO];
+const CLOQUET_SIN_IDENTIFICAR = ['Las fuentes libres consultadas no dicen a qué nodo de la Terminologia Anatomica corresponde el nodo de Cloquet (si al lacunar medial o al inguinal profundo proximal). Esta app lo identifica, como decisión propia, con el nodo inguinal profundo proximal (ver su ficha), no con este.', MODELO];
 const CLOQUET_NOTA = ['El nodo de Cloquet (o de Rosenmüller), bajo el ligamento inguinal, puede considerarse el más inferior de los ilíacos externos o el más superior de los inguinales profundos, y se considera un posible nodo centinela.', W('Deep_inguinal_lymph_nodes', 'The superior-most node is situated in the groin, deep to the inguinal ligament, and is termed the Cloquet\'s node (also Rosenmuller\'s node).'), W('Deep_inguinal_lymph_nodes', 'It can instead be considered as the inferior-most of the external iliac lymph nodes.'), W('Deep_inguinal_lymph_nodes', 'Cloquet\'s node is also considered as a potential sentinel lymph node.')];
 
 const VEJIGA_ES = ES('Vejiga_urinaria', 'La linfa de la vejiga drena en los ganglios perivesicales, de ahí a los ilíacos externos y a los hipogástricos');

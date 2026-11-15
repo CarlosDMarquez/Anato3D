@@ -53,8 +53,8 @@ export function renderPortada(ctx) {
     { id: 'explorar', icono: 'book', titulo: t('bib.acc.explorar'), sub: tn('bib.acc.explorarSub', lecciones.length) },
     { id: 'dificultades', icono: 'target', titulo: t('bib.acc.dificultades'), sub: vencidas.length ? tn('bib.repasosHoy', vencidas.length) : t('bib.verMapa') },
     { id: 'examen', icono: 'clock', titulo: t('bib.acc.examen'), sub: data.examen?.fecha ? t('bib.acc.examenPlan', { fecha: fechaDia(data.examen.fecha) }) : t('bib.acc.examenSub') },
-    { id: 'neuri', neuri: true, titulo: t('bib.acc.neuri'), sub: t('bib.acc.neuriSub') },
-    { id: 'propias', icono: 'sparkles', titulo: t('pet.misLecciones'), sub: ctx.propias.length ? tn('bib.acc.propiasSub', ctx.propias.length) : t('bib.acc.propiasNada') },
+    { id: 'neuri', neuri: true, titulo: t('bib.acc.neuri'), sub: t(ctx.neuri?.sinIa?.() ? 'bib.acc.neuriSubSinIa' : 'bib.acc.neuriSub') },
+    { id: 'propias', icono: 'sparkles', titulo: t('pet.misLecciones'), sub: ctx.propias.length ? tn('bib.acc.propiasSub', ctx.propias.length) : t(ctx.neuri?.sinIa?.() ? 'bib.acc.propiasNadaSinIa' : 'bib.acc.propiasNada') },
   ];
 
   body.innerHTML = `

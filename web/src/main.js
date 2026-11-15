@@ -974,11 +974,10 @@ function buildChrome() {
   const selIdioma = $('#set-idioma');
   selIdioma.value = idioma();
   selIdioma.addEventListener('change', () => fijarIdioma(selIdioma.value, almacen));
-  // En pantallas táctiles (móviles, tabletas) se empieza en calidad baja: la oclusión ambiental dibuja la escena dos veces.
-  if (TACTIL) {
-    $('#set-quality').checked = false;
-    viewer.setQuality(false);
-  }
+  // Alta calidad y resaltar al pasar el cursor empiezan desactivados en todos los equipos (Carlos, 13 nov 2026): la
+  // oclusión ambiental dibuja la escena dos veces. Cada persona los activa en Ajustes.
+  viewer.setQuality($('#set-quality').checked);
+  viewer.hoverEnabled = $('#set-hover').checked;
   $('#set-quality').addEventListener('change', (e) => viewer.setQuality(e.target.checked));
   // Preferencia de cada navegador; si el almacenamiento no está disponible, se usa el valor por defecto (visibles).
   const genitals = $('#set-genitals');

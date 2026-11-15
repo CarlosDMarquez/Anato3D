@@ -203,6 +203,9 @@ export const TEXTOS_BIBLIOTECA = {
   'bib.acc.neuri': T('Pedir ayuda a Neuri', 'Ask Neuri for help', 'Neuri um Hilfe bitten', 'Demander de l’aide à Neuri', 'Chiedi aiuto a Neuri'),
   'bib.acc.neuriSub': T('Te busca, te explica o te crea una lección', 'Finds, explains or creates a lesson for you', 'Sucht, erklärt oder erstellt dir eine Lektion', 'Cherche, explique ou crée une leçon pour vous', 'Ti cerca, ti spiega o ti crea una lezione'),
   'bib.acc.propiasSub': T(['{n} lección creada con Neuri', '{n} lecciones creadas con Neuri'], ['{n} lesson created with Neuri', '{n} lessons created with Neuri'], ['{n} mit Neuri erstellte Lektion', '{n} mit Neuri erstellte Lektionen'], ['{n} leçon créée avec Neuri', '{n} leçons créées avec Neuri'], ['{n} lezione creata con Neuri', '{n} lezioni create con Neuri']),
+  // Sin IA en esta web (ui/biblioteca/pet.js, sinIa): sin prometer explicaciones ni lecciones nuevas.
+  'bib.acc.neuriSubSinIa': T('Te prepara una sesión o te busca la lección', 'Prepares a session or finds the lesson for you'),
+  'bib.acc.propiasNadaSinIa': T('Las que importes a este navegador', 'The ones you import into this browser'),
   'bib.acc.propiasNada': T('Las que crees con Neuri', 'The ones you create with Neuri', 'Die, die du mit Neuri erstellst', 'Celles que vous créez avec Neuri', 'Quelle che crei con Neuri'),
   'bib.prefs.titulo': T('Tus preferencias', 'Your preferences', 'Deine Einstellungen', 'Vos préférences', 'Le tue preferenze'),
   'bib.prefs.opcional': T('Opcional', 'Optional', 'Optional', 'Facultatif', 'Facoltativo'),

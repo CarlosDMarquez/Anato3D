@@ -266,3 +266,24 @@ test('ruta: seguir una sesión con un mensaje largo; pausarla, pararla o termina
   assert.match(t('pet.ses.control', { x: 'X' }), /End session/);
   fijarIdioma('es');
 });
+
+test('sin IA en la web: las sugerencias del saludo no llaman al servidor y dan algo útil; los avisos no dicen «ahora no está disponible»', async () => {
+  for (const lengua of ['es', 'en']) {
+    fijarIdioma(lengua);
+    for (const s of t('pet.ejemplosSinIa').split('|')) {
+      const { c, posts } = montar({ ia: false });
+      await c.comprobar();
+      fijarIdioma(lengua);
+      const m = await c.preguntar(s);
+      assert.equal(posts.length, 0, `${lengua}: «${s}» llamó al servidor`);
+      assert.ok(m.lecciones?.length || m.sesion || m.mostrar?.length || m.sugerencias?.length, `${lengua}: «${s}» no dio nada útil`);
+    }
+    const e = { ...entorno(), sinIa: true };
+    fijarIdioma(lengua);
+    const explicar = responderLocal(lengua === 'es' ? '¿Qué hace el manguito rotador?' : 'What does the rotator cuff do?', e);
+    assert.ok(explicar.mensaje.startsWith(t('pet.local.explicarSinIa')), `${lengua}: ${explicar.mensaje}`);
+    const crear = responderLocal(lengua === 'es' ? 'Crea una lección sobre la nariz' : 'Create a lesson about the nose', e);
+    assert.ok(crear.mensaje.startsWith(t('pet.local.crearSinIa')), `${lengua}: ${crear.mensaje}`);
+  }
+  fijarIdioma('es');
+});

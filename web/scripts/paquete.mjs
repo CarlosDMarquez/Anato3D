@@ -40,6 +40,10 @@ const t0 = Date.now();
 if (sinWeb) {
   fs.mkdirSync(path.join(destino, 'publico'), { recursive: true });
   fs.writeFileSync(path.join(destino, 'publico/index.html'), '<!doctype html><meta charset="utf-8"><title>Anato3D</title><p>Paquete de prueba sin la web.</p>\n');
+  fs.mkdirSync(path.join(destino, 'publico/app'), { recursive: true });
+  fs.writeFileSync(path.join(destino, 'publico/app/index.html'), '<!doctype html><meta charset="utf-8"><title>Anato3D · app</title><p>Paquete de prueba sin la app.</p>\n');
+  fs.mkdirSync(path.join(destino, 'publico/en'), { recursive: true });
+  fs.writeFileSync(path.join(destino, 'publico/en/index.html'), '<!doctype html><meta charset="utf-8"><title>Anato3D · en</title><p>Test package without the web.</p>\n');
 } else {
   await build({ root: web, configFile: path.join(web, 'vite.config.js'), logLevel: 'warn', build: { outDir: path.join(destino, 'publico'), emptyOutDir: true } });
 }

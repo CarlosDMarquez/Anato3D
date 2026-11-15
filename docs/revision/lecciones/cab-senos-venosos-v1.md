@@ -142,7 +142,7 @@ En el modelo: resalta Arteria meníngea media; muestra Seno sagital superior; vi
 | P7.3 | Si se rompe, sobre todo por una fractura del temporal, la sangre se acumula entre el hueso y la duramadre: es el hematoma epidural. | «The cause is typically a head injury that results in a break of the temporal bone and bleeding from the middle meningeal artery.» ([Epidural hematoma](https://en.wikipedia.org/w/index.php?title=Epidural_hematoma&oldid=1384704743)) · «Rupture of the artery may give rise to an epidural hematoma.» ([Middle meningeal artery](https://en.wikipedia.org/w/index.php?title=Middle_meningeal_artery&oldid=1296440562)) | Sin revisar |  |
 | P7.4 | En el modelo, la meníngea media y su rama accesoria son solo el tramo corto que sube hasta la base del cráneo; sus ramas por dentro de la bóveda no están como piezas. | (sin cita) | Sin revisar |  |
 | P7.5 | Muchas personas tienen un intervalo lúcido tras el golpe antes de empeorar. | «Many people with epidural hematomas experience a lucid period immediately following the injury, with a delay before symptoms become evident.» ([Epidural hematoma](https://en.wikipedia.org/w/index.php?title=Epidural_hematoma&oldid=1384704743)) | Sin revisar |  |
-| P7.A | (Actividad: vistas) Sigue la arteria por dentro del cráneo, de lado y desde arriba. |  | Sin revisar |  |
+| P7.A | (Actividad: vistas) Mira de lado, desde arriba y de frente el tramo que sube hasta la base del cráneo: en el modelo, sus ramas por dentro de la bóveda no están. |  | Sin revisar |  |
 
 ### P8. Repaso (síntesis)
 

@@ -27,7 +27,7 @@ test('con enlace se activa; sin él, aviso en desarrollo y oculta en la web publ
 });
 
 test('el menú de inicio tiene «Donar» debajo de «Créditos», con su vista', () => {
-  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const html = readFileSync(new URL('../app/index.html', import.meta.url), 'utf8');
   const orden = [...html.matchAll(/data-start="(\w+)"/g)].map((m) => m[1]);
   assert.deepEqual(orden, ['iniciar', 'configuracion', 'creditos', 'donar']);
   assert.match(html, /id="start-donar"[^>]*hidden/);

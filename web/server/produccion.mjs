@@ -218,6 +218,16 @@ function servirEstatico(req, res, publico, ruta) {
   if (archivo !== publico && !archivo.startsWith(`${publico}${path.sep}`)) { res.statusCode = 404; return res.end(); }
   let st;
   try { st = fs.statSync(archivo); } catch { st = null; }
+  // Una carpeta sin la barra final (/app): a la misma con barra (/app/), donde está su index.html. El destino se arma con
+  // la ruta ya resuelta dentro de publico/ (nunca con lo que mandó el navegador: «//sitio» sería otro dominio).
+  if (st?.isDirectory() && archivo !== publico && fs.existsSync(path.join(archivo, 'index.html'))) {
+    const destino = `/${path.relative(publico, archivo).split(path.sep).map(encodeURIComponent).join('/')}/`;
+    const consulta = (req.url ?? '').includes('?') ? (req.url ?? '').slice((req.url ?? '').indexOf('?')) : '';
+    res.statusCode = 301;
+    res.setHeader('location', destino + consulta);
+    res.setHeader('cache-control', 'public, max-age=3600');
+    return res.end();
+  }
   if (!st?.isFile()) { res.statusCode = 404; res.setHeader('content-type', 'text/plain; charset=utf-8'); return res.end('No existe.'); }
   const tipo = TIPOS[path.extname(archivo).toLowerCase()] ?? 'application/octet-stream';
   res.setHeader('content-type', tipo);

@@ -125,6 +125,15 @@ test('paquete: arranca en una carpeta limpia, sirve la web y no expone los recur
       assert.equal((await fetch(`${s.url}${ruta}`)).status, 404, ruta);
     }
     assert.equal((await fetch(s.url, { method: 'POST' })).status, 405);
+    // La app está en /app/ (la presentación, en /): sin la barra final, se redirige a la carpeta, también con «//app»
+    // (el destino sale de la ruta resuelta, no de lo que manda el navegador: nunca otro dominio).
+    for (const [ruta, destino] of [['/app', '/app/'], ['/app?x=1', '/app/?x=1'], ['//app', '/app/'], ['/en', '/en/']]) {
+      const r = await fetch(`${s.url}${ruta}`, { redirect: 'manual' });
+      assert.deepEqual([r.status, r.headers.get('location')], [301, destino], ruta);
+    }
+    const app = await fetch(`${s.url}/app/`);
+    assert.deepEqual([app.status, app.headers.get('content-type')], [200, 'text/html; charset=utf-8']);
+    assert.match(await app.text(), /Anato3D · app/);
     // Sin clave: el buscador de la app (la API lo dice, sin llamar a nada).
     const r = await post(s, conversacion('hombro'));
     assert.deepEqual([r.status, (await json(r)).error], [503, 'sin-ia']);

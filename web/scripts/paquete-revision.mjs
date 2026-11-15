@@ -62,15 +62,15 @@ const ESPECIFICO = {
       ['Vasos', (f) => f.tipo === 'arteria' || f.tipo === 'vena', 'La arteria braquial (evaluable) y, como contexto, la braquial profunda y las venas.'],
     ],
     inspeccion: [
-      ['V1', 'Inserción del bíceps en la tuberosidad del radio', 'Estudiar → Lección, paso 2'],
-      ['V2', 'Inserción del braquial en la tuberosidad de la ulna', 'Estudiar → Lección, paso 2'],
-      ['V3', 'Coracobraquial: del proceso coracoides a la cara medial del húmero', 'Estudiar → Lección, paso 2'],
-      ['V4', 'Tres cabezas del tríceps y su inserción en el olécranon', 'Estudiar → Lección, paso 3'],
-      ['V5', 'Nervio radial en el surco del nervio radial, con la arteria braquial profunda', 'Lección, pasos 4 y 5'],
-      ['V6', 'Nervio ulnar por detrás del epicóndilo medial', 'Lección, paso 4'],
-      ['V7', 'Nervio mediano cruzando la arteria braquial a mitad del brazo', 'Lección, pasos 4 y 5'],
-      ['V8', 'Nervio musculocutáneo atravesando el coracobraquial', 'Lección, paso 4'],
-      ['V9', 'Venas cefálica (surco deltopectoral) y basílica (cara medial)', 'Lección, paso 5'],
+      ['V1', 'Inserción del bíceps en la tuberosidad del radio', ['anterior']],
+      ['V2', 'Inserción del braquial en la tuberosidad de la ulna', ['anterior']],
+      ['V3', 'Coracobraquial: del proceso coracoides a la cara medial del húmero', ['anterior']],
+      ['V4', 'Tres cabezas del tríceps y su inserción en el olécranon', ['posterior']],
+      ['V5', 'Nervio radial en el surco del nervio radial, con la arteria braquial profunda', ['nervios', 'vasos']],
+      ['V6', 'Nervio ulnar por detrás del epicóndilo medial', ['nervios']],
+      ['V7', 'Nervio mediano cruzando la arteria braquial a mitad del brazo', ['nervios', 'vasos']],
+      ['V8', 'Nervio musculocutáneo atravesando el coracobraquial', ['nervios']],
+      ['V9', 'Venas cefálica (surco deltopectoral) y basílica (cara medial)', ['vasos']],
     ],
     decisiones: [
       ['D1', '¿El ancóneo entra en el módulo del brazo o en el del antebrazo?', 'Contexto del tríceps; no se evalúa. TeachMeAnatomy lo pone en el compartimento posterior del antebrazo.'],
@@ -87,14 +87,14 @@ const ESPECIFICO = {
       ['Arterias y nervio', (f) => f.tipo === 'arteria' || f.tipo === 'nervio', 'Las arterias radial y ulnar y el nervio interóseo anterior, como contexto (no se evalúan).'],
     ],
     inspeccion: [
-      ['V1', 'Pronador redondo: cabezas del epicóndilo medial y del proceso coronoides, e inserción en la mitad de la cara lateral del radio', 'Estudiar → Lección, paso 2'],
-      ['V2', 'Flexor ulnar del carpo: cabezas humeral y ulnar (olécranon), y tendón hacia el pisiforme', 'Estudiar → Lección, paso 2'],
-      ['V3', 'Flexor superficial de los dedos: cabezas humeroulnar y radial, y cuatro tendones hacia las falanges medias', 'Estudiar → Lección, paso 3'],
-      ['V4', 'Flexor profundo de los dedos y flexor largo del pulgar: tendones hasta las falanges distales', 'Estudiar → Lección, paso 4'],
-      ['V5', 'Pronador cuadrado entre las caras anteriores de la ulna y del radio, por debajo de los tendones flexores', 'Estudiar → Lección, paso 4'],
-      ['V6', 'Arteria ulnar pasando entre las dos cabezas del flexor superficial de los dedos', 'Lección, pasos 3 y 5'],
-      ['V7', 'Arteria radial justo por fuera del tendón del flexor radial del carpo, en la parte distal del antebrazo (lugar del pulso)', 'Lección, paso 5'],
-      ['V8', 'Nervio interóseo anterior entre el flexor largo del pulgar y el flexor profundo de los dedos', 'Lección, paso 4'],
+      ['V1', 'Pronador redondo: cabezas del epicóndilo medial y del proceso coronoides, e inserción en la mitad de la cara lateral del radio', ['superficial']],
+      ['V2', 'Flexor ulnar del carpo: cabezas humeral y ulnar (olécranon), y tendón hacia el pisiforme', ['superficial']],
+      ['V3', 'Flexor superficial de los dedos: cabezas humeroulnar y radial, y cuatro tendones hacia las falanges medias', ['intermedia']],
+      ['V4', 'Flexor profundo de los dedos y flexor largo del pulgar: tendones hasta las falanges distales', ['profunda']],
+      ['V5', 'Pronador cuadrado entre las caras anteriores de la ulna y del radio, por debajo de los tendones flexores', ['profunda']],
+      ['V6', 'Arteria ulnar pasando entre las dos cabezas del flexor superficial de los dedos', ['intermedia', 'arterias']],
+      ['V7', 'Arteria radial justo por fuera del tendón del flexor radial del carpo, en la parte distal del antebrazo (lugar del pulso)', ['arterias']],
+      ['V8', 'Nervio interóseo anterior entre el flexor largo del pulgar y el flexor profundo de los dedos', ['profunda']],
     ],
     decisiones: [
       ['D1', '¿El módulo debe incluir también el compartimento posterior del antebrazo?', 'No por ahora: sería otro módulo. El ancóneo ya está, como contexto, en el módulo del brazo.'],
@@ -103,6 +103,14 @@ const ESPECIFICO = {
   },
 };
 const E = ESPECIFICO[mod.id];
+function ubicacionDePasos(ids) {
+  return ids.map((id) => {
+    const i = mod.leccion.findIndex((paso) => paso.id === id);
+    if (i < 0) throw new Error(`Paso desconocido en la hoja de ${mod.id}: ${id}`);
+    return `Paso ${i + 1} · ${mod.leccion[i].titulo}`;
+  }).join(' / ');
+}
+
 // Fuentes que usa el módulo (fichas, lección y preguntas), en el orden del catálogo.
 const usadas = new Set([
   ...fichas.flatMap((f) => [...f.fuentes.terminologia, ...f.fuentes.contenido].map((x) => x.fuente)),
@@ -176,7 +184,7 @@ ${tabla(['Código', 'Estructura resaltada', 'Posibles distractores', 'Veredicto'
 
 Que las piezas encajen dentro de la piel no demuestra que la anatomía sea correcta: hay que mirarlas de cerca. Cada punto, en los dos modelos.
 
-${tabla(['Código', 'Qué mirar', 'Dónde verlo en la app', 'Hombre', 'Mujer', 'Comentario'], E.inspeccion.map(([c, q, d]) => [c, q, d, V, V, '']))}
+${tabla(['Código', 'Qué mirar', 'Dónde verlo en la app', 'Hombre', 'Mujer', 'Comentario'], E.inspeccion.map(([c, q, pasos]) => [c, q, ubicacionDePasos(pasos), V, V, '']))}
 
 Los nervios y vasos del modelo femenino proceden del modelo masculino de Z-Anatomy ajustado al cuerpo femenino. **Pregunta abierta:** la app aún no está publicada; la inspección necesita una sesión en el ordenador del proyecto o una publicación limitada.`,
   },

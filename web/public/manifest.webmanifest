@@ -1,12 +1,14 @@
 {
+  "id": "/app/",
   "name": "Anato3D — Anatomía humana en 3D",
   "short_name": "Anato3D",
-  "description": "Atlas 3D del cuerpo humano: 12 sistemas, más de 2.800 estructuras con nombres en español y latín.",
+  "description": "Atlas 3D del cuerpo humano: 12 sistemas en un modelo de hombre y otro de mujer, con nombres en español, inglés y latín.",
   "lang": "es",
-  "start_url": "/",
+  "start_url": "/app/",
+  "scope": "/app/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#0a0d11",
+  "background_color": "#070708",
+  "theme_color": "#070708",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },

@@ -292,9 +292,12 @@ def compose():
         hgt = round(s * frac); wid = round(crop.width * hgt / crop.height)
         part = crop.resize((wid, hgt), Image.LANCZOS)
         if s <= 32: part = part.filter(ImageFilter.UnsharpMask(radius=0.6, percent=60, threshold=0))
-        canvas = Image.new('RGBA', (s, s), (0, 0, 0, 255))
+        # Los favicons, sin fondo: con el cuadrado negro, Safari (y otros en modo oscuro) les ponía una placa clara
+        # detrás y se veían con «orillas blancas» en la pestaña (Carlos, 13 nov 2026). Los iconos de app, sobre negro.
+        favicon = 'favicon' in path
+        canvas = Image.new('RGBA', (s, s), (0, 0, 0, 0 if favicon else 255))
         canvas.alpha_composite(part, ((s - wid) // 2, (s - hgt) // 2))
-        canvas.convert('RGB').save(os.path.join(ROOT, path), optimize=True)
+        (canvas if favicon else canvas.convert('RGB')).save(os.path.join(ROOT, path), optimize=True)
     print('logo: docs/marca/anato3d-craneo.png, anato3d-craneo-negro.png e iconos en web/public')
 
 

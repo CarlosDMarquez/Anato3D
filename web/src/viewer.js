@@ -255,7 +255,7 @@ export class Viewer extends EventTarget {
     this.physCache = new Map();
 
     this.scene = new THREE.Scene();
-    this.backdrop = radialTexture(1024, [[0, '#1d2733'], [0.55, '#121820'], [1, '#07090c']]);
+    this.backdrop = radialTexture(1024, [[0, '#1c1c1e'], [0.55, '#111112'], [1, '#060607']])   // gris carbón, sin azul marino;
     this.scene.background = this.backdrop;
     const environment = () => new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
     this.scene.environment = environment();

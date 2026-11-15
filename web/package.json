@@ -11,6 +11,7 @@
     "test": "node --test tests/",
     "reportes": "node scripts/reportes.mjs",
     "hoja-revision": "node scripts/biblioteca/hoja-revision.mjs",
+    "hoja-linfatico": "node scripts/biblioteca/hoja-linfatico.mjs",
     "check": "node scripts/check-cards.mjs && node scripts/contenido-i18n.mjs --comprobar && node scripts/biblioteca.mjs --comprobar && node scripts/neuri-datos.mjs --comprobar",
     "biblioteca": "node scripts/biblioteca.mjs",
     "fuentes": "node scripts/biblioteca/fuentes.mjs",

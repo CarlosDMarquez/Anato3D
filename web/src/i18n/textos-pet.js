@@ -5,6 +5,19 @@ const T = (es, en, de, fr, it) => Object.fromEntries(Object.entries({ es, en, de
 
 export const TEXTOS_PET = {
   'pet.lema': T('Tu tutor de anatomía: sesiones de estudio, dudas con fuentes y lecciones a tu medida', 'Your anatomy tutor: study sessions, sourced answers and lessons tailored to you', 'Dein Anatomie-Tutor: Lernsitzungen, Antworten mit Quellen und Lektionen nach Maß', 'Votre tuteur d’anatomie : séances d’étude, réponses sourcées et leçons sur mesure', 'Il tuo tutor di anatomia: sessioni di studio, risposte con fonti e lezioni su misura'),
+  // Sin IA en esta web (sin clave o sin servidor de IA: decisión de quien publica, no una caída): Neuri no promete
+  // explicaciones redactadas ni lecciones nuevas (ui/biblioteca/pet.js, sinIaFija; pet/local.js, e.sinIa).
+  'pet.lemaSinIa': T('Tu tutor de anatomía: sesiones de estudio, repaso y la lección que buscas', 'Your anatomy tutor: study sessions, review and the lesson you are looking for'),
+  'pet.holaSinIa': T(
+    '¡Hola! Soy Neuri, tu tutor de anatomía. Cuéntame qué quieres estudiar y cuánto tiempo tienes: te preparo una sesión con las lecciones y preguntas de la biblioteca, te enseño una estructura en el modelo o te busco la lección que necesitas.',
+    'Hi! I’m Neuri, your anatomy tutor. Tell me what you want to study and how much time you have: I’ll prepare a session with the library’s lessons and questions, show you a structure on the model or find the lesson you need.'),
+  'pet.ejemplosSinIa': T(
+    'Tengo 10 minutos para estudiar el corazón|Muéstrame el fémur|Quiero repasar|No sé por dónde empezar',
+    'I have 10 minutes to study the heart|Show me the femur|I want to review|I don’t know where to start'),
+  'pet.notaSinIa': T('Neuri funciona en tu dispositivo, sin IA: lo que escribes no sale de él.', 'Neuri works on your device, without AI: what you write never leaves it.'),
+  'pet.local.explicarSinIa': T('En esta web Neuri funciona sin IA, así que no redacta explicaciones; te dejo las lecciones que lo tratan, con sus fuentes.', 'On this site Neuri works without AI, so it does not write explanations; here are the lessons that cover it, with their sources.'),
+  'pet.local.crearSinIa': T('En esta web Neuri funciona sin IA, así que no crea lecciones nuevas; te busco lo que hay en la biblioteca.', 'On this site Neuri works without AI, so it does not create new lessons; I’ll look for what the library has.'),
+  'pet.local.explicarNadaSinIa': T('En esta web Neuri funciona sin IA, así que no redacta explicaciones, y no encontré una lección sobre eso. Prueba con una zona del cuerpo o un sistema.', 'On this site Neuri works without AI, so it does not write explanations, and I did not find a lesson on that. Try a part of the body or a system.'),
   'pet.abrir': T('Hablar con Neuri', 'Talk to Neuri', 'Mit Neuri sprechen', 'Parler à Neuri', 'Parla con Neuri'),
   'pet.burbuja': T('¿No encuentras tu lección? Pregúntame.', 'Can’t find your lesson? Ask me.', 'Findest du deine Lektion nicht? Frag mich.', 'Vous ne trouvez pas votre leçon ? Demandez-moi.', 'Non trovi la tua lezione? Chiedimi.'),
   'pet.burbujaSin': T('¿No está lo que buscas? Cuéntamelo y te ayudo.', 'Not what you were looking for? Tell me and I’ll help.', 'Nicht das Richtige dabei? Erzähl es mir, ich helfe dir.', 'Pas ce que vous cherchiez ? Dites-le-moi, je vous aide.', 'Non è quello che cerchi? Dimmelo e ti aiuto.'),

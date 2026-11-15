@@ -10,7 +10,8 @@ const COLECTOR_GENERAL = [
   ['Los vasos que llevan la linfa hacia un nodo se llaman aferentes, y los que salen de él, eferentes.', W('Lymphatic_vessel', 'Lymph vessels that carry lymph to a lymph node are called afferent lymph vessels, and those that carry it from a lymph node are called efferent lymph vessels')],
   ['Sus paredes se contraen y tienen válvulas que impiden que la linfa retroceda.', W('Lymphatic_vessel', 'as well as valves to prevent the lymph from flowing backwards')],
 ];
-const malla = (que) => [`En este modelo es una malla esquemática por lado que une ${que}: no reproduce vasos concretos medidos en una persona.`, MODELO];
+// `impar`: una sola pieza para los dos lados (mediastino y abdomen); si no, una pieza por lado.
+const malla = (que, { impar = false } = {}) => [`En este modelo es una malla esquemática${impar ? ', una sola pieza para los dos lados,' : ' por lado'} que une ${que}: no reproduce vasos concretos medidos en una persona.`, MODELO];
 const ORGANO_GENERADO = ['Z-Anatomy no la incluye: si aparece en el modelo, es una forma generada para Anato3D, con tamaño y posición esquemáticos.', MODELO];
 const SIN_AFERENTES = 'Ninguna de las fuentes libres consultadas dice qué vasos linfáticos llegan a ella; no se afirma nada.';
 
@@ -357,7 +358,7 @@ const FICHAS = {
     drena: [
       ['Sus eferentes suben sobre la tráquea y se unen a los de los nodos mamarios internos y mediastínicos anteriores para formar los troncos broncomediastínicos.', W('Tracheobronchial_lymph_nodes', 'Their efferent vessels ascend upon the trachea and unite with efferents of the internal mammary and anterior mediastinal glands to form the right and left bronchomediastinal trunks.')],
     ],
-    modelo: [malla('los nodos del mediastino entre sí y con los troncos broncomediastínicos (aquí una sola pieza para los dos lados)'), NOMBRE_DESCRIPTIVO],
+    modelo: [malla('los nodos del mediastino entre sí y con los troncos broncomediastínicos', { impar: true }), NOMBRE_DESCRIPTIVO],
   },
   Lymphatic_vessels_of_abdomen: {
     tipo: 'colector', latinFormado: true, latin: 'Vasa lymphatica abdominis', chips: ['Trazado esquemático'],
@@ -377,7 +378,7 @@ const FICHAS = {
     drena: [
       ['De los nodos preaórticos sale el tronco intestinal, y de los aórticos laterales, los troncos lumbares; todos llegan a la cisterna del quilo.', W('Preaortic_lymph_nodes', 'the majority unite to form the intestinal lymph trunk, which enters the cisterna chyli'), W('Lumbar_lymph_nodes', 'converge to form the right and left lumbar trunks which join the cisterna chyli')],
     ],
-    modelo: [malla('los nodos del abdomen entre sí y con los troncos intestinales y lumbares (aquí una sola pieza para los dos lados)'), NOMBRE_DESCRIPTIVO],
+    modelo: [malla('los nodos del abdomen entre sí y con los troncos intestinales y lumbares', { impar: true }), NOMBRE_DESCRIPTIVO],
   },
   Lymphatic_vessels_of_pelvis: {
     tipo: 'colector', latinFormado: true, latin: 'Vasa lymphatica pelvis', chips: ['Trazado esquemático'],

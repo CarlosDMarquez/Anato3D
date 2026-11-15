@@ -10,7 +10,7 @@ npm --prefix web install
 npm --prefix web run dev
 ```
 
-Abre http://localhost:5173 (o el puerto que indique Vite). Para producción: `npm --prefix web run build` (salida en `web/dist`).
+Abre http://localhost:5173 (o el puerto que indique Vite): la página de presentación está en `/` (en inglés, `/en/`) y la app en `/app/`. Para producción: `npm --prefix web run build` (salida en `web/dist`).
 
 Pruebas: `npm --prefix web test` (lógica de carga, sin navegador) y `npm --prefix web run check` (fichas de todas las piezas).
 
@@ -38,6 +38,8 @@ Modelos: `zsh tools/build_all.sh` (masculino) y `A3D_MODEL=female zsh tools/buil
 | `web/src/viewer.js` | Escena three.js: carga Draco, materiales, brillo de selección, cámara. |
 | `web/src/i18n/`, `web/public/i18n/` | Idiomas: textos de la interfaz en español, inglés, alemán, francés e italiano (`textos.js`), idioma elegido (`idioma.js`), nombres de estructuras y grupos (`nombres.js`, con las tablas `nombres-fr.json` y `nombres-it.json`) y contenido traducido (`contenido.js`, con las memorias `contenido-{en,de,fr,it}.json`). |
 | `web/src/ui/start.js`, `web/public/neurofuture.png` | Pantalla de inicio (nombre, menú, crédito) y el logo de NeuroFuture para fondo negro. |
+| `web/index.html`, `web/src/presentacion/`, `web/public/presentacion/` | Página de presentación en `/` (desde el 2026-11-13): qué es, los 12 sistemas, tutorial, educación y contacto, en español (en el HTML, en `/`) e inglés (`textos.js`, en `/en/`: una página aparte que `vite.config.js` genera con `src/presentacion/traducir.mjs`, en desarrollo y al empaquetar), con el mismo idioma guardado que la app. Imágenes del propio modelo; las capturas y la imagen para compartir tienen versión en cada idioma (`-es-`/`-en-`). Con `ANATO3D_ORIGEN` al empaquetar, las URL absolutas para compartir y para los buscadores (`docs/estudio/activacion.md`). Pruebas en `web/tests/presentacion.test.mjs` (cifras, textos, enlaces, la página en inglés y que no quede texto sin traducir). |
+| `web/app/index.html` | La app, en `/app/`. Todas sus rutas son absolutas (`/models`, `/i18n`, `/api`), así que funciona igual en su carpeta. |
 | `docs/marca/` | Logos: el de Anato3D (`anato3d-craneo.png`, sin fondo, y `anato3d-craneo-negro.png`) y el original de NeuroFuture. |
 | `web/src/study/`, `web/src/ui/study.js` | Progreso (local, con versión), preguntas y panel «Estudiar» (lección, evaluación, repaso). |
 | `web/src/content/` | Contenido de estudio: esquema (`schema.js`), fuentes (`fuentes.js`), módulos (`brazo.js`) e índice por pieza (`index.js`). |
@@ -58,7 +60,7 @@ El logo de Anato3D es el **cráneo del modelo masculino**, de frente, sobre negr
   - Órbitas, nariz y boca oscuras según su hondura (cierre morfológico de la profundidad): son agujeros, no sombras, y sin ellos el cráneo no se lee en pequeño.
   - Simétrico: la mitad derecha del modelo en espejo; el mentón, de la izquierda.
   - Dos retoques de defectos del modelo: una ranura negra en la sien (pterión) y el escalón entre los parietales y el frontal en el vértice, que dejaba una muesca en el contorno.
-- `index.html` usa los favicons PNG; el manifiesto, fondo negro (`#000000`). Sustituye al icono anterior, «3D» en azul (`favicon.svg`, borrado).
+- `app/index.html` (la app) e `index.html` (la presentación) usan los favicons PNG. El manifiesto abre la app (`start_url` `/app/`) con el fondo gris carbón (`#070708`). Sustituyen al icono anterior, «3D» en azul (`favicon.svg`, borrado).
 - **Licencia:** es una imagen del cráneo de Z-Anatomy, así que se comparte con su licencia, CC BY-SA 4.0 (ver Créditos).
 
 ## Idiomas (2026-11-05)
@@ -1114,6 +1116,7 @@ Escribe `build/audit.json`.
 
 ## Créditos y licencias
 
+- **Licencia del código:** MIT (ver `LICENSE`). Los modelos 3D y lo derivado de ellos siguen con CC BY-SA 4.0; el resto del contenido de terceros, con su propia licencia (detalle en `LICENSE`).
 - Proyecto: **NeuroFuture** · Conciencia Cerebral Mexicali (Mexicali, B.C.). Su logo aparece en la pantalla de inicio.
 - Nombres en otros idiomas: inglés y francés de la traducción de Z-Anatomy; francés e italiano también de la lista TA2 con traducciones descargada con Z-Anatomy; en alemán, el latín.
 - Logo de Anato3D (`docs/marca/anato3d-craneo*.png` y los iconos de la web): imagen del cráneo de Z-Anatomy, con la misma licencia CC BY-SA 4.0 y su atribución.

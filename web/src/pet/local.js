@@ -112,9 +112,9 @@ export function responderLocal(texto, e) {
   const explicar = !crear && EXPLICAR.test(n);
   const consulta = consultaDe(texto).split(' ').filter((w) => !CREAR.test(w) && !CURSO.test(w)).join(' ');
   const r = consulta ? e.buscador.buscar(consulta, { flexible: true }) : null;
-  const avisoSalud = `${salud ? `${e.t('pet.local.salud')} ` : ''}${crear ? `${e.t('pet.local.crear')} ` : ''}`;
+  const avisoSalud = `${salud ? `${e.t('pet.local.salud')} ` : ''}${crear ? `${e.t(e.sinIa ? 'pet.local.crearSinIa' : 'pet.local.crear')} ` : ''}`;
   // «Explícame…» sin IA: se dice antes de las lecciones que lo tratan (o, si no hay ninguna, en el mensaje de «nada»).
-  const avisoExplicar = explicar ? `${e.t('pet.local.explicar')} ` : '';
+  const avisoExplicar = explicar ? `${e.t(e.sinIa ? 'pet.local.explicarSinIa' : 'pet.local.explicar')} ` : '';
   const lista = (ids, motivo) => ids.filter((id) => e.porId.has(id)).slice(0, MAX).map((id) => ({ id, motivo: typeof motivo === 'function' ? motivo(id) : motivo }));
   const sinHacer = (L) => !e.progreso.terminadas.has(L.id);
   const todas = [...e.porId.values()];
@@ -187,7 +187,7 @@ export function responderLocal(texto, e) {
   }
   if (!candidatas.length && !recorrido) {
     // Nada encaja: no se repite la frase entera; se dice y se ofrece por dónde seguir.
-    return { mensaje: avisoSalud + e.t(explicar ? 'pet.local.explicarNada' : 'pet.local.nada'), lecciones: [], recorrido: null, sugerencias: zonas(), coincidencia: info() };
+    return { mensaje: avisoSalud + e.t(explicar ? (e.sinIa ? 'pet.local.explicarNadaSinIa' : 'pet.local.explicarNada') : 'pet.local.nada'), lecciones: [], recorrido: null, sugerencias: zonas(), coincidencia: info() };
   }
 
   // Repasar: primero lo que tiene repasos pendientes. Si no, lo terminado va al final. Para empezar, lo básico antes.

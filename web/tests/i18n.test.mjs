@@ -39,11 +39,11 @@ test('cada texto está en español e inglés (alemán, francés e italiano, si l
   }
 });
 
-test('todas las claves data-t* del HTML existen', () => {
-  const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+test('todas las claves data-t* del HTML de la app existen', () => {
+  const html = readFileSync(new URL('../app/index.html', import.meta.url), 'utf8');
   const claves = [...html.matchAll(/data-t(?:-html|-aria|-tip|-ph)?="([^"]+)"/g)].map((m) => m[1]);
   assert.ok(claves.length > 50);
-  for (const c of claves) assert.ok(TEXTOS[c], `index.html: ${c} no está en textos.js`);
+  for (const c of claves) assert.ok(TEXTOS[c], `app/index.html: ${c} no está en textos.js`);
 });
 
 test('cada etiqueta corta tiene inglés (y alemán, francés e italiano, si los tiene, no vacíos)', () => {
