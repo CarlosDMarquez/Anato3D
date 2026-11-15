@@ -45,12 +45,14 @@ export const TEXTOS_PET = {
   'pet.tu': T('Tú', 'You', 'Du', 'Vous', 'Tu'),
   'pet.conIa': T('Con IA (Claude)', 'With AI (Claude)', 'Mit KI (Claude)', 'Avec IA (Claude)', 'Con IA (Claude)'),
   'pet.sinIa': T('Con el buscador de la app', 'With the app’s search', 'Mit der Suche der App', 'Avec la recherche de l’application', 'Con la ricerca dell’app'),
+  // Aviso corto bajo el chat con IA; el detalle de lo que se envía está en «Mis datos y privacidad» (enlace pet.notaMas).
   'pet.nota': T(
-    'Neuri usa Claude (Haiku), la IA de Anthropic: para responderte se envían lo que escribes, qué lecciones has hecho y creado y un perfil de aprendizaje calculado en tu dispositivo (sin respuestas ni fechas), con un identificador aleatorio del dispositivo que solo sirve para el cupo diario. No escribas datos personales. Puede equivocarse; el contenido con fuentes está en las lecciones.',
-    'Neuri uses Claude (Haiku), Anthropic’s AI: to answer you it sends what you write, which lessons you have done and created and a learning profile calculated on your device (no answers or dates), with a random device identifier used only for the daily quota. Do not write personal data. Neuri can make mistakes; the sourced content is in the lessons.',
-    'Neuri nutzt Claude (Haiku), die KI von Anthropic: Um dir zu antworten, werden gesendet, was du schreibst, welche Lektionen du gemacht und erstellt hast, und ein auf deinem Gerät berechnetes Lernprofil (ohne Antworten oder Daten), mit einer zufälligen Gerätekennung nur für das tägliche Kontingent. Schreib keine persönlichen Daten. Neuri kann sich irren; die Inhalte mit Quellen stehen in den Lektionen.',
-    'Neuri utilise Claude (Haiku), l’IA d’Anthropic : pour vous répondre, sont envoyés ce que vous écrivez, les leçons que vous avez faites et créées et un profil d’apprentissage calculé sur votre appareil (sans réponses ni dates), avec un identifiant aléatoire de l’appareil qui sert uniquement au quota quotidien. N’écrivez pas de données personnelles. Neuri peut se tromper ; le contenu sourcé se trouve dans les leçons.',
-    'Neuri usa Claude (Haiku), l’IA di Anthropic: per risponderti vengono inviati ciò che scrivi, le lezioni che hai fatto e creato e un profilo di apprendimento calcolato sul tuo dispositivo (senza risposte né date), con un identificativo casuale del dispositivo che serve solo per la quota giornaliera. Non scrivere dati personali. Neuri può sbagliare; i contenuti con le fonti sono nelle lezioni.'),
+    'Lo que escribes va a la IA de Anthropic: no pongas datos personales. Puede equivocarse.',
+    'What you write goes to Anthropic’s AI: don’t include personal data. It can make mistakes.',
+    'Was du schreibst, geht an die KI von Anthropic: keine persönlichen Daten. Sie kann sich irren.',
+    'Ce que vous écrivez part vers l’IA d’Anthropic : pas de données personnelles. Elle peut se tromper.',
+    'Ciò che scrivi va all’IA di Anthropic: niente dati personali. Può sbagliare.'),
+  'pet.notaMas': T('Más información', 'More info', 'Mehr erfahren', 'En savoir plus', 'Maggiori informazioni'),
   'pet.notaLocal': T(
     'Ahora Neuri busca con el buscador de la app: lo que escribes no sale de tu dispositivo.',
     'Neuri is using the app’s search right now: what you write stays on your device.',

@@ -177,7 +177,8 @@ test('la herramienta de prueba real (npm run pet:prueba) sin presupuesto no env�
     h.stdout.resume();
     h.on('exit', (code) => resolver({ code, err }));
   });
-  for (const env of [{}, { ANATO3D_TOPE_DIARIO_USD: '0', ANATO3D_TOPE_MENSUAL_USD: '0' }, { ANATO3D_TOPE_DIARIO_USD: 'mucho', ANATO3D_TOPE_MENSUAL_USD: '20' }]) {
+  // Topes vacíos (no ausentes): el script también lee web/.env.local, que puede tener los topes reales.
+  for (const env of [{ ANATO3D_TOPE_DIARIO_USD: '', ANATO3D_TOPE_MENSUAL_USD: '' }, { ANATO3D_TOPE_DIARIO_USD: '0', ANATO3D_TOPE_MENSUAL_USD: '0' }, { ANATO3D_TOPE_DIARIO_USD: 'mucho', ANATO3D_TOPE_MENSUAL_USD: '20' }]) {
     const r = await correr(env);
     assert.equal(r.code, 1, JSON.stringify(env));
     assert.match(r.err, /Sin presupuesto para la IA \(sin-presupuesto\): la prueba no envía nada/);

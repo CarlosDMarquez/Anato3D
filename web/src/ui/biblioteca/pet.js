@@ -483,6 +483,11 @@ export function crearNeuri(ctx, panel) {
     const c = conv.cupo;
     const renueva = c ? Date.parse(c.renueva) : NaN;
     nota.textContent = notaT ? t(notaT, { cuando: Number.isFinite(renueva) ? cuando(renueva) : '' }) : '';
+    // Con IA, el aviso es corto: el detalle de lo que se envía está en «Mis datos y privacidad».
+    if (notaT === 'pet.nota') {
+      nota.insertAdjacentHTML('beforeend', ` <button class="link" type="button" data-mis-datos>${esc(t('pet.notaMas'))}</button>`);
+      nota.querySelector('[data-mis-datos]').addEventListener('click', () => ctx.ir({ tipo: 'datos' }));
+    }
     nota.hidden = !notaT;
     // El saldo de hoy (si el servidor lleva cupo): discreto, bajo el estado. Las respuestas de la app no gastan.
     const saldo = ctx.body.querySelector('.neuri-cupo');
