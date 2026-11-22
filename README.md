@@ -3,6 +3,10 @@
 App educativa de anatomía humana en 3D, para todo público. Interfaz inspirada en Complete Anatomy:
 una barra inferior con todos los sistemas, cada uno con capas (etapas) que se recorren con un toque.
 
+> **Contenido sin revisar por un profesional.** Los modelos, los nombres, las fichas y las lecciones todavía no han sido revisados por un anatomista ni por un profesional de la salud, y pueden contener errores. Anato3D es una herramienta educativa y no sustituye la consulta con profesionales de la salud.
+>
+> **Not yet reviewed by a professional.** The models, names, cards and lessons have not yet been reviewed by an anatomist or a health professional, and may contain errors.
+
 ## Ejecutar
 
 ```bash
@@ -1115,6 +1119,11 @@ Escribe `build/audit.json`.
   el color de la pareja derecha como se copió el AO (`huesos_invertidos.py`).
 
 ## Créditos y licencias
+
+> **Contenido sin revisar por un profesional.** Los modelos, los nombres, las fichas y las lecciones todavía no han sido revisados por un anatomista ni por un profesional de la salud, y pueden contener errores. Anato3D es una herramienta educativa y no sustituye la consulta con profesionales de la salud.
+>
+> **Not yet reviewed by a professional.** The models, names, cards and lessons have not yet been reviewed by an anatomist or a health professional, and may contain errors.
+
 
 - **Licencia del código:** MIT (ver `LICENSE`). Los modelos 3D y lo derivado de ellos siguen con CC BY-SA 4.0; el resto del contenido de terceros, con su propia licencia (detalle en `LICENSE`).
 - Proyecto: **NeuroFuture** · Conciencia Cerebral Mexicali (Mexicali, B.C.). Su logo aparece en la pantalla de inicio.

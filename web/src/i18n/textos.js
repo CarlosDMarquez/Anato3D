@@ -223,6 +223,14 @@ export const TEXTOS = {
     it: 'Anato3D è uno strumento educativo e non sostituisce il parere di professionisti sanitari.',
   },
 
+  'creditos.revision': {
+    es: 'Contenido sin revisar por un profesional: los modelos, los nombres, las fichas y las lecciones todavía no han sido revisados por un anatomista ni por un profesional de la salud, y pueden contener errores.',
+    en: 'Not yet reviewed by a professional: the models, names, cards and lessons have not yet been reviewed by an anatomist or a health professional, and may contain errors.',
+    de: 'Noch nicht fachlich geprüft: Modelle, Namen, Karten und Lektionen wurden noch nicht von Anatomen oder medizinischem Fachpersonal geprüft und können Fehler enthalten.',
+    fr: 'Contenu pas encore vérifié par un professionnel : les modèles, les noms, les fiches et les leçons n’ont pas encore été relus par un anatomiste ni par un professionnel de santé, et peuvent contenir des erreurs.',
+    it: 'Contenuto non ancora verificato da un professionista: i modelli, i nomi, le schede e le lezioni non sono ancora stati revisionati da un anatomista o da un professionista sanitario e possono contenere errori.',
+  },
+
   // ── Estado (vista aislada, ocultas, atenuadas) ──
   'estado.restaurar': { es: 'Restaurar', en: 'Restore', de: 'Wiederherstellen', fr: 'Rétablir', it: 'Ripristina' },
   'estado.aislada': { es: 'Vista aislada', en: 'Isolated view', de: 'Isolierte Ansicht', fr: 'Vue isolée', it: 'Vista isolata' },

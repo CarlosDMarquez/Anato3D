@@ -213,6 +213,7 @@ export const EN = {
   'pie.lema': 'Human anatomy in 3D, free and in your browser.',
   'pie.navAria': 'Footer sections',
   'pie.creditos': 'Credits',
+  'pie.revision': 'Not yet reviewed by a professional: the models, names, cards and lessons have not yet been reviewed by an anatomist or a health professional, and may contain errors.',
   'pie.modelos': `Bones, cartilage, muscles, ligaments, fasciae, vessels, heart, nervous system, sense organs and viscera derived from <a href="https://www.z-anatomy.com/" ${BLANK}>Z-Anatomy</a> (<a href="https://creativecommons.org/licenses/by-sa/4.0/" ${BLANK}>CC BY-SA 4.0</a>), based on <a href="https://lifesciencedb.jp/bp3d/" ${BLANK}>BodyParts3D</a> © The Database Center for Life Science (DBCLS). Skin and eyes derived from <a href="http://www.makehumancommunity.org/" ${BLANK}>MakeHuman</a>. Modeled for Anato3D: the breasts and female genital organs, the muscles of the urogenital triangle, the ovarian and uterine vessels, the shape of the lymph nodes and the lymphatic ducts, trunks and collecting vessels.`,
   'pie.nombres': `Structure names in English, Spanish and Latin: from the official Z-Anatomy translation. System icons: <a href="https://healthicons.org/" ${BLANK}>Health Icons</a>; interface icons: <a href="https://lucide.dev/" ${BLANK}>Lucide</a>; typeface: <a href="https://www.ibm.com/plex/" ${BLANK}>IBM Plex</a>.`,
 };
